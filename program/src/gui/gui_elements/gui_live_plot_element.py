@@ -112,10 +112,26 @@ class LivePlotComponent(BaseComponent):
         fig = go.Figure()
         
         # Configure layout
+        # Determine y-axis title based on sensor units
+        sensors = self.sensors_to_display if self.sensors_to_display is not None else self.sensor_manager.get_all_sensors()
+        units = []
+        for sensor_id in sensors:
+            reading = self.sensor_manager.get_sensor_reading(sensor_id)
+            if reading and reading.metadata:
+                units.append(reading.metadata.get('unit', ''))
+
+        first_unit = units[0] if units else ''
+        unique_units = {u for u in units if u}
+        if len(unique_units) == 1 and first_unit:
+            yaxis_title = f"Value ({first_unit})"
+        else:
+            # Different units or unknown unit
+            yaxis_title = "Value"
+
         fig.update_layout(
             title="Live Sensor Data",
             xaxis_title="Time",
-            yaxis_title="Temperature (°C)",
+            yaxis_title=yaxis_title,
             showlegend=True,
             height=400,
             margin=dict(l=50, r=50, t=50, b=50),
@@ -132,7 +148,8 @@ class LivePlotComponent(BaseComponent):
             ),
             yaxis=dict(
                 showgrid=self.plot_config.show_grid,
-                gridcolor='lightgray'
+                gridcolor='lightgray',
+                autorange=self.plot_config.auto_scale
             )
         )
         
@@ -222,6 +239,8 @@ class LivePlotComponent(BaseComponent):
         # Update plot
         try:
             self._plot_element.figure["data"] = traces
+            # Update y-axis scaling based on configuration
+            self._plot_element.figure.update_yaxes(autorange=self.plot_config.auto_scale)
             self._plot_element.update()
         except Exception as e:
             error(f"Error refreshing plot: {e}")
