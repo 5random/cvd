@@ -5,6 +5,7 @@ from typing import Dict, List, Any, Optional
 from collections import deque
 from dataclasses import dataclass
 import time
+from datetime import datetime
 import plotly.graph_objs as go
 from plotly.subplots import make_subplots
 from nicegui import ui
@@ -193,9 +194,8 @@ class LivePlotComponent(BaseComponent):
         if not self._plot_element:
             return
         
-        # Convert timestamps to datetime for plotting
-        time_axis = [time.time() - (len(self._time_store) - i) * (self.plot_config.refresh_rate_ms / 1000) 
-                     for i in range(len(self._time_store))]
+        # Convert stored timestamps to datetime objects for plotting
+        time_axis = [datetime.fromtimestamp(ts) for ts in self._time_store]
         
         # Create traces for each sensor
         traces = []
