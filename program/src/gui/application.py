@@ -1,27 +1,35 @@
 """
 Main web application class for managing the NiceGUI interface.
 """
-from typing import Dict, Any, Optional
 import asyncio
 import contextlib
-from nicegui import ui, app
-from nicegui import app
-from starlette.staticfiles import StaticFiles
-from src.utils.data_utils.data_manager import get_data_manager
+from typing import Any, Dict, Optional
 
-from src.utils.config_utils.config_service import ConfigurationService
-from src.data_handler.sources.sensor_source_manager import SensorManager
-from src.gui.gui_tab_components.gui_tab_base_component import ComponentRegistry, get_component_registry
-from src.gui.gui_tab_components.gui_tab_dashboard_component import DashboardComponent
-from src.gui.gui_elements.gui_live_plot_element import LivePlotComponent, PlotConfig
-from src.gui.gui_tab_components.gui_tab_controllers_component import ControllersComponent
-from src.gui.gui_tab_components.gui_tab_sensors_component import SensorsComponent
-from src.gui.gui_tab_components.gui_tab_log_component import LogComponent
-from src.gui.gui_tab_components.gui_tab_experiment_component import create_experiment_component
-from src.gui.gui_tab_components.gui_tab_data_component import create_data_component
-from src.gui.gui_elements.gui_notification_center_element import create_notification_center
+from nicegui import app, ui
 from src.controllers.controller_manager import create_cvd_controller_manager
-from src.utils.log_utils.log_service import info, warning, error, debug
+from src.data_handler.sources.sensor_source_manager import SensorManager
+from src.gui.gui_elements.gui_live_plot_element import (LivePlotComponent,
+                                                        PlotConfig)
+from src.gui.gui_elements.gui_notification_center_element import \
+    create_notification_center
+from src.gui.gui_tab_components.gui_tab_base_component import (
+    ComponentRegistry, get_component_registry)
+from src.gui.gui_tab_components.gui_tab_controllers_component import \
+    ControllersComponent
+from src.gui.gui_tab_components.gui_tab_dashboard_component import \
+    DashboardComponent
+from src.gui.gui_tab_components.gui_tab_data_component import \
+    create_data_component
+from src.gui.gui_tab_components.gui_tab_experiment_component import \
+    create_experiment_component
+from src.gui.gui_tab_components.gui_tab_log_component import LogComponent
+from src.gui.gui_tab_components.gui_tab_sensors_component import \
+    SensorsComponent
+from src.utils.config_utils.config_service import ConfigurationService
+from src.utils.data_utils.data_manager import get_data_manager
+from src.utils.log_utils.log_service import debug, error, info, warning
+from starlette.staticfiles import StaticFiles
+
 
 class WebApplication:
     """Main web application managing NiceGUI interface and routing"""
@@ -282,6 +290,7 @@ class WebApplication:
                 
                 # Get container status
                 from src.utils.container import ApplicationContainer
+
                 # This is a simplified status display
                 ui.label('✓ Configuration Service: Running').classes('text-green-600')
                 ui.label('✓ Sensor Manager: Running').classes('text-green-600')
