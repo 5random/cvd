@@ -47,7 +47,12 @@ class LivePlotComponent(BaseComponent):
         
         # Data storage
         self._data_store: Dict[str, deque] = {}
-        self._time_store: deque = deque(maxlen=self.plot_config.max_points)
+        # Calculate maxlen based on history window and refresh rate
+        history_maxlen = max(
+            1,
+            int(self.plot_config.history_seconds * 1000 / self.plot_config.refresh_rate_ms),
+        )
+        self._time_store: deque = deque(maxlen=history_maxlen)
         self._series_configs: Dict[str, SeriesConfig] = {}
         
         # UI elements
@@ -189,7 +194,15 @@ class LivePlotComponent(BaseComponent):
         try:
             current_time = time.time()
             self._time_store.append(current_time)
-            
+
+            # Remove data older than history window
+            cutoff = current_time - self.plot_config.history_seconds
+            while self._time_store and self._time_store[0] < cutoff:
+                self._time_store.popleft()
+                for queue in self._data_store.values():
+                    if queue:
+                        queue.popleft()
+
             # Collect data from all sensors
             for sensor_id in self._series_configs:
                 reading = self.sensor_manager.get_sensor_reading(sensor_id)
@@ -308,13 +321,16 @@ class LivePlotComponent(BaseComponent):
         
         # Update data store max lengths
         for data_queue in self._data_store.values():
-            # Create new deque with updated maxlen
             new_queue = deque(data_queue, maxlen=self.plot_config.max_points)
             data_queue.clear()
             data_queue.extend(new_queue)
-        
-        self._time_store = deque(self._time_store, maxlen=self.plot_config.max_points)
-        
+
+        history_maxlen = max(
+            1,
+            int(self.plot_config.history_seconds * 1000 / self.plot_config.refresh_rate_ms),
+        )
+        self._time_store = deque(self._time_store, maxlen=history_maxlen)
+
         dialog.close()
     
     def add_sensor(self, sensor_id: str, label: Optional[str] = None, color: Optional[str] = None) -> None:
