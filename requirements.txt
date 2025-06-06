@@ -1,0 +1,9 @@
+plotly
+nicegui
+numpy
+pyserial
+opencv-python
+Pillow
+pytest
+pytest-asyncio
+watchdog
