@@ -13,7 +13,7 @@ from src.controllers.controller_base import (
     ControllerInput,
     ControllerResult,
 )
-from src.utils.log_utils.log_service import info, warning, error, debug
+from src.utils.log_utils.log_service import info, warning, error
 
 
 class CameraCaptureController(ControllerStage):
@@ -73,7 +73,12 @@ class CameraCaptureController(ControllerStage):
             return False
 
     async def _capture_loop(self) -> None:
-        delay = 1.0 / self.fps if self.fps else 0.03
+        base_delay = 1.0 / self.fps if self.fps else 0.03
+        failure_delay = 0.1
+        failure_count = 0
+        max_failures = 5
+        delay = base_delay
+
         while not self._stop_event.is_set():
             try:
                 if self._capture is None:
@@ -83,9 +88,27 @@ class CameraCaptureController(ControllerStage):
                     if self.rotation:
                         frame = self._apply_rotation(frame)
                     self._output_cache[self.controller_id] = frame
+                    failure_count = 0
+                    delay = base_delay
+                else:
+                    failure_count += 1
+                    delay = min(failure_delay * 2 ** failure_count, 2.0)
+                    if failure_count > max_failures:
+                        opened = await run_camera_io(self._capture.isOpened)
+                        if not opened:
+                            warning("Camera not opened, attempting to reinitialize")
+                            await run_camera_io(self._capture.release)
+                            self._capture = await run_camera_io(cv2.VideoCapture, self.device_index)
+                            if self._capture and self._capture.isOpened():
+                                await self._apply_uvc_settings()
+                                failure_count = 0
+                                delay = base_delay
+                            else:
+                                error("Failed to reopen camera")
             except Exception as e:
                 error(f"Camera capture error: {e}")
-                await asyncio.sleep(0.1)
+                failure_count += 1
+                delay = min(failure_delay * 2 ** failure_count, 2.0)
             await asyncio.sleep(delay)
 
     async def start(self) -> bool:
