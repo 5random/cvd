@@ -11,7 +11,11 @@ from src.utils.log_utils.log_service import info, warning, error, debug
 
 from src.data_handler.sources.sensor_source_manager import SensorManager
 from src.data_handler.interface.sensor_interface import SensorReading, SensorStatus
-from src.gui.gui_tab_components.gui_tab_base_component import BaseComponent, ComponentConfig
+from src.gui.gui_tab_components.gui_tab_base_component import (
+    BaseComponent,
+    ComponentConfig,
+    get_component_registry,
+)
 from src.gui.gui_elements.gui_webcam_stream_element import CameraStreamComponent
 from src.controllers.controller_manager import ControllerManager
 from src.controllers.controller_base import ControllerStatus
@@ -152,6 +156,7 @@ class DashboardComponent(BaseComponent):
         self.config_service = config_service
         self.sensor_manager = sensor_manager
         self.controller_manager = controller_manager
+        self.component_registry = get_component_registry()
         self._sensor_cards: Dict[str, SensorCardComponent] = {}
         self._controller_cards: Dict[str, ui.card] = {}
         self._camera_stream: Optional[CameraStreamComponent] = None
@@ -227,6 +232,7 @@ class DashboardComponent(BaseComponent):
             
             # Render the camera stream
             self._camera_stream.render()
+            self.component_registry.register(self._camera_stream)
             
         except Exception as e:
             error(f"Error rendering camera stream: {e}")
