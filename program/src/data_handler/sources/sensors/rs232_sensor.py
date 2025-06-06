@@ -95,7 +95,8 @@ class RS232Sensor(SensorInterface):
 
             # Test connection
             if hasattr(self._connection, 'open'):
-                self._connection.open()
+                if not getattr(self._connection, 'is_open', False):
+                    self._connection.open()
             
             self._is_connected = True
             info(f"RS232 sensor {self.sensor_id} initialized on port {self._port}")
