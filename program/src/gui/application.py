@@ -58,6 +58,8 @@ class WebApplication:
     async def startup(self) -> None:
         """Async startup for web application"""
         info("Web application starting up...")
+        # Apply persisted dark mode setting before starting controllers
+        ui.dark_mode().value = self.config_service.get('ui.dark_mode', bool, True)
         await self.controller_manager.start_all_controllers()
         self._processing_task = asyncio.create_task(self._processing_loop())
         info("Web application startup complete")
@@ -306,8 +308,15 @@ class WebApplication:
     def _create_quick_settings(self) -> None:
         """Create quick settings in header"""
         with ui.row().classes('gap-2'):
-            # Dark mode toggle (placeholder)
-            ui.button(icon='dark_mode',color='#5898d4', on_click=lambda: ui.notify('Dark mode toggled')).props('flat round')
+            # Dark mode toggle using NiceGUI's global dark mode object
+            dark_mode = ui.dark_mode()
+
+            def toggle_dark_mode() -> None:
+                """Toggle UI dark mode and persist setting"""
+                dark_mode.value = not dark_mode.value
+                self.config_service.set('ui.dark_mode', dark_mode.value)
+
+            ui.button(icon='dark_mode', color='#5898d4', on_click=toggle_dark_mode).props('flat round')
             
             # Refresh button
             ui.button(icon='refresh',color='#5898d4', on_click=ui.navigate.reload).props('flat round')
@@ -473,8 +482,12 @@ class WebApplication:
                 # Dark mode toggle
                 dark_mode = ui.dark_mode()
                 dark_mode.value = self.config_service.get('ui.dark_mode', bool, True)
-                ui.checkbox('Dark Mode', value=dark_mode.value, 
-                           on_change=lambda e: setattr(dark_mode, 'value', e.value))
+
+                def on_dark_mode_change(e) -> None:
+                    dark_mode.value = e.value
+                    self.config_service.set('ui.dark_mode', dark_mode.value)
+
+                ui.checkbox('Dark Mode', value=dark_mode.value, on_change=on_dark_mode_change)
                 
                 ui.separator()
                 
