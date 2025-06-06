@@ -127,7 +127,13 @@ class RS232Sensor(SensorInterface):
                     line = line.decode('utf-8', errors='ignore')
                 elif not isinstance(line, str):
                     return None
-                return float(line.strip())
+                try:
+                    return float(line.strip())
+                except ValueError:
+                    warning(
+                        f"Invalid RS232 data for sensor {self.sensor_id}: {line!r}"
+                    )
+                    return None
 
             # Read data in background thread
             loop = asyncio.get_running_loop()
