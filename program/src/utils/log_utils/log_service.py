@@ -139,7 +139,7 @@ class LogService:
             # works even when the caller has not initialised one explicitly.
             repo_root = Path(__file__).resolve().parents[3]
             config_path = repo_root / "config" / "config.json"
-            default_config_path = repo_root / "program" / "config" / "default_config.json"
+            default_config_path = repo_root / "config" / "default_config.json"
             try:
                 service = ConfigurationService(config_path, default_config_path)
                 set_config_service(service)
