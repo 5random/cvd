@@ -29,8 +29,14 @@ class ControllerCardConfig:
 class ControllerConfigDialog:
     """Dialog for creating new controllers with webcam settings."""
 
-    def __init__(self, config_service: ConfigurationService, on_save_callback=None):
+    def __init__(
+        self,
+        config_service: ConfigurationService,
+        controller_manager: ControllerManager,
+        on_save_callback=None,
+    ):
         self.config_service = config_service
+        self.controller_manager = controller_manager
         self.on_save_callback = on_save_callback
         self._dialog: Optional[ui.dialog] = None
         self._form_data: Dict[str, Any] = {}
@@ -197,6 +203,15 @@ class ControllerConfigDialog:
             }
 
             self.config_service.add_controller_config(controller_config)
+
+            # Register new controller immediately
+            if self.controller_manager:
+                new_controller = self.controller_manager.add_controller_from_config(controller_config)
+                if new_controller is None:
+                    warning(f"Failed to register controller {controller_id}")
+                else:
+                    info(f"Registered new controller {controller_id}")
+
             ui.notify(f"Controller {controller_id} added", color="positive")
             if self._dialog:
                 self._dialog.close()
@@ -605,6 +620,7 @@ class ControllersComponent(BaseComponent):
 
         self._config_dialog = ControllerConfigDialog(
             self.config_service,
+            self.controller_manager,
             self._refresh_controllers,
         )
 

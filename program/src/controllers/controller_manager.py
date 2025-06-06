@@ -18,6 +18,7 @@ from src.utils.log_utils.log_service import info, warning, error, debug
 
 from src.controllers.controller_utils.controller_data_sources.camera_capture_controller import CameraCaptureController
 from .algorithms.motion_detection import MotionDetectionController
+from .algorithms.reactor_state import ReactorStateController
 
 @dataclass
 class ControllerDependency:
@@ -57,6 +58,41 @@ class ControllerManager:
         self._calculate_execution_order()
         
         info(f"Registered controller {controller.controller_id}")
+
+    def create_controller(self, config: Dict[str, Any]) -> Optional[ControllerStage]:
+        """Create a controller instance from configuration dict."""
+        try:
+            controller_id = config.get("controller_id")
+            controller_type = config.get("type")
+            cfg = ControllerConfig(
+                controller_id=controller_id,
+                controller_type=controller_type,
+                enabled=config.get("enabled", True),
+                parameters=config.get("parameters", {}),
+                input_sensors=config.get("input_sensors", []),
+                input_controllers=config.get("input_controllers", []),
+                output_name=config.get("output_name"),
+            )
+
+            if controller_type == "camera_capture":
+                return CameraCaptureController(controller_id, cfg)
+            if controller_type == "motion_detection":
+                return MotionDetectionController(controller_id, cfg)
+            if controller_type == "reactor_state":
+                return ReactorStateController(controller_id, cfg)
+
+            warning(f"Unknown controller type: {controller_type}")
+        except Exception as exc:
+            error(f"Failed to create controller from config: {exc}")
+        return None
+
+    def add_controller_from_config(self, config: Dict[str, Any]) -> Optional[ControllerStage]:
+        """Create and register a controller from configuration."""
+        controller = self.create_controller(config)
+        if controller is not None:
+            self.register_controller(controller)
+            return controller
+        return None
     
     def unregister_controller(self, controller_id: str) -> bool:
         """Unregister a controller"""
