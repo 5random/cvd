@@ -297,6 +297,7 @@ class LogComponent(BaseComponent):
         self._log_viewers: Dict[str, LogViewerComponent] = {}
         self._refresh_timer: Optional[ui.timer] = None
         self._selected_tab: str = "overview"
+        self._selected_recent_tab: str = "info"
         # Task handle for updating statistics; used to cancel previous tasks
         self._stats_task: Optional[asyncio.Task] = None
         self._overview_container: Optional[Any] = None  # container for overview panel
@@ -419,7 +420,10 @@ class LogComponent(BaseComponent):
                 # Show recent entries from different log files
                 log_files = self._get_log_files()
 
-                with ui.tabs().classes("w-full") as recent_tabs:
+                with ui.tabs(
+                    value=self._selected_recent_tab,
+                    on_change=self._on_recent_tab_change,
+                ).classes("w-full") as recent_tabs:
                     for log_type in [
                         "info",
                         "error",
@@ -429,7 +433,9 @@ class LogComponent(BaseComponent):
                     ]:
                         ui.tab(log_type, label=log_type.capitalize())
 
-                with ui.tab_panels(recent_tabs, value="info").classes("w-full"):
+                with ui.tab_panels(recent_tabs, value=self._selected_recent_tab).classes(
+                    "w-full"
+                ):
                     for log_type in [
                         "info",
                         "error",
@@ -445,6 +451,10 @@ class LogComponent(BaseComponent):
                 ui.label(f"Error loading recent entries: {str(e)}").classes(
                     "text-red-500"
                 )
+
+    def _on_recent_tab_change(self, e) -> None:
+        """Store the currently selected recent log tab"""
+        self._selected_recent_tab = e.value
 
     def _render_recent_entries_for_type(
         self, log_type: str, log_files: List[LogFileInfo]
