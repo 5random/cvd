@@ -36,12 +36,13 @@ class SeriesConfig:
 
 class LivePlotComponent(BaseComponent):
     """Live plotting component for sensor data"""
-    
-    def __init__(self, sensor_manager: SensorManager, plot_config: Optional[PlotConfig] = None):
+
+    def __init__(self, sensor_manager: SensorManager, plot_config: Optional[PlotConfig] = None, sensors_to_display: Optional[List[str]] = None):
         config = ComponentConfig(component_id="live_plot")
         super().__init__(config)
         self.sensor_manager = sensor_manager
         self.plot_config = plot_config or PlotConfig()
+        self.sensors_to_display = sensors_to_display
         
         # Data storage
         self._data_store: Dict[str, deque] = {}
@@ -139,7 +140,7 @@ class LivePlotComponent(BaseComponent):
     
     def _initialize_series(self) -> None:
         """Initialize data series for all active sensors"""
-        active_sensors = self.sensor_manager.get_all_sensors()
+        active_sensors = self.sensors_to_display if self.sensors_to_display is not None else self.sensor_manager.get_all_sensors()
         
         colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b']
         

@@ -206,6 +206,8 @@ class WebApplication:
         """Create dashboard tab content"""
         with ui.row().classes('w-full h-full gap-4'):
             # Left column - sensor dashboard
+            dashboard_sensors = [sid for sid, cfg in self.config_service.get_sensor_configs() if cfg.get('show_on_dashboard')]
+
             with ui.column().classes('w-1/2'):
                 dashboard = DashboardComponent(
                     self.config_service,
@@ -213,16 +215,17 @@ class WebApplication:
                     self.controller_manager
                 )
                 dashboard.render()
-            
+
             # Right column - live plot
-            with ui.column().classes('w-1/2'):
-                plot_config = PlotConfig(
-                    max_points=2000,
-                    refresh_rate_ms=1000,
-                    history_seconds=3600
-                )
-                live_plot = LivePlotComponent(self.sensor_manager, plot_config)
-                live_plot.render()
+            if dashboard_sensors:
+                with ui.column().classes('w-1/2'):
+                    plot_config = PlotConfig(
+                        max_points=2000,
+                        refresh_rate_ms=1000,
+                        history_seconds=3600
+                    )
+                    live_plot = LivePlotComponent(self.sensor_manager, plot_config, dashboard_sensors)
+                    live_plot.render()
     
     def _create_sensors_content(self) -> None:
         """Create sensors tab content"""

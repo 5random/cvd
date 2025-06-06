@@ -40,7 +40,7 @@ class ConfigurationService:
     # Schema definitions for validation
     SENSOR_SCHEMA = {
         "required_fields": ["name", "type", "interface", "enabled"],
-        "optional_fields": ["source", "port", "channel", "poll_interval_ms", "algorithm", "state_output"],
+        "optional_fields": ["source", "port", "channel", "poll_interval_ms", "algorithm", "state_output", "show_on_dashboard"],
         "field_types": {
             "name": str,
             "type": str,
@@ -51,7 +51,8 @@ class ConfigurationService:
             "address": str,
             "poll_interval_ms": int,
             "algorithm": list,
-            "state_output": list
+            "state_output": list,
+            "show_on_dashboard": bool
         },
         "valid_interfaces": ["serial", "usb", "ethernet", "modbus"],
         "valid_types": ["temperature", "pressure", "flow", "level", "ph"],
@@ -63,7 +64,7 @@ class ConfigurationService:
     
     CONTROLLER_SCHEMA = {
         "required_fields": ["name", "type", "enabled"],
-        "optional_fields": ["interface", "device_index", "settings", "algorithm", "state_output"],
+        "optional_fields": ["interface", "device_index", "settings", "algorithm", "state_output", "show_on_dashboard"],
         "field_types": {
             "name": str,
             "type": str,
@@ -73,7 +74,8 @@ class ConfigurationService:
             "ip_address": str,
             "settings": dict,
             "algorithm": list,
-            "state_output": list
+            "state_output": list,
+            "show_on_dashboard": bool
         },
         "valid_interfaces": ["usb_camera", "network_camera", "virtual"],
         "valid_types": [

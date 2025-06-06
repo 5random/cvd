@@ -106,8 +106,9 @@
         "poll_interval_ms": 200,
         "algorithm": ["alg001"],
         "state_output": ["Sensor konnte nicht gelesen werden","Sensor ok"],
+        "show_on_dashboard": true,
         "enabled": true
-        } 
+        }
     },
 
     {
@@ -121,6 +122,7 @@
         "poll_interval_ms": 200,
         "algorithm": ["alg001"],
         "state_output": ["Sensor konnte nicht gelesen werden","Sensor ok"],
+        "show_on_dashboard": false,
         "enabled": true
         }
     }
@@ -134,6 +136,7 @@
         "cam_id": "cam001",
         "algorithm": ["bubble_detection"],
         "state_output": ["Keine Bewegung erkannt", "Bewegung erkannt"],
+        "show_on_dashboard": true,
         "enabled": true
         }
     },
@@ -144,6 +147,7 @@
         "type": "reactor_state",
         "algorithm": ["alg003"],
         "state_output": ["Reaktor fehler", "Reaktor OK"],
+        "show_on_dashboard": true,
         "enabled": true
         }
     }

@@ -14,6 +14,7 @@ from src.data_handler.interface.sensor_interface import SensorReading, SensorSta
 from src.gui.gui_tab_components.gui_tab_base_component import BaseComponent, ComponentConfig
 from src.gui.gui_elements.gui_webcam_stream_element import CameraStreamComponent
 from src.controllers.controller_manager import ControllerManager
+from src.controllers.controller_base import ControllerStatus
 
 @dataclass
 class SensorCardConfig:
@@ -144,7 +145,7 @@ class SensorCardComponent(BaseComponent):
 
 class DashboardComponent(BaseComponent):
     """Main dashboard component"""
-    
+
     def __init__(self, config_service: ConfigurationService, sensor_manager: SensorManager, controller_manager: ControllerManager):
         config = ComponentConfig("dashboard")
         super().__init__(config)
@@ -152,7 +153,12 @@ class DashboardComponent(BaseComponent):
         self.sensor_manager = sensor_manager
         self.controller_manager = controller_manager
         self._sensor_cards: Dict[str, SensorCardComponent] = {}
+        self._controller_cards: Dict[str, ui.card] = {}
         self._camera_stream: Optional[CameraStreamComponent] = None
+
+        # Determine which sensors and controllers should be displayed
+        self._dashboard_sensors = [sid for sid, cfg in self.config_service.get_sensor_configs() if cfg.get('show_on_dashboard')]
+        self._dashboard_controllers = [cid for cid, cfg in self.config_service.get_controller_configs() if cfg.get('show_on_dashboard')]
 
     def render(self) -> ui.column:
         """Render dashboard"""
@@ -166,15 +172,23 @@ class DashboardComponent(BaseComponent):
             # Main content area with camera stream and sensor data
             with ui.row().classes('w-full gap-4'):
                 # Camera stream section (left side)
-                with ui.column().classes('flex-1'):
-                    ui.label('Camera Stream').classes('text-lg font-semibold mb-2')
-                    self._render_camera_stream()
-                
+                if self._should_show_camera():
+                    with ui.column().classes('flex-1'):
+                        ui.label('Camera Stream').classes('text-lg font-semibold mb-2')
+                        self._render_camera_stream()
+
                 # Sensor data section (right side)
-                with ui.column().classes('flex-1'):
-                    ui.label('Sensor Data').classes('text-lg font-semibold mb-2')
-                    with ui.row().classes('w-full gap-4 flex-wrap'):
-                        self._render_sensor_cards()
+                if self._dashboard_sensors:
+                    with ui.column().classes('flex-1'):
+                        ui.label('Sensor Data').classes('text-lg font-semibold mb-2')
+                        with ui.row().classes('w-full gap-4 flex-wrap'):
+                            self._render_sensor_cards()
+
+                if self._dashboard_controllers:
+                    with ui.column().classes('flex-1'):
+                        ui.label('Controller States').classes('text-lg font-semibold mb-2')
+                        with ui.row().classes('w-full gap-4 flex-wrap'):
+                            self._render_controller_cards()
         
         return dashboard
 
@@ -182,23 +196,25 @@ class DashboardComponent(BaseComponent):
         """Render system status overview"""
         with ui.card().classes('w-full p-4 mb-4 cvd-card'):
             ui.label('System Status').classes('text-lg font-semibold mb-2')
-            
-            with ui.row().classes('w-full gap-4'):
-                # Active sensors count
-                active_sensors = len(self.sensor_manager.get_active_sensors())
-                total_sensors = len(self.sensor_manager.get_all_sensors())
-                
-                with ui.column().classes('text-center'):
-                    ui.label(f'{active_sensors}/{total_sensors}').classes('text-xl font-bold text-blue-600')
-                    ui.label('Active Sensors').classes('text-sm text-gray-500')
-                
-                # System uptime (placeholder)
-                with ui.column().classes('text-center'):
-                    ui.label('Running').classes('text-xl font-bold text-green-600')
-                    ui.label('System Status').classes('text-sm text-gray-500')
+
+            with ui.column().classes('w-full gap-2'):
+                active_sensors = self.sensor_manager.get_active_sensors()
+                active_controllers = [cid for cid in self.controller_manager.list_controllers() if self.controller_manager.get_controller(cid).status == ControllerStatus.RUNNING]
+
+                ui.label(f"Sensors running: {', '.join(active_sensors) if active_sensors else 'none'}").classes('text-sm')
+                ui.label(f"Controllers running: {', '.join(active_controllers) if active_controllers else 'none'}").classes('text-sm')
+
+    def _should_show_camera(self) -> bool:
+        for cid in self._dashboard_controllers:
+            cfg = next((c for c_id, c in self.config_service.get_controller_configs() if c_id == cid), None)
+            if cfg and 'camera' in str(cfg.get('type', '')).lower():
+                return True
+        return False
     
     def _render_camera_stream(self) -> None:
         """Render camera stream component"""
+        if not self._should_show_camera():
+            return
         try:
             # Create camera stream component
             self._camera_stream = CameraStreamComponent(
@@ -224,9 +240,11 @@ class DashboardComponent(BaseComponent):
     def _render_sensor_cards(self) -> None:
         """Render sensor cards"""
         sensor_configs = self.config_service.get_sensor_configs()
-        
+
         for sensor_id, sensor_config in sensor_configs:
             if not sensor_config.get('enabled', True):
+                continue
+            if self._dashboard_sensors and sensor_id not in self._dashboard_sensors:
                 continue
             
             # Create sensor card config
@@ -245,6 +263,17 @@ class DashboardComponent(BaseComponent):
             sensor_card.render()
             
             self._sensor_cards[sensor_id] = sensor_card
+
+    def _render_controller_cards(self) -> None:
+        for controller_id in self._dashboard_controllers:
+            controller = self.controller_manager.get_controller(controller_id)
+            if not controller:
+                continue
+            with ui.card().classes('p-4 cvd-card min-w-48') as card:
+                ui.label(controller_id).classes('text-lg font-semibold mb-2')
+                output = controller.get_output()
+                ui.label(str(output) if output is not None else 'No output').classes('text-sm')
+            self._controller_cards[controller_id] = card
     
     def _update_element(self, data: Any) -> None:
         """Update dashboard with new data"""
@@ -257,7 +286,9 @@ class DashboardComponent(BaseComponent):
         for card in self._sensor_cards.values():
             card.cleanup()
         self._sensor_cards.clear()
-        
+
+        self._controller_cards.clear()
+
         # Cleanup camera stream
         if self._camera_stream:
             self._camera_stream.cleanup()
