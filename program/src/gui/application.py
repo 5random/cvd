@@ -6,6 +6,7 @@ import contextlib
 from typing import Any, Dict, Optional
 
 from nicegui import app, ui
+import cv2
 from src.controllers.controller_manager import create_cvd_controller_manager
 from src.data_handler.sources.sensor_source_manager import SensorManager
 from src.gui.gui_elements.gui_live_plot_element import (LivePlotComponent,
@@ -28,6 +29,7 @@ from src.gui.gui_tab_components.gui_tab_sensors_component import \
 from src.utils.config_utils.config_service import ConfigurationService
 from src.utils.data_utils.data_manager import get_data_manager
 from src.utils.log_utils.log_service import debug, error, info, warning
+from src.gui.gui_elements.gui_webcam_stream_element import CameraStreamComponent
 from starlette.staticfiles import StaticFiles
 
 
@@ -118,6 +120,25 @@ class WebApplication:
         def status():
             """System status page"""
             return self._create_status_page()
+
+        @ui.page('/video_feed')
+        async def video_feed():
+            """Stream MJPEG frames from the dashboard camera"""
+            camera = self.component_registry.get_component('dashboard_camera_stream')
+
+            async def gen():
+                while True:
+                    if isinstance(camera, CameraStreamComponent):
+                        frame = camera.get_latest_frame()
+                        if frame is not None:
+                            success, buf = cv2.imencode('jpg', frame)
+                            if success:
+                                jpeg_bytes = buf.tobytes()
+                                yield (b'--frame\r\nContent-Type: image/jpeg\r\n\r\n' +
+                                       jpeg_bytes + b'\r\n')
+                    await asyncio.sleep(camera.update_interval if isinstance(camera, CameraStreamComponent) else 0.03)
+
+            return app.response_class(gen(), media_type='multipart/x-mixed-replace; boundary=frame')
     
     def _setup_layout(self) -> None:
         """Setup common layout elements"""
