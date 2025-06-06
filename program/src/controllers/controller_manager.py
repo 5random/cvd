@@ -395,7 +395,11 @@ def create_cvd_controller_manager() -> ControllerManager:
     motion_controller = MotionDetectionController("motion_detection", motion_cfg)
     manager.register_controller(motion_controller)
 
-    manager.add_dependency("camera_capture", "motion_detection")
+    manager.add_dependency(
+        "camera_capture",
+        "motion_detection",
+        {"frame": "image"}
+    )
 
     return manager
 
