@@ -225,6 +225,10 @@ class ConfigurationService:
         errors = self._validate_config(sensor_config, self.SENSOR_SCHEMA, "sensor")
         if errors:
             raise ValidationError(f"Sensor validation failed: {'; '.join(errors)}")
+
+    def validate_sensor_config(self, sensor_config: Dict[str, Any]) -> None:
+        """Public wrapper for validating sensor configuration"""
+        self._validate_sensor_config(sensor_config)
     
     def _validate_controller_config(self, controller_config: Dict[str, Any]) -> None:
         """Validate controller configuration"""
