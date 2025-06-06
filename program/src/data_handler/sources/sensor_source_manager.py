@@ -72,7 +72,7 @@ class SensorManager:
                 
             # Create config object
             config = SensorConfig(
-                sensor_id=sensor_config['id'],
+                sensor_id=sensor_config['sensor_id'],
                 sensor_type=sensor_type,
                 enabled=sensor_config.get('enabled', True),
                 poll_interval_ms=sensor_config.get('poll_interval_ms', 1000),
@@ -342,7 +342,7 @@ class SensorManager:
                         started_count += 1
                 
             except Exception as e:
-                error(f"Failed to start sensor {sensor_config.get('id', 'unknown')}: {e}")
+                error(f"Failed to start sensor {sensor_config.get('sensor_id', 'unknown')}: {e}")
         
         info(f"Started {started_count} sensors")
         return started_count
