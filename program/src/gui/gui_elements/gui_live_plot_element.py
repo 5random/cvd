@@ -199,32 +199,47 @@ class LivePlotComponent(BaseComponent):
         
         # Create traces for each sensor
         traces = []
+        last_sensor_id = None
         for sensor_id, series_config in self._series_configs.items():
+            last_sensor_id = sensor_id
             if not series_config.visible:
                 continue
-                
+
             data = list(self._data_store[sensor_id])
-            
+
             if len(data) > 0:
-                trace = go.Scatter(
-                    x=time_axis[:len(data)],
-                    y=data,
-                    mode='lines',
-                    name=series_config.label,
-                    line=dict(
-                        color=series_config.color,
-                        width=self.plot_config.line_width
-                    ),
-                    connectgaps=False
-                )
-                traces.append(trace)
+                try:
+                    trace = go.Scatter(
+                        x=time_axis[:len(data)],
+                        y=data,
+                        mode='lines',
+                        name=series_config.label,
+                        line=dict(
+                            color=series_config.color,
+                            width=self.plot_config.line_width
+                        ),
+                        connectgaps=False,
+                        hovertemplate=(
+                            f"{series_config.label}: %{y:.2f}{series_config.unit}"
+                            "<extra></extra>"
+                        ),
+                    )
+                    traces.append(trace)
+                except Exception as e:
+                    error(
+                        f"Error refreshing plot for sensor {sensor_id}: {e}",
+                        exc_info=True,
+                    )
         
         # Update plot
         try:
             self._plot_element.figure["data"] = traces
             self._plot_element.update()
         except Exception as e:
-            error(f"Error refreshing plot: {e}")
+            error(
+                f"Error refreshing plot after sensor {last_sensor_id}: {e}",
+                exc_info=True,
+            )
     
     def _toggle_recording(self) -> None:
         """Toggle recording state"""
