@@ -273,17 +273,19 @@ class WebApplication:
                 ui.label('Configuration').classes('text-lg font-semibold mb-2')
                 
                 # Basic settings
-                ui.input(
+                self._title_input = ui.input(
                     label='System Title',
                     value=self.config_service.get('ui.title', str, 'CVD Tracker')
-                ).classes('w-full mb-2')
-                
-                ui.number(
+                )
+                self._title_input.classes('w-full mb-2')
+
+                self._refresh_rate_input = ui.number(
                     label='Refresh Rate (ms)',
                     value=self.config_service.get('ui.refresh_rate_ms', int, 1000),
                     min=100,
                     max=10000
-                ).classes('w-full mb-2')
+                )
+                self._refresh_rate_input.classes('w-full mb-2')
                 
                 ui.button('Save Settings', on_click=self._save_settings).classes('mt-4')
             
@@ -300,8 +302,20 @@ class WebApplication:
                 ui.label('✓ Web Application: Running').classes('text-green-600')
     
     def _save_settings(self) -> None:
-        """Save settings (placeholder)"""
-        ui.notify('Settings saved successfully!')
+        """Persist settings from input fields to configuration"""
+        try:
+            if hasattr(self, '_title_input') and self._title_input is not None:
+                self.config_service.set('ui.title', str(self._title_input.value))
+
+            if hasattr(self, '_refresh_rate_input') and self._refresh_rate_input is not None:
+                self.config_service.set(
+                    'ui.refresh_rate_ms', int(self._refresh_rate_input.value)
+                )
+
+            ui.notify('Settings saved successfully!', type='positive')
+        except Exception as e:
+            error(f'Error saving settings: {e}')
+            ui.notify(f'Error saving settings: {e}', type='negative')
         
     def _create_quick_settings(self) -> None:
         """Create quick settings in header"""
