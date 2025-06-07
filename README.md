@@ -14,8 +14,7 @@ Example snippets demonstrating typical usage are available in
 To install dependencies and this package in editable mode, run:
 
 ```bash
-pip install -r requirements.txt
-pip install -e .
+make install
 pip install pre-commit black
 ```
 
@@ -23,12 +22,11 @@ The `requirements.txt` file lists the dependencies required by this project.
 
 ## Running tests
 
-Install the dependencies, install this package in editable mode, and run the test suite with `pytest`:
+Install the dependencies and run the test suite with:
 
 ```bash
-pip install -r requirements.txt
-pip install -e .
-pytest
+make install
+make test
 ```
 
 The tests rely on the `cv2` module from OpenCV and the `nicegui` package. Ensure
