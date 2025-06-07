@@ -507,6 +507,9 @@ class ControllerCardComponent(BaseComponent):
         controller_settings = self.config_service.get_controller_settings(
             self.controller_config.controller_id
         )
+        controller_parameters = self.config_service.get_controller_parameters(
+            self.controller_config.controller_id
+        )
 
         with ui.dialog().props("persistent") as dialog:
             with ui.card().classes("w-96"):
@@ -514,49 +517,85 @@ class ControllerCardComponent(BaseComponent):
                     "text-lg font-bold mb-4"
                 )
 
-                if controller_settings:
-                    # Create input fields for each setting
-                    inputs = {}
-                    with ui.column().classes("w-full gap-3"):
-                        for key, value in controller_settings.items():
-                            with ui.row().classes("w-full items-center"):
-                                ui.label(f"{key}:").classes("min-w-24")
-                                if isinstance(value, bool):
-                                    inputs[key] = ui.checkbox("", value=value)
-                                elif isinstance(value, (int, float)):
-                                    inputs[key] = ui.number(
-                                        "", value=value, format="%.2f"
-                                    )
-                                else:
-                                    inputs[key] = ui.input("", value=str(value))
+                if controller_settings or controller_parameters:
+                    parameter_inputs: Dict[str, Any] = {}
+                    settings_inputs: Dict[str, Any] = {}
 
-                    # Buttons
+                    if controller_parameters:
+                        ui.label("Parameters").classes("font-semibold")
+                        with ui.column().classes("w-full gap-3"):
+                            for key, value in controller_parameters.items():
+                                with ui.row().classes("w-full items-center"):
+                                    ui.label(f"{key}:").classes("min-w-24")
+                                    if isinstance(value, bool):
+                                        parameter_inputs[key] = ui.checkbox("", value=value)
+                                    elif isinstance(value, (int, float)):
+                                        parameter_inputs[key] = ui.number(
+                                            "", value=value, format="%.2f"
+                                        )
+                                    else:
+                                        parameter_inputs[key] = ui.input("", value=str(value))
+
+                    if controller_settings:
+                        ui.label("Settings").classes("font-semibold mt-2")
+                        with ui.column().classes("w-full gap-3"):
+                            for key, value in controller_settings.items():
+                                with ui.row().classes("w-full items-center"):
+                                    ui.label(f"{key}:").classes("min-w-24")
+                                    if isinstance(value, bool):
+                                        settings_inputs[key] = ui.checkbox("", value=value)
+                                    elif isinstance(value, (int, float)):
+                                        settings_inputs[key] = ui.number(
+                                            "", value=value, format="%.2f"
+                                        )
+                                    else:
+                                        settings_inputs[key] = ui.input("", value=str(value))
+
                     with ui.row().classes("w-full justify-end gap-2 mt-4"):
                         ui.button("Cancel", color="grey").on("click", dialog.close)
                         ui.button("Save", color="primary").on(
-                            "click", lambda: self._save_configuration(dialog, inputs)
+                            "click",
+                            lambda: self._save_configuration(dialog, parameter_inputs, settings_inputs),
                         )
                 else:
-                    ui.label("No configurable settings available").classes(
-                        "text-gray-500 mb-4"
-                    )
+                    ui.label("No configurable settings available").classes("text-gray-500 mb-4")
                     ui.button("Close", color="grey").on("click", dialog.close)
 
         dialog.open()
 
-    def _save_configuration(self, dialog, inputs: Dict[str, Any]) -> None:
+    def _save_configuration(
+        self,
+        dialog,
+        parameter_inputs: Dict[str, Any],
+        settings_inputs: Dict[str, Any],
+    ) -> None:
         """Save configuration changes"""
         try:
-            updates = {}
-            for key, input_element in inputs.items():
+            param_updates: Dict[str, Any] = {}
+            for key, input_element in parameter_inputs.items():
                 if hasattr(input_element, "value"):
-                    updates[key] = input_element.value
+                    param_updates[key] = input_element.value
 
-            success = self.config_service.update_controller_settings(
-                self.controller_config.controller_id, updates
-            )
+            settings_updates: Dict[str, Any] = {}
+            for key, input_element in settings_inputs.items():
+                if hasattr(input_element, "value"):
+                    settings_updates[key] = input_element.value
 
-            if success:
+            success_params = True
+            if param_updates:
+                success_params = self.config_service.update_controller_parameters(
+                    self.controller_config.controller_id,
+                    param_updates,
+                )
+
+            success_settings = True
+            if settings_updates:
+                success_settings = self.config_service.update_controller_settings(
+                    self.controller_config.controller_id,
+                    settings_updates,
+                )
+
+            if success_params and success_settings:
                 ui.notify("Configuration saved successfully", type="positive")
                 dialog.close()
             else:
