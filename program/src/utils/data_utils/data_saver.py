@@ -334,9 +334,22 @@ class DataSaver:
         # Cancel tracked background tasks only
         for fut in self._tasks:
             try:
-                fut.cancel()
+                # attempt cooperative cancellation
+                was_cancelled = fut.cancel()
+                if not was_cancelled:
+                    # task already running - wait for it to finish
+                    try:
+                        fut.result()
+                    except Exception:
+                        pass
+                else:
+                    # wait until the future acknowledges cancellation
+                    while not fut.done():
+                        time.sleep(0.01)
             except Exception:
                 pass
+        # ensure list cleared only after all tasks finished so no lingering
+        # maintenance threads remain
         self._tasks.clear()
 
         # Close all file handles
