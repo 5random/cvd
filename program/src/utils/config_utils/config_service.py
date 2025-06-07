@@ -753,18 +753,24 @@ class ConfigurationService:
     
     def update_algorithm_config(self, algorithm_id: str, updates: Dict[str, Any]) -> bool:
         """Update existing algorithm configuration with validation"""
-        # Get current config
-        current_config = None
         algorithms = self.get_section('algorithms')
+        current_config = None
         algorithm_index = None
-        
-        if isinstance(algorithms, list):
+
+        # Support dict storage
+        if isinstance(algorithms, dict):
+            if algorithm_id not in algorithms:
+                return False
+            current_config = algorithms[algorithm_id].copy()
+        elif isinstance(algorithms, list):
             for i, algorithm_entry in enumerate(algorithms):
                 if isinstance(algorithm_entry, dict) and algorithm_id in algorithm_entry:
                     current_config = algorithm_entry[algorithm_id].copy()
                     algorithm_index = i
                     break
-        
+        else:
+            raise ConfigurationError("Unsupported format for algorithms config: expected list or dict.")
+
         if current_config is None:
             return False
         
@@ -779,18 +785,32 @@ class ConfigurationService:
         # Remove algorithm_id before storing
         del updated_config['algorithm_id']
         
-        # Update in list
-        if algorithm_index is not None:
+        if isinstance(algorithms, dict):
+            algorithms[algorithm_id] = updated_config
+            self._save_config()
+            info(f"Updated algorithm configuration: {algorithm_id}")
+            return True
+
+        if isinstance(algorithms, list) and algorithm_index is not None:
             algorithms[algorithm_index][algorithm_id] = updated_config
             self._save_config()
             info(f"Updated algorithm configuration: {algorithm_id}")
             return True
-        
+
         return False
     
     def remove_algorithm_config(self, algorithm_id: str) -> bool:
         """Remove algorithm configuration"""
         algorithms = self.get_section('algorithms')
+
+        if isinstance(algorithms, dict):
+            if algorithm_id in algorithms:
+                algorithms.pop(algorithm_id)
+                self._save_config()
+                info(f"Removed algorithm configuration: {algorithm_id}")
+                return True
+            return False
+
         if isinstance(algorithms, list):
             for i, algorithm_entry in enumerate(algorithms):
                 if isinstance(algorithm_entry, dict) and algorithm_id in algorithm_entry:
@@ -798,7 +818,9 @@ class ConfigurationService:
                     self._save_config()
                     info(f"Removed algorithm configuration: {algorithm_id}")
                     return True
-        return False
+            return False
+
+        raise ConfigurationError("Unsupported format for algorithms config: expected list or dict.")
     
     def get_algorithms_by_type(self, algorithm_type: str) -> List[tuple[str, Dict[str, Any]]]:
         """Get all algorithms of a specific type"""
