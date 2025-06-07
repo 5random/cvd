@@ -10,7 +10,7 @@ This component provides:
 - Real-time status updates
 
 Fixed issues:
-- Event handling using event.value instead of event.args
+- Event handling using event.selection instead of event.args
 - Pagination division-by-zero protection
 - File ID collision prevention
 - Memory leak prevention with proper timer cleanup
@@ -776,8 +776,8 @@ class DataFilesList(BaseComponent):
     def _on_table_select(self, event) -> None:
         """Handle row selection change in table"""
         try:
-            # Directly assign selected IDs from event.value
-            selected_ids = set(event.value or [])
+            # Derive selected IDs from event.selection
+            selected_ids = set(event.selection or [])
             self.selected_files = selected_ids
             self._update_selection_info()
         except Exception as e:
