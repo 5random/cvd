@@ -376,7 +376,10 @@ class DataFilesList(BaseComponent):
             self.all_files = self.data_manager.list_files()
             self.current_files = self.all_files.copy()
             # Build mapping for all files once to prevent stale entries
-            self.selected_file_paths = { self._generate_file_id(f): f.file_path for f in self.all_files }
+            self.selected_file_paths = {
+                self._generate_file_id(f): f.file_path.resolve()
+                for f in self.all_files
+            }
             self._update_display()
         except Exception as e:
             error(f"Error loading files: {e}")
@@ -588,11 +591,11 @@ class DataFilesList(BaseComponent):
             return
         
         try:
-            # Convert selected IDs back to file paths
+            # Convert selected IDs back to absolute file paths
             file_paths = []
             for file_id in self.selected_files:
                 if file_id in self.selected_file_paths:
-                    file_paths.append(str(self.selected_file_paths[file_id]))
+                    file_paths.append(str(Path(self.selected_file_paths[file_id]).resolve()))
 
             # Validate file existence and readability
             valid_paths = []
