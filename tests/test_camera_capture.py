@@ -1,10 +1,12 @@
 import asyncio
+import numpy as np
 
 import pytest
 
 from src.controllers.controller_utils.controller_data_sources import camera_capture_controller
 from src.controllers.controller_utils.controller_data_sources.camera_capture_controller import CameraCaptureController
-from src.controllers.controller_base import ControllerConfig
+from src.controllers.algorithms.motion_detection import MotionDetectionController
+from src.controllers.controller_base import ControllerConfig, ControllerInput
 
 class DummyCapture:
     def __init__(self, index):
@@ -14,10 +16,13 @@ class DummyCapture:
     def isOpened(self):
         return True
     def read(self):
+        import numpy as np
         self.read_calls += 1
         if self.read_calls == 1:
             raise RuntimeError("read fail")
-        return True, f"frame{self.read_calls}"
+        frame = np.zeros((10, 10, 3), dtype=np.uint8)
+        frame.fill(self.read_calls)
+        return True, frame
     def set(self, prop, value):
         return True
     def release(self):
@@ -62,7 +67,16 @@ async def test_camera_capture_recovery(monkeypatch):
     assert started
     await asyncio.sleep(0.3)
     frame = controller.get_output()
-    assert frame == "frame2"
+    assert isinstance(frame, np.ndarray)
+
+    md_cfg = ControllerConfig(controller_id="md", controller_type="motion_detection")
+    md = MotionDetectionController("md", md_cfg)
+    monkeypatch.setattr(md._motion_pool, "submit_async", immediate)
+    await md.start()
+    result = await md.process(ControllerInput(controller_data={"cam": {"image": frame}}))
+    assert result.success
+    await md.stop()
+    await md.cleanup()
     try:
         await controller.stop()
     except asyncio.CancelledError:
@@ -95,6 +109,16 @@ async def test_reinitialize_on_none(monkeypatch):
     monkeypatch.setattr(cap_module.cv2, "VideoCapture", lambda idx: second)
     await asyncio.sleep(0.2)
     assert controller._capture is second
+
+    frame = np.zeros((10, 10, 3), dtype=np.uint8)
+    md_cfg = ControllerConfig(controller_id="md", controller_type="motion_detection")
+    md = MotionDetectionController("md", md_cfg)
+    monkeypatch.setattr(md._motion_pool, "submit_async", immediate)
+    await md.start()
+    result = await md.process(ControllerInput(controller_data={"cam": {"image": frame}}))
+    assert result.success
+    await md.stop()
+    await md.cleanup()
     try:
         await controller.stop()
     except asyncio.CancelledError:
@@ -136,6 +160,16 @@ async def test_reopen_after_failures(monkeypatch):
     await asyncio.sleep(0.8)
     assert attempts["count"] >= 3
     assert controller._capture is not None
+
+    frame = np.zeros((10, 10, 3), dtype=np.uint8)
+    md_cfg = ControllerConfig(controller_id="md", controller_type="motion_detection")
+    md = MotionDetectionController("md", md_cfg)
+    monkeypatch.setattr(md._motion_pool, "submit_async", immediate)
+    await md.start()
+    result = await md.process(ControllerInput(controller_data={"cam": {"image": frame}}))
+    assert result.success
+    await md.stop()
+    await md.cleanup()
     try:
         await controller.stop()
     except asyncio.CancelledError:
