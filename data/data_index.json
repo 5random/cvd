@@ -1,0 +1,77 @@
+{
+  "files": {
+    "D:\\Willem\\KV_GitHub\\cvd\\data\\logs\\audit.log": {
+      "file_path": "data\\logs\\audit.log",
+      "category": "logs",
+      "status": "active",
+      "size_bytes": 0,
+      "created_at": "2025-06-07T07:35:04.910282",
+      "modified_at": "2025-06-07T07:35:04.910282",
+      "sensor_id": "audit",
+      "experiment_id": null,
+      "compressed_path": null,
+      "checksum": null,
+      "tags": null
+    },
+    "D:\\Willem\\KV_GitHub\\cvd\\data\\logs\\error.log": {
+      "file_path": "data\\logs\\error.log",
+      "category": "logs",
+      "status": "active",
+      "size_bytes": 128,
+      "created_at": "2025-06-07T07:35:04.908275",
+      "modified_at": "2025-06-07T07:35:13.349666",
+      "sensor_id": "error",
+      "experiment_id": null,
+      "compressed_path": null,
+      "checksum": null,
+      "tags": null
+    },
+    "D:\\Willem\\KV_GitHub\\cvd\\data\\logs\\info.log": {
+      "file_path": "data\\logs\\info.log",
+      "category": "logs",
+      "status": "active",
+      "size_bytes": 1954,
+      "created_at": "2025-06-07T07:35:04.908275",
+      "modified_at": "2025-06-07T07:35:13.351801",
+      "sensor_id": "info",
+      "experiment_id": null,
+      "compressed_path": null,
+      "checksum": null,
+      "tags": null
+    },
+    "D:\\Willem\\KV_GitHub\\cvd\\data\\logs\\performance.log": {
+      "file_path": "data\\logs\\performance.log",
+      "category": "logs",
+      "status": "active",
+      "size_bytes": 0,
+      "created_at": "2025-06-07T07:35:04.909280",
+      "modified_at": "2025-06-07T07:35:04.909280",
+      "sensor_id": "performance",
+      "experiment_id": null,
+      "compressed_path": null,
+      "checksum": null,
+      "tags": null
+    },
+    "D:\\Willem\\KV_GitHub\\cvd\\data\\logs\\structured.log": {
+      "file_path": "data\\logs\\structured.log",
+      "category": "logs",
+      "status": "active",
+      "size_bytes": 0,
+      "created_at": "2025-06-07T07:35:04.912807",
+      "modified_at": "2025-06-07T07:35:04.912807",
+      "sensor_id": "structured",
+      "experiment_id": null,
+      "compressed_path": null,
+      "checksum": null,
+      "tags": null
+    }
+  },
+  "last_updated": "2025-06-07T07:35:13.360383",
+  "dir_mtimes": {
+    "D:\\Willem\\KV_GitHub\\cvd\\data\\raw": 1749274513.3386335,
+    "D:\\Willem\\KV_GitHub\\cvd\\data\\processed": 1749274513.3396335,
+    "D:\\Willem\\KV_GitHub\\cvd\\data\\experiments": 1749274513.3396335,
+    "D:\\Willem\\KV_GitHub\\cvd\\data\\logs": 1749274513.3396335
+  },
+  "version": "1.0"
+}

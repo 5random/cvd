@@ -1,0 +1,2477 @@
+{
+  "last_updated": "2025-06-07T07:39:47.536832",
+  "notifications": [
+    {
+      "id": "system_1749274606627",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for structured.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:36:46.627208",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274606782",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for info.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:36:46.782808",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274606921",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for audit.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:36:46.921419",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274607033",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for performance.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:36:47.033826",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "config_1749274611498",
+      "title": "Configuration Validation Errors",
+      "message": "Found 2 configuration validation error(s)",
+      "severity": "warning",
+      "source": "config",
+      "timestamp": "2025-06-07T07:36:51.498200",
+      "read": false,
+      "metadata": {
+        "error_count": 2,
+        "errors": [
+          "Missing sensors configuration",
+          "Missing controllers configuration"
+        ]
+      }
+    },
+    {
+      "id": "system_1749274611637",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for structured.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:36:51.637480",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274611789",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for info.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:36:51.789074",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274611952",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for audit.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:36:51.952558",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274612082",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for performance.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:36:52.082088",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274612223",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - Error refreshing log content for error.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:36:52.223265",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274616504",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for structured.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:36:56.504551",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274616626",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for info.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:36:56.626384",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274616744",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for audit.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:36:56.744017",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274616853",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for performance.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:36:56.853576",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274616990",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for error.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:36:56.990298",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "config_1749274621501",
+      "title": "Configuration Validation Errors",
+      "message": "Found 2 configuration validation error(s)",
+      "severity": "warning",
+      "source": "config",
+      "timestamp": "2025-06-07T07:37:01.501387",
+      "read": false,
+      "metadata": {
+        "error_count": 2,
+        "errors": [
+          "Missing sensors configuration",
+          "Missing controllers configuration"
+        ]
+      }
+    },
+    {
+      "id": "system_1749274621692",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for info.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:37:01.692360",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274621864",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for audit.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:37:01.864992",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274622045",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for performance.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:37:02.045426",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274622218",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for error.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:37:02.218919",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274622356",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - Error refreshing log content for structured.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:37:02.356290",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274626516",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for info.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:37:06.516064",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274626791",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for audit.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:37:06.791276",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274626968",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for performance.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:37:06.968996",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274627090",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for error.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:37:07.090338",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274627235",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for structured.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:37:07.235366",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "config_1749274631522",
+      "title": "Configuration Validation Errors",
+      "message": "Found 2 configuration validation error(s)",
+      "severity": "warning",
+      "source": "config",
+      "timestamp": "2025-06-07T07:37:11.522299",
+      "read": false,
+      "metadata": {
+        "error_count": 2,
+        "errors": [
+          "Missing sensors configuration",
+          "Missing controllers configuration"
+        ]
+      }
+    },
+    {
+      "id": "system_1749274631699",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for audit.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:37:11.699020",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274631902",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for performance.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:37:11.902759",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274632080",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for error.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:37:12.080965",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274632260",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for structured.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:37:12.260255",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274632428",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - Error refreshing log content for info.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:37:12.428380",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274636541",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for audit.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:37:16.541188",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274636813",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for performance.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:37:16.813410",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274636947",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for error.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:37:16.947521",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274637103",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for structured.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:37:17.103011",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274637272",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for info.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:37:17.272298",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "config_1749274641538",
+      "title": "Configuration Validation Errors",
+      "message": "Found 2 configuration validation error(s)",
+      "severity": "warning",
+      "source": "config",
+      "timestamp": "2025-06-07T07:37:21.538949",
+      "read": false,
+      "metadata": {
+        "error_count": 2,
+        "errors": [
+          "Missing sensors configuration",
+          "Missing controllers configuration"
+        ]
+      }
+    },
+    {
+      "id": "system_1749274641727",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for performance.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:37:21.727633",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274641949",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for error.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:37:21.949810",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274642149",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for structured.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:37:22.149094",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274642348",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for info.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:37:22.348802",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274642530",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - Error refreshing log content for audit.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:37:22.530274",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274646544",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for performance.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:37:26.544808",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274646707",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for error.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:37:26.707513",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274646902",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for structured.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:37:26.902530",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274647076",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for info.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:37:27.076010",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274647263",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for audit.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:37:27.263214",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "config_1749274651540",
+      "title": "Configuration Validation Errors",
+      "message": "Found 2 configuration validation error(s)",
+      "severity": "warning",
+      "source": "config",
+      "timestamp": "2025-06-07T07:37:31.540715",
+      "read": false,
+      "metadata": {
+        "error_count": 2,
+        "errors": [
+          "Missing sensors configuration",
+          "Missing controllers configuration"
+        ]
+      }
+    },
+    {
+      "id": "system_1749274651734",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for error.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:37:31.734909",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274651953",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for structured.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:37:31.953677",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274652144",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for info.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:37:32.144852",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274652316",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for audit.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:37:32.316101",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274652719",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - Error refreshing log content for performance.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:37:32.719021",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274656548",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for error.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:37:36.548136",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274656725",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for structured.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:37:36.725944",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274656960",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for info.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:37:36.960479",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274657167",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for audit.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:37:37.167922",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274657373",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for performance.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:37:37.373820",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "config_1749274661554",
+      "title": "Configuration Validation Errors",
+      "message": "Found 2 configuration validation error(s)",
+      "severity": "warning",
+      "source": "config",
+      "timestamp": "2025-06-07T07:37:41.554049",
+      "read": false,
+      "metadata": {
+        "error_count": 2,
+        "errors": [
+          "Missing sensors configuration",
+          "Missing controllers configuration"
+        ]
+      }
+    },
+    {
+      "id": "system_1749274661756",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for structured.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:37:41.756300",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274662162",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for info.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:37:42.162300",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274662380",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for audit.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:37:42.380813",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274662596",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for performance.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:37:42.596916",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274662818",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - Error refreshing log content for error.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:37:42.818449",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274666581",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for structured.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:37:46.581008",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274666776",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for info.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:37:46.776790",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274667025",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for audit.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:37:47.025904",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274667229",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for performance.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:37:47.229437",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274667460",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for error.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:37:47.460936",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "config_1749274671568",
+      "title": "Configuration Validation Errors",
+      "message": "Found 2 configuration validation error(s)",
+      "severity": "warning",
+      "source": "config",
+      "timestamp": "2025-06-07T07:37:51.568504",
+      "read": false,
+      "metadata": {
+        "error_count": 2,
+        "errors": [
+          "Missing sensors configuration",
+          "Missing controllers configuration"
+        ]
+      }
+    },
+    {
+      "id": "system_1749274671775",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for info.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:37:51.775515",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274672021",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for audit.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:37:52.021652",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274672284",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for performance.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:37:52.284369",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274672531",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for error.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:37:52.531051",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274672771",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - Error refreshing log content for structured.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:37:52.771434",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274676589",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for info.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:37:56.589880",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274676808",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for audit.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:37:56.808292",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274677298",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for performance.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:37:57.298239",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274677528",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for error.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:37:57.528371",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274677808",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for structured.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:37:57.808084",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "config_1749274681586",
+      "title": "Configuration Validation Errors",
+      "message": "Found 2 configuration validation error(s)",
+      "severity": "warning",
+      "source": "config",
+      "timestamp": "2025-06-07T07:38:01.586522",
+      "read": false,
+      "metadata": {
+        "error_count": 2,
+        "errors": [
+          "Missing sensors configuration",
+          "Missing controllers configuration"
+        ]
+      }
+    },
+    {
+      "id": "system_1749274681794",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for audit.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:38:01.794858",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274682029",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for performance.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:38:02.029688",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274682262",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for error.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:38:02.262147",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274682702",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for structured.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:38:02.702530",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274682941",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - Error refreshing log content for info.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:38:02.941345",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274686600",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for audit.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:38:06.600644",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274686826",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for performance.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:38:06.826594",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274687070",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for error.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:38:07.070460",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274687342",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for structured.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:38:07.342981",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274687590",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for info.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:38:07.590469",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "config_1749274691596",
+      "title": "Configuration Validation Errors",
+      "message": "Found 2 configuration validation error(s)",
+      "severity": "warning",
+      "source": "config",
+      "timestamp": "2025-06-07T07:38:11.596958",
+      "read": false,
+      "metadata": {
+        "error_count": 2,
+        "errors": [
+          "Missing sensors configuration",
+          "Missing controllers configuration"
+        ]
+      }
+    },
+    {
+      "id": "system_1749274691826",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for performance.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:38:11.826772",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274692090",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for error.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:38:12.090175",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274692337",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for structured.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:38:12.337614",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274692584",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for info.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:38:12.584146",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274692824",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - Error refreshing log content for audit.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:38:12.824902",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274696611",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for performance.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:38:16.611659",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274697058",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for error.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:38:17.058940",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274697343",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for structured.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:38:17.343265",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274697545",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for info.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:38:17.545896",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274697773",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for audit.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:38:17.773866",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "config_1749274701614",
+      "title": "Configuration Validation Errors",
+      "message": "Found 2 configuration validation error(s)",
+      "severity": "warning",
+      "source": "config",
+      "timestamp": "2025-06-07T07:38:21.614142",
+      "read": false,
+      "metadata": {
+        "error_count": 2,
+        "errors": [
+          "Missing sensors configuration",
+          "Missing controllers configuration"
+        ]
+      }
+    },
+    {
+      "id": "system_1749274701841",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for error.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:38:21.841837",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274702112",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for structured.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:38:22.112905",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274702585",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for info.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:38:22.585163",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274702848",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for audit.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:38:22.848947",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274703103",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - Error refreshing log content for performance.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:38:23.103943",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274706627",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for error.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:38:26.628001",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274706902",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for structured.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:38:26.903002",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274707184",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for info.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:38:27.184225",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274707669",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for audit.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:38:27.669011",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274707927",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for performance.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:38:27.927906",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "config_1749274711635",
+      "title": "Configuration Validation Errors",
+      "message": "Found 2 configuration validation error(s)",
+      "severity": "warning",
+      "source": "config",
+      "timestamp": "2025-06-07T07:38:31.635599",
+      "read": false,
+      "metadata": {
+        "error_count": 2,
+        "errors": [
+          "Missing sensors configuration",
+          "Missing controllers configuration"
+        ]
+      }
+    },
+    {
+      "id": "system_1749274711884",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for structured.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:38:31.884942",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274712122",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for info.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:38:32.122067",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274712391",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for audit.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:38:32.391751",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274712880",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for performance.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:38:32.880465",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274713134",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - Error refreshing log content for error.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:38:33.134242",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274716645",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for structured.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:38:36.645083",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274716882",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for info.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:38:36.882257",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274717186",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for audit.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:38:37.186629",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274717455",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for performance.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:38:37.455226",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274717733",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for error.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:38:37.733299",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "config_1749274721653",
+      "title": "Configuration Validation Errors",
+      "message": "Found 2 configuration validation error(s)",
+      "severity": "warning",
+      "source": "config",
+      "timestamp": "2025-06-07T07:38:41.653684",
+      "read": false,
+      "metadata": {
+        "error_count": 2,
+        "errors": [
+          "Missing sensors configuration",
+          "Missing controllers configuration"
+        ]
+      }
+    },
+    {
+      "id": "system_1749274721941",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for info.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:38:41.941282",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274722242",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for audit.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:38:42.242782",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274722537",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for performance.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:38:42.537260",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274722810",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for error.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:38:42.810062",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274723323",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - Error refreshing log content for structured.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:38:43.323033",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274726666",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for info.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:38:46.666343",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274726965",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for audit.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:38:46.966004",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274727269",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for performance.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:38:47.269445",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274727542",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for error.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:38:47.542723",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274727828",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for structured.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:38:47.828865",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "config_1749274731666",
+      "title": "Configuration Validation Errors",
+      "message": "Found 2 configuration validation error(s)",
+      "severity": "warning",
+      "source": "config",
+      "timestamp": "2025-06-07T07:38:51.666389",
+      "read": false,
+      "metadata": {
+        "error_count": 2,
+        "errors": [
+          "Missing sensors configuration",
+          "Missing controllers configuration"
+        ]
+      }
+    },
+    {
+      "id": "system_1749274731911",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for audit.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:38:51.911280",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274732204",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for performance.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:38:52.204217",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274732533",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for error.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:38:52.533381",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274732874",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for structured.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:38:52.874314",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274733169",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - Error refreshing log content for info.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:38:53.169762",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274736680",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for audit.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:38:56.680518",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274736961",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for performance.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:38:56.961541",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274737267",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for error.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:38:57.267625",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274737582",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for structured.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:38:57.582209",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274737916",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for info.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:38:57.916189",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "config_1749274741686",
+      "title": "Configuration Validation Errors",
+      "message": "Found 2 configuration validation error(s)",
+      "severity": "warning",
+      "source": "config",
+      "timestamp": "2025-06-07T07:39:01.686750",
+      "read": false,
+      "metadata": {
+        "error_count": 2,
+        "errors": [
+          "Missing sensors configuration",
+          "Missing controllers configuration"
+        ]
+      }
+    },
+    {
+      "id": "system_1749274741983",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for performance.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:39:01.983742",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274742277",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for error.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:39:02.277759",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274742615",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for structured.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:39:02.615498",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274742887",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for info.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:39:02.887268",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274743433",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - Error refreshing log content for audit.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:39:03.433307",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274746698",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for performance.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:39:06.698279",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274747003",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for error.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:39:07.003821",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274747327",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for structured.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:39:07.327669",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274747645",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for info.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:39:07.645980",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274747990",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for audit.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:39:07.990513",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "config_1749274751700",
+      "title": "Configuration Validation Errors",
+      "message": "Found 2 configuration validation error(s)",
+      "severity": "warning",
+      "source": "config",
+      "timestamp": "2025-06-07T07:39:11.700759",
+      "read": false,
+      "metadata": {
+        "error_count": 2,
+        "errors": [
+          "Missing sensors configuration",
+          "Missing controllers configuration"
+        ]
+      }
+    },
+    {
+      "id": "system_1749274751959",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for error.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:39:11.959351",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274752224",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for structured.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:39:12.224743",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274752518",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for info.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:39:12.518119",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274752814",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for audit.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:39:12.814905",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274753349",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - Error refreshing log content for performance.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:39:13.349324",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274756707",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for error.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:39:16.707334",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274757026",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for structured.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:39:17.026472",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274757379",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for info.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:39:17.379653",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274757644",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for audit.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:39:17.644894",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274758168",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for performance.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:39:18.168018",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "config_1749274761708",
+      "title": "Configuration Validation Errors",
+      "message": "Found 2 configuration validation error(s)",
+      "severity": "warning",
+      "source": "config",
+      "timestamp": "2025-06-07T07:39:21.708605",
+      "read": false,
+      "metadata": {
+        "error_count": 2,
+        "errors": [
+          "Missing sensors configuration",
+          "Missing controllers configuration"
+        ]
+      }
+    },
+    {
+      "id": "system_1749274761999",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for structured.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:39:21.999555",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274762352",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for info.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:39:22.352026",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274762718",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for audit.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:39:22.718927",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274763265",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for performance.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:39:23.265306",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274763588",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - Error refreshing log content for error.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:39:23.588967",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274766727",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for structured.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:39:26.727595",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274767087",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for info.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:39:27.087135",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274767656",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for audit.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:39:27.656578",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274768027",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for performance.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:39:28.027394",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274768376",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for error.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:39:28.376771",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "config_1749274771734",
+      "title": "Configuration Validation Errors",
+      "message": "Found 2 configuration validation error(s)",
+      "severity": "warning",
+      "source": "config",
+      "timestamp": "2025-06-07T07:39:31.734969",
+      "read": false,
+      "metadata": {
+        "error_count": 2,
+        "errors": [
+          "Missing sensors configuration",
+          "Missing controllers configuration"
+        ]
+      }
+    },
+    {
+      "id": "system_1749274772034",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for info.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:39:32.034441",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274772653",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for audit.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:39:32.653187",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274773004",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for performance.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:39:33.004933",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274773345",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for error.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:39:33.345195",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274773674",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - Error refreshing log content for structured.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:39:33.674110",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274776752",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for info.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:39:36.752434",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274777365",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for audit.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:39:37.365126",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274777736",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for performance.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:39:37.736769",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274778090",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for error.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:39:38.090073",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274778474",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for structured.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:39:38.474030",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "config_1749274781750",
+      "title": "Configuration Validation Errors",
+      "message": "Found 2 configuration validation error(s)",
+      "severity": "warning",
+      "source": "config",
+      "timestamp": "2025-06-07T07:39:41.750701",
+      "read": false,
+      "metadata": {
+        "error_count": 2,
+        "errors": [
+          "Missing sensors configuration",
+          "Missing controllers configuration"
+        ]
+      }
+    },
+    {
+      "id": "system_1749274782087",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for audit.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:39:42.087874",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274782446",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for performance.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:39:42.446869",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274782799",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for error.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:39:42.799388",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274783152",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for structured.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:39:43.152396",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274783750",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - Error refreshing log content for info.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:39:43.750894",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274786768",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for audit.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:39:46.768611",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274787175",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for performance.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:39:47.175116",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749274787536",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - NOTIFICATION: System Error - ERROR - log_service.py:336 - error - Error refreshing log content for error.log: 'ScrollArea' object has no attribute 'last_args'",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-07T07:39:47.536819",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    }
+  ]
+}
