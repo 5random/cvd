@@ -6,7 +6,7 @@ from src.gui.gui_tab_components.gui_tab_data_component import (
     DataComponentConfig,
     DataFilesList,
 )
-from src.utils.data_utils.data_manager import FileMetadata, DataCategory, FileStatus
+from src.utils.data_utils.indexing import FileMetadata, DataCategory, FileStatus
 
 
 class DummyManager:

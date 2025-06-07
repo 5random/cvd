@@ -30,13 +30,8 @@ import hashlib
 
 from src.utils.log_utils.log_service import info, warning, error, debug
 from src.gui.gui_tab_components.gui_tab_base_component import BaseComponent, ComponentConfig
-from src.utils.data_utils.data_manager import (
-    DataManager, 
-    get_data_manager, 
-    DataCategory, 
-    FileStatus, 
-    FileMetadata
-)
+from src.utils.data_utils.data_manager import DataManager, get_data_manager
+from src.utils.data_utils.indexing import DataCategory, FileStatus, FileMetadata
 
 
 @dataclass
