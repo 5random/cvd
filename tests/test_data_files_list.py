@@ -83,19 +83,78 @@ def test_pagination_resets_when_files_shrink(monkeypatch):
     assert len(files_list._files_table.rows) == 4
 
 
-def test_table_selection_updates_state():
-    manager = DummyManager([])
-    comp_config = ComponentConfig(component_id="test")
-    files_list = DataFilesList(comp_config, manager, DataComponentConfig())
+def test_table_selection_updates_selected_files(monkeypatch):
+    files = [_make_file(i) for i in range(3)]
+    manager = DummyManager(files)
+    comp_config = ComponentConfig(component_id="sel")
+    data_config = DataComponentConfig(files_per_page=5)
+    files_list = DataFilesList(comp_config, manager, data_config)
 
-    files_list._selection_info = DummyLabel()
-    files_list._download_button = DummyButton()
+    files_list._files_table = DummyTable()
+    files_list._pagination_info = DummyLabel()
+    files_list._prev_button = DummyButton()
+    files_list._next_button = DummyButton()
+    files_list._load_files()
 
-    class Event:
-        def __init__(self, selection):
-            self.selection = selection
+    called = {"count": 0}
 
-    files_list._on_table_select(Event(["a", "b"]))
+    def fake_update():
+        called["count"] += 1
 
-    assert files_list.selected_files == {"a", "b"}
-    assert files_list._download_button.disabled is False
+    monkeypatch.setattr(files_list, "_update_selection_info", fake_update)
+
+    selected_ids = [files_list._generate_file_id(f) for f in files[:2]]
+    event = type("Event", (), {"value": selected_ids})()
+    files_list._on_table_select(event)
+
+    assert files_list.selected_files == set(selected_ids)
+    assert called["count"] == 1
+
+
+def test_download_selected_files_calls_data_manager(tmp_path, monkeypatch):
+    files = [_make_file(i) for i in range(2)]
+    for meta in files:
+        fpath = tmp_path / meta.file_path.name
+        fpath.write_text("x")
+        meta.file_path = fpath
+
+    manager = DummyManager(files)
+    comp_config = ComponentConfig(component_id="dl")
+    data_config = DataComponentConfig(files_per_page=5)
+    files_list = DataFilesList(comp_config, manager, data_config)
+
+    files_list._files_table = DummyTable()
+    files_list._pagination_info = DummyLabel()
+    files_list._prev_button = DummyButton()
+    files_list._next_button = DummyButton()
+    files_list._download_status = DummyLabel()
+    files_list._load_files()
+
+    ids = [files_list._generate_file_id(f) for f in files]
+    files_list.selected_files = set(ids)
+
+    captured = {}
+
+    def fake_create(paths, format="zip"):
+        captured["paths"] = paths
+        return "req-1"
+
+    monkeypatch.setattr(manager, "create_download_package", fake_create, raising=False)
+
+    started = {}
+
+    def fake_start(req_id):
+        started["id"] = req_id
+
+    monkeypatch.setattr(files_list, "_start_download_monitoring", fake_start)
+
+    from nicegui import ui
+
+    monkeypatch.setattr(ui, "notify", lambda *a, **k: None)
+    monkeypatch.setattr(ui, "download", lambda *a, **k: None)
+
+    files_list._download_selected_files()
+
+    expected_paths = {str(f.file_path.resolve()) for f in files}
+    assert set(captured.get("paths")) == expected_paths
+    assert started.get("id") == "req-1"
