@@ -27,6 +27,7 @@ from src.utils.log_utils.log_service import info, warning, error, debug
 
 
 
+
 @dataclass
 class MotionDetectionResult:
     """Result from motion detection"""
@@ -40,6 +41,7 @@ class MotionDetectionResult:
     confidence: float  # Confidence score
     frame_delta: Optional[np.ndarray] = None  # Frame difference (for visualization)
     motion_mask: Optional[np.ndarray] = None  # Motion mask (for visualization)
+    frame: Optional[np.ndarray] = None  # Original frame (for visualization)
 
 
 def analyze_motion(
@@ -262,26 +264,25 @@ class MotionDetectionController(ImageController):
                     count = sum(1 for h in recent if h["motion_detected"])
                     if count / self.multi_frame_window < self.multi_frame_threshold:
                         motion_result.motion_detected = False
-                # Prepare result dict with metadata
-                motion_result_dict = self._motion_result_to_dict(motion_result)
-                # Attach original frame and mask for dashboard overlays
-                motion_result_dict["frame"] = frame
-                motion_result_dict["motion_mask"] = processed_mask
-                motion_result_dict.update(
-                    {
-                        "frame_count": self._frame_count,
-                        "timestamp": metadata.get("timestamp", time.time()),
-                        "source_sensor": metadata.get("source_sensor"),
-                        "algorithm": self.algorithm,
-                        "frame_size": self._frame_size,
-                    }
-                )
+
+                # Attach frame and mask for optional visualization
+                motion_result.frame = frame
+                motion_result.motion_mask = processed_mask
+
                 # Update frame count and last frame
                 self._frame_count += 1
                 self._last_frame = frame
 
             return ControllerResult.success_result(
-                motion_result_dict, metadata={"controller_type": "motion_detection"}
+                motion_result,
+                metadata={
+                    "controller_type": "motion_detection",
+                    "frame_count": self._frame_count,
+                    "timestamp": metadata.get("timestamp", time.time()),
+                    "source_sensor": metadata.get("source_sensor"),
+                    "algorithm": self.algorithm,
+                    "frame_size": self._frame_size,
+                },
             )
         except Exception as e:
             error(f"Error in motion detection: {e}")
@@ -419,3 +420,107 @@ class MotionDetectionController(ImageController):
         self._last_frame = None
         self._motion_history.clear()
         info("Motion detection controller cleaned up")
+
+    async def start(self) -> bool:
+        if not await super().start():
+            return False
+        self._stop_event.clear()
+        self._capture_task = asyncio.create_task(self._capture_loop())
+        return True
+
+    async def stop(self) -> None:
+        self._stop_event.set()
+        if self._capture_task:
+            self._capture_task.cancel()
+            with contextlib.suppress(Exception):
+                await self._capture_task
+            self._capture_task = None
+        await super().stop()
+
+    async def process(self, input_data: ControllerInput) -> ControllerResult:
+        output = self._output_cache.get(self.controller_id)
+        if output is None:
+            return ControllerResult.success_result(None)
+        return ControllerResult.success_result(output)
+
+    async def _capture_loop(self) -> None:
+        base_delay = 1.0 / self.fps if self.fps else 0.03
+        failure_delay = 0.1
+        reopen_delay = 5.0
+        failure_count = 0
+        max_failures = 5
+        delay = base_delay
+
+        while not self._stop_event.is_set():
+            try:
+                if self._capture is None:
+                    warning("Camera capture missing, attempting reinitialization")
+                    try:
+                        self._capture = await run_camera_io(
+                            cv2.VideoCapture, self.device_index
+                        )
+                        if self._capture and self._capture.isOpened():
+                            if self.width:
+                                await run_camera_io(
+                                    self._capture.set,
+                                    cv2.CAP_PROP_FRAME_WIDTH,
+                                    int(self.width),
+                                )
+                            if self.height:
+                                await run_camera_io(
+                                    self._capture.set,
+                                    cv2.CAP_PROP_FRAME_HEIGHT,
+                                    int(self.height),
+                                )
+                            if self.fps:
+                                await run_camera_io(
+                                    self._capture.set, cv2.CAP_PROP_FPS, int(self.fps)
+                                )
+                            await apply_uvc_settings(self._capture, self.uvc_settings)
+                            failure_count = 0
+                            delay = base_delay
+                        else:
+                            raise RuntimeError("capture not opened")
+                    except Exception as exc:
+                        error(f"Failed to reinitialize camera: {exc}")
+                        self._capture = None
+                        failure_count += 1
+                        if failure_count >= max_failures:
+                            error("Camera unavailable, retrying later")
+                            delay = reopen_delay
+                            failure_count = 0
+                        else:
+                            delay = min(failure_delay * 2**failure_count, 2.0)
+                    await asyncio.sleep(delay)
+                    continue
+
+                ret, frame = await run_camera_io(self._capture.read)
+                if ret:
+                    if self.rotation:
+                        frame = rotate_frame(frame, self.rotation)
+                    result = await self.process_image(
+                        frame,
+                        {
+                            "source_sensor": self.webcam_id or "camera",
+                            "timestamp": time.time(),
+                        },
+                    )
+                    if result.success:
+                        self._output_cache[self.controller_id] = result.data
+                    failure_count = 0
+                    delay = base_delay
+                else:
+                    failure_count += 1
+                    delay = min(failure_delay * 2**failure_count, 2.0)
+                    if failure_count > max_failures:
+                        opened = await run_camera_io(self._capture.isOpened)
+                        if not opened:
+                            warning("Camera not opened, attempting to reinitialize")
+                            await run_camera_io(self._capture.release)
+                            self._capture = None
+                            continue
+            except Exception as e:
+                error(f"Camera capture error: {e}")
+
+            await asyncio.sleep(base_delay)
+

@@ -3,7 +3,10 @@ import pytest
 from PIL import Image
 import cv2
 
-from src.controllers.algorithms.motion_detection import MotionDetectionController
+from src.controllers.algorithms.motion_detection import (
+    MotionDetectionController,
+    MotionDetectionResult,
+)
 from src.controllers.controller_base import ControllerConfig
 
 
@@ -21,8 +24,9 @@ async def test_motion_detection_on_black_frame(monkeypatch):
     frame = np.zeros((50, 50, 3), dtype=np.uint8)
     result = await ctrl.process_image(frame, {})
     assert result.success
-    assert "motion_detected" in result.data
+    assert isinstance(result.data, MotionDetectionResult)
     await ctrl.stop()
+
 
 @pytest.mark.asyncio
 async def test_motion_detection_on_pil_image(monkeypatch):
@@ -39,7 +43,7 @@ async def test_motion_detection_on_pil_image(monkeypatch):
     pil_image = Image.fromarray(np_frame)
     result = await ctrl.process_image(pil_image, {})
     assert result.success
-    assert "motion_detected" in result.data
+    assert isinstance(result.data, MotionDetectionResult)
     await ctrl.stop()
 
 
@@ -59,6 +63,5 @@ async def test_motion_detection_on_bytes(monkeypatch):
     bytes_data = encoded.tobytes()
     result = await ctrl.process_image(bytes_data, {})
     assert result.success
-    assert "motion_detected" in result.data
+    assert isinstance(result.data, MotionDetectionResult)
     await ctrl.stop()
-
