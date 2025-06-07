@@ -10,9 +10,16 @@ from src.utils.data_utils.data_manager import DataManager, FileStatus
 
 
 class DummyCompressionService:
+    def __init__(self):
+        class Settings:
+            preserve_original = False
+
+        self._compression_settings = Settings()
+
     def compress_file(self, src: str, dst: str):
         with open(src, "rb") as f_in, gzip.open(dst, "wb") as f_out:
             f_out.write(f_in.read())
+        Path(src).unlink(missing_ok=True)
         return Path(dst)
 
 
