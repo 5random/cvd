@@ -26,6 +26,7 @@ from src.utils.concurrency.process_pool import (
 from src.utils.log_utils.log_service import info, warning, error, debug
 
 
+
 @dataclass
 class MotionDetectionResult:
     """Result from motion detection"""
@@ -298,7 +299,7 @@ class MotionDetectionController(ImageController):
                 # Raw image bytes (often RGB order)
                 nparr = np.frombuffer(image_data, np.uint8)
                 frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-          
+
             elif hasattr(image_data, "__array__") or isinstance(
                 image_data, Image.Image
             ):
@@ -418,4 +419,3 @@ class MotionDetectionController(ImageController):
         self._last_frame = None
         self._motion_history.clear()
         info("Motion detection controller cleaned up")
-

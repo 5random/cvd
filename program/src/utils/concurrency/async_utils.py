@@ -115,13 +115,16 @@ class AsyncRateLimiter:
         self.release()
 
     async def acquire(self) -> None:
-        async with self._lock:
-            self._refill_tokens_locked()
-            while self._tokens < 1:
-                wait_time = (1 - self._tokens) * (self._period / self._rate)
-                await asyncio.sleep(wait_time)
+        """Acquire a rate-limiter token, waiting if necessary."""
+        while True:
+            async with self._lock:
                 self._refill_tokens_locked()
-            self._tokens -= 1
+                if self._tokens >= 1:
+                    self._tokens -= 1
+                    break
+                wait_time = (1 - self._tokens) * (self._period / self._rate)
+            await asyncio.sleep(wait_time)
+
         await self._sem.acquire()
 
     def release(self) -> None:

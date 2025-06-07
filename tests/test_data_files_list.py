@@ -41,6 +41,7 @@ class DummyButton:
 
 # Helper to create simple file metadata
 
+
 def _make_file(i):
     now = datetime.now()
     return FileMetadata(
@@ -80,3 +81,21 @@ def test_pagination_resets_when_files_shrink(monkeypatch):
     # pagination should reset to first page and table should not be empty
     assert files_list.current_page == 1
     assert len(files_list._files_table.rows) == 4
+
+
+def test_table_selection_updates_state():
+    manager = DummyManager([])
+    comp_config = ComponentConfig(component_id="test")
+    files_list = DataFilesList(comp_config, manager, DataComponentConfig())
+
+    files_list._selection_info = DummyLabel()
+    files_list._download_button = DummyButton()
+
+    class Event:
+        def __init__(self, selection):
+            self.selection = selection
+
+    files_list._on_table_select(Event(["a", "b"]))
+
+    assert files_list.selected_files == {"a", "b"}
+    assert files_list._download_button.disabled is False
