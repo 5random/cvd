@@ -26,6 +26,8 @@ from src.gui.gui_tab_components.gui_tab_experiment_component import \
 from src.gui.gui_tab_components.gui_tab_log_component import LogComponent
 from src.gui.gui_tab_components.gui_tab_sensors_component import \
     SensorsComponent
+from src.gui.gui_tab_components.gui_setup_wizard_component import \
+    SetupWizardComponent
 from src.utils.config_utils.config_service import ConfigurationService
 from src.utils.data_utils.data_manager import get_data_manager
 from src.utils.log_utils.log_service import debug, error, info, warning
@@ -115,6 +117,11 @@ class WebApplication:
         def config():
             """Configuration page"""
             return self._create_config_page()
+
+        @ui.page('/setup')
+        def setup():
+            """Initial setup wizard"""
+            return self._create_setup_wizard_page()
         
         @ui.page('/status')
         def status():
@@ -635,6 +642,17 @@ class WebApplication:
         with ui.row().classes('gap-2 mt-2'):
             ui.button('Save', on_click=lambda: self._save_configuration(config_textarea.value)).props('color=primary')
             ui.button('Reset', on_click=lambda: self._reset_configuration(config_textarea)).props('outline')
+
+    def _create_setup_wizard_page(self) -> None:
+        """Create setup wizard page"""
+        ui.label('Setup Wizard').classes('text-h4 mb-4')
+        wizard = SetupWizardComponent(
+            self.config_service,
+            self.sensor_manager,
+            self.controller_manager,
+        )
+        self.component_registry.register(wizard)
+        wizard.render()
     
     def _create_status_page(self) -> None:
         """Create system status page"""
