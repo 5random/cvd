@@ -1,4 +1,5 @@
 from setuptools import setup, find_packages
+from glob import glob
 
 setup(
     name='cvd',
@@ -17,4 +18,10 @@ setup(
     ],
     packages=find_packages('program'),
     package_dir={'': 'program'},
+    data_files=[
+        ('cvd/config', glob('config/*.json')),
+        ('cvd/data', ['data/data_index.json']),
+        ('cvd/data/logs', glob('data/logs/*.log')),
+        ('cvd/data/notifications', glob('data/notifications/*.json')),
+    ],
 )

@@ -20,6 +20,11 @@ pip install pre-commit black
 
 The `requirements.txt` file lists the dependencies required by this project.
 
+The installed package includes a `config/` directory containing the default
+configuration file as well as sample data under `data/`.  When installing with
+`pip install .`, these files are placed inside the package directory so the
+application can be started without additional setup.
+
 ## Running tests
 
 Install the dependencies and run the test suite with:
