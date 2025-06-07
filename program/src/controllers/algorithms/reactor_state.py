@@ -198,26 +198,37 @@ class ReactorStateController(StateController):
     def _extract_motion_data(self, controller_outputs: Dict[str, Any]) -> bool:
         """Extract motion detection status from controller outputs"""
         motion_detected = False
-        
-        # Look for motion detection controller output
-        for controller_id, output in controller_outputs.items():
-            if 'motion' in controller_id.lower():
-                if isinstance(output, dict):
-                    if 'motion_detected' in output:
-                        motion_detected = bool(output['motion_detected'])
-                        break
-                    elif 'data' in output and isinstance(output['data'], dict):
-                        if 'motion_detected' in output['data']:
-                            motion_detected = bool(output['data']['motion_detected'])
-                            break
-                elif isinstance(output, bool):
-                    motion_detected = output
-                    break
-        
+
+        for _, output in controller_outputs.items():
+            controller_type = None
+            data = output
+
+            if isinstance(output, dict):
+                controller_type = output.get('controller_type')
+                if 'metadata' in output and isinstance(output['metadata'], dict):
+                    controller_type = output['metadata'].get('controller_type', controller_type)
+                if 'data' in output:
+                    data = output['data']
+            else:
+                controller_type = getattr(output, 'controller_type', None)
+                if hasattr(output, 'metadata') and isinstance(output.metadata, dict):
+                    controller_type = output.metadata.get('controller_type', controller_type)
+                data = getattr(output, 'data', data)
+
+            if controller_type == 'motion_detection':
+                if isinstance(data, dict) and 'motion_detected' in data:
+                    motion_detected = bool(data['motion_detected'])
+                elif isinstance(data, bool):
+                    motion_detected = bool(data)
+                elif isinstance(data, dict) and 'data' in data and isinstance(data['data'], dict):
+                    if 'motion_detected' in data['data']:
+                        motion_detected = bool(data['data']['motion_detected'])
+                break
+
         # Update motion tracking
         if motion_detected:
             self._last_motion_time = time.time()
-        
+
         return motion_detected
     
     def _check_alarms(self, temp_sensors: Dict[str, Optional[float]], 
