@@ -203,11 +203,37 @@ class DashboardComponent(BaseComponent):
             ui.label('System Status').classes('text-lg font-semibold mb-2')
 
             with ui.column().classes('w-full gap-2'):
-                active_sensors = self.sensor_manager.get_active_sensors()
-                active_controllers = [cid for cid in self.controller_manager.list_controllers() if self.controller_manager.get_controller(cid).status == ControllerStatus.RUNNING]
+                active_sensors = []
+                if self.sensor_manager is not None:
+                    try:
+                        active_sensors = self.sensor_manager.get_active_sensors()
+                    except Exception as exc:  # pragma: no cover - log and continue
+                        error(f"Failed to get active sensors: {exc}")
 
-                ui.label(f"Sensors running: {', '.join(active_sensors) if active_sensors else 'none'}").classes('text-sm')
-                ui.label(f"Controllers running: {', '.join(active_controllers) if active_controllers else 'none'}").classes('text-sm')
+                active_controllers = []
+                if self.controller_manager is not None:
+                    try:
+                        active_controllers = [
+                            cid
+                            for cid in self.controller_manager.list_controllers()
+                            if self.controller_manager.get_controller(cid).status == ControllerStatus.RUNNING
+                        ]
+                    except Exception as exc:  # pragma: no cover - log and continue
+                        error(f"Failed to get active controllers: {exc}")
+
+                sensor_text = (
+                    ", ".join(active_sensors)
+                    if active_sensors
+                    else ("0" if self.sensor_manager is None else "none")
+                )
+                controller_text = (
+                    ", ".join(active_controllers)
+                    if active_controllers
+                    else ("0" if self.controller_manager is None else "none")
+                )
+
+                ui.label(f"Sensors running: {sensor_text}").classes('text-sm')
+                ui.label(f"Controllers running: {controller_text}").classes('text-sm')
 
     def _should_show_camera(self) -> bool:
         for cid in self._dashboard_controllers:
