@@ -305,6 +305,7 @@ class ExperimentCard(BaseComponent):
         self._container: Optional[Card] = None
         self._status_icon: Optional[Icon] = None
         self._progress_bar: Optional[Element] = None
+        self._progress_label: Optional[Label] = None
         self._state_label: Optional[Label] = None
         self._action_buttons: List[Button] = []
         
@@ -331,7 +332,9 @@ class ExperimentCard(BaseComponent):
                 # Progress bar for running experiments
                 if self.experiment_info.state == ExperimentState.RUNNING and self.experiment_info.progress_percent > 0:
                     self._progress_bar = ui.linear_progress(value=self.experiment_info.progress_percent / 100).classes('w-full mt-2')
-                    ui.label(f'Progress: {self.experiment_info.progress_percent:.1f}%').classes('text-xs text-gray-600 mt-1')
+                    self._progress_label = ui.label(
+                        f'Progress: {self.experiment_info.progress_percent:.1f}%'
+                    ).classes('text-xs text-gray-600 mt-1')
                 
                 # Statistics row
                 with ui.row().classes('items-center gap-6 w-full mt-3'):
@@ -402,6 +405,38 @@ class ExperimentCard(BaseComponent):
             self._state_label.set_text(self.experiment_info.state.value.upper())
             color_class = self._get_state_color_class(self.experiment_info.state)
             self._state_label.classes(replace=f'text-sm font-semibold {color_class}')
+
+        # Update progress bar and label
+        show_progress = (
+            self.experiment_info.state == ExperimentState.RUNNING
+            and self.experiment_info.progress_percent > 0
+        )
+
+        if show_progress:
+            if not self._progress_bar:
+                with self._container:
+                    with ui.card_section():
+                        self._progress_bar = ui.linear_progress(
+                            value=self.experiment_info.progress_percent / 100
+                        ).classes('w-full mt-2')
+                        self._progress_label = ui.label(
+                            f'Progress: {self.experiment_info.progress_percent:.1f}%'
+                        ).classes('text-xs text-gray-600 mt-1')
+            else:
+                self._progress_bar.set_visibility(True)
+                self._progress_bar.set_value(
+                    self.experiment_info.progress_percent / 100
+                )
+                if self._progress_label:
+                    self._progress_label.set_visibility(True)
+                    self._progress_label.set_text(
+                        f'Progress: {self.experiment_info.progress_percent:.1f}%'
+                    )
+        else:
+            if self._progress_bar:
+                self._progress_bar.set_visibility(False)
+            if self._progress_label:
+                self._progress_label.set_visibility(False)
     
     def _update_status_icon(self) -> None:
         """Update status icon based on experiment state"""
