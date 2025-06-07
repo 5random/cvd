@@ -1,6 +1,7 @@
 import pytest
 
 from src.data_handler.sources.sensors import arduino_tc_sensor
+from src.data_handler.sources.mock_hardware.arduino_tc_board import MockArduinoTCBoardSerial
 from src.data_handler.interface.sensor_interface import SensorConfig
 
 # Disable logging during tests
@@ -9,7 +10,6 @@ arduino_tc_sensor.warning = lambda *a, **k: None
 arduino_tc_sensor.error = lambda *a, **k: None
 arduino_tc_sensor.debug = lambda *a, **k: None
 ArduinoTCSensor = arduino_tc_sensor.ArduinoTCSensor
-MockArduinoTCBoardSerial = arduino_tc_sensor.MockArduinoTCBoardSerial
 
 @pytest.mark.asyncio
 async def test_initialize_uses_mock_serial():

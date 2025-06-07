@@ -3,40 +3,14 @@ Arduino TC Board sensor implementation using the SensorInterface.
 """
 import asyncio
 import time
-import random
 from typing import Dict, Any, Optional
 from concurrent.futures import Executor
 from src.data_handler.interface.sensor_interface import SensorInterface, SensorReading, SensorStatus, SensorConfig
 from src.utils.log_utils.log_service import info, warning, error, debug
-
-class MockArduinoTCBoardSerial:
-    """Mock Arduino TC Board for testing when hardware is not available"""
-
-    def __init__(self, port: str, baudrate: int = 9600, timeout: float = 2.0):
-        self.port = port
-        self.baudrate = baudrate
-        self.timeout = timeout
-        self.connected = False
-
-    def connect(self) -> None:
-        """Mock connect"""
-        self.connected = True
-        info(f"Mock Arduino connected on {self.port}")
-
-    def disconnect(self) -> None:
-        """Mock disconnect"""
-        self.connected = False
-        info(f"Mock Arduino disconnected on {self.port}")
-
-    def read_temperature(self, sensor_index: int) -> float:
-        """Mock read temperature in Celsius for the given sensor index"""
-        temp = random.uniform(20.0, 30.0)
-        debug(f"Mock read_temperature on sensor {sensor_index}: {temp}")
-        return temp
-
-def mock_find_arduino_port() -> Optional[str]:
-    """Mock port finding function"""
-    return "COM3"
+from src.data_handler.sources.mock_hardware import (
+    MockArduinoTCBoardSerial,
+    mock_find_arduino_port,
+)
 
 # Try to import real Arduino library, fall back to mock
 try:

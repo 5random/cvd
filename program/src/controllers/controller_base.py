@@ -8,7 +8,7 @@ from enum import Enum
 import time
 
 from src.data_handler.interface.sensor_interface import SensorReading
-from src.utils.log_utils.log_service import info, error
+from src.utils.log_utils.log_service import info, warning, error, debug
 
 T = TypeVar('T')
 

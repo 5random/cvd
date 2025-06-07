@@ -82,6 +82,12 @@ class FileMaintenanceService:
                     fut.result()
                 except Exception as ex:
                     error(f"Error compressing file in pool: {ex}")
+            now = time.time() + 1
+            for directory in directories:
+                try:
+                    os.utime(directory, (now, now))
+                except Exception:
+                    pass
         except Exception as e:
             error(f"Error compressing files: {e}")
 

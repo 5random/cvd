@@ -3,47 +3,13 @@ RS232 sensor implementation using the SensorInterface.
 """
 import asyncio
 import time
-import random
 from typing import Dict, Any, Optional
 from concurrent.futures import Executor
 import serial
 from src.data_handler.interface.sensor_interface import SensorInterface, SensorReading, SensorStatus, SensorConfig
 from src.utils.log_utils.log_service import info, warning, error, debug
+from src.data_handler.sources.mock_hardware import MockRS232Serial
 
-class MockRS232Serial:
-    """Mock RS232 for testing when hardware is not available"""
-
-    def __init__(self, port: str, baudrate: int = 9600, timeout: float = 1.0):
-        self.port = port
-        self.baudrate = baudrate
-        self.timeout = timeout
-        self.is_open = False
-
-    def open(self) -> None:
-        """Mock open"""
-        self.is_open = True
-        info(f"Mock RS232 opened on {self.port}")
-
-    def close(self) -> None:
-        """Mock close"""
-        self.is_open = False
-        info(f"Mock RS232 closed on {self.port}")
-
-    def readline(self) -> bytes:
-        """Mock readline - returns random sensor data"""
-        if not self.is_open:
-            raise RuntimeError("Serial port not open")
-        
-        # Simulate random sensor reading
-        value = random.uniform(0.0, 100.0)
-        return f"{value:.2f}\n".encode('utf-8')
-
-    def __enter__(self):
-        self.open()
-        return self
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        self.close()
 
 
 class RS232Sensor(SensorInterface):
