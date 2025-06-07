@@ -136,7 +136,9 @@ class SetupWizardComponent(BaseComponent):
             self._dialog.close()
 
     def _update_element(self, data: Any) -> None:
-        pass
+        """Refresh sensor and controller lists when configuration changes."""
+        self._refresh_sensors()
+        self._refresh_controllers()
 
     def show_dialog(
         self,

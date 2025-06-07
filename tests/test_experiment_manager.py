@@ -1,3 +1,4 @@
+
 import time
 from datetime import datetime
 import pytest
@@ -48,3 +49,4 @@ async def test_collect_data_point_includes_controller_outputs(monkeypatch):
     assert manager._collected_data
     dp = manager._collected_data[-1]
     assert dp.controller_outputs == {"c1": {"value": 42}}
+
