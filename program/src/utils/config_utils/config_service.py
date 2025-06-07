@@ -55,7 +55,7 @@ class ConfigurationService:
             "state_output": {"type": "array"},
             "show_on_dashboard": {"type": "boolean"}
         },
-        "required": ["name", "type", "interface", "enabled"],
+        "required": ["name", "type", "interface", "source", "enabled"],
         "allOf": [
             {"if": {"properties": {"interface": {"const": "serial"}}, "required": ["interface"]},
              "then": {"required": ["port", "channel"]}},

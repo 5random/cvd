@@ -17,13 +17,19 @@ class DummyCompressionSettings:
 class DummyCompressionService:
     def __init__(self):
 
+        class Settings:
+            preserve_original = False
+
         self._compression_settings = DummyCompressionSettings()
+
 
     def compress_file(self, src: str, dst: str):
         with open(src, "rb") as f_in, gzip.open(dst, "wb") as f_out:
             f_out.write(f_in.read())
+
         if not self._compression_settings.preserve_original:
             os.remove(src)
+            
         return Path(dst)
 
 
