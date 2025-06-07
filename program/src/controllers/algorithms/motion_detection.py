@@ -31,6 +31,7 @@ from src.controllers.controller_utils.camera_utils import (
     rotate_frame,
 )
 
+
 @dataclass
 class MotionDetectionResult:
     """Result from motion detection"""
@@ -44,6 +45,7 @@ class MotionDetectionResult:
     confidence: float  # Confidence score
     frame_delta: Optional[np.ndarray] = None  # Frame difference (for visualization)
     motion_mask: Optional[np.ndarray] = None  # Motion mask (for visualization)
+    frame: Optional[np.ndarray] = None  # Original frame (for visualization)
 
 
 def analyze_motion(
@@ -291,26 +293,25 @@ class MotionDetectionController(ImageController):
                     count = sum(1 for h in recent if h["motion_detected"])
                     if count / self.multi_frame_window < self.multi_frame_threshold:
                         motion_result.motion_detected = False
-                # Prepare result dict with metadata
-                motion_result_dict = self._motion_result_to_dict(motion_result)
-                # Attach original frame and mask for dashboard overlays
-                motion_result_dict["frame"] = frame
-                motion_result_dict["motion_mask"] = processed_mask
-                motion_result_dict.update(
-                    {
-                        "frame_count": self._frame_count,
-                        "timestamp": metadata.get("timestamp", time.time()),
-                        "source_sensor": metadata.get("source_sensor"),
-                        "algorithm": self.algorithm,
-                        "frame_size": self._frame_size,
-                    }
-                )
+
+                # Attach frame and mask for optional visualization
+                motion_result.frame = frame
+                motion_result.motion_mask = processed_mask
+
                 # Update frame count and last frame
                 self._frame_count += 1
                 self._last_frame = frame
 
             return ControllerResult.success_result(
-                motion_result_dict, metadata={"controller_type": "motion_detection"}
+                motion_result,
+                metadata={
+                    "controller_type": "motion_detection",
+                    "frame_count": self._frame_count,
+                    "timestamp": metadata.get("timestamp", time.time()),
+                    "source_sensor": metadata.get("source_sensor"),
+                    "algorithm": self.algorithm,
+                    "frame_size": self._frame_size,
+                },
             )
         except Exception as e:
             error(f"Error in motion detection: {e}")
@@ -328,7 +329,7 @@ class MotionDetectionController(ImageController):
                 # Raw image bytes (often RGB order)
                 nparr = np.frombuffer(image_data, np.uint8)
                 frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-          
+
             elif hasattr(image_data, "__array__") or isinstance(
                 image_data, Image.Image
             ):
@@ -494,14 +495,26 @@ class MotionDetectionController(ImageController):
                 if self._capture is None:
                     warning("Camera capture missing, attempting reinitialization")
                     try:
-                        self._capture = await run_camera_io(cv2.VideoCapture, self.device_index)
+                        self._capture = await run_camera_io(
+                            cv2.VideoCapture, self.device_index
+                        )
                         if self._capture and self._capture.isOpened():
                             if self.width:
-                                await run_camera_io(self._capture.set, cv2.CAP_PROP_FRAME_WIDTH, int(self.width))
+                                await run_camera_io(
+                                    self._capture.set,
+                                    cv2.CAP_PROP_FRAME_WIDTH,
+                                    int(self.width),
+                                )
                             if self.height:
-                                await run_camera_io(self._capture.set, cv2.CAP_PROP_FRAME_HEIGHT, int(self.height))
+                                await run_camera_io(
+                                    self._capture.set,
+                                    cv2.CAP_PROP_FRAME_HEIGHT,
+                                    int(self.height),
+                                )
                             if self.fps:
-                                await run_camera_io(self._capture.set, cv2.CAP_PROP_FPS, int(self.fps))
+                                await run_camera_io(
+                                    self._capture.set, cv2.CAP_PROP_FPS, int(self.fps)
+                                )
                             await apply_uvc_settings(self._capture, self.uvc_settings)
                             failure_count = 0
                             delay = base_delay
@@ -516,7 +529,7 @@ class MotionDetectionController(ImageController):
                             delay = reopen_delay
                             failure_count = 0
                         else:
-                            delay = min(failure_delay * 2 ** failure_count, 2.0)
+                            delay = min(failure_delay * 2**failure_count, 2.0)
                     await asyncio.sleep(delay)
                     continue
 
@@ -537,7 +550,7 @@ class MotionDetectionController(ImageController):
                     delay = base_delay
                 else:
                     failure_count += 1
-                    delay = min(failure_delay * 2 ** failure_count, 2.0)
+                    delay = min(failure_delay * 2**failure_count, 2.0)
                     if failure_count > max_failures:
                         opened = await run_camera_io(self._capture.isOpened)
                         if not opened:
