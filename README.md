@@ -1,5 +1,12 @@
 # cvd
 
+## Project Overview
+
+This project implements the **CVD Tracker** application used to collect
+data from various sensors, process it with controllers and display results
+through a NiceGUI based interface.  A short description of the architecture
+and main modules can be found in [docs/architecture.md](docs/architecture.md).
+
 ## Installation
 
 To install dependencies and this package in editable mode, run:
