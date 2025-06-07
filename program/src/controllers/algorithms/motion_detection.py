@@ -35,6 +35,76 @@ class MotionDetectionResult:
     frame_delta: Optional[np.ndarray] = None  # Frame difference (for visualization)
     motion_mask: Optional[np.ndarray] = None  # Motion mask (for visualization)
 
+
+def analyze_motion(
+    mask: np.ndarray,
+    frame: np.ndarray,
+    *,
+    min_contour_area: int,
+    roundness_enabled: bool,
+    roundness_threshold: float,
+    motion_threshold_percentage: float,
+    confidence_threshold: float,
+) -> MotionDetectionResult:
+    """Analyze the motion mask to extract motion information"""
+    # Find contours
+    contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    # Filter contours by area and optional roundness
+    valid_contours = []
+    for c in contours:
+        area = cv2.contourArea(c)
+        if area < min_contour_area:
+            continue
+        if roundness_enabled:
+            peri = cv2.arcLength(c, True)
+            if peri > 0:
+                circ = 4 * math.pi * area / (peri * peri)
+                if circ < roundness_threshold:
+                    continue
+        valid_contours.append(c)
+
+    # Calculate motion metrics
+    total_motion_area = sum(cv2.contourArea(c) for c in valid_contours)
+    frame_area = mask.shape[0] * mask.shape[1]
+    motion_percentage = (total_motion_area / frame_area) * 100
+
+    # Determine if motion is detected
+    motion_detected = motion_percentage >= motion_threshold_percentage
+
+    # Calculate motion center and bounding box
+    motion_center = None
+    motion_bbox = None
+
+    if valid_contours:
+        # Combine all contours
+        all_points = np.vstack(valid_contours)
+
+        # Calculate center
+        M = cv2.moments(all_points)
+        if M["m00"] != 0:
+            motion_center = (int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"]))
+
+        # Calculate bounding box
+        x, y, w, h = cv2.boundingRect(all_points)
+        motion_bbox = (x, y, w, h)
+
+    # Calculate confidence based on motion characteristics
+    confidence = min(motion_percentage / motion_threshold_percentage, 1.0)
+    if confidence < confidence_threshold:
+        motion_detected = False
+
+    return MotionDetectionResult(
+        motion_detected=motion_detected,
+        motion_area=total_motion_area,
+        motion_percentage=motion_percentage,
+        motion_regions=len(valid_contours),
+        motion_center=motion_center,
+        motion_bbox=motion_bbox,
+        confidence=confidence,
+        motion_mask=mask,
+        frame_delta=None,  # Could add frame differencing if needed
+    )
+
 class MotionDetectionController(ImageController):
     """Controller for detecting motion in camera images using background subtraction"""
     
@@ -167,9 +237,18 @@ class MotionDetectionController(ImageController):
             
             # Post-process the mask
             processed_mask = self._post_process_mask(fg_mask)
-            
+
             # Offload heavy analysis to dedicated process pool
-            motion_result = await self._motion_pool.submit_async(self._analyze_motion, processed_mask, frame)
+            motion_result = await self._motion_pool.submit_async(
+                analyze_motion,
+                processed_mask,
+                frame,
+                min_contour_area=self.min_contour_area,
+                roundness_enabled=self.roundness_enabled,
+                roundness_threshold=self.roundness_threshold,
+                motion_threshold_percentage=self.motion_threshold_percentage,
+                confidence_threshold=self.confidence_threshold,
+            )
 
             # Update shared state atomically
             async with self._state_lock:
@@ -257,66 +336,6 @@ class MotionDetectionController(ImageController):
         closed = cv2.morphologyEx(opened, cv2.MORPH_CLOSE, kernel)
         
         return closed
-    
-    def _analyze_motion(self, mask: np.ndarray, frame: np.ndarray) -> MotionDetectionResult:
-        """Analyze the motion mask to extract motion information"""
-        # Find contours
-        contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-        # Filter contours by area and optional roundness
-        valid_contours = []
-        for c in contours:
-            area = cv2.contourArea(c)
-            if area < self.min_contour_area:
-                continue
-            if self.roundness_enabled:
-                peri = cv2.arcLength(c, True)
-                if peri > 0:
-                    circ = 4 * math.pi * area / (peri * peri)
-                    if circ < self.roundness_threshold:
-                        continue
-            valid_contours.append(c)
-        
-        # Calculate motion metrics
-        total_motion_area = sum(cv2.contourArea(c) for c in valid_contours)
-        frame_area = mask.shape[0] * mask.shape[1]
-        motion_percentage = (total_motion_area / frame_area) * 100
-        
-        # Determine if motion is detected
-        motion_detected = motion_percentage >= self.motion_threshold_percentage
-        
-        # Calculate motion center and bounding box
-        motion_center = None
-        motion_bbox = None
-        
-        if valid_contours:
-            # Combine all contours
-            all_points = np.vstack(valid_contours)
-            
-            # Calculate center
-            M = cv2.moments(all_points)
-            if M["m00"] != 0:
-                motion_center = (int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"]))
-            
-            # Calculate bounding box
-            x, y, w, h = cv2.boundingRect(all_points)
-            motion_bbox = (x, y, w, h)
-        
-        # Calculate confidence based on motion characteristics
-        confidence = min(motion_percentage / self.motion_threshold_percentage, 1.0)
-        if confidence < self.confidence_threshold:
-            motion_detected = False
-        
-        return MotionDetectionResult(
-            motion_detected=motion_detected,
-            motion_area=total_motion_area,
-            motion_percentage=motion_percentage,
-            motion_regions=len(valid_contours),
-            motion_center=motion_center,
-            motion_bbox=motion_bbox,
-            confidence=confidence,
-            motion_mask=mask,
-            frame_delta=None  # Could add frame differencing if needed
-        )
     
     def _motion_result_to_dict(self, result: MotionDetectionResult) -> Dict[str, Any]:
         """Convert MotionDetectionResult to dictionary for serialization"""
