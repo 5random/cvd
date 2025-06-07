@@ -13,7 +13,6 @@ from src.utils.config_utils.config_service import ConfigurationService, set_conf
 from src.data_handler.sources.sensor_source_manager import SensorManager
 from src.utils.data_utils.data_saver import DataSaver
 from src.data_handler.processing.pipeline.pipeline import create_temperature_pipeline
-from src.gui.application import WebApplication
 from src.utils.data_utils.compression_service import CompressionService, set_compression_service
 from src.utils.alert_system_utils.email_alert_service import EmailAlertService, set_email_alert_service
 
@@ -23,7 +22,7 @@ class ApplicationContainer:
     config_service: ConfigurationService
     sensor_manager: SensorManager
     data_saver: DataSaver
-    web_application: WebApplication
+    web_application: 'WebApplication'
     compression_service: CompressionService
     email_alert_service: EmailAlertService
     _background_tasks: List[Tuple[ManagedThreadPool, Future]] = field(default_factory=list)
@@ -74,7 +73,8 @@ class ApplicationContainer:
                 data_saver=data_saver,
                 data_pipeline=pipeline
             )
-              # Initialize web application
+            # Initialize web application
+            from src.gui.application import WebApplication
             web_application = WebApplication(
                 config_service=config_service,
                 sensor_manager=sensor_manager
