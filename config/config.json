@@ -1,0 +1,7 @@
+{
+  "ui": {
+    "title": "CVD Tracker",
+    "refresh_rate_ms": 1000,
+    "dark_mode": true
+  }
+}

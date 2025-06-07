@@ -93,3 +93,52 @@
 2025-06-07 15:20:33 - cvd_tracker.info - INFO - Registered component: experiment_component
 2025-06-07 15:20:33 - cvd_tracker.info - INFO - Registered component: data_component
 2025-06-07 15:20:33 - cvd_tracker.info - INFO - Registered component: logs
+2025-06-07 21:07:12 - cvd_tracker.info - INFO - Using real Arduino TC Board library
+2025-06-07 21:07:19 - cvd_tracker.info - INFO - Starting CVD Tracker...
+2025-06-07 21:07:20 - cvd_tracker.info - INFO - Compression service initialized with algorithm: gzip
+2025-06-07 21:07:20 - cvd_tracker.info - INFO - Compression service initialized
+2025-06-07 21:07:20 - cvd_tracker.info - INFO - Email alert service initialized
+2025-06-07 21:07:20 - cvd_tracker.info - INFO - Added processing stage range_validation to pipeline temperature_pipeline
+2025-06-07 21:07:20 - cvd_tracker.info - INFO - Added processing stage outlier_detection to pipeline temperature_pipeline
+2025-06-07 21:07:20 - cvd_tracker.info - INFO - Added processing stage moving_average to pipeline temperature_pipeline
+2025-06-07 21:07:20 - cvd_tracker.info - INFO - Registered component: notification_center
+2025-06-07 21:07:20 - cvd_tracker.info - INFO - Application container created successfully
+2025-06-07 21:07:20 - cvd_tracker.info - INFO - Background services started on dedicated daemon thread
+2025-06-07 21:07:20 - cvd_tracker.info - INFO - Started 0 sensors
+2025-06-07 21:07:20 - cvd_tracker.info - INFO - Started 0 sensors
+2025-06-07 21:07:20 - cvd_tracker.info - INFO - Loaded existing data index with 5 files
+2025-06-07 21:07:20 - cvd_tracker.info - INFO - Background maintenance worker started
+2025-06-07 21:07:20 - cvd_tracker.info - INFO - DataManager initialized successfully and background maintenance scheduled
+2025-06-07 21:07:20 - cvd_tracker.info - INFO - UI components and routes registered
+2025-06-07 21:07:20 - cvd_tracker.info - INFO - Starting web interface: CVD Tracker at localhost:8080
+2025-06-07 21:07:20 - cvd_tracker.info - INFO - Using real Arduino TC Board library
+2025-06-07 21:07:22 - cvd_tracker.info - INFO - Starting CVD Tracker...
+2025-06-07 21:07:22 - cvd_tracker.info - INFO - Compression service initialized with algorithm: gzip
+2025-06-07 21:07:22 - cvd_tracker.info - INFO - Compression service initialized
+2025-06-07 21:07:22 - cvd_tracker.info - INFO - Email alert service initialized
+2025-06-07 21:07:22 - cvd_tracker.info - INFO - Added processing stage range_validation to pipeline temperature_pipeline
+2025-06-07 21:07:22 - cvd_tracker.info - INFO - Added processing stage outlier_detection to pipeline temperature_pipeline
+2025-06-07 21:07:22 - cvd_tracker.info - INFO - Added processing stage moving_average to pipeline temperature_pipeline
+2025-06-07 21:07:22 - cvd_tracker.info - INFO - Registered component: notification_center
+2025-06-07 21:07:22 - cvd_tracker.info - INFO - Application container created successfully
+2025-06-07 21:07:22 - cvd_tracker.info - INFO - Background services started on dedicated daemon thread
+2025-06-07 21:07:22 - cvd_tracker.info - INFO - Started 0 sensors
+2025-06-07 21:07:22 - cvd_tracker.info - INFO - Started 0 sensors
+2025-06-07 21:07:22 - cvd_tracker.info - INFO - Loaded existing data index with 5 files
+2025-06-07 21:07:22 - cvd_tracker.info - INFO - Background maintenance worker started
+2025-06-07 21:07:22 - cvd_tracker.info - INFO - DataManager initialized successfully and background maintenance scheduled
+2025-06-07 21:07:22 - cvd_tracker.info - INFO - UI components and routes registered
+2025-06-07 21:07:22 - cvd_tracker.info - INFO - Starting web interface: CVD Tracker at localhost:8080
+2025-06-07 21:07:22 - cvd_tracker.info - INFO - CVD Tracker stopped
+2025-06-07 21:07:24 - cvd_tracker.info - INFO - Registered component: sensors_component
+2025-06-07 21:07:24 - cvd_tracker.info - INFO - Registered component: controllers
+2025-06-07 21:07:24 - cvd_tracker.info - INFO - manager_created
+2025-06-07 21:07:24 - cvd_tracker.info - INFO - ExperimentManager initialized
+2025-06-07 21:07:24 - cvd_tracker.info - INFO - Registered component: experiment_component
+2025-06-07 21:07:24 - cvd_tracker.info - INFO - Registered component: data_component
+2025-06-07 21:07:24 - cvd_tracker.info - INFO - Registered component: logs
+2025-06-07 21:09:21 - cvd_tracker.info - INFO - Registered component: sensors_component
+2025-06-07 21:09:21 - cvd_tracker.info - INFO - Registered component: controllers
+2025-06-07 21:09:21 - cvd_tracker.info - INFO - Registered component: experiment_component
+2025-06-07 21:09:21 - cvd_tracker.info - INFO - Registered component: data_component
+2025-06-07 21:09:21 - cvd_tracker.info - INFO - Registered component: logs

@@ -8,3 +8,6 @@ pytest
 pytest-asyncio
 watchdog
 jsonschema
+setuptools
+types-jsonschema
+types-setuptools
