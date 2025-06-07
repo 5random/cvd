@@ -548,4 +548,4 @@ class MotionDetectionController(ImageController):
             except Exception as e:
                 error(f"Camera capture error: {e}")
 
-            await asyncio.sleep(base_delay)
+            await asyncio.sleep(delay)
