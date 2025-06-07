@@ -72,3 +72,44 @@ def test_data_saver_no_compression_available(tmp_path, monkeypatch):
     file_path = tmp_path / "raw" / "s1.csv"
     assert file_path.exists(), "csv should remain when compression unavailable"
     saver.close()
+
+
+def test_data_saver_background_tasks(tmp_path, monkeypatch):
+    dummy = DummyCompressionService()
+    monkeypatch.setattr(ds_module, "get_compression_service", lambda: dummy)
+
+    def fast_start(self):
+        def worker():
+            time.sleep(0.05)
+            self._perform_maintenance()
+
+        return self._pool.submit_task(worker, task_id="test_maintenance")
+
+    monkeypatch.setattr(ds_module.DataSaver, "_start_maintenance_thread", fast_start)
+
+    saver = ds_module.DataSaver(
+        base_output_dir=tmp_path,
+        compression_threshold_mb=0.0001,
+        max_file_age_hours=0,
+        enable_background_operations=True,
+        flush_interval=1,
+    )
+
+    old_file = saver.raw_dir / "old.csv"
+    old_file.write_text("stale")
+    os.utime(old_file, (time.time() - 3600, time.time() - 3600))
+
+    for _ in range(20):
+        saver.save(create_reading())
+
+    saver.flush_all()
+    time.sleep(0.3)
+
+    compressed_dir = saver.raw_dir / "compressed"
+    compressed_files = list(compressed_dir.glob("*.csv.gz"))
+    rotated_files = list(compressed_dir.glob("old*.csv"))
+
+    assert compressed_files, "expected compressed file"
+    assert rotated_files, "expected rotated file"
+    assert not saver._tasks, "background tasks should complete"
+    saver.close()
