@@ -167,9 +167,11 @@ class DataSaver:
             )
             self.compression_service.compress_file(str(file_path), str(compressed_path))
 
-            # Remove original after successful compression
-            file_path.unlink()
-            info(f"Compressed and removed {file_path} -> {compressed_path}")
+            # CompressionService handles removal when preserve_original is False
+            if self.compression_service._compression_settings.preserve_original:
+                info(f"Compressed file {file_path} -> {compressed_path}")
+            else:
+                info(f"Compressed and removed {file_path} -> {compressed_path}")
 
         except Exception as e:
             error(f"Failed to compress {file_path}: {e}")
@@ -189,9 +191,10 @@ class DataSaver:
             )
             self.compression_service.compress_file(str(file_path), str(compressed_path))
 
-            # Remove original after successful compression
-            file_path.unlink()
-            info(f"Compressed and removed {file_path} -> {compressed_path}")
+            if self.compression_service._compression_settings.preserve_original:
+                info(f"Compressed file {file_path} -> {compressed_path}")
+            else:
+                info(f"Compressed and removed {file_path} -> {compressed_path}")
 
         except Exception as e:
             error(f"Failed to compress {file_path}: {e}")
