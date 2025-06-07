@@ -1,6 +1,7 @@
 import asyncio
 import sys
 from pathlib import Path
+import pytest
 
 sys.path.append(str(Path(__file__).resolve().parents[1] / "program"))
 
@@ -12,14 +13,13 @@ from src.data_handler.interface.sensor_interface import SensorConfig, SensorStat
 
 
 class InvalidMockSerial(MockRS232Serial):
+
     def readline(self) -> bytes:
         return b"invalid-data\n"
-
 
 class BadSerial:
     def readline(self):
         return b"INVALID\n"
-
 
 @pytest.mark.asyncio
 async def test_rs232sensor_read_invalid_data(monkeypatch):
@@ -37,7 +37,6 @@ async def test_rs232sensor_read_invalid_data(monkeypatch):
     reading = await sensor.read()
     assert reading.status == SensorStatus.ERROR
     assert reading.error_message is not None
-
 
 @pytest.mark.asyncio
 async def test_read_returns_error_on_invalid_data():
