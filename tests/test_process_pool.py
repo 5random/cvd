@@ -1,0 +1,80 @@
+import asyncio
+import signal
+import time
+
+import pytest
+
+from src.utils.concurrency.process_pool import ManagedProcessPool, ProcessPoolConfig
+from src.utils.log_utils import log_service
+
+
+def add(x: int, y: int) -> int:
+    return x + y
+
+
+def slow() -> int:
+    time.sleep(1)
+    return 1
+
+
+def hold(duration: float) -> None:
+    time.sleep(duration)
+
+
+@pytest.fixture(autouse=True)
+def mute_logging(monkeypatch):
+    for name in ["debug", "info", "warning", "error"]:
+        monkeypatch.setattr(log_service, name, lambda *a, **k: None)
+
+
+@pytest.mark.asyncio
+async def test_pool_executes_tasks():
+    pool = ManagedProcessPool(ProcessPoolConfig(max_workers=1, timeout=1))
+
+    res = await pool.submit_async(add, 1, 2)
+    assert res == 3
+    assert pool._telemetry.finished == 1
+    pool.shutdown()
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("sig", [signal.SIGTERM, getattr(signal, "SIGKILL", signal.SIGTERM)])
+async def test_timeout_kills_pool(monkeypatch, sig):
+    killed: list[int] = []
+
+    def fake_kill(pid: int, s: int) -> None:
+        killed.append(s)
+
+    monkeypatch.setattr("src.utils.concurrency.process_pool.os.kill", fake_kill)
+
+    cfg = ProcessPoolConfig(max_workers=1, timeout=0.1, kill_on_timeout=True, kill_signal=sig)
+    pool = ManagedProcessPool(cfg)
+
+    with pytest.raises(asyncio.TimeoutError):
+        await pool.submit_async(slow)
+
+    assert killed
+    assert all(k == sig for k in killed)
+    assert pool._executor is None
+
+    res = await pool.submit_async(add, 40, 2)
+    assert res == 42
+    pool.shutdown()
+
+
+def test_scale_workers_behavior():
+    pool = ManagedProcessPool(ProcessPoolConfig(max_workers=2))
+
+    fut = pool.submit(hold, 0.2)
+    original_exec = pool._executor
+
+    pool.scale_workers(1)
+    assert pool._max_workers == 2
+    assert pool._executor is original_exec
+
+    fut.result(timeout=1)
+
+    pool.scale_workers(1)
+    assert pool._max_workers == 1
+    assert pool._executor is not original_exec
+    pool.shutdown()
