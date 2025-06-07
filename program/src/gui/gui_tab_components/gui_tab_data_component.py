@@ -196,12 +196,16 @@ class DataFilterPanel(BaseComponent):
                 # Date From filter
                 with ui.column().classes('min-w-32'):
                     ui.label('Date From').classes('text-sm font-medium')
-                    self._date_from = ui.input(value='date', on_change=self._on_date_from_change).classes('w-full')
-                
+                    self._date_from = ui.date(
+                        on_change=self._on_date_from_change
+                    ).classes('w-full')
+
                 # Date To filter
                 with ui.column().classes('min-w-32'):
                     ui.label('Date To').classes('text-sm font-medium')
-                    self._date_to = ui.input(value='date', on_change=self._on_date_to_change).classes('w-full')
+                    self._date_to = ui.date(
+                        on_change=self._on_date_to_change
+                    ).classes('w-full')
                 
                 # Clear filters button
                 ui.button('Clear Filters', on_click=self._clear_filters).classes('bg-gray-500')
@@ -240,7 +244,15 @@ class DataFilterPanel(BaseComponent):
     def _on_date_from_change(self, event) -> None:
         """Handle start date change"""
         raw = event.value or ''
-        from_date = datetime.strptime(raw, '%Y-%m-%d').date() if raw else None
+        if not raw:
+            from_date = None
+        else:
+            try:
+                from_date = datetime.strptime(raw, '%Y-%m-%d').date()
+            except ValueError:
+                ui.notify('Invalid date format', type='negative')
+                return
+
         _, to_date = self.current_filters['date_range']
         self.current_filters['date_range'] = (from_date, to_date)
         self._emit_filter_change()
@@ -248,7 +260,15 @@ class DataFilterPanel(BaseComponent):
     def _on_date_to_change(self, event) -> None:
         """Handle end date change"""
         raw = event.value or ''
-        to_date = datetime.strptime(raw, '%Y-%m-%d').date() if raw else None
+        if not raw:
+            to_date = None
+        else:
+            try:
+                to_date = datetime.strptime(raw, '%Y-%m-%d').date()
+            except ValueError:
+                ui.notify('Invalid date format', type='negative')
+                return
+
         from_date, _ = self.current_filters['date_range']
         self.current_filters['date_range'] = (from_date, to_date)
         self._emit_filter_change()
