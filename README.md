@@ -9,14 +9,15 @@ pip install -r requirements.txt
 pip install -e .
 ```
 
-The `requirements.txt` file now pins each dependency to a specific version.
+The `requirements.txt` file lists the dependencies required by this project.
 
 ## Running tests
 
-Install the test dependencies and run the test suite with `pytest`:
+Install the dependencies, install this package in editable mode, and run the test suite with `pytest`:
 
 ```bash
 pip install -r requirements.txt
+pip install -e .
 pytest
 ```
 
