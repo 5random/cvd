@@ -4,7 +4,7 @@ Provides comprehensive sensor configuration, monitoring, and control capabilitie
 """
 import asyncio
 from datetime import datetime
-from typing import Dict, List, Optional, Any, Tuple
+from typing import Dict, List, Optional, Any, Tuple, TYPE_CHECKING
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -16,10 +16,14 @@ from nicegui.elements.button import Button
 from nicegui.elements.icon import Icon
 
 from src.gui.gui_tab_components.gui_tab_base_component import BaseComponent, ComponentConfig
+from src.controllers.controller_manager import create_cvd_controller_manager
 from src.data_handler.interface.sensor_interface import SensorStatus, SensorReading
 from src.data_handler.sources.sensor_source_manager import SensorManager, SENSOR_REGISTRY
 from src.utils.config_utils.config_service import ConfigurationService
 from src.utils.log_utils.log_service import info, warning, error, debug
+
+if TYPE_CHECKING:
+    from src.gui.gui_tab_components.gui_setup_wizard_component import SetupWizardComponent
 
 
 @dataclass
@@ -462,6 +466,7 @@ class SensorsComponent(BaseComponent):
         self._search_term: str = ""
         self._sensor_cards: Dict[str, SensorCardComponent] = {}
         self._config_dialog: Optional[SensorConfigDialog] = None
+        self._setup_wizard: Optional['SetupWizardComponent'] = None
         self._refresh_timer: Optional[ui.timer] = None
 
         # UI elements
@@ -688,9 +693,21 @@ class SensorsComponent(BaseComponent):
         self._update_status_summary()
                 
     def _show_add_dialog(self) -> None:
-        """Show add sensor dialog"""
-        if self._config_dialog:
-            self._config_dialog.show_add_dialog()
+        """Show setup wizard focused on sensors"""
+        if not self._setup_wizard:
+            from src.gui.gui_tab_components.gui_setup_wizard_component import (
+                SetupWizardComponent,
+            )
+
+            controller_manager = create_cvd_controller_manager()
+            self._setup_wizard = SetupWizardComponent(
+                self.config_service,
+                self.sensor_manager,
+                controller_manager,
+            )
+
+        self._setup_wizard.show_dialog('sensors')
+        self._refresh_sensors()
             
     def _edit_sensor(self, sensor_info: SensorInfo) -> None:
         """Edit sensor configuration"""
