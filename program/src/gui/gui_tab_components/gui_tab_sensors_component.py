@@ -365,8 +365,12 @@ class SensorCardComponent(BaseComponent):
             'unknown': ('help', 'text-gray-400')
         }
         
-        icon, color = status_config.get(self.sensor_info.status.lower(), ('help', 'text-gray-400'))
-        self._status_icon.props(f'name={icon}')
+        icon, color = status_config.get(
+            self.sensor_info.status.lower(), ('help', 'text-gray-400')
+        )
+        # props() does not update the icon name dynamically; use set_name
+        # to properly update the underlying DOM element
+        self._status_icon.set_name(icon)
         self._status_icon.classes(replace=color)
         
     async def _toggle_polling(self) -> None:
