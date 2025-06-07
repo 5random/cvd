@@ -41,8 +41,14 @@ class ControllerManager:
         
         # Concurrency control
         self._controller_locks: Dict[str, asyncio.Lock] = {}
-        # Determine max concurrency: constructor param or environment variable
-        limit = max_concurrency if max_concurrency is not None else int(os.getenv("CONTROLLER_MANAGER_CONCURRENCY_LIMIT", "10"))
+        # Determine max concurrency from config, env or parameter
+        limit = max_concurrency
+        if limit is None:
+            service = get_config_service()
+            if service is not None:
+                limit = service.get("controller_concurrency_limit", int, None)
+        if limit is None:
+            limit = int(os.getenv("CONTROLLER_MANAGER_CONCURRENCY_LIMIT", "10"))
         self._execution_semaphore = asyncio.Semaphore(limit)  # Limit concurrent executions
         self._max_concurrency = limit
         
