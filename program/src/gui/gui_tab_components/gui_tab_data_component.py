@@ -311,6 +311,8 @@ class DataFilesList(BaseComponent):
         self._selection_info = None
         self._download_button = None
         self._download_status = None
+        self._download_progress = None
+        self._download_spinner = None
         self._prev_button = None
         self._next_button = None
         
@@ -335,6 +337,10 @@ class DataFilesList(BaseComponent):
             
             # Download status
             self._download_status = ui.label('').classes('text-sm text-blue-600 mb-2')
+            self._download_spinner = ui.spinner(size='2em').classes('mb-2')
+            self._download_spinner.set_visibility(False)
+            self._download_progress = ui.linear_progress(value=0.0, show_value=False).classes('w-full mb-2')
+            self._download_progress.set_visibility(False)
               # Files table
             self._files_table = ui.table(
                 columns=[
@@ -636,7 +642,13 @@ class DataFilesList(BaseComponent):
         # Stop any existing download timer
         if self._download_timer:
             self._download_timer.cancel()
-        
+
+        if self._download_progress:
+            self._download_progress.set_value(0.0)
+            self._download_progress.set_visibility(False)
+        if self._download_spinner:
+            self._download_spinner.set_visibility(True)
+
         # Start new monitoring timer
         self._download_timer = ui.timer(1.0, lambda: self._monitor_download_sync(request_id))
           
@@ -645,6 +657,10 @@ class DataFilesList(BaseComponent):
         if self._download_timer:
             self._download_timer.cancel()
             self._download_timer = None
+        if self._download_progress:
+            self._download_progress.set_visibility(False)
+        if self._download_spinner:
+            self._download_spinner.set_visibility(False)
 
     def _monitor_download_sync(self, request_id: str) -> None:
         """Synchronous download monitoring using timer"""
@@ -695,9 +711,19 @@ class DataFilesList(BaseComponent):
                     total = progress.get('total_files', 0)
                     if self._download_status:
                         self._download_status.text = f'Processing download package... ({processed}/{total} files)'
+                    if self._download_progress:
+                        self._download_progress.set_visibility(True)
+                        if total:
+                            self._download_progress.set_value(processed / total)
+                    if self._download_spinner:
+                        self._download_spinner.set_visibility(False)
                 else:
                     if self._download_status:
                         self._download_status.text = 'Processing download package...'
+                    if self._download_spinner:
+                        self._download_spinner.set_visibility(True)
+                    if self._download_progress:
+                        self._download_progress.set_visibility(False)
                 
                 # Continue monitoring with next timer cycle
                 # Note: Timer will automatically call this method again after interval
@@ -707,6 +733,10 @@ class DataFilesList(BaseComponent):
                 # Download is queued
                 if self._download_status:
                     self._download_status.text = 'Download request is queued...'
+                if self._download_spinner:
+                    self._download_spinner.set_visibility(True)
+                if self._download_progress:
+                    self._download_progress.set_visibility(False)
                 return
                 
             else:

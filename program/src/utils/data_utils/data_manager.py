@@ -137,6 +137,8 @@ class DownloadRequest:
     expires_at: datetime
     download_path: Optional[Path] = None
     error_message: Optional[str] = None
+    processed_files: int = 0
+    total_files: int = 0
 
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary for JSON serialization"""
@@ -610,7 +612,9 @@ class DataManager:
             format=format,
             status='pending',
             created_at=datetime.now(),
-            expires_at=expires_at
+            expires_at=expires_at,
+            processed_files=0,
+            total_files=len(valid_paths)
         )
         
         self._download_requests[request_id] = download_request
@@ -633,10 +637,11 @@ class DataManager:
                 if not request:
                     return
                 request.status = 'processing'
+                request.processed_files = 0
             # Create download package outside lock
             package_path = self.downloads_dir / f"{request_id}.{request.format}"
             if request.format == 'zip':
-                self._create_zip_package(request.requested_files, package_path)
+                self._create_zip_package(request.requested_files, package_path, request)
             # Update request under lock
             with self._lock:
                 request.download_path = package_path
@@ -649,11 +654,11 @@ class DataManager:
                     self._download_requests[request_id].status = 'error'
                     self._download_requests[request_id].error_message = str(e)
 
-    def _create_zip_package(self, file_paths: List[str], output_path: Path) -> None:
-        """Create a ZIP package from the specified files"""
+    def _create_zip_package(self, file_paths: List[str], output_path: Path, request: DownloadRequest) -> None:
+        """Create a ZIP package from the specified files and update progress."""
         if not self._index:
             raise ValueError("Data index not available")
-            
+
         with zipfile.ZipFile(output_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
             for file_path in file_paths:
                 if file_path in self._index.files:
@@ -669,6 +674,8 @@ class DataManager:
                             arcname = f"{metadata.category.value}/{arcname}"
                         
                         zipf.write(metadata.file_path, arcname)
+                        with self._lock:
+                            request.processed_files += 1
 
     def get_download_status(self, request_id: str) -> Optional[Dict[str, Any]]:
         """Get the status of a download request"""
