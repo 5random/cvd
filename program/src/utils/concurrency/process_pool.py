@@ -8,9 +8,9 @@ Changelog
 * `scale_workers` verhindert Umskalieren bei laufenden Tasks,
   außer `force_shutdown=True`.
 """
+
 from __future__ import annotations
 
-import atexit
 import asyncio
 import multiprocessing as mp
 import os
@@ -22,7 +22,7 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Any, Callable, Dict, Optional
 
-from src.utils.log_utils.log_service import info, warning  
+from src.utils.log_utils.log_service import info, warning
 
 
 class ProcessPoolType(Enum):
@@ -54,7 +54,11 @@ class _Telemetry:
 
 
 class ManagedProcessPool:
-    def __init__(self, config: ProcessPoolConfig, pool_type: ProcessPoolType = ProcessPoolType.DEFAULT) -> None:
+    def __init__(
+        self,
+        config: ProcessPoolConfig,
+        pool_type: ProcessPoolType = ProcessPoolType.DEFAULT,
+    ) -> None:
         self.config = config
         self.pool_type = pool_type
         self._max_workers = config.max_workers or (mp.cpu_count() or 1)
@@ -75,7 +79,9 @@ class ManagedProcessPool:
         fut.add_done_callback(self._on_done)
         return fut
 
-    async def submit_async(self, func: Callable[..., Any], *args: Any, **kwargs: Any) -> Any:
+    async def submit_async(
+        self, func: Callable[..., Any], *args: Any, **kwargs: Any
+    ) -> Any:
         fut = self.submit(func, *args, **kwargs)
         wrapped: asyncio.Future[Any] = asyncio.wrap_future(fut)
         try:
@@ -101,7 +107,11 @@ class ManagedProcessPool:
         new_max = max(1, min(max_workers, mp.cpu_count()))
         with self._lock:
             if self._telemetry.active and not force_shutdown:
-                warning("scale_skipped_active_jobs", active=self._telemetry.active, requested=new_max)
+                warning(
+                    "scale_skipped_active_jobs",
+                    active=self._telemetry.active,
+                    requested=new_max,
+                )
                 return
             self._max_workers = new_max
             old_exec, self._executor = self._executor, None
@@ -140,11 +150,3 @@ class ManagedProcessPool:
     def shutdown(self, wait: bool = True) -> None:
         self._closed = True
         self._terminate_executor()
-
-# ───────── Global Cleanup ─────────
-def _cleanup() -> None:
-    # … evtl. mehrere Pools orchestrieren …
-    pass
-
-
-atexit.register(_cleanup)

@@ -47,6 +47,9 @@ class SetupWizardComponent(BaseComponent):
 
     def render(self) -> ui.column:
         """Render stepper UI."""
+        if not ui.context.slot_stack:
+            from nicegui import Client
+            ui.context.slot_stack.append(Client.auto_index_client.layout.default_slot)
         with ui.column().classes("w-full") as root:
             with ui.stepper().props("vertical") as self._stepper:
                 # Sensors step

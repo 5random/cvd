@@ -10,7 +10,6 @@ from dataclasses import dataclass
 import time
 import math
 import asyncio
-import contextlib
 
 from src.controllers.controller_base import (
     ImageController,
@@ -18,7 +17,6 @@ from src.controllers.controller_base import (
     ControllerConfig,
     ControllerInput,
 )
-from src.utils.concurrency.thread_pool import run_camera_io
 from src.utils.config_utils.config_service import get_config_service
 from src.utils.concurrency.process_pool import (
     ManagedProcessPool,
@@ -26,10 +24,8 @@ from src.utils.concurrency.process_pool import (
     ProcessPoolType,
 )
 from src.utils.log_utils.log_service import info, warning, error, debug
-from src.controllers.controller_utils.camera_utils import (
-    apply_uvc_settings,
-    rotate_frame,
-)
+
+
 
 
 @dataclass
@@ -179,14 +175,8 @@ class MotionDetectionController(ImageController):
         self._max_history = params.get("max_history", 100)
 
         # Lock to protect shared state in async processing
-        import asyncio
-
         self._state_lock = asyncio.Lock()
 
-        # Camera capture resources
-        self._capture: Optional[cv2.VideoCapture] = None
-        self._capture_task: Optional[asyncio.Task] = None
-        self._stop_event = asyncio.Event()
 
     async def initialize(self) -> bool:
         """Initialize the motion detection controller"""
@@ -204,29 +194,10 @@ class MotionDetectionController(ImageController):
                 error(f"Unsupported background subtraction algorithm: {self.algorithm}")
                 return False
 
-            # Initialize camera capture if needed
-            self._capture = await run_camera_io(cv2.VideoCapture, self.device_index)
-            if self._capture and self._capture.isOpened():
-                if self.width:
-                    await run_camera_io(
-                        self._capture.set, cv2.CAP_PROP_FRAME_WIDTH, int(self.width)
-                    )
-                if self.height:
-                    await run_camera_io(
-                        self._capture.set, cv2.CAP_PROP_FRAME_HEIGHT, int(self.height)
-                    )
-                if self.fps:
-                    await run_camera_io(
-                        self._capture.set, cv2.CAP_PROP_FPS, int(self.fps)
-                    )
-                await apply_uvc_settings(self._capture, self.uvc_settings)
-                info(
-                    f"Initialized motion detection controller with {self.algorithm} algorithm"
-                )
-                return True
-            else:
-                error(f"Unable to open camera index {self.device_index}")
-                return False
+            info(
+                f"Initialized motion detection controller with {self.algorithm} algorithm"
+            )
+            return True
 
         except Exception as e:
             error(f"Failed to initialize motion detection controller: {e}")
@@ -445,16 +416,6 @@ class MotionDetectionController(ImageController):
                 break
         self._motion_pool.shutdown(wait=True)
 
-        if self._capture is not None:
-            await run_camera_io(self._capture.release)
-            self._capture = None
-        self._stop_event.set()
-        if self._capture_task:
-            self._capture_task.cancel()
-            with contextlib.suppress(Exception):
-                await self._capture_task
-            self._capture_task = None
-
         self._bg_subtractor = None
         self._last_frame = None
         self._motion_history.clear()
@@ -562,3 +523,4 @@ class MotionDetectionController(ImageController):
                 error(f"Camera capture error: {e}")
 
             await asyncio.sleep(base_delay)
+
