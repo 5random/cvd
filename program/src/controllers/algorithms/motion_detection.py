@@ -287,30 +287,36 @@ class MotionDetectionController(ImageController):
     def _convert_to_cv_frame(self, image_data: Any) -> Optional[np.ndarray]:
         """Convert various image data formats to OpenCV frame"""
         try:
+            rgb_source = False
             if isinstance(image_data, np.ndarray):
-                # Already a numpy array
+                # Already an OpenCV frame (assumed BGR/BGRA)
                 frame = image_data
-            elif hasattr(image_data, 'array'):
-                # PIL Image or similar
+            elif hasattr(image_data, "array"):
+                # PIL Image or similar returns RGB/RGBA
                 frame = np.array(image_data)
+                rgb_source = True
             elif isinstance(image_data, bytes):
-                # Raw image bytes
+                # Raw image bytes (often RGB order)
                 nparr = np.frombuffer(image_data, np.uint8)
                 frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+                rgb_source = True
             else:
                 error(f"Unsupported image data type: {type(image_data)}")
                 return None
-            
-            # Ensure the frame is in the correct format
-            if len(frame.shape) == 3 and frame.shape[2] == 3:
-                # Convert RGB to BGR for OpenCV (expects BGR format)
-                frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
-            elif len(frame.shape) == 3 and frame.shape[2] == 4:
-                # Convert RGBA to BGR
-                frame = cv2.cvtColor(frame, cv2.COLOR_RGBA2BGR)
-            
+
+            if len(frame.shape) == 3:
+                channels = frame.shape[2]
+                if channels == 3 and rgb_source:
+                    # Convert RGB to BGR for OpenCV
+                    frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+                elif channels == 4:
+                    if rgb_source:
+                        frame = cv2.cvtColor(frame, cv2.COLOR_RGBA2BGR)
+                    else:
+                        frame = cv2.cvtColor(frame, cv2.COLOR_BGRA2BGR)
+
             return frame
-            
+
         except Exception as e:
             error(f"Error converting image data: {e}")
             return None

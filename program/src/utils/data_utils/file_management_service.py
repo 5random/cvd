@@ -2,6 +2,7 @@ from pathlib import Path
 from typing import List, Optional
 import threading
 import time
+import os
 
 from src.utils.log_utils.log_service import info, warning, error
 from src.utils.concurrency.thread_pool import get_thread_pool_manager, ThreadPoolType
@@ -86,7 +87,18 @@ class FileMaintenanceService:
             # type: ignore[attr-defined]
             self.compression_service.compress_file(str(file_path), str(compressed_path))
 
-            if self.compression_service._compression_settings.preserve_original:
+            preserve = False
+            if hasattr(self.compression_service, "_compression_settings"):
+                preserve = getattr(self.compression_service._compression_settings, "preserve_original", False)
+
+            if not preserve and file_path.exists():
+                try:
+                    file_path.unlink()
+                    os.utime(file_path.parent, None)
+                except Exception as ex:
+                    error(f"Failed to remove original after compression: {ex}")
+
+            if preserve:
                 info(f"Compressed file {file_path} -> {compressed_path}")
             else:
                 info(f"Compressed and removed {file_path} -> {compressed_path}")
