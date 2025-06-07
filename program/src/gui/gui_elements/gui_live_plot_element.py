@@ -5,6 +5,7 @@ from typing import Dict, List, Any, Optional
 from collections import deque
 from dataclasses import dataclass
 import time
+from datetime import datetime
 import plotly.graph_objs as go
 from plotly.subplots import make_subplots
 from nicegui import ui
@@ -46,7 +47,12 @@ class LivePlotComponent(BaseComponent):
         
         # Data storage
         self._data_store: Dict[str, deque] = {}
-        self._time_store: deque = deque(maxlen=self.plot_config.max_points)
+        # Calculate maxlen based on history window and refresh rate
+        history_maxlen = max(
+            1,
+            int(self.plot_config.history_seconds * 1000 / self.plot_config.refresh_rate_ms),
+        )
+        self._time_store: deque = deque(maxlen=history_maxlen)
         self._series_configs: Dict[str, SeriesConfig] = {}
         
         # UI elements
@@ -112,10 +118,26 @@ class LivePlotComponent(BaseComponent):
         fig = go.Figure()
         
         # Configure layout
+        # Determine y-axis title based on sensor units
+        sensors = self.sensors_to_display if self.sensors_to_display is not None else self.sensor_manager.get_all_sensors()
+        units = []
+        for sensor_id in sensors:
+            reading = self.sensor_manager.get_sensor_reading(sensor_id)
+            if reading and reading.metadata:
+                units.append(reading.metadata.get('unit', ''))
+
+        first_unit = units[0] if units else ''
+        unique_units = {u for u in units if u}
+        if len(unique_units) == 1 and first_unit:
+            yaxis_title = f"Value ({first_unit})"
+        else:
+            # Different units or unknown unit
+            yaxis_title = "Value"
+
         fig.update_layout(
             title="Live Sensor Data",
             xaxis_title="Time",
-            yaxis_title="Temperature (°C)",
+            yaxis_title=yaxis_title,
             showlegend=True,
             height=400,
             margin=dict(l=50, r=50, t=50, b=50),
@@ -132,7 +154,8 @@ class LivePlotComponent(BaseComponent):
             ),
             yaxis=dict(
                 showgrid=self.plot_config.show_grid,
-                gridcolor='lightgray'
+                gridcolor='lightgray',
+                autorange=self.plot_config.auto_scale
             )
         )
         
@@ -171,7 +194,15 @@ class LivePlotComponent(BaseComponent):
         try:
             current_time = time.time()
             self._time_store.append(current_time)
-            
+
+            # Remove data older than history window
+            cutoff = current_time - self.plot_config.history_seconds
+            while self._time_store and self._time_store[0] < cutoff:
+                self._time_store.popleft()
+                for queue in self._data_store.values():
+                    if queue:
+                        queue.popleft()
+
             # Collect data from all sensors
             for sensor_id in self._series_configs:
                 reading = self.sensor_manager.get_sensor_reading(sensor_id)
@@ -193,38 +224,54 @@ class LivePlotComponent(BaseComponent):
         if not self._plot_element:
             return
         
-        # Convert timestamps to datetime for plotting
-        time_axis = [time.time() - (len(self._time_store) - i) * (self.plot_config.refresh_rate_ms / 1000) 
-                     for i in range(len(self._time_store))]
+        # Convert stored timestamps to datetime objects for plotting
+        time_axis = [datetime.fromtimestamp(ts) for ts in self._time_store]
         
         # Create traces for each sensor
         traces = []
+        last_sensor_id = None
         for sensor_id, series_config in self._series_configs.items():
+            last_sensor_id = sensor_id
             if not series_config.visible:
                 continue
-                
+
             data = list(self._data_store[sensor_id])
-            
+
             if len(data) > 0:
-                trace = go.Scatter(
-                    x=time_axis[:len(data)],
-                    y=data,
-                    mode='lines',
-                    name=series_config.label,
-                    line=dict(
-                        color=series_config.color,
-                        width=self.plot_config.line_width
-                    ),
-                    connectgaps=False
-                )
-                traces.append(trace)
+                try:
+                    trace = go.Scatter(
+                        x=time_axis[:len(data)],
+                        y=data,
+                        mode='lines',
+                        name=series_config.label,
+                        line=dict(
+                            color=series_config.color,
+                            width=self.plot_config.line_width
+                        ),
+                        connectgaps=False,
+                        hovertemplate=(
+                            f"{series_config.label}: %{y:.2f}{series_config.unit}"
+                            "<extra></extra>"
+                        ),
+                    )
+                    traces.append(trace)
+                except Exception as e:
+                    error(
+                        f"Error refreshing plot for sensor {sensor_id}: {e}",
+                        exc_info=True,
+                    )
         
         # Update plot
         try:
             self._plot_element.figure["data"] = traces
+            # Update y-axis scaling based on configuration
+            self._plot_element.figure.update_yaxes(autorange=self.plot_config.auto_scale)
             self._plot_element.update()
         except Exception as e:
-            error(f"Error refreshing plot: {e}")
+            error(
+                f"Error refreshing plot after sensor {last_sensor_id}: {e}",
+                exc_info=True,
+            )
     
     def _toggle_recording(self) -> None:
         """Toggle recording state"""
@@ -289,13 +336,16 @@ class LivePlotComponent(BaseComponent):
         
         # Update data store max lengths
         for data_queue in self._data_store.values():
-            # Create new deque with updated maxlen
             new_queue = deque(data_queue, maxlen=self.plot_config.max_points)
             data_queue.clear()
             data_queue.extend(new_queue)
-        
-        self._time_store = deque(self._time_store, maxlen=self.plot_config.max_points)
-        
+
+        history_maxlen = max(
+            1,
+            int(self.plot_config.history_seconds * 1000 / self.plot_config.refresh_rate_ms),
+        )
+        self._time_store = deque(self._time_store, maxlen=history_maxlen)
+
         dialog.close()
     
     def add_sensor(self, sensor_id: str, label: Optional[str] = None, color: Optional[str] = None) -> None:

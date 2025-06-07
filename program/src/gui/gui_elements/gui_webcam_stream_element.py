@@ -70,6 +70,8 @@ class CameraStreamComponent(BaseComponent):
         self.last_fps_time = None
         # Track the last resize scale (uniform)
         self._last_scale = 1.0
+        # Latest frame for MJPEG streaming
+        self._latest_frame: Optional[np.ndarray] = None
         
     def render(self) -> ui.element:
         """Render the camera stream component."""
@@ -106,9 +108,10 @@ class CameraStreamComponent(BaseComponent):
             
             # Image display area
             with ui.column().classes('w-full items-center'):
-                self.image_element = ui.image().classes('border rounded')
-                
-                # Initialize with placeholder
+                # Display MJPEG feed from /video_feed
+                self.image_element = ui.image('/video_feed').classes('border rounded')
+
+                # Initialize placeholder frame
                 self._set_placeholder_image()
         
         return container
@@ -388,24 +391,8 @@ class CameraStreamComponent(BaseComponent):
     def _update_image_display(self, frame: np.ndarray):
         """Update the image element with the new frame."""
         try:
-            # Convert OpenCV frame (BGR) to RGB
-            if len(frame.shape) == 3:
-                frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            else:
-                frame_rgb = frame
-            
-            # Convert to PIL Image
-            pil_image = Image.fromarray(frame_rgb)
-            
-            # Convert to base64 for web display
-            img_buffer = io.BytesIO()
-            pil_image.save(img_buffer, format='JPEG', quality=85)
-            img_str = base64.b64encode(img_buffer.getvalue()).decode()
-            
-            # Update the image element
-            if self.image_element:
-                self.image_element.set_source(f'data:image/jpeg;base64,{img_str}')
-            
+            # Store latest frame for MJPEG route
+            self._latest_frame = frame
         except Exception as e:
             error(f"Error updating image display: {e}")
     
@@ -425,6 +412,10 @@ class CameraStreamComponent(BaseComponent):
             
             self.fps_counter = 0
             self.last_fps_time = current_time
+
+    def get_latest_frame(self) -> Optional[np.ndarray]:
+        """Return the most recent processed frame."""
+        return self._latest_frame
     
     def _handle_no_controller(self):
         """Handle case when motion detection controller is not available."""

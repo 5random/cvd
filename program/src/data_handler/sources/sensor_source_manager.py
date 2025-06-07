@@ -5,7 +5,7 @@ import asyncio
 from typing import Dict, List, Optional, Type, Callable, Any
 from concurrent.futures import ThreadPoolExecutor, Executor
 from src.data_handler.interface.sensor_interface import SensorInterface, SensorReading, SensorConfig, SensorStatus
-from src.utils.config_utils.config_service import ConfigurationService
+from src.utils.config_utils.config_service import ConfigurationService, ValidationError
 from src.data_handler.sources.sensors.arduino_tc_sensor import ArduinoTCSensor
 from src.data_handler.sources.sensors.rs232_sensor import RS232Sensor
 from src.utils.data_utils.data_saver import DataSaver
@@ -331,16 +331,24 @@ class SensorManager:
             if not sensor_config.get('enabled', True):
                 continue
             try:
+                # Validate configuration
+                self.config_service.validate_sensor_config(sensor_config)
+            except ValidationError as ve:
+                error(
+                    f"Sensor config validation error for {sensor_config.get('sensor_id', 'unknown')}: {ve}"
+                )
+                continue
+            try:
                 # Create sensor
                 sensor = self.create_sensor(sensor_config)
                 if not sensor:
                     continue
-                
+
                 # Register and start sensor
                 if await self.register_sensor(sensor):
                     if await self.start_sensor(sensor.sensor_id):
                         started_count += 1
-                
+
             except Exception as e:
                 error(f"Failed to start sensor {sensor_config.get('sensor_id', 'unknown')}: {e}")
         

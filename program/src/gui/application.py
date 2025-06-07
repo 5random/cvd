@@ -6,6 +6,7 @@ import contextlib
 from typing import Any, Dict, Optional
 
 from nicegui import app, ui
+import cv2
 from src.controllers.controller_manager import create_cvd_controller_manager
 from src.data_handler.sources.sensor_source_manager import SensorManager
 from src.gui.gui_elements.gui_live_plot_element import (LivePlotComponent,
@@ -28,6 +29,7 @@ from src.gui.gui_tab_components.gui_tab_sensors_component import \
 from src.utils.config_utils.config_service import ConfigurationService
 from src.utils.data_utils.data_manager import get_data_manager
 from src.utils.log_utils.log_service import debug, error, info, warning
+from src.gui.gui_elements.gui_webcam_stream_element import CameraStreamComponent
 from starlette.staticfiles import StaticFiles
 
 
@@ -58,6 +60,8 @@ class WebApplication:
     async def startup(self) -> None:
         """Async startup for web application"""
         info("Web application starting up...")
+        # Apply persisted dark mode setting before starting controllers
+        ui.dark_mode().value = self.config_service.get('ui.dark_mode', bool, True)
         await self.controller_manager.start_all_controllers()
         self._processing_task = asyncio.create_task(self._processing_loop())
         info("Web application startup complete")
@@ -116,6 +120,25 @@ class WebApplication:
         def status():
             """System status page"""
             return self._create_status_page()
+
+        @ui.page('/video_feed')
+        async def video_feed():
+            """Stream MJPEG frames from the dashboard camera"""
+            camera = self.component_registry.get_component('dashboard_camera_stream')
+
+            async def gen():
+                while True:
+                    if isinstance(camera, CameraStreamComponent):
+                        frame = camera.get_latest_frame()
+                        if frame is not None:
+                            success, buf = cv2.imencode('jpg', frame)
+                            if success:
+                                jpeg_bytes = buf.tobytes()
+                                yield (b'--frame\r\nContent-Type: image/jpeg\r\n\r\n' +
+                                       jpeg_bytes + b'\r\n')
+                    await asyncio.sleep(camera.update_interval if isinstance(camera, CameraStreamComponent) else 0.03)
+
+            return app.response_class(gen(), media_type='multipart/x-mixed-replace; boundary=frame')
     
     def _setup_layout(self) -> None:
         """Setup common layout elements"""
@@ -273,17 +296,19 @@ class WebApplication:
                 ui.label('Configuration').classes('text-lg font-semibold mb-2')
                 
                 # Basic settings
-                ui.input(
+                self._title_input = ui.input(
                     label='System Title',
                     value=self.config_service.get('ui.title', str, 'CVD Tracker')
-                ).classes('w-full mb-2')
-                
-                ui.number(
+                )
+                self._title_input.classes('w-full mb-2')
+
+                self._refresh_rate_input = ui.number(
                     label='Refresh Rate (ms)',
                     value=self.config_service.get('ui.refresh_rate_ms', int, 1000),
                     min=100,
                     max=10000
-                ).classes('w-full mb-2')
+                )
+                self._refresh_rate_input.classes('w-full mb-2')
                 
                 ui.button('Save Settings', on_click=self._save_settings).classes('mt-4')
             
@@ -300,14 +325,33 @@ class WebApplication:
                 ui.label('✓ Web Application: Running').classes('text-green-600')
     
     def _save_settings(self) -> None:
-        """Save settings (placeholder)"""
-        ui.notify('Settings saved successfully!')
+        """Persist settings from input fields to configuration"""
+        try:
+            if hasattr(self, '_title_input') and self._title_input is not None:
+                self.config_service.set('ui.title', str(self._title_input.value))
+
+            if hasattr(self, '_refresh_rate_input') and self._refresh_rate_input is not None:
+                self.config_service.set(
+                    'ui.refresh_rate_ms', int(self._refresh_rate_input.value)
+                )
+
+            ui.notify('Settings saved successfully!', type='positive')
+        except Exception as e:
+            error(f'Error saving settings: {e}')
+            ui.notify(f'Error saving settings: {e}', type='negative')
         
     def _create_quick_settings(self) -> None:
         """Create quick settings in header"""
         with ui.row().classes('gap-2'):
-            # Dark mode toggle (placeholder)
-            ui.button(icon='dark_mode',color='#5898d4', on_click=lambda: ui.notify('Dark mode toggled')).props('flat round')
+            # Dark mode toggle using NiceGUI's global dark mode object
+            dark_mode = ui.dark_mode()
+
+            def toggle_dark_mode() -> None:
+                """Toggle UI dark mode and persist setting"""
+                dark_mode.value = not dark_mode.value
+                self.config_service.set('ui.dark_mode', dark_mode.value)
+
+            ui.button(icon='dark_mode', color='#5898d4', on_click=toggle_dark_mode).props('flat round')
             
             # Refresh button
             ui.button(icon='refresh',color='#5898d4', on_click=ui.navigate.reload).props('flat round')
@@ -473,8 +517,12 @@ class WebApplication:
                 # Dark mode toggle
                 dark_mode = ui.dark_mode()
                 dark_mode.value = self.config_service.get('ui.dark_mode', bool, True)
-                ui.checkbox('Dark Mode', value=dark_mode.value, 
-                           on_change=lambda e: setattr(dark_mode, 'value', e.value))
+
+                def on_dark_mode_change(e) -> None:
+                    dark_mode.value = e.value
+                    self.config_service.set('ui.dark_mode', dark_mode.value)
+
+                ui.checkbox('Dark Mode', value=dark_mode.value, on_change=on_dark_mode_change)
                 
                 ui.separator()
                 

@@ -64,7 +64,7 @@ class ConfigurationService:
     
     CONTROLLER_SCHEMA = {
         "required_fields": ["name", "type", "enabled"],
-        "optional_fields": ["interface", "device_index", "settings", "algorithm", "state_output", "show_on_dashboard"],
+        "optional_fields": ["interface", "device_index", "settings", "algorithm", "state_output", "show_on_dashboard", "cam_id"],
         "field_types": {
             "name": str,
             "type": str,
@@ -75,7 +75,8 @@ class ConfigurationService:
             "settings": dict,
             "algorithm": list,
             "state_output": list,
-            "show_on_dashboard": bool
+            "show_on_dashboard": bool,
+            "cam_id": str
         },
         "valid_interfaces": ["usb_camera", "network_camera", "virtual"],
         "valid_types": [
@@ -84,6 +85,7 @@ class ConfigurationService:
             "motion_detector",
             "camera_capture",
             "motion_detection",
+            "motion_detection_camera",
         ],
         "interface_requirements": {
             "usb_camera": ["device_index"],
@@ -93,7 +95,7 @@ class ConfigurationService:
 
     WEBCAM_SCHEMA = {
         "required_fields": ["name", "device_index"],
-        "optional_fields": ["resolution", "fps", "rotation", "uvc"],
+        "optional_fields": ["resolution", "fps", "rotation", "uvc", "uvc_settings", "webcam_id"],
         "field_types": {
             "name": str,
             "device_index": int,
@@ -101,6 +103,8 @@ class ConfigurationService:
             "fps": int,
             "rotation": int,
             "uvc": dict,
+            "uvc_settings": dict,
+            "webcam_id": str,
         },
         "valid_rotations": [0, 90, 180, 270],
         "uvc_field_types": {
@@ -225,6 +229,10 @@ class ConfigurationService:
         errors = self._validate_config(sensor_config, self.SENSOR_SCHEMA, "sensor")
         if errors:
             raise ValidationError(f"Sensor validation failed: {'; '.join(errors)}")
+
+    def validate_sensor_config(self, sensor_config: Dict[str, Any]) -> None:
+        """Public wrapper for validating sensor configuration"""
+        self._validate_sensor_config(sensor_config)
     
     def _validate_controller_config(self, controller_config: Dict[str, Any]) -> None:
         """Validate controller configuration"""
