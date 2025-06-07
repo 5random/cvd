@@ -550,19 +550,20 @@ class LogService:
 
     def get_log_stats(self) -> Dict[str, Any]:
         """Get logging statistics"""
-        stats = {
+        log_files: list[Dict[str, Any]] = []
+        stats: Dict[str, Any] = {
             "log_directory": str(self.log_dir),
             "log_level": self.log_level,
             "rotation_mb": self.rotation_mb,
             "retention_days": self.retention_days,
             "active_loggers": list(self._loggers.keys()),
-            "log_files": [],
+            "log_files": log_files,
         }
 
         # Get file stats
         for log_file in self.log_dir.glob("*.log*"):
             file_stat = log_file.stat()
-            stats["log_files"].append(
+            log_files.append(
                 {
                     "name": log_file.name,
                     "size_mb": file_stat.st_size / (1024 * 1024),
