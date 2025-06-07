@@ -107,7 +107,7 @@ class CameraStreamComponent(BaseComponent):
             # Image display area
             with ui.column().classes('w-full items-center'):
                 # Display MJPEG feed from /video_feed
-                self.image_element = ui.image('/video_feed').classes('border rounded')
+                self.image_element = ui.image('/video_feed').classes('border rounded').props('alt="Webcam stream"')
 
                 # Initialize placeholder frame
                 self._set_placeholder_image()
