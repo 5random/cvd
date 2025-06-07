@@ -5,6 +5,7 @@ FIXED VERSION - All logic errors corrected
 """
 
 from typing import Dict, Any, Optional, List, Callable
+from collections import deque
 import asyncio
 import contextlib
 from dataclasses import dataclass
@@ -182,14 +183,14 @@ class LogViewerComponent(BaseComponent):
                     opener = lzma.open
                 else:
                     opener = open
-                with opener(self.log_file_info.path, "rt", encoding="utf-8") as f:
-                    lines = f.readlines()
             else:
-                with open(self.log_file_info.path, "r", encoding="utf-8") as f:
-                    lines = f.readlines()
+                opener = open
+
+            with opener(self.log_file_info.path, "rt", encoding="utf-8") as f:
+                lines = deque(f, maxlen=self._max_lines)
 
             # Keep only recent lines for performance
-            self._log_lines = lines[-self._max_lines :]
+            self._log_lines = list(lines)
 
         except Exception as e:
             error(f"Error loading log file {self.log_file_info.path}: {e}")
@@ -470,24 +471,10 @@ class LogComponent(BaseComponent):
             return
 
         try:
-            # Read last few lines from the log file, handle compression
-            if log_file.is_compressed:
-                suffix = log_file.path.suffix.lower()
-                if suffix == ".gz":
-                    opener = gzip.open
-                elif suffix == ".bz2":
-                    opener = bz2.open
-                elif suffix == ".xz":
-                    opener = lzma.open
-                else:
-                    opener = open
-                with opener(log_file.path, "rt", encoding="utf-8") as f:
-                    lines = f.readlines()
-            else:
-                with open(log_file.path, "r", encoding="utf-8") as f:
-                    lines = f.readlines()
-
-            recent_lines = lines[-10:]  # Last 10 lines
+            # Read last few lines from the log file
+            # deque ensures we only keep the last 10 lines
+            with open(log_file.path, "r", encoding="utf-8") as f:
+                recent_lines = list(deque(f, maxlen=10))
 
             if not recent_lines:
                 ui.label(f"No recent entries in {log_type} log").classes(
