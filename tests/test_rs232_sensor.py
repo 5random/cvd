@@ -2,7 +2,8 @@ import asyncio
 import pytest
 
 from src.data_handler.sources.sensors import rs232_sensor
-from src.data_handler.sources.sensors.rs232_sensor import RS232Sensor, MockRS232Serial
+from src.data_handler.sources.sensors.rs232_sensor import RS232Sensor
+from src.data_handler.sources.mock_hardware.rs232 import MockRS232Serial
 from src.data_handler.interface.sensor_interface import SensorConfig, SensorStatus
 
 

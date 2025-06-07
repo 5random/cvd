@@ -8,6 +8,10 @@ from src.data_handler.interface.sensor_interface import SensorInterface, SensorR
 from src.utils.config_utils.config_service import ConfigurationService, ValidationError
 from src.data_handler.sources.sensors.arduino_tc_sensor import ArduinoTCSensor
 from src.data_handler.sources.sensors.rs232_sensor import RS232Sensor
+from src.data_handler.sources.mock_sensors import (
+    MockArduinoTCSensor,
+    MockRS232Sensor,
+)
 from src.utils.data_utils.data_saver import DataSaver
 from src.data_handler.processing.pipeline.pipeline import DataPipeline
 from src.utils.log_utils.log_service import info, warning, error, debug
@@ -17,6 +21,8 @@ SensorFactory = Callable[[SensorConfig, Optional[Executor]], SensorInterface]
 SENSOR_REGISTRY: Dict[str, SensorFactory] = {
     'arduino_tc_board': ArduinoTCSensor,
     'rs232': RS232Sensor,
+    'mock_arduino_tc_board': MockArduinoTCSensor,
+    'mock_rs232': MockRS232Sensor,
 }
 
 class SensorManager:
