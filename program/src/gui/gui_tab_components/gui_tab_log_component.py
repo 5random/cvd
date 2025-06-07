@@ -6,6 +6,7 @@ FIXED VERSION - All logic errors corrected
 
 from typing import Dict, Any, Optional, List, Callable
 import asyncio
+import contextlib
 from dataclasses import dataclass
 from nicegui import ui
 from pathlib import Path
@@ -684,6 +685,17 @@ class LogComponent(BaseComponent):
         """Cleanup component"""
         if self._refresh_timer:
             self._refresh_timer.cancel()
+
+        if self._stats_task:
+            self._stats_task.cancel()
+            with contextlib.suppress(asyncio.CancelledError):
+                try:
+                    if not self._stats_task.done():
+                        loop = asyncio.get_event_loop()
+                        if not loop.is_running():
+                            loop.run_until_complete(self._stats_task)
+                finally:
+                    self._stats_task = None
 
         for viewer in self._log_viewers.values():
             viewer.cleanup()
