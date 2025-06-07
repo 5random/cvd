@@ -18,6 +18,9 @@ from src.utils.log_utils.log_service import info, warning, error, debug
 
 from .algorithms.motion_detection import MotionDetectionController
 from .algorithms.reactor_state import ReactorStateController
+from .controller_utils.controller_data_sources.camera_capture_controller import (
+    CameraCaptureController,
+)
 from src.utils.config_utils.config_service import get_config_service
 
 @dataclass
@@ -84,6 +87,8 @@ class ControllerManager:
                 return MotionDetectionController(controller_id, cfg)
             if controller_type == "reactor_state":
                 return ReactorStateController(controller_id, cfg)
+            if controller_type == "camera_capture":
+                return CameraCaptureController(controller_id, cfg)
 
             warning(f"Unknown controller type: {controller_type}")
         except Exception as exc:
@@ -401,14 +406,36 @@ def create_cvd_controller_manager() -> ControllerManager:
     if service:
         for _, cfg in service.get_controller_configs():
             manager.add_controller_from_config(cfg)
+        if (
+            "camera_capture" in manager._controllers
+            and "motion_detection" in manager._controllers
+        ):
+            manager.add_dependency(
+                "camera_capture",
+                "motion_detection",
+                data_mapping={"frame": "image"},
+            )
     else:
-        # Fallback to a default motion detection controller
+        # Fallback to a default camera capture and motion detection pipeline
+        cam_cfg = ControllerConfig(
+            controller_id="camera_capture",
+            controller_type="camera_capture",
+            parameters={"device_index": 0},
+        )
         motion_cfg = ControllerConfig(
             controller_id="motion_detection",
             controller_type="motion_detection",
             parameters={"device_index": 0},
         )
-        manager.register_controller(MotionDetectionController("motion_detection", motion_cfg))
+        cam_ctrl = CameraCaptureController("camera_capture", cam_cfg)
+        motion_ctrl = MotionDetectionController("motion_detection", motion_cfg)
+        manager.register_controller(cam_ctrl)
+        manager.register_controller(motion_ctrl)
+        manager.add_dependency(
+            "camera_capture",
+            "motion_detection",
+            data_mapping={"frame": "image"},
+        )
 
     return manager
 
