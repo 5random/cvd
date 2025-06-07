@@ -14,6 +14,8 @@ class MovingAverageFilter(ProcessingStage):
     
     def __init__(self, stage_id: str, window_size: int = 5):
         super().__init__(stage_id)
+        if window_size <= 0:
+            raise ValueError("window_size must be greater than 0")
         self.stage_type = ProcessingStageType.FILTER
         self.window_size = window_size
         self._data_windows: Dict[str, List[float]] = {}
