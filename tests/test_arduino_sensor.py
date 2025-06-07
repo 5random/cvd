@@ -1,8 +1,4 @@
-import os
-import sys
 import pytest
-
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'program'))
 
 from src.data_handler.sources.sensors import arduino_tc_sensor
 from src.data_handler.interface.sensor_interface import SensorConfig

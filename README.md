@@ -2,10 +2,11 @@
 
 ## Installation
 
-To install dependencies, run:
+To install dependencies and this package in editable mode, run:
 
 ```bash
 pip install -r requirements.txt
+pip install -e .
 ```
 
 The `requirements.txt` file now pins each dependency to a specific version.
