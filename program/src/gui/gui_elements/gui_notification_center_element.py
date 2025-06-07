@@ -311,6 +311,8 @@ class NotificationCenter(BaseComponent):
             now = time.time()
             for cid in self.controller_manager.list_controllers():
                 ctrl = self.controller_manager.get_controller(cid)
+                if ctrl is None:
+                    continue
                 stats = ctrl.get_stats()
                 status = stats.get('status')
                 if status == ControllerStatus.ERROR.value:
@@ -522,7 +524,7 @@ class NotificationCenter(BaseComponent):
                 with ui.card_section().classes('bg-blue-600 text-white'):
                     with ui.row().classes('w-full items-center justify-between'):
                         ui.label('Benachrichtigungen').classes('text-h6')
-                        ui.button(icon='close', on_click=menu.close).props('flat round dense')
+                        ui.button(icon='close', color='5898d4', on_click=menu.close).props('flat round dense')
                 
                 # Compact filter bar
                 with ui.card_section().classes('py-2'):
