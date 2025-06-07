@@ -316,9 +316,6 @@ class WebApplication:
             with ui.card().classes('w-1/2 p-4'):
                 ui.label('System Status').classes('text-lg font-semibold mb-2')
                 
-                # Get container status
-                from src.utils.container import ApplicationContainer
-
                 # This is a simplified status display
                 ui.label('✓ Configuration Service: Running').classes('text-green-600')
                 ui.label('✓ Sensor Manager: Running').classes('text-green-600')
