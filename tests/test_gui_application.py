@@ -1,12 +1,9 @@
-import os
-import sys
 from pathlib import Path
 import pytest
 from nicegui import Client
 
 pytest_plugins = ['nicegui.testing.user_plugin']
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'program'))
 from src.utils.container import ApplicationContainer
 
 @pytest.mark.asyncio
