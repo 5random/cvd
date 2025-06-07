@@ -222,9 +222,11 @@ class LogViewerComponent(BaseComponent):
             and self._scroll_area
         ):
             return
-        # Save current scroll position
-        if self._scroll_area.last_args:
-            self._scroll_pos = self._scroll_area.last_args.vertical_position
+        # Save current scroll position from the last scroll event
+        # NiceGUI's ScrollArea no longer exposes ``last_args``.
+        # The ``_on_scroll`` handler already stores the last position in
+        # ``self._scroll_pos`` whenever the user scrolls. Reuse that value
+        # here to avoid attribute errors with newer NiceGUI versions.
 
         self._log_column.clear()
 
