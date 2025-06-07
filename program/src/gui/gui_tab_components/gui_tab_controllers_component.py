@@ -68,13 +68,10 @@ class ControllerConfigDialog:
                 ui.label(title).classes("text-lg font-bold mb-4")
 
                 with ui.column().classes("gap-4"):
-                    ui.input(
-                        "Controller ID", value=self._form_data["controller_id"]
-                    ).bind_value_to(self._form_data, "controller_id").props(
-                        "outlined"
-                    ).classes(
-                        "w-full"
-                    )
+                    ui.label("Controller Settings").classes("font-semibold")
+                    ui.label(
+                        f"ID: {self._form_data['controller_id']}"
+                    ).classes("text-sm text-gray-500")
                     ui.input("Name", value=self._form_data["name"]).bind_value_to(
                         self._form_data, "name"
                     ).props("outlined").classes("w-full")
@@ -88,8 +85,9 @@ class ControllerConfigDialog:
                     ui.checkbox(
                         "Enabled", value=self._form_data["enabled"]
                     ).bind_value_to(self._form_data, "enabled")
-
-                    with ui.expansion("Webcam Settings").classes("w-full"):
+                ui.separator()
+                ui.label("Webcam Settings").classes("font-semibold")
+                with ui.column().classes("gap-4"):
                         ui.input(
                             "Webcam ID", value=self._form_data["webcam_id"]
                         ).bind_value_to(self._form_data, "webcam_id").props(
@@ -160,10 +158,9 @@ class ControllerConfigDialog:
                         ).classes(
                             "w-full"
                         )
-
-                    with ui.row().classes("gap-2 justify-end mt-4 w-full"):
-                        ui.button("Cancel", on_click=self._cancel).props("flat")
-                        ui.button("Save", on_click=self._save).props("color=primary")
+                with ui.row().classes("gap-2 justify-end mt-4 w-full"):
+                    ui.button("Cancel", on_click=self._cancel).props("flat")
+                    ui.button("Save", on_click=self._save).props("color=primary")
 
         dialog.open()
 
@@ -175,10 +172,11 @@ class ControllerConfigDialog:
         try:
             controller_id = self._form_data["controller_id"].strip()
             name = self._form_data["name"].strip() or controller_id
+            webcam_id = self._form_data["webcam_id"].strip()
             webcam_config = {
-                "webcam_id": self._form_data["webcam_id"].strip(),
+                "webcam_id": webcam_id,
                 "name": self._form_data["webcam_name"].strip()
-                or self._form_data["webcam_id"],
+                or webcam_id,
                 "device_index": int(self._form_data["device_index"]),
                 "resolution": [
                     int(self._form_data["width"]),
@@ -193,7 +191,9 @@ class ControllerConfigDialog:
                 },
             }
 
-            self.config_service.add_webcam_config(webcam_config)
+            # Avoid duplicate webcam entries by reusing existing configs
+            if not self.config_service.get_webcam_config(webcam_id):
+                self.config_service.add_webcam_config(webcam_config)
 
             controller_config = {
                 "controller_id": controller_id,

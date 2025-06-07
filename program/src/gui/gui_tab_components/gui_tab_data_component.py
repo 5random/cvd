@@ -383,6 +383,7 @@ class DataFilesList(BaseComponent):
             valid_ids = set(self.selected_file_paths.keys())
             self.selected_files = self.selected_files.intersection(valid_ids)
             self._update_selection_info()
+
             self._update_display()
         except Exception as e:
             error(f"Error loading files: {e}")
@@ -594,11 +595,11 @@ class DataFilesList(BaseComponent):
             return
         
         try:
-            # Convert selected IDs back to file paths
+            # Convert selected IDs back to absolute file paths
             file_paths = []
             for file_id in self.selected_files:
                 if file_id in self.selected_file_paths:
-                    file_paths.append(str(self.selected_file_paths[file_id]))
+                    file_paths.append(str(Path(self.selected_file_paths[file_id]).resolve()))
 
             # Validate file existence and readability
             valid_paths = []

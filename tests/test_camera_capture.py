@@ -40,7 +40,9 @@ async def test_camera_capture_recovery(monkeypatch):
     monkeypatch.setattr(cap_module, "info", lambda *a, **k: None)
     monkeypatch.setattr(cap_module, "warning", lambda *a, **k: None)
     monkeypatch.setattr(cap_module, "error", lambda *a, **k: None)
-    monkeypatch.setattr(cap_module, "debug", lambda *a, **k: None)
+    if hasattr(cap_module, "debug"):
+        monkeypatch.setattr(cap_module, "debug", lambda *a, **k: None)
+
     # also suppress logging in controller_base
     import src.controllers.controller_base as controller_base
     monkeypatch.setattr(controller_base, "info", lambda *a, **k: None)
