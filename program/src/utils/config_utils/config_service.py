@@ -627,10 +627,27 @@ class ConfigurationService:
         current_settings = self.get_controller_settings(controller_id)
         if current_settings is None:
             return False
-            
+
         current_settings.update(settings_updates)
         return self.update_controller_config(controller_id, {'settings': current_settings})
-    
+
+    def get_controller_parameters(self, controller_id: str) -> Optional[Dict[str, Any]]:
+        """Get parameters for a specific controller"""
+        controller_configs = self.get_controller_configs()
+        for cid, config in controller_configs:
+            if cid == controller_id:
+                return config.get('parameters', {})
+        return None
+
+    def update_controller_parameters(self, controller_id: str, parameter_updates: Dict[str, Any]) -> bool:
+        """Update parameters for a specific controller"""
+        current_params = self.get_controller_parameters(controller_id)
+        if current_params is None:
+            return False
+
+        current_params.update(parameter_updates)
+        return self.update_controller_config(controller_id, {'parameters': current_params})
+
     # Algorithm management methods
     def get_algorithm_configs(self, algorithm_type: Optional[str] = None) -> List[tuple[str, Dict[str, Any]]]:
         """Get algorithm configs as list of (algorithm_id, config_dict), optionally filtered by algorithm_type"""
