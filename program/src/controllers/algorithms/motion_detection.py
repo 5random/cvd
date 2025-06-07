@@ -8,8 +8,16 @@ from dataclasses import dataclass
 import time
 import math
 import asyncio
+import contextlib
 
-from src.controllers.controller_base import ImageController, ControllerResult, ControllerConfig
+from src.controllers.controller_base import (
+    ImageController,
+    ControllerResult,
+    ControllerConfig,
+    ControllerInput,
+)
+from src.utils.concurrency.thread_pool import run_camera_io
+from src.utils.config_utils.config_service import get_config_service
 from src.utils.concurrency.process_pool import ManagedProcessPool, ProcessPoolConfig, ProcessPoolType
 from src.utils.log_utils.log_service import info, warning, error, debug
 
@@ -36,6 +44,27 @@ class MotionDetectionController(ImageController):
         
         # Parameters from config
         params = config.parameters
+        # Camera parameters
+        self.device_index = params.get('device_index', 0)
+        self.webcam_id = params.get('cam_id')
+        self.width = params.get('width')
+        self.height = params.get('height')
+        self.fps = params.get('fps')
+        self.rotation = params.get('rotation', 0)
+        self.uvc_settings = params.get('uvc_settings', {})
+
+        if self.webcam_id:
+            service = get_config_service()
+            if service:
+                cam_cfg = service.get_webcam_config(self.webcam_id)
+                if cam_cfg:
+                    self.device_index = cam_cfg.get('device_index', self.device_index)
+                    res = cam_cfg.get('resolution')
+                    if res and len(res) == 2:
+                        self.width, self.height = res
+                    self.fps = cam_cfg.get('fps', self.fps)
+                    self.rotation = cam_cfg.get('rotation', self.rotation)
+                    self.uvc_settings.update(cam_cfg.get('uvc_settings', {}))
         self.algorithm = params.get('algorithm', 'MOG2')  # MOG2, KNN, or GMG
         self.learning_rate = params.get('learning_rate', 0.01)
         self.threshold = params.get('threshold', 25)
@@ -65,6 +94,11 @@ class MotionDetectionController(ImageController):
         import asyncio
         self._state_lock = asyncio.Lock()
 
+        # Camera capture resources
+        self._capture: Optional[cv2.VideoCapture] = None
+        self._capture_task: Optional[asyncio.Task] = None
+        self._stop_event = asyncio.Event()
+
     async def initialize(self) -> bool:
         """Initialize the motion detection controller"""
         try:
@@ -85,8 +119,21 @@ class MotionDetectionController(ImageController):
                 error(f"Unsupported background subtraction algorithm: {self.algorithm}")
                 return False
             
-            info(f"Initialized motion detection controller with {self.algorithm} algorithm")
-            return True
+            # Initialize camera capture if needed
+            self._capture = await run_camera_io(cv2.VideoCapture, self.device_index)
+            if self._capture and self._capture.isOpened():
+                if self.width:
+                    await run_camera_io(self._capture.set, cv2.CAP_PROP_FRAME_WIDTH, int(self.width))
+                if self.height:
+                    await run_camera_io(self._capture.set, cv2.CAP_PROP_FRAME_HEIGHT, int(self.height))
+                if self.fps:
+                    await run_camera_io(self._capture.set, cv2.CAP_PROP_FPS, int(self.fps))
+                await self._apply_uvc_settings()
+                info(f"Initialized motion detection controller with {self.algorithm} algorithm")
+                return True
+            else:
+                error(f"Unable to open camera index {self.device_index}")
+                return False
             
         except Exception as e:
             error(f"Failed to initialize motion detection controller: {e}")
@@ -327,7 +374,100 @@ class MotionDetectionController(ImageController):
                 break
         self._motion_pool.shutdown(wait=True)
 
+        if self._capture is not None:
+            await run_camera_io(self._capture.release)
+            self._capture = None
+        self._stop_event.set()
+        if self._capture_task:
+            self._capture_task.cancel()
+            with contextlib.suppress(Exception):
+                await self._capture_task
+            self._capture_task = None
+
         self._bg_subtractor = None
         self._last_frame = None
         self._motion_history.clear()
         info("Motion detection controller cleaned up")
+
+    async def start(self) -> bool:
+        if not await super().start():
+            return False
+        self._stop_event.clear()
+        self._capture_task = asyncio.create_task(self._capture_loop())
+        return True
+
+    async def stop(self) -> None:
+        self._stop_event.set()
+        if self._capture_task:
+            self._capture_task.cancel()
+            with contextlib.suppress(Exception):
+                await self._capture_task
+            self._capture_task = None
+        await super().stop()
+
+    async def process(self, input_data: ControllerInput) -> ControllerResult:
+        output = self._output_cache.get(self.controller_id)
+        if output is None:
+            return ControllerResult.success_result(None)
+        return ControllerResult.success_result(output)
+
+    async def _capture_loop(self) -> None:
+        base_delay = 1.0 / self.fps if self.fps else 0.03
+        while not self._stop_event.is_set():
+            try:
+                if self._capture is None:
+                    break
+                ret, frame = await run_camera_io(self._capture.read)
+                if ret:
+                    if self.rotation:
+                        frame = self._apply_rotation(frame)
+                    result = await self.process_image(
+                        frame,
+                        {
+                            "source_sensor": self.webcam_id or "camera",
+                            "timestamp": time.time(),
+                        },
+                    )
+                    if result.success:
+                        self._output_cache[self.controller_id] = result.data
+            except Exception as e:
+                error(f"Camera capture error: {e}")
+            await asyncio.sleep(base_delay)
+
+    async def _apply_uvc_settings(self) -> None:
+        if not self._capture or not self.uvc_settings:
+            return
+        prop_map = {
+            "brightness": cv2.CAP_PROP_BRIGHTNESS,
+            "hue": cv2.CAP_PROP_HUE,
+            "contrast": cv2.CAP_PROP_CONTRAST,
+            "saturation": cv2.CAP_PROP_SATURATION,
+            "sharpness": cv2.CAP_PROP_SHARPNESS,
+            "gamma": cv2.CAP_PROP_GAMMA,
+            "gain": cv2.CAP_PROP_GAIN,
+            "backlight_comp": cv2.CAP_PROP_BACKLIGHT,
+            "exposure": cv2.CAP_PROP_EXPOSURE,
+        }
+        for name, value in self.uvc_settings.items():
+            try:
+                if name == "white_balance_auto":
+                    await run_camera_io(self._capture.set, cv2.CAP_PROP_AUTO_WB, 1 if value else 0)
+                elif name == "white_balance":
+                    await run_camera_io(self._capture.set, cv2.CAP_PROP_WB_TEMPERATURE, float(value))
+                elif name == "exposure_auto":
+                    await run_camera_io(self._capture.set, cv2.CAP_PROP_AUTO_EXPOSURE, 1 if value else 0)
+                else:
+                    prop = prop_map.get(name)
+                    if prop is not None:
+                        await run_camera_io(self._capture.set, prop, float(value))
+            except Exception as exc:
+                warning(f"Failed to set UVC property {name}: {exc}")
+
+    def _apply_rotation(self, frame):
+        if self.rotation == 90:
+            return cv2.rotate(frame, cv2.ROTATE_90_CLOCKWISE)
+        if self.rotation == 180:
+            return cv2.rotate(frame, cv2.ROTATE_180)
+        if self.rotation == 270:
+            return cv2.rotate(frame, cv2.ROTATE_90_COUNTERCLOCKWISE)
+        return frame

@@ -132,8 +132,10 @@
     {
       "con001":{
         "name": "Webcam-Top",
-        "type": "motion_detection_camera",
-        "cam_id": "cam001",
+        "type": "motion_detection",
+        "parameters": {
+          "cam_id": "cam001"
+        },
         "algorithm": ["bubble_detection"],
         "state_output": ["Keine Bewegung erkannt", "Bewegung erkannt"],
         "show_on_dashboard": true,

@@ -16,7 +16,6 @@ from src.controllers.controller_base import (
 from src.data_handler.interface.sensor_interface import SensorReading
 from src.utils.log_utils.log_service import info, warning, error, debug
 
-from src.controllers.controller_utils.controller_data_sources.camera_capture_controller import CameraCaptureController
 from .algorithms.motion_detection import MotionDetectionController
 from .algorithms.reactor_state import ReactorStateController
 
@@ -74,8 +73,6 @@ class ControllerManager:
                 output_name=config.get("output_name"),
             )
 
-            if controller_type == "camera_capture":
-                return CameraCaptureController(controller_id, cfg)
             if controller_type == "motion_detection":
                 return MotionDetectionController(controller_id, cfg)
             if controller_type == "reactor_state":
@@ -387,19 +384,13 @@ def create_cvd_controller_manager() -> ControllerManager:
     """Create a controller manager configured for CVD tracking"""
     manager = ControllerManager("cvd_tracking")
 
-    cam_cfg = ControllerConfig(controller_id="camera_capture", controller_type="camera_capture")
-    capture_controller = CameraCaptureController("camera_capture", cam_cfg)
-    manager.register_controller(capture_controller)
-
-    motion_cfg = ControllerConfig(controller_id="motion_detection", controller_type="motion_detection")
+    motion_cfg = ControllerConfig(
+        controller_id="motion_detection",
+        controller_type="motion_detection",
+        parameters={"device_index": 0},
+    )
     motion_controller = MotionDetectionController("motion_detection", motion_cfg)
     manager.register_controller(motion_controller)
-
-    manager.add_dependency(
-        "camera_capture",
-        "motion_detection",
-        {"frame": "image"}
-    )
 
     return manager
 
