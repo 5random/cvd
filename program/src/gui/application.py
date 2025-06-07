@@ -180,7 +180,9 @@ class WebApplication:
         # Header
         with ui.header().classes('cvd-header text-white'):
             with ui.row().classes('w-full items-center'):
-                ui.label('CVD Tracker Dashboard').classes('text-h4 flex-grow')
+                self._title_label = ui.label(
+                    self.config_service.get('ui.title', str, 'CVD Tracker Dashboard')
+                ).classes('text-h4 flex-grow')
                 self._create_quick_settings()
                 
 
@@ -341,6 +343,8 @@ class WebApplication:
         try:
             if hasattr(self, '_title_input') and self._title_input is not None:
                 self.config_service.set('ui.title', str(self._title_input.value))
+                if hasattr(self, '_title_label') and self._title_label is not None:
+                    self._title_label.text = str(self._title_input.value)
 
             if hasattr(self, '_refresh_rate_input') and self._refresh_rate_input is not None:
                 self.config_service.set(
