@@ -26,6 +26,7 @@ class SetupWizardComponent(BaseComponent):
         self._stepper: ui.stepper | None = None
         self._sensor_list: ui.column | None = None
         self._controller_list: ui.column | None = None
+        self._dialog: ui.dialog | None = None
 
     def render(self) -> ui.column:
         """Render stepper UI."""
@@ -73,6 +74,29 @@ class SetupWizardComponent(BaseComponent):
         for controller_id, cfg in self.config_service.get_controller_configs():
             with self._controller_list:
                 ui.label(f"{controller_id}: {cfg.get('name', controller_id)}").classes("text-sm")
+
+    def show_dialog(self, start_step: str) -> None:
+        """Open the setup wizard in a dialog starting at the given step."""
+        with ui.dialog().props("persistent") as dialog:
+            self._dialog = dialog
+            with ui.card().classes("w-[600px] max-w-[90vw]"):
+                self.render()
+
+        if self._stepper:
+            try:
+                self._stepper.set_value(start_step)
+            except Exception:
+                pass
+
+        self._refresh_sensors()
+        self._refresh_controllers()
+
+        dialog.open()
+
+    def close_dialog(self) -> None:
+        """Close the setup wizard dialog if open."""
+        if self._dialog:
+            self._dialog.close()
 
     def _update_element(self, data: Any) -> None:
         pass
