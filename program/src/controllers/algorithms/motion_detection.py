@@ -31,7 +31,6 @@ from src.controllers.controller_utils.camera_utils import (
     rotate_frame,
 )
 
-
 @dataclass
 class MotionDetectionResult:
     """Result from motion detection"""
@@ -320,18 +319,22 @@ class MotionDetectionController(ImageController):
     def _convert_to_cv_frame(self, image_data: Any) -> Optional[np.ndarray]:
         """Convert various image data formats to OpenCV frame"""
         try:
+            rgb_source = False
             if isinstance(image_data, np.ndarray):
-                # Already a numpy array
+                # Already an OpenCV frame (assumed BGR/BGRA)
                 frame = image_data
+
             elif isinstance(image_data, bytes):
-                # Raw image bytes
+                # Raw image bytes (often RGB order)
                 nparr = np.frombuffer(image_data, np.uint8)
                 frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+          
             elif hasattr(image_data, "__array__") or isinstance(
                 image_data, Image.Image
             ):
                 # Objects implementing the numpy array protocol or PIL images
                 frame = np.array(image_data)
+
             else:
                 error(f"Unsupported image data type: {type(image_data)}")
                 return None
@@ -480,10 +483,43 @@ class MotionDetectionController(ImageController):
 
     async def _capture_loop(self) -> None:
         base_delay = 1.0 / self.fps if self.fps else 0.03
+        failure_delay = 0.1
+        reopen_delay = 5.0
+        failure_count = 0
+        max_failures = 5
+        delay = base_delay
+
         while not self._stop_event.is_set():
             try:
                 if self._capture is None:
-                    break
+                    warning("Camera capture missing, attempting reinitialization")
+                    try:
+                        self._capture = await run_camera_io(cv2.VideoCapture, self.device_index)
+                        if self._capture and self._capture.isOpened():
+                            if self.width:
+                                await run_camera_io(self._capture.set, cv2.CAP_PROP_FRAME_WIDTH, int(self.width))
+                            if self.height:
+                                await run_camera_io(self._capture.set, cv2.CAP_PROP_FRAME_HEIGHT, int(self.height))
+                            if self.fps:
+                                await run_camera_io(self._capture.set, cv2.CAP_PROP_FPS, int(self.fps))
+                            await apply_uvc_settings(self._capture, self.uvc_settings)
+                            failure_count = 0
+                            delay = base_delay
+                        else:
+                            raise RuntimeError("capture not opened")
+                    except Exception as exc:
+                        error(f"Failed to reinitialize camera: {exc}")
+                        self._capture = None
+                        failure_count += 1
+                        if failure_count >= max_failures:
+                            error("Camera unavailable, retrying later")
+                            delay = reopen_delay
+                            failure_count = 0
+                        else:
+                            delay = min(failure_delay * 2 ** failure_count, 2.0)
+                    await asyncio.sleep(delay)
+                    continue
+
                 ret, frame = await run_camera_io(self._capture.read)
                 if ret:
                     if self.rotation:
@@ -497,6 +533,19 @@ class MotionDetectionController(ImageController):
                     )
                     if result.success:
                         self._output_cache[self.controller_id] = result.data
+                    failure_count = 0
+                    delay = base_delay
+                else:
+                    failure_count += 1
+                    delay = min(failure_delay * 2 ** failure_count, 2.0)
+                    if failure_count > max_failures:
+                        opened = await run_camera_io(self._capture.isOpened)
+                        if not opened:
+                            warning("Camera not opened, attempting to reinitialize")
+                            await run_camera_io(self._capture.release)
+                            self._capture = None
+                            continue
             except Exception as e:
                 error(f"Camera capture error: {e}")
+
             await asyncio.sleep(base_delay)

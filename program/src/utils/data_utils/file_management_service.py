@@ -2,6 +2,7 @@ from pathlib import Path
 from typing import List, Optional
 import threading
 import time
+import os
 
 from src.utils.log_utils.log_service import info, warning, error
 from src.utils.concurrency.thread_pool import get_thread_pool_manager, ThreadPoolType
@@ -104,6 +105,7 @@ class FileMaintenanceService:
             )
             if not preserve and file_path.exists():
                 file_path.unlink()
+
             if preserve:
                 info(f"Compressed file {file_path} -> {compressed_path}")
             else:

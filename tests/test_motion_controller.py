@@ -24,7 +24,6 @@ async def test_motion_detection_on_black_frame(monkeypatch):
     assert "motion_detected" in result.data
     await ctrl.stop()
 
-
 @pytest.mark.asyncio
 async def test_motion_detection_on_pil_image(monkeypatch):
     config = ControllerConfig(controller_id="md", controller_type="motion_detection")
@@ -62,3 +61,4 @@ async def test_motion_detection_on_bytes(monkeypatch):
     assert result.success
     assert "motion_detected" in result.data
     await ctrl.stop()
+
