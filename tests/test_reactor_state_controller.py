@@ -43,3 +43,38 @@ async def test_reactor_state_transitions(monkeypatch):
     res4 = await ctrl.derive_state({"t1": reading(95)}, {}, {})
     assert ReactorAlarmType.OVERTEMPERATURE in res4.data.alarms
     assert res4.data.state == ReactorState.ALARM
+
+
+@pytest.mark.asyncio
+async def test_motion_metadata_multiple_controllers(monkeypatch):
+    from src.controllers.algorithms import reactor_state as module
+    monkeypatch.setattr(module, "info", lambda *a, **k: None)
+    monkeypatch.setattr(module, "warning", lambda *a, **k: None)
+    monkeypatch.setattr(module, "error", lambda *a, **k: None)
+    monkeypatch.setattr(module, "debug", lambda *a, **k: None)
+
+    cfg = ControllerConfig(
+        controller_id="rs",
+        controller_type="reactor_state",
+        parameters={
+            "idle_temp_max": 30.0,
+            "processing_temp_min": 50.0,
+            "processing_temp_max": 80.0,
+            "min_state_duration": 0.0,
+        },
+    )
+    ctrl = ReactorStateController("rs", cfg)
+
+    reading = SensorReading("t1", 60, time.time(), SensorStatus.OK)
+
+    controller_outputs = {
+        "other": {"motion_detected": False},
+        "md": {
+            "data": {"motion_detected": True},
+            "metadata": {"controller_type": "motion_detection"},
+        },
+    }
+
+    res = await ctrl.derive_state({"t1": reading}, controller_outputs, {})
+    assert res.data.motion_detected is True
+    assert res.data.state == ReactorState.PROCESSING
