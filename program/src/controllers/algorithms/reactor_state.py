@@ -7,7 +7,6 @@ from enum import Enum
 import asyncio
 import time
 
-from src.utils.config_utils.config_service import get_config_service
 from src.controllers.controller_base import StateController, ControllerConfig, ControllerResult, ControllerType
 from src.data_handler.interface.sensor_interface import SensorReading, SensorStatus
 from src.utils.log_utils.log_service import info, warning, error, debug
@@ -83,28 +82,15 @@ class ReactorStateController(StateController):
                                       controller_type="reactor_state")
         super().__init__(controller_id, config)
         
-        # Load default configuration values
+        # Start with default configuration values
         defaults = ReactorStateConfig()
-        
-        # Attempt to load configuration from ConfigService
-        
-        service = get_config_service()
-        
-        if service:
-            # Look for controllers of type 'reactor_state' (only first match used)
-            for ctrl_id, cfg in service.get_controller_configs():
-                if cfg.get('type') == 'reactor_state':
-                    # Extract settings from controller config
-                    settings = cfg.get('settings', {})
-                    if settings:
-                        # Update default config values with loaded settings
-                        for key, value in settings.items():
-                            if hasattr(defaults, key):
-                                setattr(defaults, key, value)
-                        info(f"Loaded Reactor-State configuration for controller {ctrl_id}")
-                    break
-        
-        # Set the final configuration
+
+        # Apply parameters from provided ControllerConfig
+        params = config.parameters
+        for key, value in params.items():
+            if hasattr(defaults, key):
+                setattr(defaults, key, value)
+
         self.reactor_config = defaults
         
         # State tracking
