@@ -1,8 +1,4 @@
-import os
-import sys
 import pytest
-
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'program'))
 
 from src.data_handler.processing.pipeline.pipeline import DataPipeline
 from src.data_handler.processing.processing_base import ProcessingStage, ProcessingResult

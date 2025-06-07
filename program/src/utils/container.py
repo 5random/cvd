@@ -34,14 +34,13 @@ from src.utils.alert_system_utils.email_alert_service import (
     set_email_alert_service,
 )
 
-
 @dataclass
 class ApplicationContainer:
     """Container for all application services with dependency injection"""
     config_service: ConfigurationService
     sensor_manager: SensorManager
     data_saver: DataSaver
-    web_application: WebApplication
+    web_application: 'WebApplication'
     compression_service: CompressionService
     email_alert_service: EmailAlertService
     _background_tasks: List[Tuple[ManagedThreadPool, Future]] = field(
@@ -98,6 +97,8 @@ class ApplicationContainer:
                 data_pipeline=pipeline
             )
             # Initialize web application
+            from src.gui.application import WebApplication
+
             web_application = WebApplication(
                 config_service=config_service,
                 sensor_manager=sensor_manager

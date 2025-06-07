@@ -20,6 +20,7 @@ from src.utils.concurrency.thread_pool import run_camera_io
 from src.utils.config_utils.config_service import get_config_service
 from src.utils.concurrency.process_pool import ManagedProcessPool, ProcessPoolConfig, ProcessPoolType
 from src.utils.log_utils.log_service import info, warning, error, debug
+from src.controllers.controller_utils.camera_utils import apply_uvc_settings, rotate_frame
 
 @dataclass
 class MotionDetectionResult:
@@ -128,7 +129,7 @@ class MotionDetectionController(ImageController):
                     await run_camera_io(self._capture.set, cv2.CAP_PROP_FRAME_HEIGHT, int(self.height))
                 if self.fps:
                     await run_camera_io(self._capture.set, cv2.CAP_PROP_FPS, int(self.fps))
-                await self._apply_uvc_settings()
+                await apply_uvc_settings(self._capture, self.uvc_settings)
                 info(f"Initialized motion detection controller with {self.algorithm} algorithm")
                 return True
             else:
@@ -420,7 +421,7 @@ class MotionDetectionController(ImageController):
                 ret, frame = await run_camera_io(self._capture.read)
                 if ret:
                     if self.rotation:
-                        frame = self._apply_rotation(frame)
+                        frame = rotate_frame(frame, self.rotation)
                     result = await self.process_image(
                         frame,
                         {
@@ -434,40 +435,3 @@ class MotionDetectionController(ImageController):
                 error(f"Camera capture error: {e}")
             await asyncio.sleep(base_delay)
 
-    async def _apply_uvc_settings(self) -> None:
-        if not self._capture or not self.uvc_settings:
-            return
-        prop_map = {
-            "brightness": cv2.CAP_PROP_BRIGHTNESS,
-            "hue": cv2.CAP_PROP_HUE,
-            "contrast": cv2.CAP_PROP_CONTRAST,
-            "saturation": cv2.CAP_PROP_SATURATION,
-            "sharpness": cv2.CAP_PROP_SHARPNESS,
-            "gamma": cv2.CAP_PROP_GAMMA,
-            "gain": cv2.CAP_PROP_GAIN,
-            "backlight_comp": cv2.CAP_PROP_BACKLIGHT,
-            "exposure": cv2.CAP_PROP_EXPOSURE,
-        }
-        for name, value in self.uvc_settings.items():
-            try:
-                if name == "white_balance_auto":
-                    await run_camera_io(self._capture.set, cv2.CAP_PROP_AUTO_WB, 1 if value else 0)
-                elif name == "white_balance":
-                    await run_camera_io(self._capture.set, cv2.CAP_PROP_WB_TEMPERATURE, float(value))
-                elif name == "exposure_auto":
-                    await run_camera_io(self._capture.set, cv2.CAP_PROP_AUTO_EXPOSURE, 1 if value else 0)
-                else:
-                    prop = prop_map.get(name)
-                    if prop is not None:
-                        await run_camera_io(self._capture.set, prop, float(value))
-            except Exception as exc:
-                warning(f"Failed to set UVC property {name}: {exc}")
-
-    def _apply_rotation(self, frame):
-        if self.rotation == 90:
-            return cv2.rotate(frame, cv2.ROTATE_90_CLOCKWISE)
-        if self.rotation == 180:
-            return cv2.rotate(frame, cv2.ROTATE_180)
-        if self.rotation == 270:
-            return cv2.rotate(frame, cv2.ROTATE_90_COUNTERCLOCKWISE)
-        return frame

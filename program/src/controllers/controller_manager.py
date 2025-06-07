@@ -18,6 +18,7 @@ from src.utils.log_utils.log_service import info, warning, error, debug
 
 from .algorithms.motion_detection import MotionDetectionController
 from .algorithms.reactor_state import ReactorStateController
+from src.utils.config_utils.config_service import get_config_service
 
 @dataclass
 class ControllerDependency:
@@ -261,6 +262,13 @@ class ControllerManager:
                 else:
                     # Use all data
                     controller_data[dep.source_controller_id] = source_data
+
+        # Filter controller data by input_controllers if specified
+        if config.input_controllers:
+            controller_data = {
+                cid: data for cid, data in controller_data.items()
+                if cid in config.input_controllers
+            }
         
         return ControllerInput(
             sensor_data=filtered_sensor_data,
@@ -383,14 +391,18 @@ class ControllerManager:
 def create_cvd_controller_manager() -> ControllerManager:
     """Create a controller manager configured for CVD tracking"""
     manager = ControllerManager("cvd_tracking")
-
-    motion_cfg = ControllerConfig(
-        controller_id="motion_detection",
-        controller_type="motion_detection",
-        parameters={"device_index": 0},
-    )
-    motion_controller = MotionDetectionController("motion_detection", motion_cfg)
-    manager.register_controller(motion_controller)
+    service = get_config_service()
+    if service:
+        for _, cfg in service.get_controller_configs():
+            manager.add_controller_from_config(cfg)
+    else:
+        # Fallback to a default motion detection controller
+        motion_cfg = ControllerConfig(
+            controller_id="motion_detection",
+            controller_type="motion_detection",
+            parameters={"device_index": 0},
+        )
+        manager.register_controller(MotionDetectionController("motion_detection", motion_cfg))
 
     return manager
 

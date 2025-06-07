@@ -1,8 +1,3 @@
-import sys
-from pathlib import Path
-
-sys.path.append(str(Path(__file__).resolve().parents[1] / "program"))
-
 import pytest
 from src.utils.config_utils.config_service import ConfigurationService, ValidationError
 
