@@ -6,21 +6,27 @@ from dataclasses import dataclass, asdict, field
 from enum import Enum
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, Any, List, Optional, Tuple
+from typing import Dict, Any, List, Optional, Tuple, TYPE_CHECKING
 
 from src.utils.log_utils.log_service import error
 
+if TYPE_CHECKING:
+    from .data_manager import DataManager
+
 try:
     from watchdog.observers import Observer  # pragma: no cover - optional
-    from watchdog.events import FileSystemEventHandler
+    from watchdog.events import FileSystemEventHandler, FileSystemEvent
+
     WATCHDOG_AVAILABLE = True
 except Exception:  # pragma: no cover - optional dependency
     FileSystemEventHandler = object  # type: ignore
+    FileSystemEvent = object  # type: ignore
     WATCHDOG_AVAILABLE = False
 
 
 class DataCategory(Enum):
     """Categories of data managed by the system"""
+
     RAW = "raw"
     PROCESSED = "processed"
     EXPERIMENTS = "experiments"
@@ -29,6 +35,7 @@ class DataCategory(Enum):
 
 class FileStatus(Enum):
     """Status of files in the data management system"""
+
     ACTIVE = "active"
     COMPRESSED = "compressed"
     ARCHIVED = "archived"
@@ -39,6 +46,7 @@ class FileStatus(Enum):
 @dataclass
 class FileMetadata:
     """Metadata information for a data file"""
+
     file_path: Path
     category: DataCategory
     status: FileStatus
@@ -78,6 +86,7 @@ class FileMetadata:
 @dataclass
 class DataIndex:
     """Index of all managed data files"""
+
     files: Dict[str, FileMetadata]
     last_updated: datetime
     dir_mtimes: Dict[str, float] = field(default_factory=dict)
@@ -93,7 +102,9 @@ class DataIndex:
 
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> "DataIndex":
-        files = {p: FileMetadata.from_dict(md) for p, md in data.get("files", {}).items()}
+        files = {
+            p: FileMetadata.from_dict(md) for p, md in data.get("files", {}).items()
+        }
         return cls(
             files=files,
             last_updated=datetime.fromisoformat(data["last_updated"]),
@@ -105,6 +116,7 @@ class DataIndex:
 @dataclass
 class DownloadRequest:
     """Request for packaging and downloading data files"""
+
     request_id: str
     requested_files: List[str]
     format: str
@@ -135,13 +147,17 @@ if WATCHDOG_AVAILABLE:
             self._manager = manager
             self._category = category
 
-        def on_created(self, event):
+        def on_created(self, event: FileSystemEvent) -> None:
             if not event.is_directory:
-                self._manager._process_changed_file(Path(event.src_path), self._category)
+                self._manager._process_changed_file(
+                    Path(event.src_path), self._category
+                )
 
-        def on_modified(self, event):
+        def on_modified(self, event: FileSystemEvent) -> None:
             if not event.is_directory:
-                self._manager._process_changed_file(Path(event.src_path), self._category)
+                self._manager._process_changed_file(
+                    Path(event.src_path), self._category
+                )
 
 
 class Indexer:
@@ -206,7 +222,7 @@ class Indexer:
             current = stack.pop()
             try:
                 for entry in os.scandir(current):
-                    if entry.name.startswith('.'):
+                    if entry.name.startswith("."):
                         continue
                     path = Path(entry.path)
                     if entry.is_dir(follow_symlinks=False):
@@ -233,7 +249,9 @@ class Indexer:
         except (OSError, ValueError):
             return True
 
-    def _create_file_metadata(self, file_path: Path, category: DataCategory) -> Optional[FileMetadata]:
+    def _create_file_metadata(
+        self, file_path: Path, category: DataCategory
+    ) -> Optional[FileMetadata]:
         try:
             stat = file_path.stat()
             created_at = datetime.fromtimestamp(stat.st_ctime)
@@ -300,7 +318,9 @@ class Indexer:
                 continue
             if status and metadata.status != status:
                 continue
-            if tags and (not metadata.tags or not all(tag in metadata.tags for tag in tags)):
+            if tags and (
+                not metadata.tags or not all(tag in metadata.tags for tag in tags)
+            ):
                 continue
             results.append(metadata)
         results.sort(key=lambda x: x.modified_at, reverse=True)
@@ -326,7 +346,9 @@ class Indexer:
             overview["categories"][cat_name]["count"] += 1
             overview["categories"][cat_name]["size_bytes"] += metadata.size_bytes
             status_name = metadata.status.value
-            overview["status_summary"][status_name] = overview["status_summary"].get(status_name, 0) + 1
+            overview["status_summary"][status_name] = (
+                overview["status_summary"].get(status_name, 0) + 1
+            )
             overview["total_size_bytes"] += metadata.size_bytes
             if metadata.sensor_id:
                 overview["sensors"].add(metadata.sensor_id)
