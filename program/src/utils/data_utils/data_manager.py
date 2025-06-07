@@ -455,11 +455,15 @@ class DataManager:
         for part in path_parts:
             if part.startswith('experiment_'):
                 exp_id = part[len('experiment_'):]
+                while exp_id.endswith(('.gz', '.bz2', '.xz', '.zip')):
+                    exp_id = Path(exp_id).stem
                 return exp_id or None
         
         # Check filename
         if file_path.stem.startswith('experiment_'):
             suffix = file_path.stem[len('experiment_'):]
+            while suffix.endswith(('.gz', '.bz2', '.xz', '.zip')):
+                suffix = Path(suffix).stem
             return suffix or None
         
         return None
