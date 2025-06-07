@@ -239,8 +239,9 @@ class LivePlotComponent(BaseComponent):
 
             if len(data) > 0:
                 try:
+                    start_index = len(time_axis) - len(data)
                     trace = go.Scatter(
-                        x=time_axis[:len(data)],
+                        x=time_axis[start_index:],
                         y=data,
                         mode='lines',
                         name=series_config.label,
@@ -250,7 +251,7 @@ class LivePlotComponent(BaseComponent):
                         ),
                         connectgaps=False,
                         hovertemplate=(
-                            f"{series_config.label}: %{y:.2f}{series_config.unit}"
+                            f"{series_config.label}: %{{y:.2f}}{series_config.unit}"
                             "<extra></extra>"
                         ),
                     )
@@ -263,7 +264,10 @@ class LivePlotComponent(BaseComponent):
         
         # Update plot
         try:
-            self._plot_element.figure["data"] = traces
+            # Replace all traces to avoid Plotly assignment restrictions
+            self._plot_element.figure.data = self._plot_element.figure.data[:0]
+            for trace in traces:
+                self._plot_element.figure.add_trace(trace)
             # Update y-axis scaling based on configuration
             self._plot_element.figure.update_yaxes(autorange=self.plot_config.auto_scale)
             self._plot_element.update()
@@ -287,7 +291,7 @@ class LivePlotComponent(BaseComponent):
             data_queue.clear()
         
         if self._plot_element:
-            self._plot_element.figure["data"] = []
+            self._plot_element.figure.data = self._plot_element.figure.data[:0]
             self._plot_element.update()
     
     def _show_settings(self) -> None:

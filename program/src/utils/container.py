@@ -250,6 +250,12 @@ class ApplicationContainer:
                 continue
             pool.shutdown()
 
+        # Clean up UI components to stop timers and other background tasks
+        try:
+            self.web_application.component_registry.cleanup_all()
+        except Exception as e:
+            error(f"Error cleaning up components: {e}")
+
         info("Synchronous shutdown complete")
 
     def get_status(self) -> dict:
