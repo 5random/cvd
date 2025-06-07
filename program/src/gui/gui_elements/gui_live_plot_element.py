@@ -335,10 +335,9 @@ class LivePlotComponent(BaseComponent):
             self._update_timer.interval = self.plot_config.refresh_rate_ms / 1000
         
         # Update data store max lengths
-        for data_queue in self._data_store.values():
-            new_queue = deque(data_queue, maxlen=self.plot_config.max_points)
-            data_queue.clear()
-            data_queue.extend(new_queue)
+        for key, data_queue in list(self._data_store.items()):
+            # Replace each queue with a new deque preserving existing data
+            self._data_store[key] = deque(data_queue, maxlen=self.plot_config.max_points)
 
         history_maxlen = max(
             1,
