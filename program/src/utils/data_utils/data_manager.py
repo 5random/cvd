@@ -443,7 +443,7 @@ class DataManager:
         stem = file_path.stem
         if stem and not stem.startswith('experiment_'):
             # Remove common extensions
-            while stem.endswith(('.gz', '.bz2', '.xz')):
+            while stem.endswith(('.gz', '.bz2', '.xz', '.zip')):
                 stem = Path(stem).stem
             return stem
         return None

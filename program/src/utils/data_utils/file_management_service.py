@@ -99,12 +99,16 @@ class FileMaintenanceService:
             )
             self.compression_service.compress_file(str(file_path), str(compressed_path))
 
+            preserve = False
             settings = getattr(self.compression_service, "_compression_settings", None)
-            preserve = (
-                getattr(settings, "preserve_original", False) if settings else False
-            )
+            if settings is not None:
+                preserve = getattr(settings, "preserve_original", False)
+
             if not preserve and file_path.exists():
-                file_path.unlink()
+                try:
+                    file_path.unlink()
+                except Exception:
+                    pass
 
             if preserve:
                 info(f"Compressed file {file_path} -> {compressed_path}")
