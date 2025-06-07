@@ -416,8 +416,8 @@ class DataFilesList(BaseComponent):
     
     def _update_display(self) -> None:
         """Update table and pagination display"""
-        self._update_table()
         self._update_pagination_info()
+        self._update_table()
         self._update_pagination_buttons()
         self._update_selection_info()
     
