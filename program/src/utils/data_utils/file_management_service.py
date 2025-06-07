@@ -86,7 +86,18 @@ class FileMaintenanceService:
             # type: ignore[attr-defined]
             self.compression_service.compress_file(str(file_path), str(compressed_path))
 
-            if self.compression_service._compression_settings.preserve_original:
+            preserve = False
+            settings = getattr(self.compression_service, "_compression_settings", None)
+            if settings is not None:
+                preserve = getattr(settings, "preserve_original", False)
+
+            if not preserve and file_path.exists():
+                try:
+                    file_path.unlink()
+                except Exception:
+                    pass
+
+            if preserve:
                 info(f"Compressed file {file_path} -> {compressed_path}")
             else:
                 info(f"Compressed and removed {file_path} -> {compressed_path}")
