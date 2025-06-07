@@ -212,8 +212,20 @@ class DashboardComponent(BaseComponent):
     def _should_show_camera(self) -> bool:
         for cid in self._dashboard_controllers:
             cfg = next((c for c_id, c in self.config_service.get_controller_configs() if c_id == cid), None)
-            if cfg and 'camera' in str(cfg.get('type', '')).lower():
+            if not cfg:
+                continue
+
+            ctype = str(cfg.get('type', '')).lower()
+            if 'camera' in ctype:
                 return True
+
+            if ctype == 'motion_detection':
+                params = cfg.get('parameters', {})
+                if isinstance(params, dict) and (
+                    'cam_id' in params or 'device_index' in params
+                ):
+                    return True
+
         return False
     
     def _render_camera_stream(self) -> None:
