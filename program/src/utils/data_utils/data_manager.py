@@ -1,4 +1,5 @@
 """Facade for data management functionality."""
+
 from __future__ import annotations
 
 import os
@@ -7,7 +8,8 @@ import uuid
 import zipfile
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple, Type
+from types import TracebackType
 
 from src.utils.config_utils.config_service import get_config_service
 from src.utils.concurrency.thread_pool import (
@@ -68,9 +70,15 @@ class DataManager:
     # Configuration and directory management
     def _load_configuration(self, base_output_dir: Optional[Path] = None) -> None:
         if self._config_service:
-            storage_cfg = self._config_service.get("data_storage.storage_paths", dict, {}) or {}
-            compression_cfg = self._config_service.get("data_storage.compression", dict, {}) or {}
-            download_cfg = self._config_service.get("data_storage.downloads", dict, {}) or {}
+            storage_cfg = (
+                self._config_service.get("data_storage.storage_paths", dict, {}) or {}
+            )
+            compression_cfg = (
+                self._config_service.get("data_storage.compression", dict, {}) or {}
+            )
+            download_cfg = (
+                self._config_service.get("data_storage.downloads", dict, {}) or {}
+            )
         else:
             storage_cfg = {}
             compression_cfg = {}
@@ -78,16 +86,26 @@ class DataManager:
             warning("Configuration service not available, using defaults")
         base_dir = base_output_dir or Path(storage_cfg.get("base", "data"))
         self.raw_dir = Path(storage_cfg.get("raw", str(base_dir / "raw")))
-        self.processed_dir = Path(storage_cfg.get("processed", str(base_dir / "processed")))
+        self.processed_dir = Path(
+            storage_cfg.get("processed", str(base_dir / "processed"))
+        )
         exp_cfg = storage_cfg.get("experiments", {}) or {}
         self.experiments_dir = Path(exp_cfg.get("base", str(base_dir / "experiments")))
         self.logs_dir = Path(storage_cfg.get("logs", str(base_dir / "logs")))
         self.cache_dir = Path(storage_cfg.get("cache", str(base_dir / "cache")))
-        self.index_file = Path(storage_cfg.get("index_file", str(base_dir / "data_index.json")))
-        self.downloads_dir = Path(download_cfg.get("downloads_dir", str(base_dir / "downloads")))
+        self.index_file = Path(
+            storage_cfg.get("index_file", str(base_dir / "data_index.json"))
+        )
+        self.downloads_dir = Path(
+            download_cfg.get("downloads_dir", str(base_dir / "downloads"))
+        )
         self.auto_compression = compression_cfg.get("enabled", True)
-        self.compression_threshold_bytes = compression_cfg.get("threshold_bytes", 10 * 1024 * 1024)
-        self.max_file_age_seconds = compression_cfg.get("max_file_age_seconds", 24 * 3600)
+        self.compression_threshold_bytes = compression_cfg.get(
+            "threshold_bytes", 10 * 1024 * 1024
+        )
+        self.max_file_age_seconds = compression_cfg.get(
+            "max_file_age_seconds", 24 * 3600
+        )
         self.index_scan_interval = max(1, download_cfg.get("scan_interval_minutes", 30))
         self.download_expiry_hours = max(1, download_cfg.get("expiry_hours", 24))
         self.max_download_size_mb = max(1, download_cfg.get("max_size_mb", 500))
@@ -120,13 +138,17 @@ class DataManager:
         tags: Optional[List[str]] = None,
     ) -> List[FileMetadata]:
         with self._lock:
-            return self.indexer.list_files(category, sensor_id, experiment_id, status, tags)
+            return self.indexer.list_files(
+                category, sensor_id, experiment_id, status, tags
+            )
 
     def get_data_overview(self) -> Dict[str, Any]:
         with self._lock:
             return self.indexer.get_data_overview()
 
-    def create_download_package(self, file_paths: List[str], format: str = "zip") -> str:
+    def create_download_package(
+        self, file_paths: List[str], format: str = "zip"
+    ) -> str:
         if format not in ["zip"]:
             raise ValueError(f"Unsupported format: {format}")
         total_size = 0
@@ -147,7 +169,9 @@ class DataManager:
         if not valid_paths:
             raise ValueError("No valid files found for download")
         if total_size > self.max_download_size_mb * 1024 * 1024:
-            raise ValueError(f"Package size exceeds limit ({self.max_download_size_mb}MB)")
+            raise ValueError(
+                f"Package size exceeds limit ({self.max_download_size_mb}MB)"
+            )
         request_id = str(uuid.uuid4())
         expires_at = datetime.now() + timedelta(hours=self.download_expiry_hours)
         download_request = DownloadRequest(
@@ -163,7 +187,10 @@ class DataManager:
         self._download_requests[request_id] = download_request
         mgr = get_thread_pool_manager()
         pool = mgr.get_pool(ThreadPoolType.GENERAL)
-        fut = pool.submit_task(lambda rid=request_id: self._process_download_request(rid), task_id=f"download_{request_id}")
+        fut = pool.submit_task(
+            lambda rid=request_id: self._process_download_request(rid),
+            task_id=f"download_{request_id}",
+        )
         self.maintenance_mgr._background_tasks.append((pool, fut))
         info(f"Created download request {request_id} for {len(valid_paths)} files")
         return request_id
@@ -190,7 +217,9 @@ class DataManager:
                     self._download_requests[request_id].status = "error"
                     self._download_requests[request_id].error_message = str(e)
 
-    def _create_zip_package(self, file_paths: List[str], output_path: Path, request: DownloadRequest) -> None:
+    def _create_zip_package(
+        self, file_paths: List[str], output_path: Path, request: DownloadRequest
+    ) -> None:
         if not self._index:
             raise ValueError("Data index not available")
         with zipfile.ZipFile(output_path, "w", zipfile.ZIP_DEFLATED) as zipf:
@@ -217,7 +246,12 @@ class DataManager:
 
     def get_download_file(self, request_id: str) -> Optional[Path]:
         request = self._download_requests.get(request_id)
-        if request and request.status == "ready" and request.download_path and request.download_path.exists():
+        if (
+            request
+            and request.status == "ready"
+            and request.download_path
+            and request.download_path.exists()
+        ):
             return request.download_path
         return None
 
@@ -236,10 +270,15 @@ class DataManager:
         self.maintenance_mgr.shutdown()
         info("DataManager shutdown complete")
 
-    def __enter__(self):
+    def __enter__(self) -> "DataManager":
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(
+        self,
+        exc_type: Optional[Type[BaseException]],
+        exc_val: Optional[BaseException],
+        exc_tb: Optional[TracebackType],
+    ) -> None:
         self.shutdown()
 
 
