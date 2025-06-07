@@ -10,9 +10,16 @@ from src.utils.data_utils.data_manager import DataManager, FileStatus
 
 
 class DummyCompressionService:
+    def __init__(self, preserve_original: bool = False):
+        self._compression_settings = type(
+            "Settings", (), {"preserve_original": preserve_original}
+        )()
+
     def compress_file(self, src: str, dst: str):
         with open(src, "rb") as f_in, gzip.open(dst, "wb") as f_out:
             f_out.write(f_in.read())
+        if not self._compression_settings.preserve_original:
+            Path(src).unlink()
         return Path(dst)
 
 
@@ -71,3 +78,15 @@ def test_background_maintenance_compression(tmp_path, data_manager):
     comp_path = compressed[0]
     meta = dm._index.files.get(str(comp_path.resolve()))
     assert meta and meta.status == FileStatus.COMPRESSED
+
+
+def test_experiment_id_zip(tmp_path, data_manager):
+    dm = data_manager
+
+    zip_file = dm.processed_dir / "experiment_5.zip"
+    zip_file.write_text("dummy")
+
+    dm.scan_directories()
+
+    meta = dm._index.files.get(str(zip_file.resolve()))
+    assert meta and meta.experiment_id == "5"
