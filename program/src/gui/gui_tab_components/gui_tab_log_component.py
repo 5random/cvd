@@ -7,6 +7,7 @@ FIXED VERSION - All logic errors corrected
 from typing import Dict, Any, Optional, List, Callable
 from collections import deque
 import asyncio
+import contextlib
 from dataclasses import dataclass
 from nicegui import ui
 from pathlib import Path
@@ -299,7 +300,6 @@ class LogComponent(BaseComponent):
         self.log_service = get_log_service()
         self._log_viewers: Dict[str, LogViewerComponent] = {}
         self._refresh_timer: Optional[ui.timer] = None
-        self._selected_tab: str = "overview"
         self._selected_recent_tab: str = "info"
         # Task handle for updating statistics; used to cancel previous tasks
         self._stats_task: Optional[asyncio.Task] = None
@@ -488,6 +488,7 @@ class LogComponent(BaseComponent):
                         ui.label(line.rstrip()).classes("whitespace-pre text-gray-800")
 
         except Exception as e:
+            error(f"Error reading log file {log_file.path}: {e}")
             ui.label(f"Error reading {log_type} log: {str(e)}").classes("text-red-500")
 
     def _render_log_files(self) -> None:
@@ -670,6 +671,17 @@ class LogComponent(BaseComponent):
         """Cleanup component"""
         if self._refresh_timer:
             self._refresh_timer.cancel()
+
+        if self._stats_task:
+            self._stats_task.cancel()
+            with contextlib.suppress(asyncio.CancelledError):
+                try:
+                    if not self._stats_task.done():
+                        loop = asyncio.get_event_loop()
+                        if not loop.is_running():
+                            loop.run_until_complete(self._stats_task)
+                finally:
+                    self._stats_task = None
 
         for viewer in self._log_viewers.values():
             viewer.cleanup()

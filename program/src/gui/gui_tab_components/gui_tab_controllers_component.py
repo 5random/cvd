@@ -184,7 +184,7 @@ class ControllerConfigDialog:
                 ],
                 "fps": int(self._form_data["fps"]),
                 "rotation": int(self._form_data["rotation"]),
-                "uvc": {
+                "uvc_settings": {
                     "brightness": float(self._form_data["brightness"]),
                     "contrast": float(self._form_data["contrast"]),
                     "saturation": float(self._form_data["saturation"]),
@@ -199,7 +199,7 @@ class ControllerConfigDialog:
                 "controller_id": controller_id,
                 "name": name,
                 "type": self._form_data["type"],
-                "parameters": {"webcam_id": self._form_data["webcam_id"].strip()},
+                "parameters": {"cam_id": self._form_data["webcam_id"].strip()},
                 "enabled": bool(self._form_data["enabled"]),
             }
 
