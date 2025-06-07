@@ -14,6 +14,7 @@ from src.controllers.controller_base import (
     ControllerResult,
 )
 from src.utils.log_utils.log_service import info, warning, error
+from src.controllers.controller_utils.camera_utils import apply_uvc_settings, rotate_frame
 
 
 class CameraCaptureController(ControllerStage):
@@ -66,7 +67,7 @@ class CameraCaptureController(ControllerStage):
                 await run_camera_io(self._capture.set, cv2.CAP_PROP_FRAME_HEIGHT, int(self.height))
             if self.fps:
                 await run_camera_io(self._capture.set, cv2.CAP_PROP_FPS, int(self.fps))
-            await self._apply_uvc_settings()
+            await apply_uvc_settings(self._capture, self.uvc_settings)
             return True
         except Exception as e:
             error(f"Failed to initialize camera: {e}")
@@ -86,7 +87,7 @@ class CameraCaptureController(ControllerStage):
                 ret, frame = await run_camera_io(self._capture.read)
                 if ret:
                     if self.rotation:
-                        frame = self._apply_rotation(frame)
+                        frame = rotate_frame(frame, self.rotation)
                     self._output_cache[self.controller_id] = frame
                     failure_count = 0
                     delay = base_delay
@@ -100,7 +101,7 @@ class CameraCaptureController(ControllerStage):
                             await run_camera_io(self._capture.release)
                             self._capture = await run_camera_io(cv2.VideoCapture, self.device_index)
                             if self._capture and self._capture.isOpened():
-                                await self._apply_uvc_settings()
+                                await apply_uvc_settings(self._capture, self.uvc_settings)
                                 failure_count = 0
                                 delay = base_delay
                             else:
@@ -136,43 +137,6 @@ class CameraCaptureController(ControllerStage):
             self._capture = None
         await super().cleanup()
 
-    async def _apply_uvc_settings(self) -> None:
-        if not self._capture or not self.uvc_settings:
-            return
-        prop_map = {
-            'brightness': cv2.CAP_PROP_BRIGHTNESS,
-            'hue': cv2.CAP_PROP_HUE,
-            'contrast': cv2.CAP_PROP_CONTRAST,
-            'saturation': cv2.CAP_PROP_SATURATION,
-            'sharpness': cv2.CAP_PROP_SHARPNESS,
-            'gamma': cv2.CAP_PROP_GAMMA,
-            'gain': cv2.CAP_PROP_GAIN,
-            'backlight_comp': cv2.CAP_PROP_BACKLIGHT,
-            'exposure': cv2.CAP_PROP_EXPOSURE,
-        }
-        for name, value in self.uvc_settings.items():
-            try:
-                if name == 'white_balance_auto':
-                    await run_camera_io(self._capture.set, cv2.CAP_PROP_AUTO_WB, 1 if value else 0)
-                elif name == 'white_balance':
-                    await run_camera_io(self._capture.set, cv2.CAP_PROP_WB_TEMPERATURE, float(value))
-                elif name == 'exposure_auto':
-                    await run_camera_io(self._capture.set, cv2.CAP_PROP_AUTO_EXPOSURE, 1 if value else 0)
-                else:
-                    prop = prop_map.get(name)
-                    if prop is not None:
-                        await run_camera_io(self._capture.set, prop, float(value))
-            except Exception as exc:
-                warning(f"Failed to set UVC property {name}: {exc}")
-
-    def _apply_rotation(self, frame):
-        if self.rotation == 90:
-            return cv2.rotate(frame, cv2.ROTATE_90_CLOCKWISE)
-        if self.rotation == 180:
-            return cv2.rotate(frame, cv2.ROTATE_180)
-        if self.rotation == 270:
-            return cv2.rotate(frame, cv2.ROTATE_90_COUNTERCLOCKWISE)
-        return frame
 
     async def process(self, input_data: ControllerInput) -> ControllerResult:
         """Return the latest captured frame."""
