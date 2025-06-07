@@ -22,6 +22,7 @@ class DummyCompressionService:
             },
         )()
 
+
     def compress_file(self, src: str, dst: str):
         with open(src, "rb") as f_in, gzip.open(dst, "wb") as f_out:
             f_out.write(f_in.read())
