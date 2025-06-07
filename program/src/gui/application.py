@@ -24,8 +24,11 @@ from src.gui.gui_tab_components.gui_tab_data_component import \
 from src.gui.gui_tab_components.gui_tab_experiment_component import \
     create_experiment_component
 from src.gui.gui_tab_components.gui_tab_log_component import LogComponent
-from src.gui.gui_tab_components.gui_tab_sensors_component import \
-    SensorsComponent
+from src.gui.gui_tab_components.gui_tab_sensors_component import (
+    SensorsComponent,
+    SensorConfigDialog,
+    SensorInfo,
+)
 from src.gui.gui_tab_components.gui_setup_wizard_component import \
     SetupWizardComponent
 from src.utils.config_utils.config_service import ConfigurationService
@@ -58,6 +61,11 @@ class WebApplication:
         except Exception as e:
             error(f"Error initializing notification center: {e}")
             self._notification_center = None
+
+        # sensor configuration UI state
+        self._sensor_config_table: Optional[ui.table] = None
+        self._sensor_config_dialog: Optional[SensorConfigDialog] = None
+        self._selected_sensor_id: Optional[str] = None
     
     async def startup(self) -> None:
         """Async startup for web application"""
@@ -510,9 +518,39 @@ class WebApplication:
         with ui.card().classes('cvd-card w-full'):
             with ui.card_section():
                 ui.label('Sensor Configuration').classes('text-h6')
-            
+
+                with ui.row().classes('gap-2'):
+                    ui.button('Add Sensor', icon='add', on_click=self._add_sensor).props('color=primary')
+                    ui.button('Edit Selected', icon='edit', on_click=self._edit_selected_sensor).props('color=secondary')
+                    ui.button('Refresh', icon='refresh', on_click=self._load_sensor_configs).props('outline')
+
             with ui.card_section():
-                ui.label('Sensor configuration UI will be implemented here').classes('text-body1')
+                columns = [
+                    {'name': 'sensor_id', 'label': 'ID', 'field': 'sensor_id', 'align': 'left'},
+                    {'name': 'name', 'label': 'Name', 'field': 'name', 'align': 'left'},
+                    {'name': 'type', 'label': 'Type', 'field': 'type', 'align': 'left'},
+                    {'name': 'interface', 'label': 'Interface', 'field': 'interface', 'align': 'left'},
+                    {'name': 'port', 'label': 'Port', 'field': 'port', 'align': 'left'},
+                    {'name': 'enabled', 'label': 'Enabled', 'field': 'enabled', 'align': 'center'},
+                ]
+
+                self._sensor_config_table = ui.table(
+                    columns=columns,
+                    rows=[],
+                    row_key='sensor_id',
+                    selection='single',
+                    on_select=self._on_sensor_select,
+                ).classes('w-full')
+
+                # initialize dialog and load data
+                if not self._sensor_config_dialog:
+                    self._sensor_config_dialog = SensorConfigDialog(
+                        self.config_service,
+                        self.sensor_manager,
+                        self._load_sensor_configs,
+                    )
+
+                self._load_sensor_configs()
     
     def _create_quick_settings_dropdown(self) -> None:
         """Create quick settings dropdown"""
@@ -603,6 +641,75 @@ class WebApplication:
                                 ui.badge('Polling').props('color=blue')
         except Exception as e:
             error(f"Error updating sensor list: {e}")
+
+    def _load_sensor_configs(self) -> None:
+        """Load sensor configurations into table"""
+        if not self._sensor_config_table:
+            return
+        try:
+            configs = self.config_service.get_sensor_configs()
+            rows = []
+            for sid, cfg in configs:
+                rows.append({
+                    'sensor_id': sid,
+                    'name': cfg.get('name', sid),
+                    'type': cfg.get('type', 'unknown'),
+                    'interface': cfg.get('interface', ''),
+                    'port': cfg.get('port', ''),
+                    'enabled': '✓' if cfg.get('enabled', True) else '✗',
+                })
+            self._sensor_config_table.rows.clear()
+            self._sensor_config_table.rows.extend(rows)
+        except Exception as e:
+            error(f"Error loading sensor configs: {e}")
+
+    def _on_sensor_select(self, event) -> None:
+        """Handle table selection change"""
+        try:
+            selected = event.value
+            self._selected_sensor_id = selected[0] if selected else None
+        except Exception as e:
+            error(f"Error selecting sensor: {e}")
+
+    def _add_sensor(self) -> None:
+        """Open dialog to add a new sensor"""
+        if self._sensor_config_dialog:
+            self._sensor_config_dialog.show_add_dialog()
+
+    def _edit_selected_sensor(self) -> None:
+        """Open dialog to edit the currently selected sensor"""
+        if not self._selected_sensor_id:
+            ui.notify('Please select a sensor to edit', color='warning')
+            return
+
+        configs = dict(self.config_service.get_sensor_configs())
+        cfg = configs.get(self._selected_sensor_id)
+        if not cfg:
+            ui.notify('Sensor configuration not found', color='negative')
+            return
+
+        status = self.sensor_manager.get_sensor_status().get(self._selected_sensor_id, {})
+        reading = self.sensor_manager.get_latest_readings().get(self._selected_sensor_id)
+
+        sensor_info = SensorInfo(
+            sensor_id=self._selected_sensor_id,
+            name=cfg.get('name', self._selected_sensor_id),
+            sensor_type=cfg.get('type', 'unknown'),
+            source=cfg.get('source', 'unknown'),
+            interface=cfg.get('interface', 'unknown'),
+            port=cfg.get('port', ''),
+            enabled=cfg.get('enabled', True),
+            connected=status.get('connected', False),
+            polling=status.get('polling', False),
+            last_reading=status.get('last_reading'),
+            status=status.get('status', 'unknown'),
+            current_value=reading.value if reading else None,
+            poll_interval_ms=cfg.get('poll_interval_ms', 1000),
+            config=cfg,
+        )
+
+        if self._sensor_config_dialog:
+            self._sensor_config_dialog.show_edit_dialog(sensor_info)
     
     def _save_configuration(self, config_json: str) -> None:
         """Save configuration from JSON text"""
