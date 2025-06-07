@@ -1,16 +1,14 @@
 """
 Base classes for the controller system following the ProcessingStage pattern.
 """
-import asyncio
-from typing import Dict, List, Any, Optional, TypeVar, Generic, Union
+from typing import Dict, List, Any, Optional, TypeVar, Generic
 from dataclasses import dataclass, field
 from abc import ABC, abstractmethod
 from enum import Enum
 import time
 
 from src.data_handler.interface.sensor_interface import SensorReading
-from src.data_handler.processing.processing_base import ProcessingResult
-from src.utils.log_utils.log_service import info, warning, error, debug
+from src.utils.log_utils.log_service import info, error
 
 T = TypeVar('T')
 

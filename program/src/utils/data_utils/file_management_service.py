@@ -2,19 +2,24 @@ from pathlib import Path
 from typing import List, Optional
 import threading
 import time
+import os
 
 from src.utils.log_utils.log_service import info, warning, error
 from src.utils.concurrency.thread_pool import get_thread_pool_manager, ThreadPoolType
 from src.utils.data_utils.compression_service import CompressionService
 
+
 class FileMaintenanceService:
     """
     Service for rotating and compressing old data files across multiple directories.
     """
-    def __init__(self,
-                 compression_service: Optional[CompressionService],
-                 compression_threshold_bytes: float,
-                 max_file_age_seconds: int):
+
+    def __init__(
+        self,
+        compression_service: Optional[CompressionService],
+        compression_threshold_bytes: float,
+        max_file_age_seconds: int,
+    ):
         self.compression_service = compression_service
         self.threshold = compression_threshold_bytes
         self.max_age = max_file_age_seconds
@@ -36,10 +41,12 @@ class FileMaintenanceService:
                         new_name = f"{file_path.stem}_{timestamp}.csv"
                         target = compressed_dir / new_name
                         # schedule rename and return the target path
-                        futures.append(pool.submit_task(
-                            lambda p=file_path, t=target: (p, (p.rename(t) or t)),
-                            task_id=f"rotate_{file_path.name}"
-                        ))
+                        futures.append(
+                            pool.submit_task(
+                                lambda p=file_path, t=target: (p, (p.rename(t) or t)),
+                                task_id=f"rotate_{file_path.name}",
+                            )
+                        )
             # wait for renames to complete
             for fut in futures:
                 try:
@@ -63,7 +70,12 @@ class FileMaintenanceService:
                     size = file_path.stat().st_size
                     if size >= self.threshold:
                         # schedule compression in FILE_IO pool
-                        futures.append(pool.submit_task(lambda p=file_path: self._compress_file(p), task_id=f"compress_{file_path.name}"))
+                        futures.append(
+                            pool.submit_task(
+                                lambda p=file_path: self._compress_file(p),
+                                task_id=f"compress_{file_path.name}",
+                            )
+                        )
             # optionally wait or log errors
             for fut in futures:
                 try:
@@ -82,22 +94,32 @@ class FileMaintenanceService:
         try:
             compressed_dir = file_path.parent / "compressed"
             compressed_dir.mkdir(exist_ok=True)
-            compressed_path = compressed_dir / f"{file_path.stem}_{int(time.time())}.csv.gz"
-            # type: ignore[attr-defined]
+            compressed_path = (
+                compressed_dir / f"{file_path.stem}_{int(time.time())}.csv.gz"
+            )
             self.compression_service.compress_file(str(file_path), str(compressed_path))
 
-            if self.compression_service._compression_settings.preserve_original:
+            settings = getattr(self.compression_service, "_compression_settings", None)
+            preserve = (
+                getattr(settings, "preserve_original", False) if settings else False
+            )
+            if not preserve and file_path.exists():
+                file_path.unlink()
+
+            if preserve:
                 info(f"Compressed file {file_path} -> {compressed_path}")
             else:
                 info(f"Compressed and removed {file_path} -> {compressed_path}")
         except Exception as e:
             error(f"Failed to compress {file_path}: {e}")
 
-    def compress_directory(self,
-                           directory: Path,
-                           pattern: str = "*",
-                           data_type: str = "general",
-                           recursive: bool = False) -> Optional[List[Path]]:
+    def compress_directory(
+        self,
+        directory: Path,
+        pattern: str = "*",
+        data_type: str = "general",
+        recursive: bool = False,
+    ) -> Optional[List[Path]]:
         """Compress all files matching pattern in a directory using compression service."""
         if not self.compression_service:
             warning("Compression service not available")
@@ -105,10 +127,7 @@ class FileMaintenanceService:
         try:
             # delegate to underlying compression service
             return self.compression_service.compress_directory(
-                directory,
-                pattern=pattern,
-                data_type=data_type,
-                recursive=recursive
+                directory, pattern=pattern, data_type=data_type, recursive=recursive
             )
         except Exception as e:
             error(f"Failed to compress directory {directory}: {e}")

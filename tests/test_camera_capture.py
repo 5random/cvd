@@ -52,10 +52,9 @@ async def test_camera_capture_recovery(monkeypatch):
 
     # also suppress logging in controller_base
     import src.controllers.controller_base as controller_base
-    monkeypatch.setattr(controller_base, "info", lambda *a, **k: None)
-    monkeypatch.setattr(controller_base, "warning", lambda *a, **k: None)
-    monkeypatch.setattr(controller_base, "error", lambda *a, **k: None)
-    monkeypatch.setattr(controller_base, "debug", lambda *a, **k: None)
+    for name in ["info", "warning", "error", "debug"]:
+        if hasattr(controller_base, name):
+            monkeypatch.setattr(controller_base, name, lambda *a, **k: None)
 
     cfg = ControllerConfig(controller_id="cam", controller_type="camera_capture", parameters={"device_index": 0, "fps": 10})
     controller = CameraCaptureController("cam", cfg)
@@ -85,7 +84,8 @@ async def test_reinitialize_on_none(monkeypatch):
             monkeypatch.setattr(cap_module, name, lambda *a, **k: None)
     import src.controllers.controller_base as controller_base
     for name in ["info", "warning", "error", "debug"]:
-        monkeypatch.setattr(controller_base, name, lambda *a, **k: None)
+        if hasattr(controller_base, name):
+            monkeypatch.setattr(controller_base, name, lambda *a, **k: None)
 
     cfg = ControllerConfig(controller_id="cam", controller_type="camera_capture", parameters={"device_index": 0, "fps": 10})
     controller = CameraCaptureController("cam", cfg)
@@ -125,7 +125,8 @@ async def test_reopen_after_failures(monkeypatch):
             monkeypatch.setattr(cap_module, name, lambda *a, **k: None)
     import src.controllers.controller_base as controller_base
     for name in ["info", "warning", "error", "debug"]:
-        monkeypatch.setattr(controller_base, name, lambda *a, **k: None)
+        if hasattr(controller_base, name):
+            monkeypatch.setattr(controller_base, name, lambda *a, **k: None)
 
     cfg = ControllerConfig(controller_id="cam", controller_type="camera_capture", parameters={"device_index": 0, "fps": 10})
     controller = CameraCaptureController("cam", cfg)
