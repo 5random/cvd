@@ -552,10 +552,13 @@ class ExperimentManager:
 
             # Collect controller outputs
             if self.controller_manager:
-                # Implementation depends on ControllerManager interface
-                # This is a placeholder
-                data_point.controller_outputs = {}
-
+                try:
+                    outputs = self.controller_manager.get_controller_outputs()
+                    data_point.controller_outputs = outputs
+                except Exception as exc:
+                    warning(f"Failed to get controller outputs: {exc}")
+                    data_point.controller_outputs = {}
+            
             # Store data point
             with self._collection_lock:
                 self._collected_data.append(data_point)

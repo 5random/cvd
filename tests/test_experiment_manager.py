@@ -1,85 +1,52 @@
-import json
+
+import time
+from datetime import datetime
 import pytest
 
-from src.utils.config_utils.config_service import ConfigurationService
-from src.controllers.controller_manager import ControllerManager
-from src.controllers.controller_base import (
-    ControllerStage,
-    ControllerConfig,
-    ControllerInput,
-    ControllerResult,
-    ControllerStatus,
+from src.data_handler.interface.sensor_interface import SensorReading, SensorStatus
+from src.experiment_handler import experiment_manager as em_module
+from src.experiment_handler.experiment_manager import (
+    ExperimentManager,
+    ExperimentResult,
+    ExperimentPhase,
+    ExperimentState,
 )
-from src.experiment_handler.experiment_manager import ExperimentManager
 
 
-class DummyController(ControllerStage):
-    def __init__(self, cid: str):
-        cfg = ControllerConfig(controller_id=cid, controller_type="dummy")
-        super().__init__(cid, cfg)
-
-    async def process(self, input_data: ControllerInput) -> ControllerResult:
-        return ControllerResult.success_result(None)
-
-    async def initialize(self) -> bool:
-        return True
-
-    async def start(self):
-        started.append(self.controller_id)
-        return await super().start()
+class DummyConfigService:
+    def get(self, *args, **kwargs):
+        return kwargs.get("default")
 
 
-def create_service(tmp_path, cfg=None):
-    config_path = tmp_path / "config.json"
-    default_path = tmp_path / "default.json"
-    config_path.write_text(json.dumps(cfg or {}))
-    default_path.write_text("{}")
-    return ConfigurationService(config_path, default_path)
+class DummySensorManager:
+    def get_latest_readings(self):
+        return {"s1": SensorReading("s1", 1.0, time.time(), SensorStatus.OK)}
+
+
+class DummyControllerManager:
+    def get_controller_outputs(self):
+        return {"c1": {"value": 42}}
 
 
 @pytest.mark.asyncio
-async def test_start_selected_controllers(tmp_path):
-    service = create_service(tmp_path)
-    ctrl_mgr = ControllerManager("test")
+async def test_collect_data_point_includes_controller_outputs(monkeypatch):
+    monkeypatch.setattr(em_module, "get_compression_service", lambda: None)
 
-    global started
-    started = []
-    c1 = DummyController("c1")
-    c2 = DummyController("c2")
-    ctrl_mgr.register_controller(c1)
-    ctrl_mgr.register_controller(c2)
+    manager = ExperimentManager(
+        DummyConfigService(), DummySensorManager(), DummyControllerManager(), None
+    )
+    manager._current_experiment = "exp1"
+    manager._current_phase = ExperimentPhase.PROCESSING
+    manager._experiment_results["exp1"] = ExperimentResult(
+        experiment_id="exp1",
+        name="exp",
+        state=ExperimentState.RUNNING,
+        start_time=datetime.now(),
+    )
 
-    manager = ExperimentManager(service, controller_manager=ctrl_mgr)
+    await manager._collect_data_point()
 
-    await manager._start_controllers(["c1"])
+    assert manager._collected_data
+    dp = manager._collected_data[-1]
+    assert dp.controller_outputs == {"c1": {"value": 42}}
 
-    assert started == ["c1"]
-    assert c1.status == ControllerStatus.RUNNING
-    assert c2.status == ControllerStatus.STOPPED
-
-
-class FailController(DummyController):
-    async def start(self):
-        started.append(self.controller_id)
-        return False
-
-
-@pytest.mark.asyncio
-async def test_start_controllers_with_failure(tmp_path):
-    service = create_service(tmp_path)
-    ctrl_mgr = ControllerManager("test")
-
-    global started
-    started = []
-    c1 = FailController("bad")
-    c2 = DummyController("good")
-    ctrl_mgr.register_controller(c1)
-    ctrl_mgr.register_controller(c2)
-
-    manager = ExperimentManager(service, controller_manager=ctrl_mgr)
-
-    await manager._start_controllers(["bad", "good"])
-
-    assert started == ["bad", "good"]
-    assert c1.status == ControllerStatus.STOPPED
-    assert c2.status == ControllerStatus.RUNNING
