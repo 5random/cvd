@@ -84,8 +84,13 @@ class ApplicationContainer:
                 'data_storage.storage_paths', dict, {}
             ) or {}
             base_dir = Path(storage_paths.get('base', 'data'))
+            flush_interval = config_service.get(
+                'data_storage.flush_interval', int, 10
+            )
             data_saver = DataSaver(
-                base_output_dir=base_dir, storage_paths=storage_paths
+                base_output_dir=base_dir,
+                storage_paths=storage_paths,
+                flush_interval=flush_interval,
             )
             # Create a default temperature processing pipeline
             pipeline = create_temperature_pipeline("temperature_pipeline")
