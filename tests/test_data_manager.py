@@ -9,16 +9,36 @@ import pytest
 from src.utils.data_utils.data_manager import DataManager, FileStatus
 
 
+class DummyCompressionSettings:
+    def __init__(self):
+        self.preserve_original = False
+
+
 class DummyCompressionService:
+
+    def __init__(self):
+
+        class Settings:
+            preserve_original = False
+
+        self._compression_settings = DummyCompressionSettings()
+
     def compress_file(self, src: str, dst: str):
         with open(src, "rb") as f_in, gzip.open(dst, "wb") as f_out:
             f_out.write(f_in.read())
+
+        if not self._compression_settings.preserve_original:
+            os.remove(src)
+
         return Path(dst)
 
 
 @pytest.fixture
 def data_manager(tmp_path, monkeypatch):
     monkeypatch.setenv("ENABLE_WATCHDOG", "0")
+    # Ensure configuration service does not override test paths
+    import src.utils.config_utils.config_service as cs_module
+    cs_module._config_service_instance = None
     monkeypatch.setattr(DataManager, "_background_maintenance_worker", lambda self: None)
     mgr = DataManager(base_output_dir=tmp_path)
     yield mgr
@@ -71,3 +91,15 @@ def test_background_maintenance_compression(tmp_path, data_manager):
     comp_path = compressed[0]
     meta = dm._index.files.get(str(comp_path.resolve()))
     assert meta and meta.status == FileStatus.COMPRESSED
+
+
+def test_experiment_id_zip(tmp_path, data_manager):
+    dm = data_manager
+
+    zip_file = dm.processed_dir / "experiment_5.zip"
+    zip_file.write_text("dummy")
+
+    dm.scan_directories()
+
+    meta = dm._index.files.get(str(zip_file.resolve()))
+    assert meta and meta.experiment_id == "5"

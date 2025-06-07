@@ -2,7 +2,7 @@ import pytest
 from src.utils.config_utils.config_service import ConfigurationService, ValidationError
 
 @pytest.mark.asyncio
-async def test_validate_sensor_config_missing_field(tmp_path):
+async def test_validate_sensor_config_missing_source(tmp_path):
     config_path = tmp_path / "config.json"
     default_path = tmp_path / "default.json"
     config_path.write_text("{}")
@@ -12,8 +12,9 @@ async def test_validate_sensor_config_missing_field(tmp_path):
 
     invalid_cfg = {
         "sensor_id": "sen1",
+        "name": "t1",
         "type": "temperature",
-        "interface": "serial",
+        "interface": "usb",
         "enabled": True,
     }
 
@@ -35,6 +36,7 @@ async def test_validate_sensor_interface_requirements(tmp_path):
         "name": "t1",
         "type": "temperature",
         "interface": "serial",
+        "source": "arduino_tc_board",
         "enabled": True,
         "channel": 1
     }
