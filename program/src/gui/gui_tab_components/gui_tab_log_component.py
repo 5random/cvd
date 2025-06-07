@@ -17,6 +17,7 @@ import zipfile
 import gzip
 import bz2
 import lzma
+import tempfile
 
 from src.utils.log_utils.log_service import (
     LogService,
@@ -596,22 +597,24 @@ class LogComponent(BaseComponent):
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             filename = f"cvd_tracker_logs_{timestamp}.zip"
 
-            # Create temporary file for download
-            temp_path = Path(self.log_service.log_dir) / filename
-            with open(temp_path, "wb") as f:
-                f.write(zip_buffer.getvalue())
+            temp_path: Optional[Path] = None
+            try:
+                with tempfile.NamedTemporaryFile(
+                    delete=False,
+                    dir=self.log_service.log_dir,
+                    suffix=".zip",
+                ) as tmp_file:
+                    tmp_file.write(zip_buffer.getvalue())
+                    temp_path = Path(tmp_file.name)
 
-            ui.download(temp_path, filename=filename)
-            ui.notify(f"Downloaded all logs as {filename}", type="positive")
-
-            # Clean up temp file after a delay
-            def _cleanup_temp_file():
-                try:
-                    temp_path.unlink()
-                except Exception as ex:
-                    debug(f"Error deleting temp file {temp_path}: {ex}")
-
-            ui.timer(5.0, _cleanup_temp_file, once=True)
+                ui.download(temp_path, filename=filename)
+                ui.notify(f"Downloaded all logs as {filename}", type="positive")
+            finally:
+                if temp_path and temp_path.exists():
+                    try:
+                        temp_path.unlink()
+                    except Exception as ex:
+                        debug(f"Error deleting temp file {temp_path}: {ex}")
 
         except Exception as e:
             error(f"Error downloading all logs: {e}")
