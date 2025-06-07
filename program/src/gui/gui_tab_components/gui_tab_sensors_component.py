@@ -453,14 +453,17 @@ class SensorsComponent(BaseComponent):
         self.config_service = config_service
         
         # State
+        self._all_sensors_info: Dict[str, SensorInfo] = {}
         self._sensors_info: Dict[str, SensorInfo] = {}
+        self._search_term: str = ""
         self._sensor_cards: Dict[str, SensorCardComponent] = {}
         self._config_dialog: Optional[SensorConfigDialog] = None
         self._refresh_timer: Optional[ui.timer] = None
-        
+
         # UI elements
         self._sensors_container: Optional[Element] = None
         self._status_summary: Optional[Element] = None
+        self._search_input: Optional[ui.input] = None
         
     def render(self) -> Element:
         """Render the sensors component"""
@@ -497,7 +500,13 @@ class SensorsComponent(BaseComponent):
                     self._status_summary = ui.column().classes('gap-2')
             
             # Sensors grid
-            ui.label('Configured Sensors').classes('text-lg font-semibold')
+            with ui.row().classes('items-center justify-between w-full'):
+                ui.label('Configured Sensors').classes('text-lg font-semibold')
+                self._search_input = ui.input(
+                    'Search...',
+                    value=self._search_term,
+                    on_change=self._on_search_change,
+                ).props('dense outlined clearable').classes('w-64')
             self._sensors_container = ui.grid(columns=3).classes('w-full gap-4')
             
         # Initialize config dialog
@@ -568,9 +577,8 @@ class SensorsComponent(BaseComponent):
                 
                 new_sensors_info[sensor_id] = sensor_info
             
-            self._sensors_info = new_sensors_info
-            self._update_sensor_cards()
-            self._update_status_summary()
+            self._all_sensors_info = new_sensors_info
+            self._apply_search_filter()
             
         except Exception as e:
             error(f"Error refreshing sensors: {e}")
@@ -586,7 +594,7 @@ class SensorsComponent(BaseComponent):
             latest_readings = self.sensor_manager.get_latest_readings()
             
             # Update existing sensor info
-            for sensor_id, sensor_info in self._sensors_info.items():
+            for sensor_id, sensor_info in self._all_sensors_info.items():
                 status_info = sensor_status.get(sensor_id, {})
                 reading = latest_readings.get(sensor_id)
                 
@@ -655,6 +663,25 @@ class SensorsComponent(BaseComponent):
                 ui.label(f'Errors: {error_sensors}').classes(
                     'text-red-600' if error_sensors > 0 else 'text-gray-500'
                 )
+
+    def _on_search_change(self, e) -> None:
+        """Handle search input change"""
+        self._search_term = e.value if e.value else ""
+        self._apply_search_filter()
+
+    def _apply_search_filter(self) -> None:
+        """Filter sensors based on the current search term"""
+        term = self._search_term.lower()
+        if term:
+            self._sensors_info = {
+                sid: info
+                for sid, info in self._all_sensors_info.items()
+                if term in sid.lower() or term in info.name.lower()
+            }
+        else:
+            self._sensors_info = dict(self._all_sensors_info)
+        self._update_sensor_cards()
+        self._update_status_summary()
                 
     def _show_add_dialog(self) -> None:
         """Show add sensor dialog"""
