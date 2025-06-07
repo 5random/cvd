@@ -1,8 +1,10 @@
 """
 Motion detection controller using OpenCV background subtraction.
 """
+
 import cv2
 import numpy as np
+from PIL import Image
 from typing import Dict, Any, Optional, Tuple
 from dataclasses import dataclass
 import time
@@ -18,13 +20,21 @@ from src.controllers.controller_base import (
 )
 from src.utils.concurrency.thread_pool import run_camera_io
 from src.utils.config_utils.config_service import get_config_service
-from src.utils.concurrency.process_pool import ManagedProcessPool, ProcessPoolConfig, ProcessPoolType
+from src.utils.concurrency.process_pool import (
+    ManagedProcessPool,
+    ProcessPoolConfig,
+    ProcessPoolType,
+)
 from src.utils.log_utils.log_service import info, warning, error, debug
-from src.controllers.controller_utils.camera_utils import apply_uvc_settings, rotate_frame
+from src.controllers.controller_utils.camera_utils import (
+    apply_uvc_settings,
+    rotate_frame,
+)
 
 @dataclass
 class MotionDetectionResult:
     """Result from motion detection"""
+
     motion_detected: bool
     motion_area: float  # Total area of motion
     motion_percentage: float  # Percentage of frame with motion
@@ -105,64 +115,70 @@ def analyze_motion(
         frame_delta=None,  # Could add frame differencing if needed
     )
 
+
 class MotionDetectionController(ImageController):
     """Controller for detecting motion in camera images using background subtraction"""
-    
+
     def __init__(self, controller_id: str, config: ControllerConfig):
         super().__init__(controller_id, config)
         # Create dedicated process pool for motion analysis (CPU-bound)
-        self._motion_pool = ManagedProcessPool(ProcessPoolConfig(), pool_type=ProcessPoolType.CPU)
-        
+        self._motion_pool = ManagedProcessPool(
+            ProcessPoolConfig(), pool_type=ProcessPoolType.CPU
+        )
+
         # Parameters from config
         params = config.parameters
         # Camera parameters
-        self.device_index = params.get('device_index', 0)
-        self.webcam_id = params.get('cam_id')
-        self.width = params.get('width')
-        self.height = params.get('height')
-        self.fps = params.get('fps')
-        self.rotation = params.get('rotation', 0)
-        self.uvc_settings = params.get('uvc_settings', {})
+        self.device_index = params.get("device_index", 0)
+        self.webcam_id = params.get("cam_id")
+        self.width = params.get("width")
+        self.height = params.get("height")
+        self.fps = params.get("fps")
+        self.rotation = params.get("rotation", 0)
+        self.uvc_settings = params.get("uvc_settings", {})
 
         if self.webcam_id:
             service = get_config_service()
             if service:
                 cam_cfg = service.get_webcam_config(self.webcam_id)
                 if cam_cfg:
-                    self.device_index = cam_cfg.get('device_index', self.device_index)
-                    res = cam_cfg.get('resolution')
+                    self.device_index = cam_cfg.get("device_index", self.device_index)
+                    res = cam_cfg.get("resolution")
                     if res and len(res) == 2:
                         self.width, self.height = res
-                    self.fps = cam_cfg.get('fps', self.fps)
-                    self.rotation = cam_cfg.get('rotation', self.rotation)
-                    self.uvc_settings.update(cam_cfg.get('uvc_settings', {}))
-        self.algorithm = params.get('algorithm', 'MOG2')  # MOG2, KNN, or GMG
-        self.learning_rate = params.get('learning_rate', 0.01)
-        self.threshold = params.get('threshold', 25)
-        self.min_contour_area = params.get('min_contour_area', 500)
-        self.motion_threshold_percentage = params.get('motion_threshold_percentage', 1.0)
-        self.gaussian_blur_kernel = params.get('gaussian_blur_kernel', (5, 5))
-        self.morphology_kernel_size = params.get('morphology_kernel_size', 5)
-        self.confidence_threshold = params.get('confidence_threshold', 0.5)
+                    self.fps = cam_cfg.get("fps", self.fps)
+                    self.rotation = cam_cfg.get("rotation", self.rotation)
+                    self.uvc_settings.update(cam_cfg.get("uvc_settings", {}))
+        self.algorithm = params.get("algorithm", "MOG2")  # MOG2, KNN, or GMG
+        self.learning_rate = params.get("learning_rate", 0.01)
+        self.threshold = params.get("threshold", 25)
+        self.min_contour_area = params.get("min_contour_area", 500)
+        self.motion_threshold_percentage = params.get(
+            "motion_threshold_percentage", 1.0
+        )
+        self.gaussian_blur_kernel = params.get("gaussian_blur_kernel", (5, 5))
+        self.morphology_kernel_size = params.get("morphology_kernel_size", 5)
+        self.confidence_threshold = params.get("confidence_threshold", 0.5)
         # New: roundness and multi-frame criteria from config
-        self.roundness_enabled = params.get('roundness_enabled', False)
-        self.roundness_threshold = params.get('roundness_threshold', 0.7)
-        self.multi_frame_enabled = params.get('multi_frame_enabled', False)
-        self.multi_frame_window = params.get('multi_frame_window', 30)
-        self.multi_frame_threshold = params.get('multi_frame_threshold', 0.3)
-        
+        self.roundness_enabled = params.get("roundness_enabled", False)
+        self.roundness_threshold = params.get("roundness_threshold", 0.7)
+        self.multi_frame_enabled = params.get("multi_frame_enabled", False)
+        self.multi_frame_window = params.get("multi_frame_window", 30)
+        self.multi_frame_threshold = params.get("multi_frame_threshold", 0.3)
+
         # Background subtractor
         self._bg_subtractor: Optional[cv2.BackgroundSubtractor] = None
         self._frame_count = 0
         self._last_frame: Optional[np.ndarray] = None
         self._frame_size: Optional[Tuple[int, int]] = None
-        
+
         # Statistics
         self._motion_history = []
-        self._max_history = params.get('max_history', 100)
-        
+        self._max_history = params.get("max_history", 100)
+
         # Lock to protect shared state in async processing
         import asyncio
+
         self._state_lock = asyncio.Lock()
 
         # Camera capture resources
@@ -174,67 +190,79 @@ class MotionDetectionController(ImageController):
         """Initialize the motion detection controller"""
         try:
             # Create background subtractor based on algorithm
-            if self.algorithm == 'MOG2':
+            if self.algorithm == "MOG2":
                 self._bg_subtractor = cv2.createBackgroundSubtractorMOG2(
-                    detectShadows=True,
-                    varThreshold=16,
-                    history=500
+                    detectShadows=True, varThreshold=16, history=500
                 )
-            elif self.algorithm == 'KNN':
+            elif self.algorithm == "KNN":
                 self._bg_subtractor = cv2.createBackgroundSubtractorKNN(
-                    detectShadows=True,
-                    dist2Threshold=400.0,
-                    history=500
+                    detectShadows=True, dist2Threshold=400.0, history=500
                 )
             else:
                 error(f"Unsupported background subtraction algorithm: {self.algorithm}")
                 return False
-            
+
             # Initialize camera capture if needed
             self._capture = await run_camera_io(cv2.VideoCapture, self.device_index)
             if self._capture and self._capture.isOpened():
                 if self.width:
-                    await run_camera_io(self._capture.set, cv2.CAP_PROP_FRAME_WIDTH, int(self.width))
+                    await run_camera_io(
+                        self._capture.set, cv2.CAP_PROP_FRAME_WIDTH, int(self.width)
+                    )
                 if self.height:
-                    await run_camera_io(self._capture.set, cv2.CAP_PROP_FRAME_HEIGHT, int(self.height))
+                    await run_camera_io(
+                        self._capture.set, cv2.CAP_PROP_FRAME_HEIGHT, int(self.height)
+                    )
                 if self.fps:
-                    await run_camera_io(self._capture.set, cv2.CAP_PROP_FPS, int(self.fps))
+                    await run_camera_io(
+                        self._capture.set, cv2.CAP_PROP_FPS, int(self.fps)
+                    )
                 await apply_uvc_settings(self._capture, self.uvc_settings)
-                info(f"Initialized motion detection controller with {self.algorithm} algorithm")
+                info(
+                    f"Initialized motion detection controller with {self.algorithm} algorithm"
+                )
                 return True
             else:
                 error(f"Unable to open camera index {self.device_index}")
                 return False
-            
+
         except Exception as e:
             error(f"Failed to initialize motion detection controller: {e}")
             return False
-    
-    async def process_image(self, image_data: Any, metadata: Dict[str, Any]) -> ControllerResult:
+
+    async def process_image(
+        self, image_data: Any, metadata: Dict[str, Any]
+    ) -> ControllerResult:
         """Process image for motion detection"""
         try:
             # Convert image data to OpenCV format
             frame = self._convert_to_cv_frame(image_data)
             if frame is None:
-                return ControllerResult.error_result("Failed to convert image data to OpenCV format")
-            
+                return ControllerResult.error_result(
+                    "Failed to convert image data to OpenCV format"
+                )
+
             # Store frame size for calculations
             if self._frame_size is None:
                 self._frame_size = (frame.shape[1], frame.shape[0])
-            
+
             # Ensure background subtractor is initialized
             if self._bg_subtractor is None:
                 initialized = await self.initialize()
                 if not initialized:
-                    return ControllerResult.error_result("Background subtractor not initialized")
+                    return ControllerResult.error_result(
+                        "Background subtractor not initialized"
+                    )
             # Explicitly handle case where background subtractor is still None
             if self._bg_subtractor is None:
                 error("Background subtractor still not initialized after initialize()")
-                return ControllerResult.error_result("Background subtractor not initialized after initialization")
+                return ControllerResult.error_result(
+                    "Background subtractor not initialized after initialization"
+                )
 
             # Apply background subtraction
             fg_mask = self._bg_subtractor.apply(frame, learningRate=self.learning_rate)
-            
+
             # Post-process the mask
             processed_mask = self._post_process_mask(fg_mask)
 
@@ -255,9 +283,12 @@ class MotionDetectionController(ImageController):
                 # Update raw detection history
                 self._update_statistics(motion_result)
                 # Robust multi-frame decision
-                if self.multi_frame_enabled and len(self._motion_history) >= self.multi_frame_window:
-                    recent = self._motion_history[-self.multi_frame_window:]
-                    count = sum(1 for h in recent if h['motion_detected'])
+                if (
+                    self.multi_frame_enabled
+                    and len(self._motion_history) >= self.multi_frame_window
+                ):
+                    recent = self._motion_history[-self.multi_frame_window :]
+                    count = sum(1 for h in recent if h["motion_detected"])
                     if count / self.multi_frame_window < self.multi_frame_threshold:
                         motion_result.motion_detected = False
                 # Prepare result dict with metadata
@@ -265,42 +296,49 @@ class MotionDetectionController(ImageController):
                 # Attach original frame and mask for dashboard overlays
                 motion_result_dict["frame"] = frame
                 motion_result_dict["motion_mask"] = processed_mask
-                motion_result_dict.update({
-                    'frame_count': self._frame_count,
-                    'timestamp': metadata.get('timestamp', time.time()),
-                    'source_sensor': metadata.get('source_sensor'),
-                    'algorithm': self.algorithm,
-                    'frame_size': self._frame_size
-                })
+                motion_result_dict.update(
+                    {
+                        "frame_count": self._frame_count,
+                        "timestamp": metadata.get("timestamp", time.time()),
+                        "source_sensor": metadata.get("source_sensor"),
+                        "algorithm": self.algorithm,
+                        "frame_size": self._frame_size,
+                    }
+                )
                 # Update frame count and last frame
                 self._frame_count += 1
                 self._last_frame = frame
-            
+
             return ControllerResult.success_result(
-                motion_result_dict,
-                metadata={'controller_type': 'motion_detection'}
+                motion_result_dict, metadata={"controller_type": "motion_detection"}
             )
         except Exception as e:
             error(f"Error in motion detection: {e}")
             return ControllerResult.error_result(f"Motion detection error: {e}")
-    
+
     def _convert_to_cv_frame(self, image_data: Any) -> Optional[np.ndarray]:
         """Convert various image data formats to OpenCV frame"""
         try:
+            rgb_source = False
             if isinstance(image_data, np.ndarray):
-                # Already a numpy array
+                # Already an OpenCV frame (assumed BGR/BGRA)
                 frame = image_data
-            elif hasattr(image_data, 'array'):
-                # PIL Image or similar
-                frame = np.array(image_data)
+
             elif isinstance(image_data, bytes):
-                # Raw image bytes
+                # Raw image bytes (often RGB order)
                 nparr = np.frombuffer(image_data, np.uint8)
                 frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+          
+            elif hasattr(image_data, "__array__") or isinstance(
+                image_data, Image.Image
+            ):
+                # Objects implementing the numpy array protocol or PIL images
+                frame = np.array(image_data)
+
             else:
                 error(f"Unsupported image data type: {type(image_data)}")
                 return None
-            
+
             # Ensure the frame is in the correct format
             if len(frame.shape) == 3 and frame.shape[2] == 3:
                 # Convert RGB to BGR for OpenCV (expects BGR format)
@@ -308,78 +346,90 @@ class MotionDetectionController(ImageController):
             elif len(frame.shape) == 3 and frame.shape[2] == 4:
                 # Convert RGBA to BGR
                 frame = cv2.cvtColor(frame, cv2.COLOR_RGBA2BGR)
-            
+
             return frame
-            
+
         except Exception as e:
             error(f"Error converting image data: {e}")
             return None
-    
+
     def _post_process_mask(self, fg_mask: np.ndarray) -> np.ndarray:
         """Post-process the foreground mask to reduce noise"""
         # Apply threshold
         _, thresh = cv2.threshold(fg_mask, self.threshold, 255, cv2.THRESH_BINARY)
-        
+
         # Apply Gaussian blur to reduce noise
         blurred = cv2.GaussianBlur(thresh, self.gaussian_blur_kernel, 0)
-        
+
         # Apply morphological operations to clean up the mask
         kernel = cv2.getStructuringElement(
-            cv2.MORPH_ELLIPSE, 
-            (self.morphology_kernel_size, self.morphology_kernel_size)
+            cv2.MORPH_ELLIPSE,
+            (self.morphology_kernel_size, self.morphology_kernel_size),
         )
-        
+
         # Remove noise with opening
         opened = cv2.morphologyEx(blurred, cv2.MORPH_OPEN, kernel)
-        
+
         # Fill gaps with closing
         closed = cv2.morphologyEx(opened, cv2.MORPH_CLOSE, kernel)
-        
+
         return closed
-    
+
     def _motion_result_to_dict(self, result: MotionDetectionResult) -> Dict[str, Any]:
         """Convert MotionDetectionResult to dictionary for serialization"""
         return {
-            'motion_detected': result.motion_detected,
-            'motion_area': result.motion_area,
-            'motion_percentage': result.motion_percentage,
-            'motion_regions': result.motion_regions,
-            'motion_center': result.motion_center,
-            'motion_bbox': result.motion_bbox,
-            'confidence': result.confidence,
+            "motion_detected": result.motion_detected,
+            "motion_area": result.motion_area,
+            "motion_percentage": result.motion_percentage,
+            "motion_regions": result.motion_regions,
+            "motion_center": result.motion_center,
+            "motion_bbox": result.motion_bbox,
+            "confidence": result.confidence,
             # Note: numpy arrays (motion_mask, frame_delta) are not included for serialization
             # They can be accessed separately if needed for visualization
         }
-    
+
     def _update_statistics(self, result: MotionDetectionResult) -> None:
         """Update motion detection statistics"""
-        self._motion_history.append({
-            'timestamp': time.time(),
-            'motion_detected': result.motion_detected,
-            'motion_percentage': result.motion_percentage,
-            'confidence': result.confidence
-        })
-        
+        self._motion_history.append(
+            {
+                "timestamp": time.time(),
+                "motion_detected": result.motion_detected,
+                "motion_percentage": result.motion_percentage,
+                "confidence": result.confidence,
+            }
+        )
+
         # Limit history size
         if len(self._motion_history) > self._max_history:
             self._motion_history.pop(0)
-    
+
     def get_motion_statistics(self) -> Dict[str, Any]:
         """Get motion detection statistics"""
         if not self._motion_history:
             return {}
-        
-        recent_detections = [h for h in self._motion_history if h['motion_detected']]
-        
+
+        recent_detections = [h for h in self._motion_history if h["motion_detected"]]
+
         return {
-            'total_frames': len(self._motion_history),
-            'motion_frames': len(recent_detections),
-            'motion_rate': len(recent_detections) / len(self._motion_history),
-            'avg_motion_percentage': np.mean([h['motion_percentage'] for h in recent_detections]) if recent_detections else 0,
-            'avg_confidence': np.mean([h['confidence'] for h in recent_detections]) if recent_detections else 0,
-            'last_motion_time': recent_detections[-1]['timestamp'] if recent_detections else None
+            "total_frames": len(self._motion_history),
+            "motion_frames": len(recent_detections),
+            "motion_rate": len(recent_detections) / len(self._motion_history),
+            "avg_motion_percentage": (
+                np.mean([h["motion_percentage"] for h in recent_detections])
+                if recent_detections
+                else 0
+            ),
+            "avg_confidence": (
+                np.mean([h["confidence"] for h in recent_detections])
+                if recent_detections
+                else 0
+            ),
+            "last_motion_time": (
+                recent_detections[-1]["timestamp"] if recent_detections else None
+            ),
         }
-    
+
     async def cleanup(self) -> None:
         """Cleanup motion detection resources"""
         # Ensure no pending tasks remain before shutting down the process pool
@@ -433,10 +483,43 @@ class MotionDetectionController(ImageController):
 
     async def _capture_loop(self) -> None:
         base_delay = 1.0 / self.fps if self.fps else 0.03
+        failure_delay = 0.1
+        reopen_delay = 5.0
+        failure_count = 0
+        max_failures = 5
+        delay = base_delay
+
         while not self._stop_event.is_set():
             try:
                 if self._capture is None:
-                    break
+                    warning("Camera capture missing, attempting reinitialization")
+                    try:
+                        self._capture = await run_camera_io(cv2.VideoCapture, self.device_index)
+                        if self._capture and self._capture.isOpened():
+                            if self.width:
+                                await run_camera_io(self._capture.set, cv2.CAP_PROP_FRAME_WIDTH, int(self.width))
+                            if self.height:
+                                await run_camera_io(self._capture.set, cv2.CAP_PROP_FRAME_HEIGHT, int(self.height))
+                            if self.fps:
+                                await run_camera_io(self._capture.set, cv2.CAP_PROP_FPS, int(self.fps))
+                            await apply_uvc_settings(self._capture, self.uvc_settings)
+                            failure_count = 0
+                            delay = base_delay
+                        else:
+                            raise RuntimeError("capture not opened")
+                    except Exception as exc:
+                        error(f"Failed to reinitialize camera: {exc}")
+                        self._capture = None
+                        failure_count += 1
+                        if failure_count >= max_failures:
+                            error("Camera unavailable, retrying later")
+                            delay = reopen_delay
+                            failure_count = 0
+                        else:
+                            delay = min(failure_delay * 2 ** failure_count, 2.0)
+                    await asyncio.sleep(delay)
+                    continue
+
                 ret, frame = await run_camera_io(self._capture.read)
                 if ret:
                     if self.rotation:
@@ -450,7 +533,19 @@ class MotionDetectionController(ImageController):
                     )
                     if result.success:
                         self._output_cache[self.controller_id] = result.data
+                    failure_count = 0
+                    delay = base_delay
+                else:
+                    failure_count += 1
+                    delay = min(failure_delay * 2 ** failure_count, 2.0)
+                    if failure_count > max_failures:
+                        opened = await run_camera_io(self._capture.isOpened)
+                        if not opened:
+                            warning("Camera not opened, attempting to reinitialize")
+                            await run_camera_io(self._capture.release)
+                            self._capture = None
+                            continue
             except Exception as e:
                 error(f"Camera capture error: {e}")
-            await asyncio.sleep(base_delay)
 
+            await asyncio.sleep(base_delay)

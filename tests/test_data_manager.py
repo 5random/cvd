@@ -16,6 +16,7 @@ class DummyCompressionSettings:
 
 class DummyCompressionService:
     def __init__(self):
+
         self._compression_settings = DummyCompressionSettings()
 
     def compress_file(self, src: str, dst: str):

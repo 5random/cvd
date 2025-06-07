@@ -4,12 +4,11 @@ Reactor State Controller - Derives reactor operational states from sensor data a
 from typing import Dict, Any, Optional, List
 from dataclasses import dataclass
 from enum import Enum
-import asyncio
 import time
 
-from src.controllers.controller_base import StateController, ControllerConfig, ControllerResult, ControllerType
-from src.data_handler.interface.sensor_interface import SensorReading, SensorStatus
-from src.utils.log_utils.log_service import info, warning, error, debug
+from src.controllers.controller_base import StateController, ControllerConfig, ControllerResult
+from src.data_handler.interface.sensor_interface import SensorReading
+from src.utils.log_utils.log_service import info, error
 
 class ReactorState(Enum):
     """Reactor operational states"""

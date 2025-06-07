@@ -2,16 +2,16 @@
 Controller manager for orchestrating multiple controllers with dependency management.
 """
 import asyncio
-from typing import Dict, List, Any, Optional, Set, Callable
-from dataclasses import dataclass, field
+from typing import Dict, List, Any, Optional, Callable
+from dataclasses import dataclass
 import time
 import json
 from pathlib import Path
 import os
 
 from src.controllers.controller_base import (
-    ControllerStage, ControllerInput, ControllerResult, ControllerConfig, 
-    ControllerStatus, ControllerType
+    ControllerStage, ControllerInput, ControllerResult, ControllerConfig,
+    ControllerStatus
 )
 from src.data_handler.interface.sensor_interface import SensorReading
 from src.utils.log_utils.log_service import info, warning, error, debug

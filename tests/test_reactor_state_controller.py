@@ -10,10 +10,9 @@ from src.data_handler.interface.sensor_interface import SensorReading, SensorSta
 async def test_reactor_state_transitions(monkeypatch):
     # suppress logging
     from src.controllers.algorithms import reactor_state as module
-    monkeypatch.setattr(module, "info", lambda *a, **k: None)
-    monkeypatch.setattr(module, "warning", lambda *a, **k: None)
-    monkeypatch.setattr(module, "error", lambda *a, **k: None)
-    monkeypatch.setattr(module, "debug", lambda *a, **k: None)
+    for name in ["info", "warning", "error", "debug"]:
+        if hasattr(module, name):
+            monkeypatch.setattr(module, name, lambda *a, **k: None)
 
     cfg = ControllerConfig(
         controller_id="rs",
