@@ -5,8 +5,6 @@ This component displays live camera feed with optional motion detection overlays
 It integrates with the motion detection controller to show the same processed frames.
 """
 
-import base64
-import io
 
 import time
 from typing import Optional, Dict, Any
