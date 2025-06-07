@@ -299,7 +299,6 @@ class LogComponent(BaseComponent):
         self.log_service = get_log_service()
         self._log_viewers: Dict[str, LogViewerComponent] = {}
         self._refresh_timer: Optional[ui.timer] = None
-        self._selected_tab: str = "overview"
         self._selected_recent_tab: str = "info"
         # Task handle for updating statistics; used to cancel previous tasks
         self._stats_task: Optional[asyncio.Task] = None
