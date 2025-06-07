@@ -414,10 +414,6 @@ class ConfigurationService:
         
         sensor_id = sensor_config['sensor_id']
         
-        # Validate that sensor_id in config matches the extracted sensor_id
-        if sensor_config['sensor_id'] != sensor_id:
-            raise ConfigurationError(f"Sensor ID mismatch: config contains '{sensor_config['sensor_id']}' but expected '{sensor_id}'")
-        
         # Check if sensor already exists
         existing_configs = self.get_sensor_configs()
         for existing_id, _ in existing_configs:
