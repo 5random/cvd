@@ -96,7 +96,8 @@ class FileMaintenanceService:
                     file_path.unlink()
                     os.utime(file_path.parent, None)
                 except Exception as ex:
-                    error(f"Failed to remove original after compression: {ex}")
+                    error(f"Failed to remove original after compression {file_path}: {ex}")
+
 
             if preserve:
                 info(f"Compressed file {file_path} -> {compressed_path}")

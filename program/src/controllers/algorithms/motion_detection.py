@@ -19,7 +19,7 @@ from src.controllers.controller_base import (
 from src.utils.concurrency.thread_pool import run_camera_io
 from src.utils.config_utils.config_service import get_config_service
 from src.utils.concurrency.process_pool import ManagedProcessPool, ProcessPoolConfig, ProcessPoolType
-from src.utils.log_utils.log_service import info, warning, error, debug
+from src.utils.log_utils.log_service import info, warning, error
 from src.controllers.controller_utils.camera_utils import apply_uvc_settings, rotate_frame
 
 @dataclass
@@ -162,7 +162,6 @@ class MotionDetectionController(ImageController):
         self._max_history = params.get('max_history', 100)
         
         # Lock to protect shared state in async processing
-        import asyncio
         self._state_lock = asyncio.Lock()
 
         # Camera capture resources
@@ -439,10 +438,43 @@ class MotionDetectionController(ImageController):
 
     async def _capture_loop(self) -> None:
         base_delay = 1.0 / self.fps if self.fps else 0.03
+        failure_delay = 0.1
+        reopen_delay = 5.0
+        failure_count = 0
+        max_failures = 5
+        delay = base_delay
+
         while not self._stop_event.is_set():
             try:
                 if self._capture is None:
-                    break
+                    warning("Camera capture missing, attempting reinitialization")
+                    try:
+                        self._capture = await run_camera_io(cv2.VideoCapture, self.device_index)
+                        if self._capture and self._capture.isOpened():
+                            if self.width:
+                                await run_camera_io(self._capture.set, cv2.CAP_PROP_FRAME_WIDTH, int(self.width))
+                            if self.height:
+                                await run_camera_io(self._capture.set, cv2.CAP_PROP_FRAME_HEIGHT, int(self.height))
+                            if self.fps:
+                                await run_camera_io(self._capture.set, cv2.CAP_PROP_FPS, int(self.fps))
+                            await apply_uvc_settings(self._capture, self.uvc_settings)
+                            failure_count = 0
+                            delay = base_delay
+                        else:
+                            raise RuntimeError("capture not opened")
+                    except Exception as exc:
+                        error(f"Failed to reinitialize camera: {exc}")
+                        self._capture = None
+                        failure_count += 1
+                        if failure_count >= max_failures:
+                            error("Camera unavailable, retrying later")
+                            delay = reopen_delay
+                            failure_count = 0
+                        else:
+                            delay = min(failure_delay * 2 ** failure_count, 2.0)
+                    await asyncio.sleep(delay)
+                    continue
+
                 ret, frame = await run_camera_io(self._capture.read)
                 if ret:
                     if self.rotation:
@@ -456,7 +488,21 @@ class MotionDetectionController(ImageController):
                     )
                     if result.success:
                         self._output_cache[self.controller_id] = result.data
+                    failure_count = 0
+                    delay = base_delay
+                else:
+                    failure_count += 1
+                    delay = min(failure_delay * 2 ** failure_count, 2.0)
+                    if failure_count > max_failures:
+                        opened = await run_camera_io(self._capture.isOpened)
+                        if not opened:
+                            warning("Camera not opened, attempting to reinitialize")
+                            await run_camera_io(self._capture.release)
+                            self._capture = None
+                            continue
             except Exception as e:
                 error(f"Camera capture error: {e}")
-            await asyncio.sleep(base_delay)
+                failure_count += 1
+                delay = min(failure_delay * 2 ** failure_count, 2.0)
+            await asyncio.sleep(delay)
 
