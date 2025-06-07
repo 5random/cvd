@@ -9,23 +9,36 @@ import pytest
 from src.utils.data_utils.data_manager import DataManager, FileStatus
 
 
+class DummyCompressionSettings:
+    def __init__(self):
+        self.preserve_original = False
+
+
 class DummyCompressionService:
-    def __init__(self, preserve_original: bool = False):
-        self._compression_settings = type(
-            "Settings", (), {"preserve_original": preserve_original}
-        )()
+
+    def __init__(self):
+
+        class Settings:
+            preserve_original = False
+
+        self._compression_settings = DummyCompressionSettings()
 
     def compress_file(self, src: str, dst: str):
         with open(src, "rb") as f_in, gzip.open(dst, "wb") as f_out:
             f_out.write(f_in.read())
+
         if not self._compression_settings.preserve_original:
-            Path(src).unlink()
+            os.remove(src)
+
         return Path(dst)
 
 
 @pytest.fixture
 def data_manager(tmp_path, monkeypatch):
     monkeypatch.setenv("ENABLE_WATCHDOG", "0")
+    # Ensure configuration service does not override test paths
+    import src.utils.config_utils.config_service as cs_module
+    cs_module._config_service_instance = None
     monkeypatch.setattr(DataManager, "_background_maintenance_worker", lambda self: None)
     mgr = DataManager(base_output_dir=tmp_path)
     yield mgr
