@@ -12,8 +12,16 @@ from src.utils.config_utils.config_service import ConfigurationService
 from src.utils.log_utils.log_service import info, warning, error, debug
 
 from src.controllers.controller_manager import ControllerManager
-from src.controllers.controller_base import ControllerStage, ControllerStatus, ControllerType
-from src.gui.gui_tab_components.gui_tab_base_component import BaseComponent, ComponentConfig
+from src.controllers.controller_base import (
+    ControllerStage,
+    ControllerStatus,
+    ControllerType,
+)
+from src.gui.gui_tab_components.gui_tab_base_component import (
+    BaseComponent,
+    ComponentConfig,
+    get_component_registry,
+)
 
 
 @dataclass
@@ -69,9 +77,9 @@ class ControllerConfigDialog:
 
                 with ui.column().classes("gap-4"):
                     ui.label("Controller Settings").classes("font-semibold")
-                    ui.label(
-                        f"ID: {self._form_data['controller_id']}"
-                    ).classes("text-sm text-gray-500")
+                    ui.label(f"ID: {self._form_data['controller_id']}").classes(
+                        "text-sm text-gray-500"
+                    )
                     ui.input("Name", value=self._form_data["name"]).bind_value_to(
                         self._form_data, "name"
                     ).props("outlined").classes("w-full")
@@ -88,76 +96,76 @@ class ControllerConfigDialog:
                 ui.separator()
                 ui.label("Webcam Settings").classes("font-semibold")
                 with ui.column().classes("gap-4"):
-                        ui.input(
-                            "Webcam ID", value=self._form_data["webcam_id"]
-                        ).bind_value_to(self._form_data, "webcam_id").props(
+                    ui.input(
+                        "Webcam ID", value=self._form_data["webcam_id"]
+                    ).bind_value_to(self._form_data, "webcam_id").props(
+                        "outlined"
+                    ).classes(
+                        "w-full"
+                    )
+                    ui.input(
+                        "Webcam Name", value=self._form_data["webcam_name"]
+                    ).bind_value_to(self._form_data, "webcam_name").props(
+                        "outlined"
+                    ).classes(
+                        "w-full"
+                    )
+                    ui.number(
+                        "Device Index", value=self._form_data["device_index"]
+                    ).bind_value_to(self._form_data, "device_index").props(
+                        "outlined"
+                    ).classes(
+                        "w-full"
+                    )
+                    with ui.row().classes("gap-2 w-full"):
+                        ui.number(
+                            "Width", value=self._form_data["width"]
+                        ).bind_value_to(self._form_data, "width").props(
                             "outlined"
                         ).classes(
-                            "w-full"
-                        )
-                        ui.input(
-                            "Webcam Name", value=self._form_data["webcam_name"]
-                        ).bind_value_to(self._form_data, "webcam_name").props(
-                            "outlined"
-                        ).classes(
-                            "w-full"
+                            "flex-1"
                         )
                         ui.number(
-                            "Device Index", value=self._form_data["device_index"]
-                        ).bind_value_to(self._form_data, "device_index").props(
+                            "Height", value=self._form_data["height"]
+                        ).bind_value_to(self._form_data, "height").props(
                             "outlined"
                         ).classes(
-                            "w-full"
+                            "flex-1"
                         )
-                        with ui.row().classes("gap-2 w-full"):
-                            ui.number(
-                                "Width", value=self._form_data["width"]
-                            ).bind_value_to(self._form_data, "width").props(
-                                "outlined"
-                            ).classes(
-                                "flex-1"
-                            )
-                            ui.number(
-                                "Height", value=self._form_data["height"]
-                            ).bind_value_to(self._form_data, "height").props(
-                                "outlined"
-                            ).classes(
-                                "flex-1"
-                            )
-                        ui.number("FPS", value=self._form_data["fps"]).bind_value_to(
-                            self._form_data, "fps"
-                        ).props("outlined").classes("w-full")
-                        ui.select(
-                            [0, 90, 180, 270],
-                            label="Rotation",
-                            value=self._form_data["rotation"],
-                        ).bind_value_to(self._form_data, "rotation").props(
-                            "outlined"
-                        ).classes(
-                            "w-full"
-                        )
-                        ui.label("UVC Settings").classes("font-semibold mt-2")
-                        ui.number(
-                            "Brightness", value=self._form_data["brightness"]
-                        ).bind_value_to(self._form_data, "brightness").props(
-                            "outlined"
-                        ).classes(
-                            "w-full"
-                        )
-                        ui.number(
-                            "Contrast", value=self._form_data["contrast"]
-                        ).bind_value_to(self._form_data, "contrast").props(
-                            "outlined"
-                        ).classes(
-                            "w-full"
-                        )
-                        ui.number(
-                            "Saturation", value=self._form_data["saturation"]
-                        ).bind_value_to(self._form_data, "saturation").props(
-                            "outlined"
-                        ).classes(
-                            "w-full"
-                        )
+                    ui.number("FPS", value=self._form_data["fps"]).bind_value_to(
+                        self._form_data, "fps"
+                    ).props("outlined").classes("w-full")
+                    ui.select(
+                        [0, 90, 180, 270],
+                        label="Rotation",
+                        value=self._form_data["rotation"],
+                    ).bind_value_to(self._form_data, "rotation").props(
+                        "outlined"
+                    ).classes(
+                        "w-full"
+                    )
+                    ui.label("UVC Settings").classes("font-semibold mt-2")
+                    ui.number(
+                        "Brightness", value=self._form_data["brightness"]
+                    ).bind_value_to(self._form_data, "brightness").props(
+                        "outlined"
+                    ).classes(
+                        "w-full"
+                    )
+                    ui.number(
+                        "Contrast", value=self._form_data["contrast"]
+                    ).bind_value_to(self._form_data, "contrast").props(
+                        "outlined"
+                    ).classes(
+                        "w-full"
+                    )
+                    ui.number(
+                        "Saturation", value=self._form_data["saturation"]
+                    ).bind_value_to(self._form_data, "saturation").props(
+                        "outlined"
+                    ).classes(
+                        "w-full"
+                    )
                 with ui.row().classes("gap-2 justify-end mt-4 w-full"):
                     ui.button("Cancel", on_click=self._cancel).props("flat")
                     ui.button("Save", on_click=self._save).props("color=primary")
@@ -175,8 +183,7 @@ class ControllerConfigDialog:
             webcam_id = self._form_data["webcam_id"].strip()
             webcam_config = {
                 "webcam_id": webcam_id,
-                "name": self._form_data["webcam_name"].strip()
-                or webcam_id,
+                "name": self._form_data["webcam_name"].strip() or webcam_id,
                 "device_index": int(self._form_data["device_index"]),
                 "resolution": [
                     int(self._form_data["width"]),
@@ -207,7 +214,9 @@ class ControllerConfigDialog:
 
             # Register new controller immediately
             if self.controller_manager:
-                new_controller = self.controller_manager.add_controller_from_config(controller_config)
+                new_controller = self.controller_manager.add_controller_from_config(
+                    controller_config
+                )
                 if new_controller is None:
                     warning(f"Failed to register controller {controller_id}")
                 else:
@@ -730,8 +739,24 @@ class ControllersComponent(BaseComponent):
                 )
 
     def _show_add_dialog(self) -> None:
-        if self._config_dialog:
-            self._config_dialog.show_add_dialog()
+        from src.gui.gui_tab_components.gui_setup_wizard_component import (
+            SetupWizardComponent,
+        )
+
+        registry = get_component_registry()
+        sensors_component = registry.get_component("sensors_component")
+        sensor_manager = getattr(sensors_component, "sensor_manager", None)
+
+        if sensor_manager is None:
+            if self._config_dialog:
+                self._config_dialog.show_add_dialog()
+            return
+
+        wizard = SetupWizardComponent(
+            self.config_service, sensor_manager, self.controller_manager
+        )
+        wizard.show_dialog("controllers", on_close=self._refresh_controllers)
+        self.add_child(wizard)
 
     async def _start_all_controllers(self) -> None:
         """Start all controllers"""
