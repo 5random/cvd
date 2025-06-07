@@ -19,7 +19,7 @@ from src.controllers.controller_base import (
 from src.utils.concurrency.thread_pool import run_camera_io
 from src.utils.config_utils.config_service import get_config_service
 from src.utils.concurrency.process_pool import ManagedProcessPool, ProcessPoolConfig, ProcessPoolType
-from src.utils.log_utils.log_service import info, warning, error, debug
+from src.utils.log_utils.log_service import info, warning, error
 from src.controllers.controller_utils.camera_utils import apply_uvc_settings, rotate_frame
 
 @dataclass
@@ -162,7 +162,6 @@ class MotionDetectionController(ImageController):
         self._max_history = params.get('max_history', 100)
         
         # Lock to protect shared state in async processing
-        import asyncio
         self._state_lock = asyncio.Lock()
 
         # Camera capture resources
