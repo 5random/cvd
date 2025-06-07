@@ -6,7 +6,9 @@ import zipfile
 
 import pytest
 
-from src.utils.data_utils.data_manager import DataManager, FileStatus
+from src.utils.data_utils.data_manager import DataManager
+from src.utils.data_utils.maintenance import MaintenanceManager
+from src.utils.data_utils.indexing import FileStatus
 
 
 class DummyCompressionSettings:
@@ -39,7 +41,7 @@ def data_manager(tmp_path, monkeypatch):
     # Ensure configuration service does not override test paths
     import src.utils.config_utils.config_service as cs_module
     cs_module._config_service_instance = None
-    monkeypatch.setattr(DataManager, "_background_maintenance_worker", lambda self: None)
+    monkeypatch.setattr(MaintenanceManager, "start_worker", lambda self: None)
     mgr = DataManager(base_output_dir=tmp_path)
     yield mgr
 
