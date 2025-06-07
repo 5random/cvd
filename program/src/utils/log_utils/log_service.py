@@ -323,27 +323,37 @@ class LogService:
     def info(self, message: str, **kwargs):
         """Log info message"""
         if 'info' in self._loggers:
-            self._loggers['info'].info(message, extra=kwargs)
+            self._loggers['info'].info(message, extra=kwargs, stacklevel=2)
     
     def warning(self, message: str, **kwargs):
         """Log warning message"""
         if 'error' in self._loggers:
-            self._loggers['error'].warning(message, extra=kwargs)
+            self._loggers['error'].warning(message, extra=kwargs, stacklevel=2)
     
     def error(self, message: str, exc_info=None, **kwargs):
         """Log error message"""
         if 'error' in self._loggers:
-            self._loggers['error'].error(message, exc_info=exc_info, extra=kwargs)
+            self._loggers['error'].error(
+                message,
+                exc_info=exc_info,
+                extra=kwargs,
+                stacklevel=2,
+            )
     
     def critical(self, message: str, exc_info=None, **kwargs):
         """Log critical message"""
         if 'error' in self._loggers:
-            self._loggers['error'].critical(message, exc_info=exc_info, extra=kwargs)
+            self._loggers['error'].critical(
+                message,
+                exc_info=exc_info,
+                extra=kwargs,
+                stacklevel=2,
+            )
     
     def debug(self, message: str, **kwargs):
         """Log debug message"""
         if 'info' in self._loggers:
-            self._loggers['info'].debug(message, extra=kwargs)
+            self._loggers['info'].debug(message, extra=kwargs, stacklevel=2)
     
     # Specialized logging methods
     def log_experiment_event(self, event_type: str, experiment_id: str, details: Optional[Dict[str, Any]] = None):
