@@ -3,12 +3,27 @@ CVD Tracker main application entry point.
 Refactored to use the new core abstractions and application container.
 """
 import sys
+import os
 from pathlib import Path
+import argparse
 from src.utils.container import ApplicationContainer
 from src.utils.log_utils.log_service import info, error, warning, debug
 
 def main():
     """Main application entry point"""
+    parser = argparse.ArgumentParser(description="CVD Tracker")
+    parser.add_argument(
+        "--controller-concurrency-limit",
+        type=int,
+        help="Max concurrent controller executions",
+    )
+    args = parser.parse_args()
+
+    if args.controller_concurrency_limit is not None:
+        os.environ["CONTROLLER_MANAGER_CONCURRENCY_LIMIT"] = str(
+            args.controller_concurrency_limit
+        )
+
     info("Starting CVD Tracker...")
      
     try:

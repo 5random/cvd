@@ -68,6 +68,7 @@
     "max_workers": 2,
     "task_timeout_s": 60
   },
+  "controller_concurrency_limit": 10,
   "controller_manager": {
     "processing_interval_ms": 30
   },
