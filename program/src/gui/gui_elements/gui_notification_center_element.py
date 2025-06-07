@@ -392,6 +392,9 @@ class NotificationCenter(BaseComponent):
                     recent_lines = lines[-10:] if len(lines) > 10 else lines
                     
                     for line in recent_lines:
+                        # Skip errors generated from our own notifications
+                        if 'NOTIFICATION:' in line:
+                            continue
                         if 'ERROR' in line and datetime.now().strftime('%Y-%m-%d') in line:
                             # Extract error message
                             parts = line.split(' - ', 2)
