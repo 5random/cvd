@@ -5,6 +5,7 @@ import json
 import copy
 import logging
 import re
+from jsonschema import Draft7Validator
 
 from typing import Dict, Any, Optional, Type, TypeVar, Union, List, Set
 from pathlib import Path
@@ -39,97 +40,96 @@ class ConfigurationService:
     
     # Schema definitions for validation
     SENSOR_SCHEMA = {
-        "required_fields": ["name", "type", "interface", "enabled"],
-        "optional_fields": ["source", "port", "channel", "poll_interval_ms", "algorithm", "state_output", "show_on_dashboard"],
-        "field_types": {
-            "name": str,
-            "type": str,
-            "interface": str,
-            "enabled": bool,
-            "port": str,
-            "channel": int,
-            "address": str,
-            "poll_interval_ms": int,
-            "algorithm": list,
-            "state_output": list,
-            "show_on_dashboard": bool
+        "type": "object",
+        "properties": {
+            "name": {"type": "string"},
+            "type": {"type": "string", "enum": ["temperature", "pressure", "flow", "level", "ph"]},
+            "interface": {"type": "string", "enum": ["serial", "usb", "ethernet", "modbus"]},
+            "enabled": {"type": "boolean"},
+            "source": {"type": "string"},
+            "port": {"type": "string"},
+            "channel": {"type": "integer"},
+            "address": {"type": "string"},
+            "poll_interval_ms": {"type": "integer"},
+            "algorithm": {"type": "array"},
+            "state_output": {"type": "array"},
+            "show_on_dashboard": {"type": "boolean"}
         },
-        "valid_interfaces": ["serial", "usb", "ethernet", "modbus"],
-        "valid_types": ["temperature", "pressure", "flow", "level", "ph"],
-        "interface_requirements": {
-            "serial": ["port", "channel"],
-            "modbus": ["port", "address"]
-        }
+        "required": ["name", "type", "interface", "enabled"],
+        "allOf": [
+            {"if": {"properties": {"interface": {"const": "serial"}}, "required": ["interface"]},
+             "then": {"required": ["port", "channel"]}},
+            {"if": {"properties": {"interface": {"const": "modbus"}}, "required": ["interface"]},
+             "then": {"required": ["port", "address"]}}
+        ]
     }
     
     CONTROLLER_SCHEMA = {
-        "required_fields": ["name", "type", "enabled"],
-        "optional_fields": ["interface", "device_index", "settings", "algorithm", "state_output", "show_on_dashboard", "cam_id"],
-        "field_types": {
-            "name": str,
-            "type": str,
-            "interface": str,
-            "enabled": bool,
-            "device_index": int,
-            "ip_address": str,
-            "settings": dict,
-            "algorithm": list,
-            "state_output": list,
-            "show_on_dashboard": bool,
-            "cam_id": str
+        "type": "object",
+        "properties": {
+            "name": {"type": "string"},
+            "type": {"type": "string", "enum": ["reactor_state", "motion_detection", "camera"]},
+            "interface": {"type": "string", "enum": ["usb_camera", "network_camera", "virtual"]},
+            "enabled": {"type": "boolean"},
+            "device_index": {"type": "integer"},
+            "ip_address": {"type": "string"},
+            "port": {"type": "integer"},
+            "settings": {"type": "object"},
+            "algorithm": {"type": "array"},
+            "state_output": {"type": "array"},
+            "show_on_dashboard": {"type": "boolean"},
+            "cam_id": {"type": "string"}
         },
-        "valid_interfaces": ["usb_camera", "network_camera", "virtual"],
-        # Limit controller types to supported options
-        "valid_types": [
-            "reactor_state",
-            "motion_detection",
-        ],
-        "interface_requirements": {
-            "usb_camera": ["device_index"],
-            "network_camera": ["ip_address", "port"]
-        }
+        "required": ["name", "type", "enabled"],
+        "allOf": [
+            {"if": {"properties": {"interface": {"const": "usb_camera"}}, "required": ["interface"]},
+             "then": {"required": ["device_index"]}},
+            {"if": {"properties": {"interface": {"const": "network_camera"}}, "required": ["interface"]},
+             "then": {"required": ["ip_address", "port"]}}
+        ]
     }
 
     WEBCAM_SCHEMA = {
-        "required_fields": ["name", "device_index"],
-        "optional_fields": ["resolution", "fps", "rotation", "uvc", "uvc_settings", "webcam_id"],
-        "field_types": {
-            "name": str,
-            "device_index": int,
-            "resolution": list,
-            "fps": int,
-            "rotation": int,
-            "uvc": dict,
-            "uvc_settings": dict,
-            "webcam_id": str,
+        "type": "object",
+        "properties": {
+            "name": {"type": "string"},
+            "device_index": {"type": "integer"},
+            "resolution": {"type": "array"},
+            "fps": {"type": "integer"},
+            "rotation": {"type": "integer", "enum": [0, 90, 180, 270]},
+            "uvc": {
+                "type": "object",
+                "properties": {
+                    "brightness": {"type": "number"},
+                    "hue": {"type": "number"},
+                    "contrast": {"type": "number"},
+                    "saturation": {"type": "number"},
+                    "sharpness": {"type": "number"},
+                    "gamma": {"type": "number"},
+                    "white_balance": {"type": "number"},
+                    "white_balance_auto": {"type": "boolean"},
+                    "gain": {"type": "number"},
+                    "backlight_comp": {"type": "number"},
+                    "exposure": {"type": "number"},
+                    "exposure_auto": {"type": "boolean"}
+                },
+                "additionalProperties": False
+            },
+            "uvc_settings": {"type": "object"},
+            "webcam_id": {"type": "string"}
         },
-        "valid_rotations": [0, 90, 180, 270],
-        "uvc_field_types": {
-            "brightness": (int, float),
-            "hue": (int, float),
-            "contrast": (int, float),
-            "saturation": (int, float),
-            "sharpness": (int, float),
-            "gamma": (int, float),
-            "white_balance": (int, float),
-            "white_balance_auto": bool,
-            "gain": (int, float),
-            "backlight_comp": (int, float),
-            "exposure": (int, float),
-            "exposure_auto": bool,
-        },
+        "required": ["name", "device_index"]
     }
     
     ALGORITHM_SCHEMA = {
-        "required_fields": ["name", "type", "enabled"],
-        "optional_fields": ["settings"],
-        "field_types": {
-            "name": str,
-            "type": str,
-            "enabled": bool,
-            "settings": dict
+        "type": "object",
+        "properties": {
+            "name": {"type": "string"},
+            "type": {"type": "string", "enum": ["smoothing", "motion_detection", "state_detection", "filtering"]},
+            "enabled": {"type": "boolean"},
+            "settings": {"type": "object"}
         },
-        "valid_types": ["smoothing", "motion_detection", "state_detection", "filtering"]
+        "required": ["name", "type", "enabled"]
     }
     
     def __init__(self, config_path: Path, default_config_path: Path):
@@ -179,46 +179,18 @@ class ConfigurationService:
     
     def _validate_config(self, config: Dict[str, Any], schema: Dict[str, Any], config_type: str) -> List[str]:
         """Validate configuration against schema and return list of errors"""
-        errors = []
-        
-        # Check required fields
-        for field in schema.get("required_fields", []):
-            if field not in config:
-                errors.append(f"Missing required field: {field}")
-        
-        # Check field types
-        field_types = schema.get("field_types", {})
-        for field, expected_type in field_types.items():
-            if field in config:
-                if not isinstance(config[field], expected_type):
-                    errors.append(f"Field '{field}' should be of type {expected_type.__name__}, got {type(config[field]).__name__}")
-        
-        # Check valid values for specific fields
-        if "interface" in config:
-            valid_interfaces = schema.get("valid_interfaces", [])
-            if valid_interfaces and config["interface"] not in valid_interfaces:
-                errors.append(f"Invalid interface '{config['interface']}'. Valid options: {valid_interfaces}")
-        
-        if "type" in config:
-            valid_types = schema.get("valid_types", [])
-            if valid_types and config["type"] not in valid_types:
-                errors.append(f"Invalid type '{config['type']}'. Valid options: {valid_types}")
-        
-        # Check interface-specific requirements
-        if "interface" in config:
-            interface_reqs = schema.get("interface_requirements", {})
-            if config["interface"] in interface_reqs:
-                required_fields = interface_reqs[config["interface"]]
-                for field in required_fields:
-                    if field not in config:
-                        errors.append(f"Interface '{config['interface']}' requires field: {field}")
-        
-        # Check for unknown fields (warnings, not errors)
-        all_known_fields = set(schema.get("required_fields", [])) | set(schema.get("optional_fields", []))
-        unknown_fields = set(config.keys()) - all_known_fields - {"sensor_id", "controller_id", "algorithm_id"}
-        for field in unknown_fields:
+        validator = Draft7Validator(schema)
+        errors: List[str] = []
+        for err in validator.iter_errors(config):
+            path = ".".join(str(p) for p in err.path)
+            message = f"{path}: {err.message}" if path else err.message
+            errors.append(message)
+
+        known_fields: Set[str] = set(schema.get("properties", {}).keys())
+        known_fields.update({"sensor_id", "controller_id", "algorithm_id", "webcam_id"})
+        for field in set(config.keys()) - known_fields:
             warning(f"Unknown field in {config_type} config: {field}")
-        
+
         return errors
     
     def _validate_sensor_config(self, sensor_config: Dict[str, Any]) -> None:
@@ -246,26 +218,6 @@ class ConfigurationService:
     def _validate_webcam_config(self, webcam_config: Dict[str, Any]) -> None:
         """Validate webcam configuration"""
         errors = self._validate_config(webcam_config, self.WEBCAM_SCHEMA, "webcam")
-        rotation = webcam_config.get("rotation")
-        if rotation is not None and rotation not in self.WEBCAM_SCHEMA["valid_rotations"]:
-            errors.append(f"Invalid rotation '{rotation}'. Valid options: {self.WEBCAM_SCHEMA['valid_rotations']}")
-        uvc = webcam_config.get("uvc")
-        if uvc is not None:
-            if not isinstance(uvc, dict):
-                errors.append("'uvc' must be a dictionary")
-            else:
-                for field, expected in self.WEBCAM_SCHEMA["uvc_field_types"].items():
-                    if field in uvc and not isinstance(uvc[field], expected):
-                        exp_names = (
-                            expected.__name__ if isinstance(expected, type) else '/'.join(t.__name__ for t in expected)
-                        )
-                        errors.append(
-                            f"UVC field '{field}' should be of type {exp_names}, got {type(uvc[field]).__name__}"
-                        )
-                # warn about unknown fields
-                unknown = set(uvc.keys()) - set(self.WEBCAM_SCHEMA["uvc_field_types"].keys())
-                for field in unknown:
-                    warning(f"Unknown field in UVC settings: {field}")
         if errors:
             raise ValidationError(f"Webcam validation failed: {'; '.join(errors)}")
     
