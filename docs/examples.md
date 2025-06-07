@@ -5,7 +5,8 @@ This page gives a few quick examples of how to use components of the CVD Tracker
 ## Starting the GUI
 
 The application is started through the :class:`~src.utils.container.ApplicationContainer` which wires
-up all services and launches the NiceGUI interface.
+up all services and launches the NiceGUI interface.  The configuration directory can be specified on
+the command line using ``--config-dir`` or via the ``CVD_CONFIG_DIR`` environment variable.
 
 ```python
 from pathlib import Path
@@ -15,6 +16,15 @@ from src.utils.container import ApplicationContainer
 container = ApplicationContainer.create_sync(Path("program/config"))
 container.start_gui()
 ```
+
+To start the application from the command line with a custom configuration
+directory run:
+
+```bash
+python program/main.py --config-dir program/config
+```
+
+You can also set ``CVD_CONFIG_DIR`` instead of passing the argument.
 
 ## Working with Mock Sensors
 

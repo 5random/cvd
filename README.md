@@ -20,6 +20,17 @@ pip install pre-commit black
 
 The `requirements.txt` file lists the dependencies required by this project.
 
+## Usage
+
+Launch the GUI application specifying the configuration directory:
+
+```bash
+python program/main.py --config-dir program/config
+```
+
+You may also set the ``CVD_CONFIG_DIR`` environment variable instead of passing
+``--config-dir``.
+
 ## Running tests
 
 Install the dependencies and run the test suite with:
