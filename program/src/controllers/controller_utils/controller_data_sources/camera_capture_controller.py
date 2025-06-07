@@ -76,6 +76,7 @@ class CameraCaptureController(ControllerStage):
     async def _capture_loop(self) -> None:
         base_delay = 1.0 / self.fps if self.fps else 0.03
         failure_delay = 0.1
+        reopen_delay = 5.0
         failure_count = 0
         max_failures = 5
         delay = base_delay
@@ -83,7 +84,27 @@ class CameraCaptureController(ControllerStage):
         while not self._stop_event.is_set():
             try:
                 if self._capture is None:
-                    break
+                    warning("Camera capture missing, attempting reinitialization")
+                    try:
+                        self._capture = await run_camera_io(cv2.VideoCapture, self.device_index)
+                        if self._capture and self._capture.isOpened():
+                            await apply_uvc_settings(self._capture, self.uvc_settings)
+                            failure_count = 0
+                            delay = base_delay
+                        else:
+                            raise RuntimeError("capture not opened")
+                    except Exception as exc:
+                        error(f"Failed to reinitialize camera: {exc}")
+                        self._capture = None
+                        failure_count += 1
+                        if failure_count >= max_failures:
+                            error("Camera unavailable, retrying later")
+                            delay = reopen_delay
+                            failure_count = 0
+                        else:
+                            delay = min(failure_delay * 2 ** failure_count, 2.0)
+                    await asyncio.sleep(delay)
+                    continue
                 ret, frame = await run_camera_io(self._capture.read)
                 if ret:
                     if self.rotation:
@@ -99,13 +120,8 @@ class CameraCaptureController(ControllerStage):
                         if not opened:
                             warning("Camera not opened, attempting to reinitialize")
                             await run_camera_io(self._capture.release)
-                            self._capture = await run_camera_io(cv2.VideoCapture, self.device_index)
-                            if self._capture and self._capture.isOpened():
-                                await apply_uvc_settings(self._capture, self.uvc_settings)
-                                failure_count = 0
-                                delay = base_delay
-                            else:
-                                error("Failed to reopen camera")
+                            self._capture = None
+                            continue
             except Exception as e:
                 error(f"Camera capture error: {e}")
                 failure_count += 1
