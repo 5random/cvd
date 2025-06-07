@@ -45,7 +45,8 @@ class ControllerConfigDialog:
         self._form_data = {
             "controller_id": self.config_service.generate_next_controller_id(),
             "name": "",
-            "type": "camera_capture",
+            # Default to reactor_state controller type
+            "type": "reactor_state",
             "enabled": True,
             "webcam_id": self.config_service.generate_next_webcam_id(),
             "webcam_name": "",

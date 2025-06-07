@@ -79,13 +79,10 @@ class ConfigurationService:
             "cam_id": str
         },
         "valid_interfaces": ["usb_camera", "network_camera", "virtual"],
+        # Limit controller types to supported options
         "valid_types": [
-            "camera",
             "reactor_state",
-            "motion_detector",
-            "camera_capture",
             "motion_detection",
-            "motion_detection_camera",
         ],
         "interface_requirements": {
             "usb_camera": ["device_index"],

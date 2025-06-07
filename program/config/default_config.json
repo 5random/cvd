@@ -170,25 +170,14 @@
     },
 
     {
-      "camera_capture": {
-        "name": "Camera Capture",
-        "type": "camera_capture",
-        "parameters": {
-          "webcam_id": "cam001"
-        },
-        "enabled": true
-      }
-    },
-
-    {
       "motion_detection": {
         "name": "Motion Detection",
         "type": "motion_detection",
         "parameters": {
+          "cam_id": "cam001",
           "algorithm": "MOG2",
           "learning_rate": 0.01
         },
-        "input_controllers": ["camera_capture"],
         "enabled": true
       }
     },
