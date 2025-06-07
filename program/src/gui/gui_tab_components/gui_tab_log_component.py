@@ -470,9 +470,22 @@ class LogComponent(BaseComponent):
             return
 
         try:
-            # Read last few lines from the log file
-            with open(log_file.path, "r", encoding="utf-8") as f:
-                lines = f.readlines()
+            # Read last few lines from the log file, handle compression
+            if log_file.is_compressed:
+                suffix = log_file.path.suffix.lower()
+                if suffix == ".gz":
+                    opener = gzip.open
+                elif suffix == ".bz2":
+                    opener = bz2.open
+                elif suffix == ".xz":
+                    opener = lzma.open
+                else:
+                    opener = open
+                with opener(log_file.path, "rt", encoding="utf-8") as f:
+                    lines = f.readlines()
+            else:
+                with open(log_file.path, "r", encoding="utf-8") as f:
+                    lines = f.readlines()
 
             recent_lines = lines[-10:]  # Last 10 lines
 
@@ -488,6 +501,7 @@ class LogComponent(BaseComponent):
                         ui.label(line.rstrip()).classes("whitespace-pre text-gray-800")
 
         except Exception as e:
+            error(f"Error reading log file {log_file.path}: {e}")
             ui.label(f"Error reading {log_type} log: {str(e)}").classes("text-red-500")
 
     def _render_log_files(self) -> None:
