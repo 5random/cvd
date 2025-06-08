@@ -37,8 +37,8 @@ def main():
         # Initialize application container
         if args.config_dir:
             config_dir = args.config_dir
-        elif os.getenv("CVD_CONFIG_DIR"):
-            config_dir = Path(os.getenv("CVD_CONFIG_DIR"))
+        elif (env := os.getenv("CVD_CONFIG_DIR")) is not None:
+            config_dir = Path(env)
         else:
             # Determine config directory relative to project root
             base_dir = Path(__file__).parent.resolve()

@@ -3,5 +3,92 @@
     "title": "CVD Tracker",
     "refresh_rate_ms": 1000,
     "dark_mode": true
-  }
+  },
+  "sensors": [
+    {
+      "sen001": {
+        "name": "Mock_Sens_1",
+        "type": "temperature",
+        "source": "mock_arduino_tc_board",
+        "interface": "serial",
+        "port": "COM3",
+        "channel": 0,
+        "poll_interval_ms": 1000,
+        "baudrate": 9600,
+        "timeout": 2.0,
+        "enabled": true
+      }
+    },
+    {
+      "sen002": {
+        "name": "Mock_Sens_2",
+        "type": "temperature",
+        "source": "mock_rs232",
+        "interface": "serial",
+        "port": "COM3",
+        "channel": 0,
+        "poll_interval_ms": 1000,
+        "baudrate": 9600,
+        "timeout": 2.0,
+        "enabled": true
+      }
+    },
+    {
+      "sen003": {
+        "name": "rgfdgsg",
+        "type": "temperature",
+        "source": "arduino_tc_board",
+        "interface": "serial",
+        "enabled": true,
+        "port": "COM3",
+        "channel": 0,
+        "poll_interval_ms": 1000,
+        "baudrate": 9600,
+        "timeout": 2.0
+      }
+    }
+  ],
+  "webcams": [
+    {
+      "Built-in Camera": {
+        "name": "Built-in Camera",
+        "device_index": 0,
+        "resolution": [
+          640,
+          480
+        ],
+        "fps": 30,
+        "rotation": 0,
+        "uvc_settings": {
+          "brightness": 255,
+          "contrast": 100,
+          "saturation": 64
+        }
+      }
+    }
+  ],
+  "controllers": [
+    {
+      "con001": {
+        "name": "blablinbuln",
+        "type": "motion_detection",
+        "enabled": true,
+        "show_on_dashboard": true,
+        "algorithm": [
+          "bubble_detection"
+        ],
+        "state_output": [
+          "Keine Bewegung erkannt",
+          "Bewegung erkannt"
+        ],
+        "parameters": {
+          "cam_id": "Built-in Camera",
+          "sensitivity": 0.5,
+          "min_area": 500,
+          "background_learning_rate": 0.01,
+          "noise_threshold": 25
+        }
+      }
+    }
+  ]
 }

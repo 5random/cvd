@@ -691,23 +691,19 @@ class SensorsComponent(BaseComponent):
             self._sensors_info = dict(self._all_sensors_info)
         self._update_sensor_cards()
         self._update_status_summary()
-                
+        
     def _show_add_dialog(self) -> None:
-        """Show setup wizard focused on sensors"""
-        if not self._setup_wizard:
-            from src.gui.gui_tab_components.gui_setup_wizard_component import (
-                SetupWizardComponent,
-            )
-
-            controller_manager = create_cvd_controller_manager()
-            self._setup_wizard = SetupWizardComponent(
-                self.config_service,
-                self.sensor_manager,
-                controller_manager,
-            )
-
-        self._setup_wizard.show_dialog('sensors')
-        self._refresh_sensors()
+        """Show sensor setup wizard."""
+        from src.gui.gui_elements.gui_sensor_setup_wizard_element import (
+            SensorSetupWizardComponent,
+        )
+        
+        wizard = SensorSetupWizardComponent(
+            self.config_service,
+            self.sensor_manager,
+            on_close=self._refresh_sensors
+        )
+        wizard.show_dialog()
             
     def _edit_sensor(self, sensor_info: SensorInfo) -> None:
         """Edit sensor configuration"""

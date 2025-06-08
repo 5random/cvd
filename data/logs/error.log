@@ -587,3 +587,81 @@
 2025-06-07 21:07:55 - cvd_tracker.error - ERROR - log_service.py:556 - error - Error handling table selection: 'TableSelectionEventArguments' object has no attribute 'value'
 2025-06-07 21:07:57 - cvd_tracker.error - ERROR - log_service.py:556 - error - Error handling table selection: 'TableSelectionEventArguments' object has no attribute 'value'
 2025-06-07 21:07:58 - cvd_tracker.error - ERROR - gui_notification_center_element.py:463 - add_notification - NOTIFICATION: System Error - ERROR - log_service.py:556 - error - Error handling table selection: 'TableSelectionEventArguments' object has no attribute 'value'
+2025-06-07 23:56:38 - cvd_tracker.error - WARNING - log_service.py:600 - warning - No valid sensor configuration entries found
+2025-06-07 23:56:41 - cvd_tracker.error - WARNING - log_service.py:600 - warning - No valid sensor configuration entries found
+2025-06-07 23:56:41 - cvd_tracker.error - WARNING - gui_notification_center_element.py:463 - add_notification - NOTIFICATION: Configuration Validation Errors - Found 2 configuration validation error(s)
+2025-06-07 23:56:41 - cvd_tracker.error - ERROR - gui_notification_center_element.py:463 - add_notification - NOTIFICATION: System Error - ERROR - log_service.py:556 - error - Error handling table selection: 'TableSelectionEventArguments' object has no attribute 'value'
+2025-06-07 23:56:42 - cvd_tracker.error - WARNING - log_service.py:600 - warning - No experiment manager available - creating new instance
+2025-06-07 23:57:49 - cvd_tracker.error - ERROR - log_service.py:605 - error - Sensor not found: sen001
+2025-06-07 23:57:51 - cvd_tracker.error - ERROR - log_service.py:605 - error - Sensor not found: sen002
+2025-06-07 23:57:51 - cvd_tracker.error - ERROR - gui_notification_center_element.py:463 - add_notification - NOTIFICATION: System Error - ERROR - log_service.py:605 - error - Sensor not found: sen001
+2025-06-07 23:57:52 - cvd_tracker.error - ERROR - gui_notification_center_element.py:463 - add_notification - NOTIFICATION: System Error - ERROR - log_service.py:605 - error - Sensor not found: sen002
+2025-06-07 23:58:11 - cvd_tracker.error - ERROR - log_service.py:605 - error - Error handling table selection: unhashable type: 'dict'
+2025-06-07 23:58:16 - cvd_tracker.error - ERROR - gui_notification_center_element.py:463 - add_notification - NOTIFICATION: System Error - ERROR - log_service.py:605 - error - Error handling table selection: unhashable type: 'dict'
+2025-06-08 11:25:20 - cvd_tracker.error - WARNING - gui_notification_center_element.py:463 - add_notification - NOTIFICATION: Configuration Validation Errors - Found 1 configuration validation error(s)
+2025-06-08 11:25:21 - cvd_tracker.error - WARNING - log_service.py:600 - warning - No experiment manager available - creating new instance
+2025-06-08 11:27:05 - cvd_tracker.error - ERROR - log_service.py:605 - error - Error toggling sensor polling: Task <Task pending name='<bound method SensorCardComponent._toggle_polling of <src.gui.gui_tab_components.gui_tab_sensors_component.SensorCardComponent object at 0x0000023C472F2710>>' coro=<handle_event.<locals>.wait_for_result() running at C:\Users\Willem\AppData\Local\Programs\Python\Python313\Lib\site-packages\nicegui\events.py:445> cb=[_handle_task_result() at C:\Users\Willem\AppData\Local\Programs\Python\Python313\Lib\site-packages\nicegui\background_tasks.py:75, set.discard()]> got Future <Task cancelling name='Task-3' coro=<SensorManager._poll_sensor() running at d:\Willem\KV_GitHub\cvd\program\src\data_handler\sources\sensor_source_manager.py:242> wait_for=<Future cancelled>> attached to a different loop
+2025-06-08 11:27:05 - cvd_tracker.error - ERROR - gui_notification_center_element.py:463 - add_notification - NOTIFICATION: System Error - ERROR - log_service.py:605 - error - Error toggling sensor polling: Task <Task pending name='<bound method SensorCardComponent._toggle_polling of <src.gui.gui_tab_components.gui_tab_sensors_component.SensorCardComponent object at 0x0000023C472F2710>>' coro=<handle_event.<locals>.wait_for_result() running at C:\Users\Willem\AppData\Local\Programs\Python\Python313\Lib\site-packages\nicegui\events.py:445> cb=[_handle_task_result() at C:\Users\Willem\AppData\Local\Programs\Python\Python313\Lib\site-packages\nicegui\background_tasks.py:75, set.discard()]> got Future <Task cancelling name='Task-3' coro=<SensorManager._poll_sensor() running at d:\Willem\KV_GitHub\cvd\program\src\data_handler\sources\sensor_source_manager.py:242> wait_for=<Future cancelled>> attached to a different loop
+2025-06-08 11:27:07 - cvd_tracker.error - ERROR - log_service.py:605 - error - Error toggling sensor polling: Task <Task pending name='<bound method SensorCardComponent._toggle_polling of <src.gui.gui_tab_components.gui_tab_sensors_component.SensorCardComponent object at 0x0000023C472D3B60>>' coro=<handle_event.<locals>.wait_for_result() running at C:\Users\Willem\AppData\Local\Programs\Python\Python313\Lib\site-packages\nicegui\events.py:445> cb=[_handle_task_result() at C:\Users\Willem\AppData\Local\Programs\Python\Python313\Lib\site-packages\nicegui\background_tasks.py:75, set.discard()]> got Future <Task cancelling name='Task-2' coro=<SensorManager._poll_sensor() running at d:\Willem\KV_GitHub\cvd\program\src\data_handler\sources\sensor_source_manager.py:242> wait_for=<Future cancelled>> attached to a different loop
+2025-06-08 11:27:10 - cvd_tracker.error - ERROR - gui_notification_center_element.py:463 - add_notification - NOTIFICATION: System Error - ERROR - log_service.py:605 - error - Error toggling sensor polling: Task <Task pending name='<bound method SensorCardComponent._toggle_polling of <src.gui.gui_tab_components.gui_tab_sensors_component.SensorCardComponent object at 0x0000023C472D3B60>>' coro=<handle_event.<locals>.wait_for_result() running at C:\Users\Willem\AppData\Local\Programs\Python\Python313\Lib\site-packages\nicegui\events.py:445> cb=[_handle_task_result() at C:\Users\Willem\AppData\Local\Programs\Python\Python313\Lib\site-packages\nicegui\background_tasks.py:75, set.discard()]> got Future <Task cancelling name='Task-2' coro=<SensorManager._poll_sensor() running at d:\Willem\KV_GitHub\cvd\program\src\data_handler\sources\sensor_source_manager.py:242> wait_for=<Future cancelled>> attached to a different loop
+2025-06-08 11:27:52 - cvd_tracker.error - ERROR - log_service.py:605 - error - Sensor not found: sen003
+2025-06-08 11:27:55 - cvd_tracker.error - ERROR - log_service.py:605 - error - Sensor not found: sen003
+2025-06-08 11:27:55 - cvd_tracker.error - ERROR - gui_notification_center_element.py:463 - add_notification - NOTIFICATION: System Error - ERROR - log_service.py:605 - error - Sensor not found: sen003
+2025-06-08 11:27:56 - cvd_tracker.error - ERROR - log_service.py:605 - error - Sensor not found: sen003
+2025-06-08 11:27:56 - cvd_tracker.error - ERROR - log_service.py:605 - error - Sensor not found: sen003
+2025-06-08 11:27:57 - cvd_tracker.error - ERROR - log_service.py:605 - error - Sensor not found: sen003
+2025-06-08 11:27:57 - cvd_tracker.error - ERROR - log_service.py:605 - error - Sensor not found: sen003
+2025-06-08 11:27:57 - cvd_tracker.error - ERROR - log_service.py:605 - error - Sensor not found: sen003
+2025-06-08 11:27:58 - cvd_tracker.error - WARNING - log_service.py:600 - warning - Sensor sen001 is already polling
+2025-06-08 11:27:58 - cvd_tracker.error - WARNING - log_service.py:600 - warning - Sensor sen002 is already polling
+2025-06-08 11:27:58 - cvd_tracker.error - ERROR - log_service.py:605 - error - Failed to initialize Arduino TC sensor sen003: could not open port 'COM3': FileNotFoundError(2, 'Das System kann die angegebene Datei nicht finden.', None, 2)
+2025-06-08 11:27:58 - cvd_tracker.error - ERROR - log_service.py:605 - error - Failed to initialize sensor sen003
+2025-06-08 11:28:00 - cvd_tracker.error - WARNING - gui_notification_center_element.py:463 - add_notification - NOTIFICATION: Sensor Issue: sen001 - Sensor sen001 status: OFFLINE
+2025-06-08 11:28:00 - cvd_tracker.error - WARNING - gui_notification_center_element.py:463 - add_notification - NOTIFICATION: Sensor Issue: sen002 - Sensor sen002 status: OFFLINE
+2025-06-08 11:28:01 - cvd_tracker.error - ERROR - gui_notification_center_element.py:463 - add_notification - NOTIFICATION: System Error - ERROR - log_service.py:605 - error - Failed to initialize Arduino TC sensor sen003: could not open port 'COM3': FileNotFoundError(2, 'Das System kann die angegebene Datei nicht finden.', None, 2)
+2025-06-08 11:28:01 - cvd_tracker.error - ERROR - gui_notification_center_element.py:463 - add_notification - NOTIFICATION: System Error - ERROR - log_service.py:605 - error - Failed to initialize sensor sen003
+2025-06-08 11:28:02 - cvd_tracker.error - WARNING - log_service.py:600 - warning - Sensor sen001 is already polling
+2025-06-08 11:28:02 - cvd_tracker.error - WARNING - log_service.py:600 - warning - Sensor sen002 is already polling
+2025-06-08 11:28:02 - cvd_tracker.error - ERROR - log_service.py:605 - error - Failed to initialize Arduino TC sensor sen003: could not open port 'COM3': FileNotFoundError(2, 'Das System kann die angegebene Datei nicht finden.', None, 2)
+2025-06-08 11:28:02 - cvd_tracker.error - ERROR - log_service.py:605 - error - Failed to initialize sensor sen003
+2025-06-08 14:35:13 - cvd_tracker.error - ERROR - log_service.py:605 - error - Failed to initialize Arduino TC sensor sen003: could not open port 'COM3': FileNotFoundError(2, 'Das System kann die angegebene Datei nicht finden.', None, 2)
+2025-06-08 14:35:13 - cvd_tracker.error - ERROR - log_service.py:605 - error - Failed to initialize sensor sen003
+2025-06-08 14:35:15 - cvd_tracker.error - ERROR - log_service.py:605 - error - Failed to initialize Arduino TC sensor sen003: could not open port 'COM3': FileNotFoundError(2, 'Das System kann die angegebene Datei nicht finden.', None, 2)
+2025-06-08 14:35:15 - cvd_tracker.error - ERROR - log_service.py:605 - error - Failed to initialize sensor sen003
+2025-06-08 14:35:16 - cvd_tracker.error - ERROR - gui_notification_center_element.py:463 - add_notification - NOTIFICATION: System Error - ERROR - log_service.py:605 - error - Failed to initialize Arduino TC sensor sen003: could not open port 'COM3': FileNotFoundError(2, 'Das System kann die angegebene Datei nicht finden.', None, 2)
+2025-06-08 14:35:16 - cvd_tracker.error - ERROR - gui_notification_center_element.py:463 - add_notification - NOTIFICATION: System Error - ERROR - log_service.py:605 - error - Failed to initialize sensor sen003
+2025-06-08 14:35:17 - cvd_tracker.error - WARNING - log_service.py:600 - warning - No experiment manager available - creating new instance
+2025-06-08 14:35:31 - cvd_tracker.error - WARNING - log_service.py:600 - warning - Motion detection controller not available
+2025-06-08 14:35:31 - cvd_tracker.error - WARNING - log_service.py:600 - warning - Motion detection controller not available
+2025-06-08 14:35:31 - cvd_tracker.error - WARNING - log_service.py:600 - warning - Motion detection controller not available
+2025-06-08 14:35:31 - cvd_tracker.error - WARNING - log_service.py:600 - warning - Motion detection controller not available
+2025-06-08 14:35:31 - cvd_tracker.error - WARNING - log_service.py:600 - warning - Motion detection controller not available
+2025-06-08 14:35:31 - cvd_tracker.error - WARNING - log_service.py:600 - warning - Motion detection controller not available
+2025-06-08 14:35:31 - cvd_tracker.error - WARNING - log_service.py:600 - warning - Motion detection controller not available
+2025-06-08 14:35:31 - cvd_tracker.error - WARNING - log_service.py:600 - warning - Motion detection controller not available
+2025-06-08 14:35:31 - cvd_tracker.error - WARNING - log_service.py:600 - warning - Motion detection controller not available
+2025-06-08 14:35:32 - cvd_tracker.error - WARNING - log_service.py:600 - warning - Motion detection controller not available
+2025-06-08 14:35:32 - cvd_tracker.error - WARNING - log_service.py:600 - warning - Motion detection controller not available
+2025-06-08 14:35:32 - cvd_tracker.error - WARNING - log_service.py:600 - warning - Motion detection controller not available
+2025-06-08 14:35:32 - cvd_tracker.error - WARNING - log_service.py:600 - warning - Motion detection controller not available
+2025-06-08 14:35:32 - cvd_tracker.error - WARNING - log_service.py:600 - warning - Motion detection controller not available
+2025-06-08 14:35:32 - cvd_tracker.error - WARNING - log_service.py:600 - warning - Motion detection controller not available
+2025-06-08 14:35:32 - cvd_tracker.error - WARNING - log_service.py:600 - warning - Motion detection controller not available
+2025-06-08 14:35:32 - cvd_tracker.error - WARNING - log_service.py:600 - warning - Motion detection controller not available
+2025-06-08 14:35:32 - cvd_tracker.error - WARNING - log_service.py:600 - warning - Motion detection controller not available
+2025-06-08 14:35:32 - cvd_tracker.error - WARNING - log_service.py:600 - warning - Motion detection controller not available
+2025-06-08 14:35:32 - cvd_tracker.error - WARNING - log_service.py:600 - warning - Motion detection controller not available
+2025-06-08 14:35:41 - cvd_tracker.error - ERROR - log_service.py:605 - error - Sensor not found: sen003
+2025-06-08 14:35:46 - cvd_tracker.error - ERROR - gui_notification_center_element.py:463 - add_notification - NOTIFICATION: System Error - ERROR - log_service.py:605 - error - Sensor not found: sen003
+2025-06-08 14:36:00 - cvd_tracker.error - ERROR - log_service.py:605 - error - Error starting controller con001: 'MotionDetectionController' object has no attribute '_stop_event'
+2025-06-08 14:36:01 - cvd_tracker.error - ERROR - gui_notification_center_element.py:463 - add_notification - NOTIFICATION: System Error - ERROR - log_service.py:605 - error - Error starting controller con001: 'MotionDetectionController' object has no attribute '_stop_event'
+2025-06-08 14:37:10 - cvd_tracker.error - WARNING - log_service.py:600 - warning - Sensor sen001 is already polling
+2025-06-08 14:37:10 - cvd_tracker.error - WARNING - log_service.py:600 - warning - Sensor sen002 is already polling
+2025-06-08 14:37:10 - cvd_tracker.error - ERROR - log_service.py:605 - error - Sensor not found: sen003
+2025-06-08 14:37:10 - cvd_tracker.error - ERROR - log_service.py:605 - error - Error starting controller con001: 'MotionDetectionController' object has no attribute '_stop_event'
+2025-06-08 14:37:10 - cvd_tracker.error - ERROR - log_service.py:605 - error - Error starting experiment: The current slot cannot be determined because the slot stack for this task is empty.
+This may happen if you try to create UI from a background task.
+To fix this, enter the target slot explicitly using `with container_element:`.
+2025-06-08 14:37:11 - cvd_tracker.error - ERROR - gui_notification_center_element.py:463 - add_notification - NOTIFICATION: System Error - ERROR - log_service.py:605 - error - Error starting experiment: The current slot cannot be determined because the slot stack for this task is empty.
+2025-06-08 14:37:25 - cvd_tracker.error - ERROR - log_service.py:605 - error - Error handling table selection: unhashable type: 'dict'
+2025-06-08 14:37:26 - cvd_tracker.error - ERROR - gui_notification_center_element.py:463 - add_notification - NOTIFICATION: System Error - ERROR - log_service.py:605 - error - Error handling table selection: unhashable type: 'dict'

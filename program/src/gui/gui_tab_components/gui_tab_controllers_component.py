@@ -22,6 +22,9 @@ from src.gui.gui_tab_components.gui_tab_base_component import (
     ComponentConfig,
     get_component_registry,
 )
+from src.gui.gui_elements.gui_controller_setup_wizard_element import (
+    ControllerSetupWizardComponent,
+)
 
 
 @dataclass
@@ -772,30 +775,31 @@ class ControllersComponent(BaseComponent):
                 ui.label("No execution order defined").classes("text-gray-500")
 
             # Dependencies info
-            if dependencies:
-                ui.label(f"Dependencies: {len(dependencies)} total").classes(
+            if dependencies:                ui.label(f"Dependencies: {len(dependencies)} total").classes(
                     "text-sm text-gray-500 mt-2"
                 )
 
     def _show_add_dialog(self) -> None:
-        from src.gui.gui_tab_components.gui_setup_wizard_component import (
-            SetupWizardComponent,
-        )
-
+        """Show the controller setup wizard."""
+        # Get sensor manager from the component registry
         registry = get_component_registry()
         sensors_component = registry.get_component("sensors_component")
         sensor_manager = getattr(sensors_component, "sensor_manager", None)
 
         if sensor_manager is None:
+            # Fallback to old dialog if sensor manager is not available
             if self._config_dialog:
                 self._config_dialog.show_add_dialog()
             return
 
-        wizard = SetupWizardComponent(
-            self.config_service, sensor_manager, self.controller_manager
+        # Use the new controller setup wizard
+        wizard = ControllerSetupWizardComponent(
+            config_service=self.config_service,
+            controller_manager=self.controller_manager,
+            sensor_manager=sensor_manager,
+            on_close=self._refresh_controllers
         )
-        wizard.show_dialog("controllers", on_close=self._refresh_controllers)
-        self.add_child(wizard)
+        wizard.show_dialog()
 
     async def _start_all_controllers(self) -> None:
         """Start all controllers"""

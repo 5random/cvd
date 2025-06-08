@@ -26,6 +26,7 @@ from src.data_handler.sources.sensor_source_manager import SensorManager
 from src.controllers.controller_manager import ControllerManager
 from src.utils.config_utils.config_service import ConfigurationService, get_config_service
 from src.utils.log_utils.log_service import info, warning, error, debug
+from src.gui.gui_elements.gui_experiment_setup_wizard_element import ExperimentSetupWizardComponent
 from typing import cast
 
 
@@ -304,8 +305,8 @@ class ExperimentCard(BaseComponent):
         # UI elements
         self._container: Optional[Card] = None
         self._status_icon: Optional[Icon] = None
-        self._progress_bar: Optional[Element] = None
-        self._progress_label: Optional[Label] = None
+        self._progress_bar: Any = None
+        self._progress_label: Any = None
         self._state_label: Optional[Label] = None
         self._action_buttons: List[Button] = []
         
@@ -423,20 +424,16 @@ class ExperimentCard(BaseComponent):
                             f'Progress: {self.experiment_info.progress_percent:.1f}%'
                         ).classes('text-xs text-gray-600 mt-1')
             else:
-                self._progress_bar.set_visibility(True)
-                self._progress_bar.set_value(
-                    self.experiment_info.progress_percent / 100
-                )
+                self._progress_bar.visible = True
+                self._progress_bar.value = self.experiment_info.progress_percent / 100
                 if self._progress_label:
-                    self._progress_label.set_visibility(True)
-                    self._progress_label.set_text(
-                        f'Progress: {self.experiment_info.progress_percent:.1f}%'
-                    )
+                    self._progress_label.visible = True
+                    self._progress_label.text = f'Progress: {self.experiment_info.progress_percent:.1f}%'
         else:
             if self._progress_bar:
-                self._progress_bar.set_visibility(False)
+                self._progress_bar.visible = False
             if self._progress_label:
-                self._progress_label.set_visibility(False)
+                self._progress_label.visible = False
     
     def _update_status_icon(self) -> None:
         """Update status icon based on experiment state"""
@@ -990,27 +987,24 @@ class ExperimentComponent(BaseComponent):
                 cast(ExperimentManager, self.experiment_manager)
             )
             self.current_experiment_display.render()
-            
-            # History section
+              # History section
             self.history_table = ExperimentHistoryTable(
                 cast(ExperimentManager, self.experiment_manager)
             )
             self.history_table.render()
         
         return container
-    
+
     def _show_new_experiment_dialog(self) -> None:
         """Show new experiment configuration dialog"""
-        if not self.config_dialog:
-            self.config_dialog = ExperimentConfigDialog(
-                config_service=self.config_service,
-                experiment_manager=cast(ExperimentManager, self.experiment_manager),
-                sensor_manager=self.sensor_manager,
-                controller_manager=self.controller_manager,
-                on_save_callback=self._on_experiment_created
-            )
-        
-        self.config_dialog.show_dialog()
+        experiment_wizard = ExperimentSetupWizardComponent(
+            config_service=self.config_service,
+            experiment_manager=cast(ExperimentManager, self.experiment_manager),
+            sensor_manager=self.sensor_manager,
+            controller_manager=self.controller_manager,
+            on_close=None
+        )
+        experiment_wizard.show_dialog()
     
     async def _stop_current_experiment(self) -> None:
         """Stop the current experiment"""

@@ -74,6 +74,7 @@ class ConfigurationService:
             "device_index": {"type": "integer"},
             "ip_address": {"type": "string"},
             "port": {"type": "integer"},
+            "parameters": {"type": "object"},
             "settings": {"type": "object"},
             "algorithm": {"type": "array"},
             "state_output": {"type": "array"},
