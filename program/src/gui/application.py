@@ -160,6 +160,12 @@ class WebApplication:
         async def video_feed():
             """Stream MJPEG frames from the dashboard camera"""
             camera = self.component_registry.get_component('dashboard_camera_stream')
+            if camera is None:
+                # fallback to first registered camera stream
+                for cid in self.component_registry.components:
+                    if str(cid).startswith('dashboard_camera_stream_'):
+                        camera = self.component_registry.get_component(cid)
+                        break
 
             async def gen():
                 while True:
