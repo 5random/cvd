@@ -77,8 +77,12 @@ class NotificationCenter(NotificationMonitoringMixin, NotificationUIMixin, Timed
         
         # Notification storage
         self.notifications: List[Notification] = []
-        self.max_notifications: int = 500
-        self.notification_history_file: Path = Path("data/notifications/history.json")
+
+        notif_cfg = self.config_service.get("ui.notification_center", dict, {}) or {}
+        self.max_notifications: int = notif_cfg.get("max_notifications", 500)
+        history_file = notif_cfg.get("history_file", "data/notifications/history.json")
+        self.notification_history_file: Path = Path(history_file)
+        self.check_interval: float = float(notif_cfg.get("update_interval_s", 5.0))
         
         # UI elements
         self._notification_list: Optional[Any] = None
@@ -156,7 +160,7 @@ class NotificationCenter(NotificationMonitoringMixin, NotificationUIMixin, Timed
                 
         except Exception as e:
             self.log_service.error(f"Failed to save notification history: {e}")
-    
+
     def add_notification(self, 
                         title: str, 
                         message: str, 
