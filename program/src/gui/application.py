@@ -3,7 +3,8 @@ Main web application class for managing the NiceGUI interface.
 """
 import asyncio
 import contextlib
-from typing import Any, Dict, Optional
+import json
+from typing import Optional
 
 from nicegui import app, ui
 import cv2
@@ -31,7 +32,7 @@ from src.gui.gui_tab_components.gui_tab_sensors_component import (
 )
 from src.gui.gui_tab_components.gui_setup_wizard_component import \
     SetupWizardComponent
-from src.utils.config_utils.config_service import ConfigurationService
+from src.utils.config_utils.config_service import ConfigurationService, ConfigurationError
 from src.utils.data_utils.data_manager import get_data_manager
 from src.utils.log_utils.log_service import debug, error, info, warning
 from src.gui.gui_elements.gui_webcam_stream_element import CameraStreamComponent
@@ -47,6 +48,18 @@ class WebApplication:
         self.controller_manager = create_cvd_controller_manager()
         self.component_registry = get_component_registry()
         self._routes_registered = False
+
+        # Initialize attributes that will be assigned later
+        self._processing_task: Optional[asyncio.Task] = None
+        self._title_label: Optional[ui.label] = None
+        self._title_input: Optional[ui.input] = None
+        self._refresh_rate_input: Optional[ui.number] = None
+        self._sensors_component: Optional[SensorsComponent] = None
+        self._controllers_component: Optional[ControllersComponent] = None
+        self._log_component: Optional[LogComponent] = None
+        self._sensor_readings_container: Optional[ui.column] = None
+        self._live_plot: Optional[LivePlotComponent] = None
+        self._sensor_list_container: Optional[ui.column] = None
         
         # Initialize notification center with error handling
         try:
@@ -718,24 +731,28 @@ class WebApplication:
     def _save_configuration(self, config_json: str) -> None:
         """Save configuration from JSON text"""
         try:
-            import json
             config_data = json.loads(config_json)
-            # Save to file
+        except json.JSONDecodeError as e:
+            ui.notify(f'Invalid configuration JSON: {e}', type='negative')
+            return
+        try:
             with open(self.config_service.config_path, 'w', encoding='utf-8') as f:
                 json.dump(config_data, f, indent=2, ensure_ascii=False)
             self.config_service.reload()
-            ui.notify('Configuration saved successfully', type='positive')
-        except Exception as e:
+        except (OSError, ConfigurationError) as e:
             ui.notify(f'Error saving configuration: {e}', type='negative')
+        else:
+            ui.notify('Configuration saved successfully', type='positive')
     
     def _reset_configuration(self, config_textarea) -> None:
         """Reset configuration to defaults"""
         try:
             self.config_service.reset_to_defaults()
             config_textarea.value = self.config_service.get_raw_config_as_json()
-            ui.notify('Configuration reset to defaults', type='positive')
-        except Exception as e:
+        except (OSError, ConfigurationError) as e:
             ui.notify(f'Error resetting configuration: {e}', type='negative')
+        else:
+            ui.notify('Configuration reset to defaults', type='positive')
     
     def _create_sensor_page(self) -> None:
         """Create standalone sensor management page"""
