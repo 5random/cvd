@@ -37,6 +37,7 @@ from src.utils.data_utils.data_manager import get_data_manager
 from src.utils.log_utils.log_service import debug, error, info, warning
 from src.gui.gui_elements.gui_webcam_stream_element import CameraStreamComponent
 from starlette.staticfiles import StaticFiles
+from fastapi.responses import StreamingResponse
 
 
 class WebApplication:
@@ -166,7 +167,8 @@ class WebApplication:
                                        jpeg_bytes + b'\r\n')
                     await asyncio.sleep(camera.update_interval if isinstance(camera, CameraStreamComponent) else 0.03)
 
-            return app.response_class(gen(), media_type='multipart/x-mixed-replace; boundary=frame')
+            return StreamingResponse(gen(),
+                                     media_type='multipart/x-mixed-replace; boundary=frame')
     
     def _setup_layout(self) -> None:
         """Setup common layout elements"""
