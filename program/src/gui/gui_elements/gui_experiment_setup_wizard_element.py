@@ -5,6 +5,7 @@ from datetime import datetime
 from pathlib import Path
 from nicegui import ui
 import json
+from src.utils.ui_helpers import notify_later
 
 from src.gui.gui_tab_components.gui_tab_base_component import (
     BaseComponent,
@@ -619,8 +620,6 @@ class ExperimentSetupWizardComponent(BaseComponent):
 
     async def _start_experiment_async(self, experiment_id: str) -> None:
         """Start experiment asynchronously."""
-        def notify_later(message: str, **kwargs) -> None:
-            ui.timer(0, lambda: ui.notify(message, **kwargs), once=True)
         
         try:
             if not self.experiment_manager:

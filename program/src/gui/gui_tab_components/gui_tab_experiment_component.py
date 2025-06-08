@@ -11,6 +11,7 @@ from pathlib import Path
 
 from nicegui import ui
 from nicegui.element import Element
+from src.utils.ui_helpers import notify_later
 from nicegui.elements.dialog import Dialog
 from nicegui.elements.label import Label
 from nicegui.elements.button import Button
@@ -272,8 +273,6 @@ class ExperimentConfigDialog:
     async def _start_experiment_async(self, experiment_id: str) -> None:
         """Start experiment asynchronously"""
         # Helper to schedule notifications in main UI context
-        def notify_later(message: str, **kwargs) -> None:
-            ui.timer(0, lambda: ui.notify(message, **kwargs), once=True)
         try:
             success = await self.experiment_manager.start_experiment(experiment_id)
             if success:
