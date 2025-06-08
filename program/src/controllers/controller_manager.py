@@ -3,7 +3,7 @@ Controller manager for orchestrating multiple controllers with dependency manage
 """
 
 import asyncio
-from typing import Dict, List, Any, Optional, Callable
+from typing import Dict, List, Any, Optional, Callable, Type
 from dataclasses import dataclass
 import time
 import json
@@ -26,6 +26,20 @@ from .controller_utils.controller_data_sources.camera_capture_controller import 
     CameraCaptureController,
 )
 from src.utils.config_utils.config_service import get_config_service
+
+# Registry mapping controller type names to classes
+CONTROLLER_REGISTRY: Dict[str, Type[ControllerStage]] = {}
+
+
+def register_controller_type(name: str, cls: Type[ControllerStage]) -> None:
+    """Register a controller class under a type name."""
+    CONTROLLER_REGISTRY[name] = cls
+
+
+# Register built-in controller types
+register_controller_type("camera_capture", CameraCaptureController)
+register_controller_type("motion_detection", MotionDetectionController)
+register_controller_type("reactor_state", ReactorStateController)
 
 
 @dataclass
@@ -99,12 +113,9 @@ class ControllerManager:
                 output_name=config.get("output_name"),
             )
 
-            if controller_type == "motion_detection":
-                return MotionDetectionController(controller_id, cfg)
-            if controller_type == "reactor_state":
-                return ReactorStateController(controller_id, cfg)
-            if controller_type == "camera_capture":
-                return CameraCaptureController(controller_id, cfg)
+            cls = CONTROLLER_REGISTRY.get(controller_type)
+            if cls is not None:
+                return cls(controller_id, cfg)
 
             warning(
                 "Unknown controller type",
