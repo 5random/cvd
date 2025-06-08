@@ -6,11 +6,10 @@ It integrates with the motion detection controller to show the same processed fr
 """
 
 import time
-from typing import Optional, Dict, Any
+from typing import Optional, Any
 import cv2
 import numpy as np
 from nicegui import ui
-from PIL import Image
 
 from src.gui.gui_tab_components.gui_tab_base_component import (
     BaseComponent,
@@ -21,7 +20,7 @@ from ...controllers.algorithms.motion_detection import (
     MotionDetectionController,
     MotionDetectionResult,
 )
-from src.utils.log_utils.log_service import info, warning, error, debug
+from src.utils.log_utils.log_service import warning, error, debug
 
 
 class CameraStreamComponent(BaseComponent):
@@ -195,55 +194,55 @@ class CameraStreamComponent(BaseComponent):
                     self.status_label.text = "Streaming"
                     self.status_label.classes("text-green-600")
 
-    def _update_frame(self):
+    def _update_frame(self) -> None:
         """Update the displayed frame with latest camera data."""
         try:
-            # Get motion detection controller
-            motion_controller = self._get_motion_detection_controller()
-            if not motion_controller:
+            controller = self._get_motion_detection_controller()
+            if not controller:
                 self._handle_no_controller()
                 return
 
-            # Get latest frame and detection results
-            frame_data = self._get_latest_frame_data(motion_controller)
-            if frame_data is None:
+            data = self._get_latest_frame_data(controller)
+            if data is None:
                 self._handle_no_frame()
                 return
 
-            # Process and display frame
-            display_frame = self._prepare_display_frame(frame_data)
-            if display_frame is not None:
-                self._update_image_display(display_frame)
-                self._update_fps_counter()
+            self._render_frame(data)
 
-                if self.status_label:
-                    self.status_label.text = "Streaming"
-                    self.status_label.classes("text-green-600")
-
-        except Exception as e:
-            error(f"Error updating camera frame: {e}")
+        except cv2.error as exc:
+            error(f"OpenCV error updating camera frame: {exc}")
             if self.status_label:
-                self.status_label.text = f"Error: {str(e)[:30]}..."
+                self.status_label.text = "OpenCV Error"
                 self.status_label.classes("text-red-600")
+        except Exception as exc:  # unexpected errors
+            error(f"Unexpected error updating camera frame: {exc}")
+            if self.status_label:
+                self.status_label.text = f"Error: {str(exc)[:30]}..."
+                self.status_label.classes("text-red-600")
+
+    def _render_frame(self, frame_data: MotionDetectionResult) -> None:
+        """Render a processed frame to the UI."""
+        display_frame = self._prepare_display_frame(frame_data)
+        if display_frame is None:
+            return
+        self._update_image_display(display_frame)
+        self._update_fps_counter()
+        if self.status_label:
+            self.status_label.text = "Streaming"
+            self.status_label.classes("text-green-600")
 
     def _get_motion_detection_controller(self) -> Optional[MotionDetectionController]:
         """Get the motion detection controller instance."""
-        try:
-            controller = self.controller_manager.get_controller("motion_detection")
-            # Check if it's the right type
-            if isinstance(controller, MotionDetectionController):
-                return controller
-            return None
-        except Exception as e:
-            warning(f"Could not get motion detection controller: {e}")
-            return None
+        controller = self.controller_manager.get_controller("motion_detection")
+        if isinstance(controller, MotionDetectionController):
+            return controller
+        return None
 
     def _get_latest_frame_data(
         self, motion_controller: MotionDetectionController
     ) -> Optional[MotionDetectionResult]:
         """Get the latest frame and motion detection data."""
         try:
-            # Get the latest output from motion controller
             output = motion_controller.get_output()
             if output is None:
                 return None
@@ -277,45 +276,35 @@ class CameraStreamComponent(BaseComponent):
                 result.frame = camera_frame
             return result
 
-        except Exception as e:
-            warning(f"Error getting frame data: {e}")
+        except (AttributeError, KeyError, TypeError) as exc:
+            warning(f"Error getting frame data: {exc}")
             return None
 
     def _get_camera_frame(self) -> Optional[np.ndarray]:
         """Get current camera frame from available sources."""
-        try:
-            # Try to get from controller outputs first
-            outputs = self.controller_manager.get_controller_outputs()
+        # Try to get from controller outputs first
+        outputs = self.controller_manager.get_controller_outputs()
+        # Look for camera or image data in controller outputs
+        for _, output in outputs.items():
+            if isinstance(output, MotionDetectionResult):
+                if output.frame is not None:
+                    return output.frame
+            elif isinstance(output, dict):
+                if "frame" in output:
+                    frame_data = output["frame"]
+                    if isinstance(frame_data, np.ndarray):
+                        return frame_data
 
-            # Look for camera or image data in controller outputs
-            for controller_id, output in outputs.items():
-                if isinstance(output, MotionDetectionResult):
-                    if output.frame is not None:
-                        return output.frame
-                elif isinstance(output, dict):
-                    # Look for frame data
-                    if "frame" in output:
-                        frame_data = output["frame"]
-                        if isinstance(frame_data, np.ndarray):
-                            return frame_data
+                if "image" in output:
+                    image_data = output["image"]
+                    if isinstance(image_data, np.ndarray):
+                        return image_data
 
-                    # Look for image data
-                    if "image" in output:
-                        image_data = output["image"]
-                        if isinstance(image_data, np.ndarray):
-                            return image_data
+            elif isinstance(output, np.ndarray) and len(output.shape) == 3:
+                return output
 
-                # If output is directly a numpy array (frame)
-                elif isinstance(output, np.ndarray) and len(output.shape) == 3:
-                    return output
-
-            # If no frame found, create a placeholder for now
-            debug("No camera frame found in controller outputs")
-            return None
-
-        except Exception as e:
-            warning(f"Error getting camera frame: {e}")
-            return None
+        debug("No camera frame found in controller outputs")
+        return None
 
     def _prepare_display_frame(
         self, frame_data: MotionDetectionResult
@@ -326,17 +315,18 @@ class CameraStreamComponent(BaseComponent):
             if frame is None:
                 return None
 
-            # Resize frame if needed
             frame = self._resize_frame(frame)
 
-            # Apply overlays if enabled
             if self.show_motion_overlay:
                 frame = self._apply_motion_overlays(frame, frame_data)
 
             return frame
 
-        except Exception as e:
-            error(f"Error preparing display frame: {e}")
+        except cv2.error as exc:
+            error(f"OpenCV error preparing display frame: {exc}")
+            return None
+        except Exception as exc:  # catch unexpected issues
+            error(f"Error preparing display frame: {exc}")
             return None
 
     def _resize_frame(self, frame: np.ndarray) -> np.ndarray:
@@ -353,7 +343,12 @@ class CameraStreamComponent(BaseComponent):
         if scale < 1.0:
             new_w = int(w * scale)
             new_h = int(h * scale)
-            frame = cv2.resize(frame, (new_w, new_h), interpolation=cv2.INTER_AREA)
+            try:
+                frame = cv2.resize(frame, (new_w, new_h), interpolation=cv2.INTER_AREA)
+            except cv2.error as exc:
+                error(f"OpenCV resize error: {exc}")
+            except Exception as exc:
+                error(f"Error resizing frame: {exc}")
 
         return frame
 
@@ -484,17 +479,16 @@ class CameraStreamComponent(BaseComponent):
 
             return overlay_frame
 
-        except Exception as e:
-            error(f"Error applying motion overlays: {e}")
+        except cv2.error as exc:
+            error(f"OpenCV error applying motion overlays: {exc}")
+            return frame
+        except (ValueError, TypeError) as exc:
+            error(f"Error applying motion overlays: {exc}")
             return frame
 
     def _update_image_display(self, frame: np.ndarray):
         """Update the image element with the new frame."""
-        try:
-            # Store latest frame for MJPEG route
-            self._latest_frame = frame
-        except Exception as e:
-            error(f"Error updating image display: {e}")
+        self._latest_frame = frame
 
     def _update_fps_counter(self):
         """Update FPS counter."""
@@ -560,8 +554,10 @@ class CameraStreamComponent(BaseComponent):
 
             self._update_image_display(placeholder)
 
-        except Exception as e:
-            error(f"Error setting placeholder image: {e}")
+        except cv2.error as exc:
+            error(f"OpenCV error setting placeholder image: {exc}")
+        except Exception as exc:
+            error(f"Error setting placeholder image: {exc}")
 
     def cleanup(self):
         """Clean up resources."""
