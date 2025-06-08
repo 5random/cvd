@@ -1098,8 +1098,30 @@ class ExperimentHistoryTable(BaseComponent):
             ]
 
             self._table = ui.table(
-                columns=columns, rows=[], selection="single", pagination=10
-            ).classes("w-full")
+
+                columns=columns,
+                rows=[],
+                selection='single',
+                pagination=10
+            ).classes('w-full')
+
+            self._table.add_slot('body', r'''
+                <q-tr :props="props">
+                    <q-td key="name" :props="props">{{ props.row.name }}</q-td>
+                    <q-td key="state" :props="props">{{ props.row.state }}</q-td>
+                    <q-td key="start_time" :props="props">{{ props.row.start_time }}</q-td>
+                    <q-td key="duration" :props="props">{{ props.row.duration }}</q-td>
+                    <q-td key="data_points" :props="props">{{ props.row.data_points }}</q-td>
+                    <q-td key="actions" :props="props">
+                        <q-btn size="sm" icon="visibility" flat dense @click="$parent.$emit('view', props.row)" />
+                        <q-btn size="sm" icon="delete" flat dense color="negative" @click="$parent.$emit('delete', props.row)" />
+                    </q-td>
+                </q-tr>
+            ''')
+
+            self._table.on('view', self._on_view)
+            self._table.on('delete', self._on_delete)
+            
 
             # Load initial data
             self._load_experiments()
@@ -1191,6 +1213,7 @@ class ExperimentHistoryTable(BaseComponent):
             return f"{minutes:.1f}m"
         else:
             hours = duration_seconds / 3600
+
             return f"{hours:.1f}h"
 
     def _on_name_filter_change(self, value: str) -> None:
@@ -1241,6 +1264,117 @@ class ExperimentHistoryTable(BaseComponent):
             self._to_date_input.value = ""
         self._load_experiments()
 
+
+            return f'{hours:.1f}h'
+
+    def _on_view(self, e) -> None:
+        row = e.args
+        exp_id = row.get('id') if isinstance(row, dict) else None
+        if exp_id:
+            self._view_results(exp_id)
+
+    def _on_delete(self, e) -> None:
+        row = e.args
+        exp_id = row.get('id') if isinstance(row, dict) else None
+        if exp_id:
+            self._delete_experiment(exp_id)
+
+    def _view_results(self, experiment_id: str) -> None:
+        try:
+            result = self.experiment_manager.get_experiment_result(experiment_id)
+
+            if not result:
+                ui.notify('No results available', color='warning')
+                return
+
+            metadata: Dict[str, Any] = {}
+            if result.result_directory:
+                meta_path = result.result_directory / 'experiment_metadata.json'
+                if meta_path.exists():
+                    try:
+                        with open(meta_path, 'r', encoding='utf-8') as f:
+                            metadata = json.load(f)
+                    except Exception as e:  # pragma: no cover - best effort
+                        warning(f'Failed to read metadata: {e}')
+
+            raw_files: List[str] = []
+            proc_files: List[str] = []
+            if result.raw_data_dir and result.raw_data_dir.exists():
+                raw_files = [p.name for p in result.raw_data_dir.iterdir() if p.is_file()]
+            if result.processed_data_dir and result.processed_data_dir.exists():
+                proc_files = [p.name for p in result.processed_data_dir.iterdir() if p.is_file()]
+
+            with ui.dialog() as dialog:
+                with ui.card().classes('w-[600px] max-w-[95vw]'):
+                    ui.label(f'Results: {result.name}').classes('text-lg font-bold mb-2')
+
+                    with ui.column().classes('gap-1'):
+                        ui.label(f'Experiment ID: {result.experiment_id}').classes('text-sm')
+                        ui.label(f'State: {result.state.value}').classes('text-sm')
+                        if result.start_time:
+                            ui.label('Start: ' + result.start_time.strftime('%Y-%m-%d %H:%M:%S')).classes('text-sm')
+                        if result.end_time:
+                            ui.label('End: ' + result.end_time.strftime('%Y-%m-%d %H:%M:%S')).classes('text-sm')
+                        if result.duration_seconds:
+                            ui.label('Duration: ' + self._format_duration(result.duration_seconds)).classes('text-sm')
+                        ui.label(f'Data Points: {result.data_points_collected}').classes('text-sm')
+                        if result.errors_count:
+                            ui.label(f'Errors: {result.errors_count}').classes('text-sm text-red-600')
+
+                    if metadata:
+                        ui.separator()
+                        ui.label('Metadata').classes('font-semibold')
+                        with ui.column().classes('gap-1 max-h-40 overflow-y-auto'):
+                            for key, value in metadata.items():
+                                if isinstance(value, (dict, list)):
+                                    continue
+                                ui.label(f'{key}: {value}').classes('text-sm text-gray-700')
+
+                    if raw_files or proc_files:
+                        ui.separator()
+                        ui.label('Stored Files').classes('font-semibold')
+                        with ui.column().classes('gap-1 max-h-40 overflow-y-auto'):
+                            for fname in raw_files:
+                                ui.label(fname).classes('text-sm text-gray-600')
+                            for fname in proc_files:
+                                ui.label(fname).classes('text-sm text-gray-600')
+
+                    ui.button('Close', on_click=dialog.close).classes('self-end mt-4')
+
+            dialog.open()
+        except Exception as e:
+            error(f'Error viewing results: {e}')
+            ui.notify(f'Error viewing results: {e}', color='negative')
+
+    def _delete_experiment(self, experiment_id: str) -> None:
+        async def confirm_delete() -> None:
+            try:
+                success = self.experiment_manager.delete_experiment(experiment_id)
+                if success:
+                    ui.notify('Experiment deleted', color='positive')
+                else:
+                    ui.notify('Failed to delete experiment', color='negative')
+            except Exception as e:
+                error(f'Error deleting experiment: {e}')
+                ui.notify(f'Error: {e}', color='negative')
+            self._load_experiments()
+
+        with ui.dialog() as dialog:
+            with ui.card():
+                ui.label('Delete Experiment').classes('text-lg font-bold')
+                ui.label('Are you sure you want to delete this experiment?').classes('mt-2')
+
+                with ui.row().classes('gap-2 justify-end mt-4'):
+                    ui.button('Cancel', on_click=dialog.close).props('flat')
+
+                    async def _on_confirm():
+                        await confirm_delete()
+                        dialog.close()
+
+                    ui.button('Delete', on_click=_on_confirm).props('color=negative')
+
+        dialog.open()
+        
     def _update_element(self, data: Any) -> None:
         """Update element with new data (required by BaseComponent)"""
         self._load_experiments()
