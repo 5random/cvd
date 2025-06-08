@@ -394,7 +394,8 @@ class WebApplication:
             ui.button(icon='refresh',color='#5898d4', on_click=ui.navigate.reload).props('flat round')
             
             # Full screen button
-            ui.button(icon='fullscreen',color='#5898d4', on_click=lambda: ui.notify('Fullscreen mode')).props('flat round')
+            ui.button(icon='fullscreen', color='#5898d4',
+                      on_click=lambda: ui.fullscreen().toggle()).props('flat round')
             # Notification center button
             # Only create notification button if attribute exists and not None
             if hasattr(self, '_notification_center') and self._notification_center is not None:
