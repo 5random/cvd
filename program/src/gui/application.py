@@ -35,6 +35,7 @@ from src.utils.log_utils.log_service import debug, error, info, warning
 from src.gui.gui_elements.gui_webcam_stream_element import CameraStreamComponent
 from starlette.staticfiles import StaticFiles
 from fastapi.responses import StreamingResponse
+from fastapi import Request
 
 
 class WebApplication:
@@ -90,6 +91,12 @@ class WebApplication:
             with contextlib.suppress(Exception):
                 await self._processing_task
         await self.controller_manager.stop_all_controllers()
+        if self._dashboard_component:
+            self.component_registry.unregister(self._dashboard_component.component_id)
+            self._dashboard_component = None
+        if self._live_plot:
+            self.component_registry.unregister(self._live_plot.component_id)
+            self._live_plot = None
         self.component_registry.cleanup_all()
         info("Web application shutdown complete")
 
@@ -140,19 +147,29 @@ class WebApplication:
             """System status page"""
             return self._create_status_page()
 
+
         @ui.page("/video_feed")
         async def video_feed():
+
             """Stream MJPEG frames from the dashboard camera"""
             camera = self.component_registry.get_component("dashboard_camera_stream")
 
             async def gen():
                 while True:
+                    try:
+                        if await request.is_disconnected():
+                            info('Client disconnected from video feed')
+                            break
+                    except asyncio.CancelledError:
+                        info('Video feed cancelled')
+                        break
                     if isinstance(camera, CameraStreamComponent):
                         frame = camera.get_latest_frame()
                         if frame is not None:
                             success, buf = cv2.imencode("jpg", frame)
                             if success:
                                 jpeg_bytes = buf.tobytes()
+
                                 yield (b"--frame\r\nContent-Type: image/jpeg\r\n\r\n" + jpeg_bytes + b"\r\n")
                     await asyncio.sleep(camera.update_interval if isinstance(camera, CameraStreamComponent) else 0.03)
 
@@ -251,6 +268,7 @@ class WebApplication:
         with ui.row().classes("w-full h-full gap-4"):
             # Left column - sensor dashboard
             dashboard_sensors = [
+
                 sid for sid, cfg in self.config_service.get_sensor_configs() if cfg.get("show_on_dashboard")
             ]
 
@@ -373,6 +391,7 @@ class WebApplication:
             ui.button(icon="fullscreen", color="#5898d4", on_click=lambda: ui.notify("Fullscreen mode")).props(
                 "flat round"
             )
+
             # Notification center button
             # Only create notification button if attribute exists and not None
             if hasattr(self, "_notification_center") and self._notification_center is not None:
