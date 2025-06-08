@@ -10,6 +10,7 @@ from dataclasses import dataclass
 import time
 import math
 import asyncio
+import contextlib
 
 from src.controllers.controller_base import (
     ImageController,
@@ -24,6 +25,8 @@ from src.utils.concurrency.process_pool import (
     ProcessPoolType,
 )
 from src.utils.log_utils.log_service import info, warning, error, debug
+from src.utils.concurrency.thread_pool import run_camera_io
+from src.controllers.controller_utils.camera_utils import apply_uvc_settings, rotate_frame
 
 
 
@@ -176,6 +179,11 @@ class MotionDetectionController(ImageController):
 
         # Lock to protect shared state in async processing
         self._state_lock = asyncio.Lock()
+
+        # Camera capture state
+        self._stop_event = asyncio.Event()
+        self._capture: Optional[cv2.VideoCapture] = None
+        self._capture_task: Optional[asyncio.Task] = None
 
 
     async def initialize(self) -> bool:
@@ -404,6 +412,16 @@ class MotionDetectionController(ImageController):
 
     async def cleanup(self) -> None:
         """Cleanup motion detection resources"""
+        # Stop capture loop and release camera resources
+        self._stop_event.set()
+        if self._capture_task:
+            self._capture_task.cancel()
+            with contextlib.suppress(asyncio.CancelledError, Exception):
+                await self._capture_task
+            self._capture_task = None
+        if self._capture is not None:
+            await run_camera_io(self._capture.release)
+            self._capture = None
         # Ensure no pending tasks remain before shutting down the process pool
         start_time = time.monotonic()
         while getattr(self._motion_pool, "_telemetry").active:
@@ -432,7 +450,7 @@ class MotionDetectionController(ImageController):
         self._stop_event.set()
         if self._capture_task:
             self._capture_task.cancel()
-            with contextlib.suppress(Exception):
+            with contextlib.suppress(asyncio.CancelledError, Exception):
                 await self._capture_task
             self._capture_task = None
         await super().stop()
