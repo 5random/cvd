@@ -1,26 +1,28 @@
 {
-    "ui": {
-        "title": "CVD Tracker",
-        "refresh_rate_ms": 1000,
-        "dark_mode": true,
-        "notification_center": {"max_notifications": 500}
-    },
-    "sensors": [
-        {
-            "sen001": {
-                "name": "MockSensor1",
-                "type": "temperature",
-                "source": "mock_arduino_tc_board",
-                "interface": "serial",
-                "enabled": true,
-                "show_on_dashboard": true,
-                "port": "COM3",
-                "channel": 0,
-                "poll_interval_ms": 1000,
-                "baudrate": 9600,
-                "timeout": 2.0
-            }
 
+  "ui": {
+    "title": "CVD Tracker",
+    "refresh_rate_ms": 1000,
+    "dark_mode": true
+  },
+  "sensor_reconnect_attempts": 3,
+  "sensors": [
+    {
+      "sen001": {
+        "name": "MockSensor1",
+        "type": "temperature",
+        "source": "mock_arduino_tc_board",
+        "interface": "serial",
+        "enabled": true,
+        "show_on_dashboard": true,
+        "port": "COM3",
+        "channel": 0,
+        "poll_interval_ms": 1000,
+        "baudrate": 9600,
+        "timeout": 2.0
+      }
+    }
+  ],
         }
     ],
     "webcams": [
