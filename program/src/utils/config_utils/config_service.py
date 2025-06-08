@@ -96,7 +96,7 @@ class ConfigurationService:
             "name": {"type": "string"},
             "type": {
                 "type": "string",
-                "enum": ["reactor_state", "motion_detection", "camera"],
+                "enum": ["reactor_state", "motion_detection", "camera_capture"],
             },
             "interface": {
                 "type": "string",
@@ -206,6 +206,13 @@ class ConfigurationService:
 
             # Merge configs
             self._config_cache = self._deep_merge(default_config, user_config)
+
+            # Normalize sensors to list-of-dicts format
+            sensors = self._config_cache.get("sensors")
+            if isinstance(sensors, dict):
+                self._config_cache["sensors"] = [
+                    {sid: cfg} for sid, cfg in sensors.items()
+                ]
             # Validate loaded configuration
             validation_errors = self.validate_all_configs()
             if validation_errors:
@@ -453,22 +460,16 @@ class ConfigurationService:
             if existing_id == sensor_id:
                 raise ConfigurationError(f"Sensor with ID '{sensor_id}' already exists")
 
-        # Add to sensors, preserving existing dict or list
-        raw = self._config_cache.get("sensors")
-        # Remove sensor_id before storing
-        config_to_store = sensor_config.copy()
-        del config_to_store["sensor_id"]
-        if isinstance(raw, dict):
-            # convert dict entries to list then append
-            sensors_list = [{sid: cfg} for sid, cfg in raw.items()]
-            sensors_list.append({sensor_id: config_to_store})
-            self._config_cache["sensors"] = sensors_list
-        elif isinstance(raw, list):
-            raw.append({sensor_id: config_to_store})
-            self._config_cache["sensors"] = raw
-        else:
-            # no existing entries
-            self._config_cache["sensors"] = [{sensor_id: config_to_store}]
+        sensors = self._config_cache.get("sensors")
+        if sensors is None:
+            sensors = []
+            self._config_cache["sensors"] = sensors
+        if not isinstance(sensors, list):
+            raise ConfigurationError("Sensors config must be a list")
+
+        entry = sensor_config.copy()
+        del entry["sensor_id"]
+        sensors.append({sensor_id: entry})
         self._save_config()
         info(f"Added sensor configuration: {sensor_id}")
 
@@ -525,65 +526,39 @@ class ConfigurationService:
     def update_sensor_config(self, sensor_id: str, updates: Dict[str, Any]) -> bool:
         """Update existing sensor configuration with validation"""
         sensors = self.get_section("sensors")
-        # Support dict format
-        if isinstance(sensors, dict):
-            if sensor_id not in sensors:
-                return False
-            current = sensors[sensor_id].copy()
-            current.update(updates)
-            current["sensor_id"] = sensor_id
-            self._validate_sensor_config(current)
-            # store without sensor_id field
-            cfg = current.copy()
-            del cfg["sensor_id"]
-            sensors[sensor_id] = cfg
-            self._save_config()
-            info(f"Updated sensor configuration: {sensor_id}")
-            return True
-        # Support list format
-        if isinstance(sensors, list):
-            for idx, sensor_entry in enumerate(sensors):
-                if isinstance(sensor_entry, dict) and sensor_id in sensor_entry:
-                    entry = sensor_entry[sensor_id].copy()
-                    entry.update(updates)
-                    entry["sensor_id"] = sensor_id
-                    self._validate_sensor_config(entry)
-                    # remove sensor_id before storing
-                    cfg = entry.copy()
-                    del cfg["sensor_id"]
-                    sensors[idx][sensor_id] = cfg
-                    self._save_config()
-                    info(f"Updated sensor configuration: {sensor_id}")
-                    return True
-        # Unsupported format
-        raise ConfigurationError(
-            "Unsupported format for sensors config: expected list or dict."
-        )
+        if not isinstance(sensors, list):
+            raise ConfigurationError("Sensors config must be a list")
+
+        for idx, sensor_entry in enumerate(sensors):
+            if isinstance(sensor_entry, dict) and sensor_id in sensor_entry:
+                entry = sensor_entry[sensor_id].copy()
+                entry.update(updates)
+                entry["sensor_id"] = sensor_id
+                self._validate_sensor_config(entry)
+
+                cfg = entry.copy()
+                del cfg["sensor_id"]
+                sensors[idx] = {sensor_id: cfg}
+                self._save_config()
+                info(f"Updated sensor configuration: {sensor_id}")
+                return True
+
+        return False
 
     def remove_sensor_config(self, sensor_id: str) -> bool:
         """Remove sensor configuration"""
         sensors = self.get_section("sensors")
-        # dict format
-        if isinstance(sensors, dict):
-            if sensor_id in sensors:
-                sensors.pop(sensor_id)
+        if not isinstance(sensors, list):
+            raise ConfigurationError("Sensors config must be a list")
+
+        for idx, sensor_entry in enumerate(sensors):
+            if isinstance(sensor_entry, dict) and sensor_id in sensor_entry:
+                sensors.pop(idx)
                 self._save_config()
                 info(f"Removed sensor configuration: {sensor_id}")
                 return True
-            return False
-        # list format
-        if isinstance(sensors, list):
-            for idx, sensor_entry in enumerate(sensors):
-                if isinstance(sensor_entry, dict) and sensor_id in sensor_entry:
-                    sensors.pop(idx)
-                    self._save_config()
-                    info(f"Removed sensor configuration: {sensor_id}")
-                    return True
-            return False
-        # unsupported format
-        raise ConfigurationError(
-            "Unsupported format for sensors config: expected list or dict."
-        )
+
+        return False
 
     def get_controller_configs(
         self, interface_type: Optional[str] = None
