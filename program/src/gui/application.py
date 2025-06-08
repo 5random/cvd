@@ -276,11 +276,14 @@ class WebApplication:
             # Left column - sensor dashboard
             dashboard_sensors = [
 
-                sid for sid, cfg in self.config_service.get_sensor_configs() if cfg.get("show_on_dashboard")
-            ]
+            with ui.column().classes('w-1/2'):
+                dashboard = DashboardComponent(
+                    self.config_service,
+                    self.sensor_manager,
+                    self.controller_manager,
+                    self._notification_center,
+                )
 
-            with ui.column().classes("w-1/2"):
-                dashboard = DashboardComponent(self.config_service, self.sensor_manager, self.controller_manager)
                 dashboard.render()
 
             # Right column - live plot

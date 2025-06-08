@@ -22,6 +22,7 @@ from src.gui.gui_tab_components.gui_tab_base_component import (
 from src.gui.gui_elements.gui_webcam_stream_element import CameraStreamComponent
 from src.controllers.controller_manager import ControllerManager
 from src.controllers.controller_base import ControllerStatus
+from src.gui.gui_elements.gui_notification_center_element import NotificationCenter
 
 
 @dataclass
@@ -176,26 +177,26 @@ class SensorCardComponent(TimedComponent):
 class DashboardComponent(BaseComponent):
     """Main dashboard component"""
 
-    def __init__(
-        self,
-        config_service: ConfigurationService,
-        sensor_manager: SensorManager,
-        controller_manager: ControllerManager,
-    ):
+
+    def __init__(self, config_service: ConfigurationService, sensor_manager: SensorManager, controller_manager: ControllerManager, notification_center: Optional[NotificationCenter] = None):
+
         config = ComponentConfig("dashboard")
         super().__init__(config)
         self.config_service = config_service
         self.sensor_manager = sensor_manager
         self.controller_manager = controller_manager
+        self._notification_center = notification_center
         self.component_registry = get_component_registry()
         self._sensor_cards: Dict[str, SensorCardComponent] = {}
         self._controller_cards: Dict[str, ui.card] = {}
         self._camera_stream: Optional[CameraStreamComponent] = None
+
+        self._badge: Optional[ui.badge] = None
+
         self._sensor_row: Optional[ui.row] = None
         self._controller_row: Optional[ui.row] = None
         self._drag_sensor_id: Optional[str] = None
         self._drag_controller_id: Optional[str] = None
-
 
         # Determine which sensors and controllers should be displayed
         self._dashboard_sensors = [
@@ -226,10 +227,15 @@ class DashboardComponent(BaseComponent):
         """Render dashboard"""
         with ui.column().classes("w-full") as dashboard:
             # Dashboard header
-            ui.label("CVD Tracker Dashboard").classes("text-2xl font-bold mb-4")
+            ui.label('CVD Tracker Dashboard').classes('text-2xl font-bold mb-4')
+
 
             # System status overview
             self._render_system_status()
+
+            if self._notification_center is not None:
+                self._render_notification_panel()
+            
 
             # Main content area with camera stream and sensor data
             with ui.row().classes("w-full gap-4"):
@@ -311,6 +317,33 @@ class DashboardComponent(BaseComponent):
                 self._memory_label.text = f"RAM: {mem:.0f}%"
         except Exception as exc:  # pragma: no cover - log and continue
             error(f"Failed to update system status: {exc}")
+
+    def _render_notification_panel(self) -> None:
+        """Collapsible panel displaying notifications"""
+        unread = self._notification_center.get_unread_count() if self._notification_center else 0
+        with ui.expansion('Benachrichtigungen', icon='notifications', on_value_change=self._on_notification_toggle) as exp:
+            with exp.add_slot('header'):
+                with ui.row().classes('items-center'):
+                    ui.label('Benachrichtigungen').classes('font-medium')
+                    self._badge = ui.badge(str(unread) if unread else '', color='red').classes('ml-2')
+                    if unread == 0:
+                        self._badge.set_visibility(False)
+            with exp:
+                if self._notification_center:
+                    self._notification_center.render()
+            ui.timer(1.0, self._update_badge)
+
+    def _on_notification_toggle(self, event) -> None:
+        if event.value and self._notification_center:
+            self._notification_center.mark_all_as_read()
+            self._update_badge()
+
+    def _update_badge(self) -> None:
+        if not self._notification_center or not self._badge:
+            return
+        count = self._notification_center.get_unread_count()
+        self._badge.set_text(str(count) if count else '')
+        self._badge.set_visibility(count > 0)
 
     def _should_show_camera(self) -> bool:
 
@@ -546,9 +579,12 @@ class DashboardComponent(BaseComponent):
 
         self._controller_cards.clear()
 
-        # Cleanup camera streams
-        for stream in self._camera_streams.values():
-            stream.cleanup()
-        self._camera_streams.clear()
+        # Cleanup camera stream
+        if self._camera_stream:
+            self._camera_stream.cleanup()
+            self._camera_stream = None
+
+        self._badge = None
+
 
         super().cleanup()
