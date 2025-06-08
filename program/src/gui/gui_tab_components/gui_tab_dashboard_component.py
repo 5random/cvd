@@ -186,10 +186,8 @@ class DashboardComponent(BaseComponent):
         self.component_registry = get_component_registry()
         self._sensor_cards: Dict[str, SensorCardComponent] = {}
         self._controller_cards: Dict[str, ui.card] = {}
-        self._camera_stream: Optional[CameraStreamComponent] = None
-        self._cpu_label: Optional[ui.label] = None
-        self._memory_label: Optional[ui.label] = None
-        self._system_status_timer: Optional[ui.timer] = None
+        self._camera_streams: Dict[str, CameraStreamComponent] = {}
+
 
         # Determine which sensors and controllers should be displayed
         self._dashboard_sensors = [
@@ -294,36 +292,74 @@ class DashboardComponent(BaseComponent):
             error(f"Failed to update system status: {exc}")
 
     def _should_show_camera(self) -> bool:
-        for cid in self._dashboard_controllers:
-            cfg = next(
-                (
-                    c
-                    for c_id, c in self.config_service.get_controller_configs()
-                    if c_id == cid
-                ),
-                None,
-            )
-            if not cfg:
+
+        return len(self._get_camera_controllers()) > 0
+
+    def _get_camera_controllers(self) -> list[str]:
+        camera_ids: list[str] = []
+        for cid, cfg in self.config_service.get_controller_configs():
+            if self._dashboard_controllers and cid not in self._dashboard_controllers:
                 continue
+            if not cfg.get('enabled', True):
+                continue
+            ctype = str(cfg.get('type', '')).lower()
+            if ctype == 'camera':
+                camera_ids.append(cid)
+                continue
+            if ctype == 'motion_detection':
+                params = cfg.get('parameters', {})
 
-            ctype = str(cfg.get("type", "")).lower()
-            if "camera" in ctype:
-                return True
-
-            if ctype == "motion_detection":
-                params = cfg.get("parameters", {})
                 if isinstance(params, dict) and (
                     "cam_id" in params or "device_index" in params
                 ):
-                    return True
 
-        return False
+                    camera_ids.append(cid)
+        return camera_ids
+    
 
     def _render_camera_stream(self) -> None:
         """Render camera stream component"""
-        if not self._should_show_camera():
+        camera_ids = self._get_camera_controllers()
+        if not camera_ids:
             return
         try:
+            for cid in camera_ids:
+                settings = self.config_service.get_controller_settings(cid) or {}
+                resolution = settings.get("resolution")
+                if isinstance(resolution, list) and len(resolution) == 2:
+                    width, height = int(resolution[0]), int(resolution[1])
+                else:
+                    width, height = 480, 360
+                overlay = settings.get("overlay") if isinstance(settings, dict) else None
+
+                stream = CameraStreamComponent(
+                    controller_manager=self.controller_manager,
+                    update_interval=1 / 15,
+                    max_width=width,
+                    max_height=height,
+                    component_id=f"dashboard_camera_stream_{cid}",
+                    resolution=(width, height),
+                    overlay_options=overlay,
+                )
+
+                with ui.card().classes('p-2 cvd-card mb-2'):
+                    ui.label(f"Camera {cid}").classes('text-sm font-semibold mb-2')
+                    stream.render()
+                    with ui.row().classes('gap-2 mt-2'):
+                        ui.select(
+                            ["320x240", "640x480", "1280x720"],
+                            value=f"{width}x{height}",
+                            on_change=lambda e, s=stream: self._set_stream_resolution(s, e.value),
+                        ).classes('w-32')
+                        ui.checkbox(
+                            "Overlay",
+                            value=stream.show_motion_overlay,
+                            on_change=lambda e, s=stream: setattr(s, 'show_motion_overlay', e.value),
+                        )
+
+                self.component_registry.register(stream)
+                self._camera_streams[cid] = stream
+
             # Create camera stream component
             self._camera_stream = CameraStreamComponent(
                 controller_manager=self.controller_manager,
@@ -337,14 +373,32 @@ class DashboardComponent(BaseComponent):
             self._camera_stream.render()
             self.component_registry.register(self._camera_stream)
 
+
         except Exception as e:
             error(f"Error rendering camera stream: {e}")
             # Show error message instead
+            with ui.card().classes('p-4 cvd-card'):
+                with ui.column().classes('items-center'):
+                    ui.icon('videocam_off', size='lg').classes('text-gray-400 mb-2')
+                    ui.label('Camera Stream Unavailable').classes('text-gray-600')
+                    ui.label(f'Error: {str(e)}').classes('text-xs text-red-500')
+
+    def _set_stream_resolution(self, stream: CameraStreamComponent, value: str) -> None:
+        """Update resolution of a camera stream from dropdown selection."""
+        try:
+            width, height = (int(v) for v in value.split('x'))
+            stream.max_width = width
+            stream.max_height = height
+        except Exception:
+            pass
+    
+
             with ui.card().classes("p-4 cvd-card"):
                 with ui.column().classes("items-center"):
                     ui.icon("videocam_off", size="lg").classes("text-gray-400 mb-2")
                     ui.label("Camera Stream Unavailable").classes("text-gray-600")
                     ui.label(f"Error: {str(e)}").classes("text-xs text-red-500")
+
 
     def _render_sensor_cards(self) -> None:
         """Render sensor cards"""
@@ -402,13 +456,9 @@ class DashboardComponent(BaseComponent):
 
         self._controller_cards.clear()
 
-        # Cleanup camera stream
-        if self._camera_stream:
-            self._camera_stream.cleanup()
-            self._camera_stream = None
-
-        if self._system_status_timer:
-            self._system_status_timer.cancel()
-            self._system_status_timer = None
+        # Cleanup camera streams
+        for stream in self._camera_streams.values():
+            stream.cleanup()
+        self._camera_streams.clear()
 
         super().cleanup()

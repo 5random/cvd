@@ -31,3 +31,19 @@ def test_motion_detection_camera_detection(tmp_path):
     dashboard = DashboardComponent(service, None, None)
 
     assert dashboard._should_show_camera() is True
+    assert dashboard._get_camera_controllers() == ["md1"]
+
+
+def test_multiple_cameras(tmp_path):
+    cfg = {
+        "controllers": [
+            {"cam1": {"name": "C1", "type": "camera", "show_on_dashboard": True, "enabled": True}},
+            {"cam2": {"name": "C2", "type": "camera", "show_on_dashboard": True, "enabled": True}},
+        ]
+    }
+
+    service = create_service(tmp_path, cfg)
+    dashboard = DashboardComponent(service, None, None)
+
+    cams = dashboard._get_camera_controllers()
+    assert set(cams) == {"cam1", "cam2"}
