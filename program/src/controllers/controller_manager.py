@@ -20,8 +20,19 @@ from src.controllers.controller_base import (
 from src.data_handler.interface.sensor_interface import SensorReading
 from src.utils.log_utils.log_service import info, warning, error, debug
 
+
+from .algorithms.motion_detection import MotionDetectionController
+from .algorithms.reactor_state import ReactorStateController
+from .controller_utils.controller_data_sources.camera_capture_controller import (
+    CameraCaptureController,
+)
+from src.utils.config_utils.config_service import (
+    get_config_service,
+    ConfigurationError,
+)
+
 from .controller_registry import CONTROLLER_CLASS_MAP
-from src.utils.config_utils.config_service import get_config_service
+
 
 # Registry mapping controller type names to classes
 CONTROLLER_REGISTRY: Dict[str, Type[ControllerStage]] = {}
@@ -96,9 +107,15 @@ class ControllerManager:
 
     def create_controller(self, config: Dict[str, Any]) -> Optional[ControllerStage]:
         """Create a controller instance from configuration dict."""
+        if "controller_id" not in config:
+            raise ConfigurationError(
+                "Controller configuration must include 'controller_id'"
+            )
+        if "type" not in config:
+            raise ConfigurationError("Controller configuration must include 'type'")
         try:
-            controller_id = config.get("controller_id")
-            controller_type = config.get("type")
+            controller_id = config["controller_id"]
+            controller_type = config["type"]
             cfg = ControllerConfig(
                 controller_id=controller_id,
                 controller_type=controller_type,
