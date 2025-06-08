@@ -92,7 +92,7 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
 
         # anschließend evtl. controller-spezifische Defaults setzen
         self._update_controller_defaults()
-        
+
         # Sensor wizard for creating new sensors
         self._sensor_wizard = SensorSetupWizardComponent(
             config_service, sensor_manager, self._refresh_sensor_list
