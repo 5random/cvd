@@ -46,3 +46,24 @@ async def read_once():
 
 asyncio.run(read_once())
 ```
+
+## Adding a sensor to the configuration
+
+The configuration service accepts a dictionary describing the sensor.  Set the
+optional `show_on_dashboard` field to control whether the sensor appears on the
+dashboard.
+
+```python
+from src.utils.config_utils.config_service import ConfigurationService
+
+service = ConfigurationService(Path("program/config/config.json"), Path("program/config/default.json"))
+service.add_sensor_config({
+    "sensor_id": "mock1",
+    "name": "Example",
+    "type": "temperature",
+    "source": "mock",
+    "interface": "usb",
+    "enabled": True,
+    "show_on_dashboard": True,
+})
+```
