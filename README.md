@@ -37,6 +37,13 @@ python program/main.py --config-dir program/config
 You may also set the ``CVD_CONFIG_DIR`` environment variable instead of passing
 ``--config-dir``.
 
+### Dashboard visibility
+
+Sensors and controllers defined in the configuration will only appear on the
+dashboard when their configuration contains ``"show_on_dashboard": true``.
+Add this flag under each sensor or controller entry to control what is visible
+in the GUI.
+
 
 ## Running tests
 
