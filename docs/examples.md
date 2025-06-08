@@ -68,9 +68,26 @@ service.add_sensor_config({
 })
 ```
 
+
+## Registering custom sensors via entry points
+
+Third-party packages can contribute new sensor implementations without
+modifying the main repository. Expose a factory under the
+``cvd.sensors`` entry point group in your ``pyproject.toml``:
+
+```toml
+[project.entry-points."cvd.sensors"]
+my_sensor = "your_package.sensors:MySensor"
+```
+
+When ``sensor_source_manager`` is imported, all entry points in this group
+are loaded and added to ``SENSOR_REGISTRY`` so the sensor can be used in
+the configuration.
+
 ## Sensor Setup Wizard
 
 The NiceGUI interface includes a multi-step wizard for defining sensors.
 On step 2 you can click **Test Connection** to verify the settings
 before creating the sensor. The wizard temporarily creates the device,
 reads once and then cleans up, displaying the result as a notification.
+
