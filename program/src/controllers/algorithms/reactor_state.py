@@ -51,6 +51,19 @@ class ReactorStateData:
     state_duration: float  # seconds in current state
     metadata: Dict[str, Any]
 
+    def to_dict(self) -> Dict[str, Any]:
+        """Return a serializable dictionary representation of this data."""
+        return {
+            "state": self.state.value,
+            "confidence": self.confidence,
+            "primary_temperature": self.primary_temperature,
+            "temperature_sensors": self.temperature_sensors,
+            "motion_detected": self.motion_detected,
+            "alarms": [a.value for a in self.alarms],
+            "state_duration": self.state_duration,
+            "metadata": self.metadata,
+        }
+
 
 @dataclass
 class ReactorStateConfig:
@@ -179,15 +192,20 @@ class ReactorStateController(StateController):
                     "state": new_state.value,
                     "confidence": confidence,
                     "alarms": [alarm.value for alarm in alarms],
+
+                    "data": result_data.to_dict(),
+
                 },
             )
 
         except Exception as e:
+
             error(
                 "Error in reactor state derivation",
                 controller_id=self.controller_id,
                 error=str(e),
             )
+            
             return ControllerResult.error_result(
                 f"Reactor state derivation failed: {e}"
             )
@@ -452,6 +470,7 @@ class ReactorStateController(StateController):
                     controller_id=self.controller_id,
                     new_state=new_state.value,
                     transitions=self._state_transitions,
+
                 )
 
         return state_duration
