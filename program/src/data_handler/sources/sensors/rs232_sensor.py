@@ -1,38 +1,27 @@
-"""
-RS232 sensor implementation using the SensorInterface.
+"""RS232 sensor implementation using the :class:`BaseSensor`.
 """
 import asyncio
 import time
 from typing import Dict, Any, Optional
 from concurrent.futures import Executor
 import serial
-from src.data_handler.interface.sensor_interface import SensorInterface, SensorReading, SensorStatus, SensorConfig
+from src.data_handler.interface.sensor_interface import SensorReading, SensorStatus, SensorConfig
+from .base_sensor import BaseSensor
 from src.utils.log_utils.log_service import info, warning, error, debug
 from src.data_handler.sources.mock_hardware import MockRS232Serial
 
 
 
-class RS232Sensor(SensorInterface):
+class RS232Sensor(BaseSensor):
     """RS232 sensor implementation"""
 
     def __init__(self, config: SensorConfig, executor: Optional[Executor] = None):
-        self._config = config
-        self._connection = None
-        self._is_connected = False
+        super().__init__(config, executor)
         self._port: str = ""
-        self._executor = executor
-
-    @property
-    def sensor_id(self) -> str:
-        return self._config.sensor_id
 
     @property
     def sensor_type(self) -> str:
         return "rs232"
-
-    @property
-    def is_connected(self) -> bool:
-        return self._is_connected and self._connection is not None
 
     async def initialize(self) -> bool:
         """Initialize RS232 connection"""
