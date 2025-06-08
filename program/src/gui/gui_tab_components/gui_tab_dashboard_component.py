@@ -1,8 +1,7 @@
 """
 Dashboard component for displaying sensor data and system status.
 """
-
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 from dataclasses import dataclass
 from nicegui import ui
 import time
@@ -191,9 +190,11 @@ class DashboardComponent(BaseComponent):
         self._controller_cards: Dict[str, ui.card] = {}
         self._camera_stream: Optional[CameraStreamComponent] = None
 
-        self._badge: Optional[ui.badge] = None
-
+        # Filter state and timer
+        self._sensor_filter: List[str] = []
+        self._filter_timer: Optional[ui.timer] = None
         self._sensor_row: Optional[ui.row] = None
+        self._badge: Optional[ui.badge] = None
         self._controller_row: Optional[ui.row] = None
         self._drag_sensor_id: Optional[str] = None
         self._drag_controller_id: Optional[str] = None
@@ -249,8 +250,16 @@ class DashboardComponent(BaseComponent):
                 if self._dashboard_sensors:
                     with ui.column().classes('flex-1'):
                         ui.label('Sensor Data').classes('text-lg font-semibold mb-2')
-                        with ui.row().classes('w-full gap-4 flex-wrap').on('dragover', lambda e: e.prevent_default()) as row:
-                            self._sensor_row = row
+
+                        ui.select(
+                            self._dashboard_sensors,
+                            multiple=True,
+                            value=self._sensor_filter,
+                            on_change=self._on_sensor_filter_change,
+                        ).props('outlined use-chips clearable').classes('w-full mb-2')
+                        with ui.row().classes('w-full gap-4 flex-wrap') as sensor_row:
+                            self._sensor_row = sensor_row
+
                             self._render_sensor_cards()
 
                 if self._dashboard_controllers:
@@ -437,6 +446,23 @@ class DashboardComponent(BaseComponent):
                     ui.label('Camera Stream Unavailable').classes('text-gray-600')
                     ui.label(f'Error: {str(e)}').classes('text-xs text-red-500')
 
+    def _on_sensor_filter_change(self, e) -> None:
+        """Handle sensor filter selection"""
+        self._sensor_filter = e.value or []
+        if self._filter_timer:
+            self._filter_timer.cancel()
+        self._filter_timer = ui.timer(0.1, self._reload_sensor_cards, once=True)
+
+    def _reload_sensor_cards(self) -> None:
+        """Reload sensor cards based on current filter"""
+        if not self._sensor_row:
+            return
+        for card in self._sensor_cards.values():
+            card.cleanup()
+        self._sensor_cards.clear()
+        self._sensor_row.clear()
+        self._render_sensor_cards()
+
     def _set_stream_resolution(self, stream: CameraStreamComponent, value: str) -> None:
         """Update resolution of a camera stream from dropdown selection."""
         try:
@@ -445,6 +471,7 @@ class DashboardComponent(BaseComponent):
             stream.max_height = height
         except Exception:
             pass
+
     
 
             with ui.card().classes("p-4 cvd-card"):
@@ -463,6 +490,9 @@ class DashboardComponent(BaseComponent):
             if not sensor_config or not sensor_config.get('enabled', True):
                 continue
 
+            if self._sensor_filter and sensor_id not in self._sensor_filter:
+                continue
+            
             # Create sensor card config
             card_config = SensorCardConfig(
                 sensor_id=sensor_id,
@@ -476,6 +506,8 @@ class DashboardComponent(BaseComponent):
             # Create and render sensor card
             component_config = ComponentConfig(f"sensor_card_{sensor_id}")
             sensor_card = SensorCardComponent(component_config, card_config, self.sensor_manager)
+            sensor_card.render()
+
             card_el = sensor_card.render()
             card_el.props('draggable=true')
             card_el.on('dragstart', lambda e, sid=sensor_id: self._start_sensor_drag(sid))
@@ -483,7 +515,6 @@ class DashboardComponent(BaseComponent):
             card_el.on('dragover', lambda e: e.prevent_default())
             
             sensor_card.render()
-
 
             self._sensor_cards[sensor_id] = sensor_card
 
@@ -576,6 +607,11 @@ class DashboardComponent(BaseComponent):
         for card in self._sensor_cards.values():
             card.cleanup()
         self._sensor_cards.clear()
+
+        if self._filter_timer:
+            self._filter_timer.cancel()
+            self._filter_timer = None
+        self._sensor_row = None
 
         self._controller_cards.clear()
 
