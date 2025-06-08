@@ -16600,3 +16600,177 @@ To fix this, enter the target slot explicitly using `with container_element:`.
 2025-06-08 17:00:29 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error handling table selection: unhashable type: 'dict'
 2025-06-08 17:00:32 - cvd_tracker.error - ERROR - gui_notification_center_element.py:470 - add_notification - NOTIFICATION: System Error - ERROR - log_service.py:607 - error - Error handling table selection: unhashable type: 'dict'
 2025-06-08 17:03:49 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error in motion detection: A process in the process pool was terminated abruptly while the future was running or pending.
+2025-06-08 17:39:20 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Camera capture missing, attempting reinitialization
+2025-06-08 17:39:20 - cvd_tracker.error - ERROR - log_service.py:607 - error - Failed to initialize Arduino TC sensor sen003: could not open port 'COM3': FileNotFoundError(2, 'Das System kann die angegebene Datei nicht finden.', None, 2)
+2025-06-08 17:39:20 - cvd_tracker.error - ERROR - log_service.py:607 - error - Failed to initialize sensor sen003
+2025-06-08 17:39:22 - cvd_tracker.error - WARNING - log_service.py:602 - warning - No experiment manager available - creating new instance
+2025-06-08 17:39:25 - cvd_tracker.error - ERROR - gui_notification_center_element.py:470 - add_notification - NOTIFICATION: System Error - ERROR - log_service.py:607 - error - Error handling table selection: unhashable type: 'dict'
+2025-06-08 17:39:25 - cvd_tracker.error - ERROR - gui_notification_center_element.py:470 - add_notification - NOTIFICATION: System Error - ERROR - log_service.py:607 - error - Error in motion detection: A process in the process pool was terminated abruptly while the future was running or pending.
+2025-06-08 17:39:25 - cvd_tracker.error - ERROR - gui_notification_center_element.py:470 - add_notification - NOTIFICATION: System Error - ERROR - log_service.py:607 - error - Failed to initialize Arduino TC sensor sen003: could not open port 'COM3': FileNotFoundError(2, 'Das System kann die angegebene Datei nicht finden.', None, 2)
+2025-06-08 17:39:25 - cvd_tracker.error - ERROR - gui_notification_center_element.py:470 - add_notification - NOTIFICATION: System Error - ERROR - log_service.py:607 - error - Failed to initialize sensor sen003
+2025-06-08 17:39:56 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-08 17:39:56 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-08 17:39:56 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-08 17:39:57 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-08 17:39:57 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-08 17:39:57 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-08 17:39:57 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-08 17:39:57 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-08 17:39:57 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-08 17:39:57 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-08 17:39:57 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-08 17:39:57 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-08 17:39:57 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-08 17:39:57 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-08 17:39:57 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-08 17:39:57 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-08 17:39:57 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-08 17:39:58 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-08 17:39:58 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-08 17:39:58 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-08 17:39:58 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-08 17:39:58 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-08 17:39:58 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-08 17:39:58 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-08 17:39:58 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-08 17:39:58 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-08 17:39:58 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-08 17:39:58 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-08 17:39:58 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-08 17:39:58 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-08 17:39:59 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-08 17:39:59 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-08 17:39:59 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-08 17:39:59 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-08 17:39:59 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-08 17:39:59 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-08 17:39:59 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-08 17:44:08 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-08 17:44:08 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-08 17:44:08 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-08 17:44:08 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-08 17:44:08 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-08 17:44:08 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-08 17:44:08 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-08 17:44:09 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-08 17:44:09 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-08 17:44:09 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-08 17:44:09 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-08 17:44:09 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-08 17:44:09 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-08 17:44:09 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-08 17:44:09 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-08 17:44:09 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-08 17:44:09 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-08 17:44:09 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-08 17:44:09 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-08 17:44:09 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-08 17:44:10 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-08 17:44:10 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-08 17:44:10 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-08 17:44:10 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-08 17:44:10 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-08 17:44:10 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-08 17:44:10 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-08 17:44:10 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-08 17:44:10 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-08 17:44:10 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-08 17:44:10 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-08 17:44:10 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-08 17:44:10 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-08 17:44:10 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-08 17:44:11 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-08 17:44:11 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-08 17:44:11 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-08 17:44:11 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-08 17:47:50 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Camera capture missing, attempting reinitialization
+2025-06-08 17:47:51 - cvd_tracker.error - WARNING - log_service.py:602 - warning - No experiment manager available - creating new instance
+2025-06-08 17:57:27 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Camera capture missing, attempting reinitialization
+2025-06-08 17:57:27 - cvd_tracker.error - WARNING - log_service.py:602 - warning - No experiment manager available - creating new instance
+2025-06-08 17:59:27 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Camera capture missing, attempting reinitialization
+2025-06-08 17:59:29 - cvd_tracker.error - WARNING - log_service.py:602 - warning - No experiment manager available - creating new instance
+2025-06-08 17:59:46 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 is already polling
+2025-06-08 18:00:03 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 status: SensorStatus.OFFLINE
+2025-06-08 18:00:04 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 status: SensorStatus.OFFLINE
+2025-06-08 18:00:05 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 status: SensorStatus.OFFLINE
+2025-06-08 18:00:06 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 status: SensorStatus.OFFLINE
+2025-06-08 18:00:07 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 status: SensorStatus.OFFLINE
+2025-06-08 18:00:07 - cvd_tracker.error - WARNING - gui_notification_center_element.py:470 - add_notification - NOTIFICATION: Sensor Issue: sen001 - Sensor sen001 status: OFFLINE
+2025-06-08 18:00:08 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 status: SensorStatus.OFFLINE
+2025-06-08 18:00:09 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 status: SensorStatus.OFFLINE
+2025-06-08 18:00:10 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 status: SensorStatus.OFFLINE
+2025-06-08 18:00:11 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 status: SensorStatus.OFFLINE
+2025-06-08 18:00:12 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 status: SensorStatus.OFFLINE
+2025-06-08 18:00:13 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 status: SensorStatus.OFFLINE
+2025-06-08 18:00:14 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 status: SensorStatus.OFFLINE
+2025-06-08 18:00:15 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 status: SensorStatus.OFFLINE
+2025-06-08 18:00:16 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 status: SensorStatus.OFFLINE
+2025-06-08 18:00:17 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 status: SensorStatus.OFFLINE
+2025-06-08 18:00:18 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 status: SensorStatus.OFFLINE
+2025-06-08 18:00:19 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 status: SensorStatus.OFFLINE
+2025-06-08 18:00:20 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 status: SensorStatus.OFFLINE
+2025-06-08 18:00:21 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 status: SensorStatus.OFFLINE
+2025-06-08 18:00:22 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 status: SensorStatus.OFFLINE
+2025-06-08 18:00:23 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 status: SensorStatus.OFFLINE
+2025-06-08 18:00:24 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 status: SensorStatus.OFFLINE
+2025-06-08 18:00:25 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 status: SensorStatus.OFFLINE
+2025-06-08 18:00:26 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 status: SensorStatus.OFFLINE
+2025-06-08 18:00:39 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 status: SensorStatus.OFFLINE
+2025-06-08 18:00:40 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 status: SensorStatus.OFFLINE
+2025-06-08 18:00:41 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 status: SensorStatus.OFFLINE
+2025-06-08 18:00:42 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 status: SensorStatus.OFFLINE
+2025-06-08 18:00:43 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 status: SensorStatus.OFFLINE
+2025-06-08 18:00:44 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 status: SensorStatus.OFFLINE
+2025-06-08 18:00:45 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 status: SensorStatus.OFFLINE
+2025-06-08 18:00:46 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 status: SensorStatus.OFFLINE
+2025-06-08 18:00:47 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 status: SensorStatus.OFFLINE
+2025-06-08 18:00:48 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 status: SensorStatus.OFFLINE
+2025-06-08 18:00:50 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 status: SensorStatus.OFFLINE
+2025-06-08 18:00:51 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 status: SensorStatus.OFFLINE
+2025-06-08 18:00:52 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 status: SensorStatus.OFFLINE
+2025-06-08 18:00:53 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 status: SensorStatus.OFFLINE
+2025-06-08 18:00:54 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 status: SensorStatus.OFFLINE
+2025-06-08 18:00:55 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 status: SensorStatus.OFFLINE
+2025-06-08 18:00:56 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 status: SensorStatus.OFFLINE
+2025-06-08 18:00:57 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 status: SensorStatus.OFFLINE
+2025-06-08 18:00:58 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 status: SensorStatus.OFFLINE
+2025-06-08 18:00:59 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 status: SensorStatus.OFFLINE
+2025-06-08 18:01:00 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 status: SensorStatus.OFFLINE
+2025-06-08 18:01:01 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 status: SensorStatus.OFFLINE
+2025-06-08 18:01:02 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 status: SensorStatus.OFFLINE
+2025-06-08 18:01:03 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 status: SensorStatus.OFFLINE
+2025-06-08 18:01:04 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 status: SensorStatus.OFFLINE
+2025-06-08 18:01:05 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 status: SensorStatus.OFFLINE
+2025-06-08 18:01:06 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 status: SensorStatus.OFFLINE
+2025-06-08 18:01:07 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 status: SensorStatus.OFFLINE
+2025-06-08 18:01:08 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 status: SensorStatus.OFFLINE
+2025-06-08 18:01:09 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 status: SensorStatus.OFFLINE
+2025-06-08 18:01:10 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 status: SensorStatus.OFFLINE
+2025-06-08 18:01:11 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 status: SensorStatus.OFFLINE
+2025-06-08 18:01:12 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 status: SensorStatus.OFFLINE
+2025-06-08 18:01:13 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 status: SensorStatus.OFFLINE
+2025-06-08 18:01:14 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 status: SensorStatus.OFFLINE
+2025-06-08 18:01:15 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 status: SensorStatus.OFFLINE
+2025-06-08 18:01:16 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 status: SensorStatus.OFFLINE
+2025-06-08 18:01:17 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 status: SensorStatus.OFFLINE
+2025-06-08 18:01:18 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 status: SensorStatus.OFFLINE
+2025-06-08 18:01:19 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 status: SensorStatus.OFFLINE
+2025-06-08 18:01:20 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 status: SensorStatus.OFFLINE
+2025-06-08 18:01:21 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 status: SensorStatus.OFFLINE
+2025-06-08 18:01:22 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 status: SensorStatus.OFFLINE
+2025-06-08 18:01:23 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 status: SensorStatus.OFFLINE
+2025-06-08 18:01:24 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 status: SensorStatus.OFFLINE
+2025-06-08 18:01:25 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 status: SensorStatus.OFFLINE
+2025-06-08 18:01:26 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 status: SensorStatus.OFFLINE
+2025-06-08 18:01:27 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 status: SensorStatus.OFFLINE
+2025-06-08 18:01:28 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 status: SensorStatus.OFFLINE
+2025-06-08 18:01:29 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 status: SensorStatus.OFFLINE
+2025-06-08 18:01:30 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 status: SensorStatus.OFFLINE
+2025-06-08 18:01:38 - cvd_tracker.error - WARNING - gui_notification_center_element.py:470 - add_notification - NOTIFICATION: Configuration Validation Errors - Found 1 configuration validation error(s)
+2025-06-08 18:03:17 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Camera capture missing, attempting reinitialization
+2025-06-08 18:03:18 - cvd_tracker.error - WARNING - log_service.py:602 - warning - No experiment manager available - creating new instance
+2025-06-08 18:06:03 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 is already polling
+2025-06-08 18:06:03 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error starting experiment: The current slot cannot be determined because the slot stack for this task is empty.
+This may happen if you try to create UI from a background task.
+To fix this, enter the target slot explicitly using `with container_element:`.
+2025-06-08 18:06:08 - cvd_tracker.error - ERROR - gui_notification_center_element.py:470 - add_notification - NOTIFICATION: System Error - ERROR - log_service.py:607 - error - Error starting experiment: The current slot cannot be determined because the slot stack for this task is empty.

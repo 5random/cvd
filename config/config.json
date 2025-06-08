@@ -7,32 +7,17 @@
   "sensors": [
     {
       "sen001": {
-        "name": "Mock_Sens_1",
+        "name": "MockSensor1",
         "type": "temperature",
         "source": "mock_arduino_tc_board",
         "interface": "serial",
+        "enabled": true,
+        "show_on_dashboard": true,
         "port": "COM3",
         "channel": 0,
         "poll_interval_ms": 1000,
         "baudrate": 9600,
-        "timeout": 2.0,
-        "enabled": true,
-        "show_on_dashboard": true
-      }
-    },
-    {
-      "sen003": {
-        "name": "rgfdgsg",
-        "type": "temperature",
-        "source": "arduino_tc_board",
-        "interface": "serial",
-        "enabled": true,
-        "port": "COM3",
-        "channel": 0,
-        "poll_interval_ms": 1000,
-        "baudrate": 9600,
-        "timeout": 2.0,
-        "show_on_dashboard": false
+        "timeout": 2.0
       }
     }
   ],
