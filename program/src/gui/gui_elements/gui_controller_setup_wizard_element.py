@@ -9,6 +9,7 @@ from src.gui.gui_tab_components.gui_tab_base_component import (
     BaseComponent,
     ComponentConfig,
 )
+from .gui_wizard_mixin import WizardMixin
 from src.gui.gui_tab_components.gui_tab_sensors_component import SensorConfigDialog
 from src.gui.gui_elements.gui_sensor_setup_wizard_element import SensorSetupWizardComponent
 from src.data_handler.sources.sensor_source_manager import SensorManager
@@ -17,7 +18,7 @@ from src.utils.config_utils.config_service import ConfigurationService
 from src.utils.log_utils.log_service import info, warning, error, debug
 
 
-class ControllerSetupWizardComponent(BaseComponent):
+class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
     """Comprehensive 4-step controller setup wizard using NiceGUI stepper."""
 
     def __init__(
@@ -638,14 +639,6 @@ class ControllerSetupWizardComponent(BaseComponent):
             error(f"Failed to create controller: {e}")
             ui.notify(f"Failed to create controller: {str(e)}", color="negative")
 
-    def _close_dialog(self) -> None:
-        """Close the wizard dialog."""
-        if self._dialog:
-            self._dialog.close()
-            self._dialog = None
-            
-        if self.on_close:
-            self.on_close()
 
     def _refresh_step2(self) -> None:
         """Refresh step 2 elements."""
@@ -657,9 +650,6 @@ class ControllerSetupWizardComponent(BaseComponent):
         if hasattr(self, '_step3_elements'):
             self._render_step3()
 
-    def _update_element(self, data: Any) -> None:
-        """Update element with new data (required by BaseComponent)."""
-        pass
 
 
 # Legacy compatibility class

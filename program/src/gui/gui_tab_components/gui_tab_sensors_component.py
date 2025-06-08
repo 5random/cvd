@@ -20,6 +20,8 @@ from src.gui.gui_tab_components.gui_tab_base_component import (
     BaseComponent,
     ComponentConfig,
 )
+
+from .dialog_utils import CancelableDialogMixin
 from src.controllers.controller_manager import create_cvd_controller_manager
 from src.data_handler.interface.sensor_interface import SensorStatus, SensorReading
 from src.data_handler.sources.sensor_source_manager import SensorManager, SENSOR_REGISTRY
@@ -49,7 +51,7 @@ class SensorInfo:
     config: Dict[str, Any]
 
 
-class SensorConfigDialog:
+class SensorConfigDialog(CancelableDialogMixin):
     """Dialog for sensor configuration"""
     
     def __init__(self, 
@@ -181,10 +183,6 @@ class SensorConfigDialog:
         
         dialog.open()
     
-    def _cancel(self) -> None:
-        """Cancel dialog"""
-        if self._dialog:
-            self._dialog.close()
             
     def _save(self) -> None:
         """Save sensor configuration"""

@@ -8,6 +8,8 @@ from nicegui import ui
 import time
 import asyncio
 
+from .dialog_utils import CancelableDialogMixin
+
 from src.utils.config_utils.config_service import ConfigurationService
 from src.utils.log_utils.log_service import info, warning, error, debug
 
@@ -38,7 +40,7 @@ class ControllerCardConfig:
     enabled: bool = True
 
 
-class ControllerConfigDialog:
+class ControllerConfigDialog(CancelableDialogMixin):
     """Dialog for creating new controllers with webcam settings."""
 
     def __init__(
@@ -176,9 +178,6 @@ class ControllerConfigDialog:
 
         dialog.open()
 
-    def _cancel(self) -> None:
-        if self._dialog:
-            self._dialog.close()
 
     def _save(self) -> None:
         try:

@@ -5,11 +5,13 @@ from datetime import datetime
 from pathlib import Path
 from nicegui import ui
 import json
+from src.utils.ui_helpers import notify_later
 
 from src.gui.gui_tab_components.gui_tab_base_component import (
     BaseComponent,
     ComponentConfig,
 )
+from .gui_wizard_mixin import WizardMixin
 from src.experiment_handler.experiment_manager import (
     ExperimentManager, ExperimentConfig, ExperimentState, ExperimentPhase,
     get_experiment_manager
@@ -20,7 +22,7 @@ from src.utils.config_utils.config_service import ConfigurationService
 from src.utils.log_utils.log_service import info, warning, error, debug
 
 
-class ExperimentSetupWizardComponent(BaseComponent):
+class ExperimentSetupWizardComponent(WizardMixin, BaseComponent):
     """Comprehensive 4-step experiment setup wizard using NiceGUI stepper."""
 
     def __init__(
@@ -619,8 +621,6 @@ class ExperimentSetupWizardComponent(BaseComponent):
 
     async def _start_experiment_async(self, experiment_id: str) -> None:
         """Start experiment asynchronously."""
-        def notify_later(message: str, **kwargs) -> None:
-            ui.timer(0, lambda: ui.notify(message, **kwargs), once=True)
         
         try:
             if not self.experiment_manager:
@@ -636,18 +636,6 @@ class ExperimentSetupWizardComponent(BaseComponent):
             error(f"Error starting experiment: {e}")
             notify_later(f'Error starting experiment: {str(e)}', color='negative')
 
-    def _close_dialog(self) -> None:
-        """Close the wizard dialog."""
-        if self._dialog:
-            self._dialog.close()
-            self._dialog = None
-            
-        if self.on_close:
-            self.on_close()
-
-    def _update_element(self, data: Any) -> None:
-        """Update element with new data (required by BaseComponent)."""
-        pass
 
 
 # Legacy compatibility class - redirect to new wizard

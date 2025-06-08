@@ -11,6 +11,7 @@ from pathlib import Path
 
 from nicegui import ui
 from nicegui.element import Element
+from src.utils.ui_helpers import notify_later
 from nicegui.elements.dialog import Dialog
 from nicegui.elements.label import Label
 from nicegui.elements.button import Button
@@ -18,6 +19,7 @@ from nicegui.elements.icon import Icon
 from nicegui.elements.card import Card
 
 from src.gui.gui_tab_components.gui_tab_base_component import BaseComponent, ComponentConfig
+from .dialog_utils import CancelableDialogMixin
 from src.experiment_handler.experiment_manager import (
     ExperimentManager, ExperimentConfig, ExperimentResult, ExperimentState, 
     ExperimentPhase, ExperimentDataPoint, get_experiment_manager, set_experiment_manager
@@ -49,7 +51,7 @@ class ExperimentInfo:
     estimated_remaining: Optional[str]
 
 
-class ExperimentConfigDialog:
+class ExperimentConfigDialog(CancelableDialogMixin):
     """Dialog for experiment configuration"""
     
     def __init__(self, 
@@ -211,10 +213,6 @@ class ExperimentConfigDialog:
         
         dialog.open()
     
-    def _cancel(self) -> None:
-        """Cancel dialog"""
-        if self._dialog:
-            self._dialog.close()
             
     def _create_only(self) -> None:
         """Create experiment without starting"""
@@ -272,8 +270,6 @@ class ExperimentConfigDialog:
     async def _start_experiment_async(self, experiment_id: str) -> None:
         """Start experiment asynchronously"""
         # Helper to schedule notifications in main UI context
-        def notify_later(message: str, **kwargs) -> None:
-            ui.timer(0, lambda: ui.notify(message, **kwargs), once=True)
         try:
             success = await self.experiment_manager.start_experiment(experiment_id)
             if success:
