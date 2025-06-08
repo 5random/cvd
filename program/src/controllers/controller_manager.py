@@ -87,7 +87,7 @@ class ControllerManager:
                 return MotionDetectionController(controller_id, cfg)
             if controller_type == "reactor_state":
                 return ReactorStateController(controller_id, cfg)
-            if controller_type == "camera_capture":
+            if controller_type in ("camera_capture", "camera"):
                 return CameraCaptureController(controller_id, cfg)
 
             warning(f"Unknown controller type: {controller_type}")
