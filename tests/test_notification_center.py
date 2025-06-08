@@ -58,7 +58,6 @@ def test_check_log_notifications_uses_configured_dir(minimal_services, monkeypat
 
     assert any(msg in n.message for n in center.notifications)
 
-
 @pytest.fixture
 def notification_center(tmp_path, minimal_services, monkeypatch):
     config_service, _ = minimal_services
@@ -170,3 +169,34 @@ def test_notification_history_persistence(
     assert set(loaded.keys()) == set(ids)
     assert loaded[ids[0]].read is True
     assert loaded[ids[1]].read is False
+
+def test_init_uses_configuration(tmp_path, monkeypatch):
+    cfg = {
+        "logging": {"log_dir": str(tmp_path / "logs"), "retention_days": 0},
+        "ui": {
+            "notification_center": {
+                "max_notifications": 10,
+                "history_file": str(tmp_path / "history.json"),
+                "update_interval_s": 3,
+            }
+        },
+    }
+    (tmp_path / "config.json").write_text(json.dumps(cfg))
+    (tmp_path / "default_config.json").write_text("{}")
+    config_service = ConfigurationService(
+        tmp_path / "config.json", tmp_path / "default_config.json"
+    )
+
+    monkeypatch.setattr(LogService, "_initialize_logging", lambda self: None)
+    monkeypatch.setattr(NotificationCenter, "_setup_monitoring", lambda self: None)
+    monkeypatch.setattr(
+        "src.gui.gui_elements.gui_notification_center_element.get_log_service",
+        lambda: LogService(config_service),
+    )
+
+    center = NotificationCenter(config_service)
+
+    assert center.max_notifications == 10
+    assert center.notification_history_file == Path(tmp_path / "history.json")
+    assert center.check_interval == 3
+
