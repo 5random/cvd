@@ -536,17 +536,19 @@ class LogService:
 
     def compress_old_logs(self) -> None:
         """Compress old log files to save space"""
+        compressed_exts = {".gz", ".bz2", ".xz", ".zip"}
         for log_file in self.log_dir.glob("*.log.*"):
-            if not log_file.name.endswith(".gz"):
-                try:
-                    compressed_file = f"{log_file}.gz"
-                    with open(log_file, "rb") as f_in:
-                        with gzip.open(compressed_file, "wb") as f_out:
-                            shutil.copyfileobj(f_in, f_out)
-                    log_file.unlink()
-                    self.info(f"Compressed log file: {log_file} -> {compressed_file}")
-                except Exception as e:
-                    self.error(f"Failed to compress log file {log_file}: {e}")
+            if any(log_file.name.endswith(ext) for ext in compressed_exts):
+                continue
+            try:
+                compressed_file = f"{log_file}.gz"
+                with open(log_file, "rb") as f_in:
+                    with gzip.open(compressed_file, "wb") as f_out:
+                        shutil.copyfileobj(f_in, f_out)
+                log_file.unlink()
+                self.info(f"Compressed log file: {log_file} -> {compressed_file}")
+            except Exception as e:
+                self.error(f"Failed to compress log file {log_file}: {e}")
 
     def get_log_stats(self) -> Dict[str, Any]:
         """Get logging statistics"""
