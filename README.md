@@ -37,6 +37,8 @@ python program/main.py --config-dir program/config
 You may also set the ``CVD_CONFIG_DIR`` environment variable instead of passing
 ``--config-dir``.
 
+Use the fullscreen button in the header to toggle between windowed and fullscreen mode.
+
 ### Dashboard visibility
 
 Sensors and controllers defined in the configuration will only appear on the
