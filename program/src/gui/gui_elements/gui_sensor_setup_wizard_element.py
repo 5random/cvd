@@ -13,6 +13,8 @@ from src.data_handler.sources.sensor_source_manager import (
     SensorManager,
     SENSOR_REGISTRY,
 )
+from src.data_handler.interface.sensor_interface import SensorStatus
+from src.utils.ui_helpers import notify_later
 from src.controllers.controller_manager import ControllerManager
 from src.utils.config_utils.config_service import ConfigurationService
 from src.utils.log_utils.log_service import info, warning, error, debug
@@ -191,6 +193,9 @@ class SensorSetupWizardComponent(WizardMixin, BaseComponent):
                     ui.button("Previous", on_click=self._stepper.previous)
                     ui.button("Next", on_click=self._validate_and_next_step2).props(
                         "color=primary"
+                    )
+                    ui.button("Test Connection", on_click=self._test_connection).props(
+                        "color=secondary"
                     )
                     ui.button("Cancel", on_click=self._close_dialog).props("flat")
 
@@ -679,6 +684,76 @@ class SensorSetupWizardComponent(WizardMixin, BaseComponent):
 
         if self._stepper:
             self._stepper.next()
+
+    def _test_connection(self) -> None:
+        """Create a temporary sensor and read a single value."""
+        import asyncio
+
+        asyncio.create_task(self._test_connection_async())
+
+    async def _test_connection_async(self) -> None:
+        """Asynchronously test the sensor connection."""
+        try:
+            # Build temporary sensor configuration using current wizard data
+            sensor_config = {
+                "sensor_id": self._wizard_data["sensor_id"],
+                "name": self._wizard_data.get("name", "temp"),
+                "type": self._wizard_data["type"],
+                "source": self._wizard_data["source"],
+                "interface": self._wizard_data["interface"],
+                "enabled": True,
+                "show_on_dashboard": False,
+            }
+
+            if self._wizard_data["interface"] in ["serial", "usb"]:
+                sensor_config.update(
+                    {
+                        "port": self._wizard_data.get("port"),
+                        "channel": self._wizard_data.get("channel", 0),
+                        "baudrate": self._wizard_data.get("baudrate", 9600),
+                        "timeout": self._wizard_data.get("timeout", 2.0),
+                    }
+                )
+            elif self._wizard_data["interface"] == "modbus":
+                sensor_config.update(
+                    {
+                        "port": self._wizard_data.get("port"),
+                        "address": self._wizard_data.get("port"),
+                        "unit_id": self._wizard_data.get("unit_id", 1),
+                    }
+                )
+            elif self._wizard_data["interface"] == "ethernet":
+                sensor_config.update(
+                    {
+                        "ip_address": self._wizard_data.get("ip_address"),
+                        "port": self._wizard_data.get("port", 502),
+                    }
+                )
+
+            # Create sensor instance without registering
+            sensor = self.sensor_manager.create_sensor(sensor_config)
+            if not sensor:
+                notify_later("Failed to create sensor instance", color="negative")
+                return
+
+            if not await sensor.initialize():
+                await sensor.cleanup()
+                notify_later("Sensor initialization failed", color="negative")
+                return
+
+            reading = await sensor.read()
+            await sensor.cleanup()
+
+            if reading.status == SensorStatus.OK:
+                msg = f"Connection successful: {reading.value}"
+                notify_later(msg, color="positive")
+            else:
+                err = reading.error_message or reading.status.value
+                notify_later(f"Read failed: {err}", color="negative")
+
+        except Exception as e:
+            error(f"Connection test error: {e}")
+            notify_later(f"Connection test failed: {e}", color="negative")
 
     def _create_sensor(self) -> None:
         """Create the sensor with the configured settings."""
