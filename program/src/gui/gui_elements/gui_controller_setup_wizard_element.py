@@ -64,7 +64,7 @@ class ControllerSetupWizardComponent(BaseComponent):
                 'requires_sensors': True,
                 'requires_webcam': False,
                 'algorithms': ['reactor_status_detection'],
-                'default_state_output': ['Reaktor fehler', 'Reaktor OK'],
+                'default_state_output': ['Reaktor Fehler', 'Reaktor OK'],
                 'parameters': {
                     'min_valid_sensors': {'type': 'int', 'default': 1, 'min': 1, 'max': 10, 'label': 'Min. Valid Sensors'},
                     'alarm_threshold_high': {'type': 'float', 'default': 80.0, 'min': 0, 'max': 200, 'label': 'High Alarm Threshold (°C)'},
@@ -92,7 +92,7 @@ class ControllerSetupWizardComponent(BaseComponent):
                 'requires_sensors': False,
                 'requires_webcam': True,
                 'algorithms': [],
-                'default_state_output': ['Kamera fehler', 'Kamera OK'],
+                'default_state_output': ['Kamera Fehler', 'Kamera OK'],
                 'parameters': {
                     'fps': {'type': 'int', 'default': 30, 'min': 1, 'max': 60, 'label': 'Frames per Second'},
                     'resolution_width': {'type': 'int', 'default': 640, 'min': 320, 'max': 1920, 'label': 'Resolution Width'},
