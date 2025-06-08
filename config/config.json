@@ -4,6 +4,7 @@
     "refresh_rate_ms": 1000,
     "dark_mode": true
   },
+  "sensor_reconnect_attempts": 3,
   "sensors": [
     {
       "sen001": {
