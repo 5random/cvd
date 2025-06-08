@@ -111,6 +111,34 @@ def test_table_selection_updates_selected_files(monkeypatch):
     assert called["count"] == 1
 
 
+def test_table_selection_accepts_row_dicts(monkeypatch):
+    files = [_make_file(i) for i in range(2)]
+    manager = DummyManager(files)
+    comp_config = ComponentConfig(component_id="sel2")
+    data_config = DataComponentConfig(files_per_page=5)
+    files_list = DataFilesList(comp_config, manager, data_config)
+
+    files_list._files_table = DummyTable()
+    files_list._pagination_info = DummyLabel()
+    files_list._prev_button = DummyButton()
+    files_list._next_button = DummyButton()
+    files_list._load_files()
+
+    called = {"count": 0}
+
+    def fake_update():
+        called["count"] += 1
+
+    monkeypatch.setattr(files_list, "_update_selection_info", fake_update)
+
+    selected_ids = [files_list._generate_file_id(f) for f in files[:1]]
+    event = type("Event", (), {"selection": [{"id": selected_ids[0]}]})()
+    files_list._on_table_select(event)
+
+    assert files_list.selected_files == set(selected_ids)
+    assert called["count"] == 1
+
+
 def test_download_selected_files_calls_data_manager(tmp_path, monkeypatch):
     files = [_make_file(i) for i in range(2)]
     for meta in files:

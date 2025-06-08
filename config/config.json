@@ -16,7 +16,8 @@
         "poll_interval_ms": 1000,
         "baudrate": 9600,
         "timeout": 2.0,
-        "enabled": true
+        "enabled": true,
+        "show_on_dashboard": true
       }
     },
     {
@@ -30,7 +31,8 @@
         "channel": 0,
         "poll_interval_ms": 1000,
         "baudrate": 9600,
-        "timeout": 2.0
+        "timeout": 2.0,
+        "show_on_dashboard": false
       }
     }
   ],

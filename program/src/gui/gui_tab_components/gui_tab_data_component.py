@@ -898,7 +898,10 @@ class DataFilesList(BaseComponent):
             selected = getattr(event, "selection", None)
             if selected is None:
                 selected = getattr(event, "value", [])
-            selected_ids = set(selected or [])
+            if selected and isinstance(selected[0], dict):
+                selected_ids = {row.get("id") for row in selected}
+            else:
+                selected_ids = set(selected or [])
 
             self.selected_files = selected_ids
             self._update_selection_info()

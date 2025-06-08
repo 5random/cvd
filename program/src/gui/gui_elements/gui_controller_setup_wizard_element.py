@@ -63,8 +63,6 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
             'algorithms': [],
             'state_output': []
         }
-        # anschließend evtl. controller-spezifische Defaults setzen
-        self._update_controller_defaults()
         
         # UI elements for each step (typed as Any to allow dynamic attribute access)
         self._step1_elements: Dict[str, Any] = {}
@@ -91,7 +89,10 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
             }
             for t in types
         }
-        
+
+        # anschließend evtl. controller-spezifische Defaults setzen
+        self._update_controller_defaults()
+
         # Sensor wizard for creating new sensors
         self._sensor_wizard = SensorSetupWizardComponent(
             config_service, sensor_manager, self._refresh_sensor_list
