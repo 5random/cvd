@@ -7,13 +7,14 @@ from src.gui.gui_tab_components.gui_tab_base_component import (
     BaseComponent,
     ComponentConfig,
 )
+from .gui_wizard_mixin import WizardMixin
 from src.data_handler.sources.sensor_source_manager import SensorManager, SENSOR_REGISTRY
 from src.controllers.controller_manager import ControllerManager
 from src.utils.config_utils.config_service import ConfigurationService
 from src.utils.log_utils.log_service import info, warning, error, debug
 
 
-class SensorSetupWizardComponent(BaseComponent):
+class SensorSetupWizardComponent(WizardMixin, BaseComponent):
     """Comprehensive 4-step sensor setup wizard using NiceGUI stepper."""
 
     def __init__(
@@ -591,18 +592,6 @@ class SensorSetupWizardComponent(BaseComponent):
             error(f"Failed to create sensor: {e}")
             ui.notify(f"Failed to create sensor: {str(e)}", color="negative")
 
-    def _close_dialog(self) -> None:
-        """Close the wizard dialog."""
-        if self._dialog:
-            self._dialog.close()
-            self._dialog = None
-            
-        if self.on_close:
-            self.on_close()
-
-    def _update_element(self, data: Any) -> None:
-        """Update element with new data (required by BaseComponent)."""
-        pass
 
 
 # Legacy compatibility class - redirect to new wizard
