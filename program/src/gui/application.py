@@ -20,10 +20,14 @@ from src.gui.gui_tab_components.gui_tab_controllers_component import \
     ControllersComponent
 from src.gui.gui_tab_components.gui_tab_dashboard_component import \
     DashboardComponent
-from src.gui.gui_tab_components.gui_tab_data_component import \
-    create_data_component
-from src.gui.gui_tab_components.gui_tab_experiment_component import \
-    create_experiment_component
+from src.gui.gui_tab_components.gui_tab_data_component import (
+    create_data_component,
+    DataComponent,
+)
+from src.gui.gui_tab_components.gui_tab_experiment_component import (
+    create_experiment_component,
+    ExperimentComponent,
+)
 from src.gui.gui_tab_components.gui_tab_log_component import LogComponent
 from src.gui.gui_tab_components.gui_tab_sensors_component import (
     SensorsComponent,
@@ -58,6 +62,8 @@ class WebApplication:
         self._sensors_component: Optional[SensorsComponent] = None
         self._controllers_component: Optional[ControllersComponent] = None
         self._log_component: Optional[LogComponent] = None
+        self._experiment_component: Optional[ExperimentComponent] = None
+        self._data_component: Optional[DataComponent] = None
         self._sensor_readings_container: Optional[ui.column] = None
         self._live_plot: Optional[LivePlotComponent] = None
         self._sensor_list_container: Optional[ui.column] = None
@@ -231,21 +237,21 @@ class WebApplication:
             # Experiments tab
             with ui.tab_panel('experiments').classes('p-4'):
                 ui.label('Experiment Management').classes('text-xl mb-4')
-                experiment_component = create_experiment_component(
+                self._experiment_component = create_experiment_component(
                     component_id='experiment_component',
                     config_service=self.config_service,
                     sensor_manager=self.sensor_manager,
-                    controller_manager=self.controller_manager
+                    controller_manager=self.controller_manager,
                 )
-                self.component_registry.register(experiment_component)
-                experiment_component.render()
+                self.component_registry.register(self._experiment_component)
+                self._experiment_component.render()
 
             # Data tab
             with ui.tab_panel('data').classes('p-4'):
                 ui.label('Data Management').classes('text-xl mb-4')
-                data_component = create_data_component(component_id='data_component')
-                self.component_registry.register(data_component)
-                data_component.render()
+                self._data_component = create_data_component(component_id='data_component')
+                self.component_registry.register(self._data_component)
+                self._data_component.render()
             
             # Logs tab
             with ui.tab_panel('logs').classes('p-4'):
@@ -399,15 +405,21 @@ class WebApplication:
     def _refresh_data(self) -> None:
         """Refresh all data"""
         ui.notify('Data refreshed')
-        # Force update of all components
-        # This would trigger component refresh in a real implementation
-        self._create_dashboard_panel()
-        self._create_sensors_panel()
-        self._create_controllers_panel()
-        self._create_experiments_panel()
-        self._create_data_panel()
-        self._create_logs_panel()
-        self._create_settings_panel()
+        # Update existing components instead of recreating panels
+        self._update_sensor_readings()
+        self._update_sensor_list()
+        self._load_sensor_configs()
+
+        if self._sensors_component:
+            self._sensors_component._refresh_sensors()
+        if self._controllers_component:
+            self._controllers_component._refresh_controllers()
+        if self._experiment_component:
+            self._experiment_component.update({})
+        if self._data_component:
+            self._data_component._auto_refresh()
+        if self._log_component:
+            self._log_component._refresh_log_info()
     
     def _create_dashboard_panel(self) -> None:
         """Create dashboard tab panel"""
