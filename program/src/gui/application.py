@@ -273,7 +273,8 @@ class WebApplication:
                 dashboard = DashboardComponent(
                     self.config_service,
                     self.sensor_manager,
-                    self.controller_manager
+                    self.controller_manager,
+                    self._notification_center,
                 )
                 dashboard.render()
 
