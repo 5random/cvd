@@ -3,6 +3,7 @@ Central sensor management service for handling sensor lifecycle and data collect
 """
 
 import asyncio
+import importlib.metadata
 from typing import Dict, List, Optional, Type, Callable, Any
 from concurrent.futures import ThreadPoolExecutor, Executor
 from src.data_handler.interface.sensor_interface import (
@@ -30,6 +31,23 @@ SENSOR_REGISTRY: Dict[str, SensorFactory] = {
     "mock_arduino_tc_board": MockArduinoTCSensor,
     "mock_rs232": MockRS232Sensor,
 }
+
+def load_entry_point_sensors(group: str = 'cvd.sensors') -> None:
+    """Load sensor implementations from entry points."""
+    try:
+        eps = importlib.metadata.entry_points()
+        selected = eps.select(group=group) if hasattr(eps, 'select') else eps.get(group, [])
+        for ep in selected:
+            try:
+                factory = ep.load()
+                SENSOR_REGISTRY[ep.name] = factory
+                info(f"Loaded sensor entry point: {ep.name}")
+            except Exception as e:  # pragma: no cover - log only
+                error(f"Failed to load sensor entry point {ep.name}: {e}")
+    except Exception as e:  # pragma: no cover - log only
+        warning(f"Could not load sensor entry points: {e}")
+
+load_entry_point_sensors()
 
 
 class SensorManager:

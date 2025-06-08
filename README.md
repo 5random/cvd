@@ -37,6 +37,8 @@ python program/main.py --config-dir program/config
 You may also set the ``CVD_CONFIG_DIR`` environment variable instead of passing
 ``--config-dir``.
 
+Use the fullscreen button in the header to toggle between windowed and fullscreen mode.
+
 ### Dashboard visibility
 
 Sensors and controllers defined in the configuration will only appear on the
@@ -44,14 +46,29 @@ dashboard when their configuration contains ``"show_on_dashboard": true``.
 Add this flag under each sensor or controller entry to control what is visible
 in the GUI.
 
+### Controller concurrency
+
+The controller manager controls how many controllers may execute in parallel.
+Set the ``CONTROLLER_MANAGER_CONCURRENCY_LIMIT`` environment variable to adjust
+this number. If unset, it defaults to ``10``. You can also provide the same
+value on startup using the ``--controller-concurrency-limit`` option of
+``program/main.py`` which simply sets this environment variable for you.
+
 
 ## Running tests
 
-Install the dependencies and run the test suite with:
+Before running the tests you must install this package and its dependencies.
+Attempting to execute `pytest` without installation will result in import
+errors.  Install everything with:
 
 ```bash
-make install
-make test
+make install    # or: pip install -e .
+```
+
+After installation run the test suite with:
+
+```bash
+pytest          # or: make test
 ```
 
 The tests rely on the `cv2` module from OpenCV and the `nicegui` package. Ensure

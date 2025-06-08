@@ -42,6 +42,7 @@ from src.utils.log_utils.log_service import debug, error, info, warning
 from src.gui.gui_elements.gui_webcam_stream_element import CameraStreamComponent
 from starlette.staticfiles import StaticFiles
 from fastapi.responses import StreamingResponse
+from fastapi import Request
 
 
 class WebApplication:
@@ -65,6 +66,7 @@ class WebApplication:
         self._experiment_component: Optional[ExperimentComponent] = None
         self._data_component: Optional[DataComponent] = None
         self._sensor_readings_container: Optional[ui.column] = None
+        self._dashboard_component: Optional[DashboardComponent] = None
         self._live_plot: Optional[LivePlotComponent] = None
         self._sensor_list_container: Optional[ui.column] = None
         
@@ -104,6 +106,12 @@ class WebApplication:
             with contextlib.suppress(Exception):
                 await self._processing_task
         await self.controller_manager.stop_all_controllers()
+        if self._dashboard_component:
+            self.component_registry.unregister(self._dashboard_component.component_id)
+            self._dashboard_component = None
+        if self._live_plot:
+            self.component_registry.unregister(self._live_plot.component_id)
+            self._live_plot = None
         self.component_registry.cleanup_all()
         info("Web application shutdown complete")
 
@@ -157,12 +165,19 @@ class WebApplication:
             return self._create_status_page()
 
         @ui.page('/video_feed')
-        async def video_feed():
+        async def video_feed(request: Request):
             """Stream MJPEG frames from the dashboard camera"""
             camera = self.component_registry.get_component('dashboard_camera_stream')
 
             async def gen():
                 while True:
+                    try:
+                        if await request.is_disconnected():
+                            info('Client disconnected from video feed')
+                            break
+                    except asyncio.CancelledError:
+                        info('Video feed cancelled')
+                        break
                     if isinstance(camera, CameraStreamComponent):
                         frame = camera.get_latest_frame()
                         if frame is not None:
@@ -171,7 +186,9 @@ class WebApplication:
                                 jpeg_bytes = buf.tobytes()
                                 yield (b'--frame\r\nContent-Type: image/jpeg\r\n\r\n' +
                                        jpeg_bytes + b'\r\n')
-                    await asyncio.sleep(camera.update_interval if isinstance(camera, CameraStreamComponent) else 0.03)
+                    await asyncio.sleep(
+                        camera.update_interval if isinstance(camera, CameraStreamComponent) else 0.03
+                    )
 
             return StreamingResponse(gen(),
                                      media_type='multipart/x-mixed-replace; boundary=frame')
@@ -267,26 +284,38 @@ class WebApplication:
         """Create dashboard tab content"""
         with ui.row().classes('w-full h-full gap-4'):
             # Left column - sensor dashboard
-            dashboard_sensors = [sid for sid, cfg in self.config_service.get_sensor_configs() if cfg.get('show_on_dashboard')]
+            dashboard_sensors = [
+                sid for sid, cfg in self.config_service.get_sensor_configs()
+                if cfg.get('show_on_dashboard')
+            ]
 
             with ui.column().classes('w-1/2'):
-                dashboard = DashboardComponent(
+                self._dashboard_component = DashboardComponent(
                     self.config_service,
                     self.sensor_manager,
                     self.controller_manager
                 )
-                dashboard.render()
+                self.component_registry.register(self._dashboard_component)
+                self._dashboard_component.render()
 
             # Right column - live plot
             if dashboard_sensors:
                 with ui.column().classes('w-1/2'):
+                    max_points = self.config_service.get('ui.liveplot.plot_max_points', int, 2000)
+                    history_seconds = self.config_service.get('ui.liveplot.history_seconds', int, 3600)
+                    sample_rate = self.config_service.get('ui.liveplot.sample_rate', int, 20)
+
+                    refresh_rate_ms = int(1000 / sample_rate) if sample_rate > 0 else 1000
+
                     plot_config = PlotConfig(
-                        max_points=2000,
-                        refresh_rate_ms=1000,
-                        history_seconds=3600
+                        max_points=max_points,
+                        refresh_rate_ms=refresh_rate_ms,
+                        history_seconds=history_seconds
                     )
-                    live_plot = LivePlotComponent(self.sensor_manager, plot_config, dashboard_sensors)
-                    live_plot.render()
+
+                    self._live_plot = LivePlotComponent(self.sensor_manager, plot_config, dashboard_sensors)
+                    self.component_registry.register(self._live_plot)
+                    self._live_plot.render()
     
     def _create_sensors_content(self) -> None:
         """Create sensors tab content"""
@@ -394,7 +423,8 @@ class WebApplication:
             ui.button(icon='refresh',color='#5898d4', on_click=ui.navigate.reload).props('flat round')
             
             # Full screen button
-            ui.button(icon='fullscreen',color='#5898d4', on_click=lambda: ui.notify('Fullscreen mode')).props('flat round')
+            ui.button(icon='fullscreen', color='#5898d4',
+                      on_click=lambda: ui.fullscreen().toggle()).props('flat round')
             # Notification center button
             # Only create notification button if attribute exists and not None
             if hasattr(self, '_notification_center') and self._notification_center is not None:
@@ -630,7 +660,9 @@ class WebApplication:
             
             # Clear and rebuild readings display
             self._sensor_readings_container.clear()
-            
+
+            configs = dict(self.config_service.get_sensor_configs())
+
             with self._sensor_readings_container:
                 if not readings:
                     ui.label('No sensor data available').classes('text-body2 text-grey')
@@ -641,7 +673,8 @@ class WebApplication:
                         ui.label(sensor_id).classes('text-body1')
                         
                         if reading.is_valid():
-                            ui.label(f'{reading.value:.2f}°C').classes('cvd-sensor-value text-green')
+                            unit = reading.metadata.get('unit') or configs.get(sensor_id, {}).get('unit') or '°C'
+                            ui.label(f'{reading.value:.2f}{unit}').classes('cvd-sensor-value text-green')
                         else:
                             ui.label(f'Status: {reading.status.value}').classes('text-red')
 
