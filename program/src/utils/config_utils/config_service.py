@@ -930,6 +930,14 @@ class ConfigurationService:
                 result.append((algorithm_id, config))
         return result
 
+    def get_dashboard_layout(self) -> Dict[str, Any]:
+        """Return stored dashboard layout configuration."""
+        return self.get("dashboard_layout", expected_type=dict, default={})
+
+    def set_dashboard_layout(self, layout: Dict[str, Any]) -> None:
+        """Persist dashboard layout configuration."""
+        self.set("dashboard_layout", layout)
+
     def get_algorithms_for_entity(self, entity_type: str, entity_id: str) -> List[str]:
         """Get algorithm IDs referenced by a sensor or controller"""
         if entity_type == "sensor":

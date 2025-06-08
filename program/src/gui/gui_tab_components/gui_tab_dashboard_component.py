@@ -63,7 +63,10 @@ class SensorCardComponent(TimedComponent):
             
             # Start update timer
             self._update_timer = ui.timer(1.0, self._update_display)
-        
+
+        # mark as rendered so the element can be moved later
+        self._rendered = True
+        self._element = card
         return card
     
     def _update_display(self) -> None:
@@ -158,10 +161,27 @@ class DashboardComponent(BaseComponent):
         self._sensor_cards: Dict[str, SensorCardComponent] = {}
         self._controller_cards: Dict[str, ui.card] = {}
         self._camera_stream: Optional[CameraStreamComponent] = None
+        self._sensor_row: Optional[ui.row] = None
+        self._controller_row: Optional[ui.row] = None
+        self._drag_sensor_id: Optional[str] = None
+        self._drag_controller_id: Optional[str] = None
 
         # Determine which sensors and controllers should be displayed
         self._dashboard_sensors = [sid for sid, cfg in self.config_service.get_sensor_configs() if cfg.get('show_on_dashboard')]
         self._dashboard_controllers = [cid for cid, cfg in self.config_service.get_controller_configs() if cfg.get('show_on_dashboard')]
+
+        layout = self.config_service.get_dashboard_layout()
+        if isinstance(layout, dict):
+            sensor_layout = layout.get('sensors', [])
+            controller_layout = layout.get('controllers', [])
+            if sensor_layout:
+                ordered = [sid for sid in sensor_layout if sid in self._dashboard_sensors]
+                ordered += [sid for sid in self._dashboard_sensors if sid not in ordered]
+                self._dashboard_sensors = ordered
+            if controller_layout:
+                ordered = [cid for cid in controller_layout if cid in self._dashboard_controllers]
+                ordered += [cid for cid in self._dashboard_controllers if cid not in ordered]
+                self._dashboard_controllers = ordered
 
     def render(self) -> ui.column:
         """Render dashboard"""
@@ -184,13 +204,15 @@ class DashboardComponent(BaseComponent):
                 if self._dashboard_sensors:
                     with ui.column().classes('flex-1'):
                         ui.label('Sensor Data').classes('text-lg font-semibold mb-2')
-                        with ui.row().classes('w-full gap-4 flex-wrap'):
+                        with ui.row().classes('w-full gap-4 flex-wrap').on('dragover', lambda e: e.prevent_default()) as row:
+                            self._sensor_row = row
                             self._render_sensor_cards()
 
                 if self._dashboard_controllers:
                     with ui.column().classes('flex-1'):
                         ui.label('Controller States').classes('text-lg font-semibold mb-2')
-                        with ui.row().classes('w-full gap-4 flex-wrap'):
+                        with ui.row().classes('w-full gap-4 flex-wrap').on('dragover', lambda e: e.prevent_default()) as row:
+                            self._controller_row = row
                             self._render_controller_cards()
         
         return dashboard
@@ -281,12 +303,11 @@ class DashboardComponent(BaseComponent):
     
     def _render_sensor_cards(self) -> None:
         """Render sensor cards"""
-        sensor_configs = self.config_service.get_sensor_configs()
+        cfgs = {sid: cfg for sid, cfg in self.config_service.get_sensor_configs()}
 
-        for sensor_id, sensor_config in sensor_configs:
-            if not sensor_config.get('enabled', True):
-                continue
-            if self._dashboard_sensors and sensor_id not in self._dashboard_sensors:
+        for sensor_id in self._dashboard_sensors:
+            sensor_config = cfgs.get(sensor_id)
+            if not sensor_config or not sensor_config.get('enabled', True):
                 continue
             
             # Create sensor card config
@@ -302,8 +323,12 @@ class DashboardComponent(BaseComponent):
             # Create and render sensor card
             component_config = ComponentConfig(f"sensor_card_{sensor_id}")
             sensor_card = SensorCardComponent(component_config, card_config, self.sensor_manager)
-            sensor_card.render()
-            
+            card_el = sensor_card.render()
+            card_el.props('draggable=true')
+            card_el.on('dragstart', lambda e, sid=sensor_id: self._start_sensor_drag(sid))
+            card_el.on('drop', lambda e, sid=sensor_id: self._drop_sensor_on(sid))
+            card_el.on('dragover', lambda e: e.prevent_default())
+
             self._sensor_cards[sensor_id] = sensor_card
 
     def _render_controller_cards(self) -> None:
@@ -311,11 +336,76 @@ class DashboardComponent(BaseComponent):
             controller = self.controller_manager.get_controller(controller_id)
             if not controller:
                 continue
-            with ui.card().classes('p-4 cvd-card min-w-48') as card:
+            with ui.card().classes('p-4 cvd-card min-w-48').props('draggable=true') as card:
                 ui.label(controller_id).classes('text-lg font-semibold mb-2')
                 output = controller.get_output()
                 ui.label(str(output) if output is not None else 'No output').classes('text-sm')
+            card.on('dragstart', lambda e, cid=controller_id: self._start_controller_drag(cid))
+            card.on('drop', lambda e, cid=controller_id: self._drop_controller_on(cid))
+            card.on('dragover', lambda e: e.prevent_default())
             self._controller_cards[controller_id] = card
+
+    def _start_sensor_drag(self, sensor_id: str) -> None:
+        self._drag_sensor_id = sensor_id
+
+    def _drop_sensor_on(self, target_id: str) -> None:
+        if self._drag_sensor_id is None or self._sensor_row is None:
+            return
+        if target_id == self._drag_sensor_id:
+            return
+        source = self._sensor_cards.get(self._drag_sensor_id)
+        target = self._sensor_cards.get(target_id)
+        if not source or not target:
+            return
+        row_children = list(self._sensor_row.default_slot.children)
+        target_index = row_children.index(target.get_element())
+        source.get_element().move(target_container=self._sensor_row, target_index=target_index)
+        self._update_sensor_layout()
+        self._drag_sensor_id = None
+
+    def _start_controller_drag(self, controller_id: str) -> None:
+        self._drag_controller_id = controller_id
+
+    def _drop_controller_on(self, target_id: str) -> None:
+        if self._drag_controller_id is None or self._controller_row is None:
+            return
+        if target_id == self._drag_controller_id:
+            return
+        source = self._controller_cards.get(self._drag_controller_id)
+        target = self._controller_cards.get(target_id)
+        if not source or not target:
+            return
+        row_children = list(self._controller_row.default_slot.children)
+        target_index = row_children.index(target)
+        source.move(target_container=self._controller_row, target_index=target_index)
+        self._update_controller_layout()
+        self._drag_controller_id = None
+
+    def _update_sensor_layout(self) -> None:
+        if not self._sensor_row:
+            return
+        order: list[str] = []
+        for child in self._sensor_row.default_slot.children:
+            for sid, card in self._sensor_cards.items():
+                if card.get_element() is child:
+                    order.append(sid)
+                    break
+        layout = self.config_service.get_dashboard_layout()
+        layout["sensors"] = order
+        self.config_service.set_dashboard_layout(layout)
+
+    def _update_controller_layout(self) -> None:
+        if not self._controller_row:
+            return
+        order: list[str] = []
+        for child in self._controller_row.default_slot.children:
+            for cid, card in self._controller_cards.items():
+                if card is child:
+                    order.append(cid)
+                    break
+        layout = self.config_service.get_dashboard_layout()
+        layout["controllers"] = order
+        self.config_service.set_dashboard_layout(layout)
     
     def _update_element(self, data: Any) -> None:
         """Update dashboard with new data"""
