@@ -65,3 +65,21 @@ async def test_motion_detection_on_bytes(monkeypatch):
     assert result.success
     assert isinstance(result.data, MotionDetectionResult)
     await ctrl.stop()
+
+
+@pytest.mark.asyncio
+async def test_initialize_logs_algorithm(monkeypatch):
+    config = ControllerConfig(controller_id="md", controller_type="motion_detection")
+    ctrl = MotionDetectionController("md", config)
+
+    import src.controllers.algorithms.motion_detection as md
+    messages = []
+    monkeypatch.setattr(md, "info", lambda msg, **kwargs: messages.append(msg))
+
+    success = await ctrl.initialize()
+    await ctrl.cleanup()
+
+    assert success
+    assert any(
+        m == "Initialized motion detection controller with MOG2 algorithm" for m in messages
+    )

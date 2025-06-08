@@ -194,9 +194,7 @@ class MotionDetectionController(ImageController):
                 error(f"Unsupported background subtraction algorithm: {self.algorithm}")
                 return False
 
-            info(
-                f"Initialized motion detection controller with {self.algorithm} algorithm"
-            )
+            info(f"Initialized motion detection controller with {self.algorithm} algorithm")
             return True
 
         except Exception as e:
