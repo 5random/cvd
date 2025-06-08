@@ -12,6 +12,7 @@ from src.utils.log_utils.log_service import info, warning, error, debug
 from src.data_handler.sources.sensor_source_manager import SensorManager
 from src.data_handler.interface.sensor_interface import SensorReading, SensorStatus
 from src.gui.gui_tab_components.gui_tab_base_component import (
+    TimedComponent,
     BaseComponent,
     ComponentConfig,
     get_component_registry,
@@ -30,8 +31,10 @@ class SensorCardConfig:
     warning_threshold: Optional[float] = None
     error_threshold: Optional[float] = None
 
-class SensorCardComponent(BaseComponent):
+class SensorCardComponent(TimedComponent):
     """Individual sensor display card"""
+
+    timer_attributes = ["_update_timer"]
     
     def __init__(self, config: ComponentConfig, sensor_config: SensorCardConfig, sensor_manager: SensorManager):
         super().__init__(config)
@@ -141,11 +144,6 @@ class SensorCardComponent(BaseComponent):
         # Data updates are handled by timer
         pass
     
-    def cleanup(self) -> None:
-        """Cleanup component"""
-        if self._update_timer:
-            self._update_timer.cancel()
-        super().cleanup()
 
 class DashboardComponent(BaseComponent):
     """Main dashboard component"""

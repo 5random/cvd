@@ -27,7 +27,11 @@ from src.utils.log_utils.log_service import (
     error,
     debug,
 )
-from src.gui.gui_tab_components.gui_tab_base_component import BaseComponent, ComponentConfig
+from src.gui.gui_tab_components.gui_tab_base_component import (
+    TimedComponent,
+    BaseComponent,
+    ComponentConfig,
+)
 
 
 @dataclass
@@ -43,8 +47,10 @@ class LogFileInfo:
     is_compressed: bool = False
 
 
-class LogViewerComponent(BaseComponent):
+class LogViewerComponent(TimedComponent):
     """Log file viewer component"""
+
+    timer_attributes = ["_refresh_timer"]
 
     def __init__(self, config: ComponentConfig, log_file_info: LogFileInfo):
         super().__init__(config)
@@ -285,11 +291,6 @@ class LogViewerComponent(BaseComponent):
         # Auto-refresh handles updates
         pass
 
-    def cleanup(self) -> None:
-        """Cleanup component"""
-        if self._refresh_timer:
-            self._refresh_timer.cancel()
-        super().cleanup()
 
 
 class LogComponent(BaseComponent):
