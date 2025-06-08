@@ -38,72 +38,57 @@ class ControllerSetupWizardComponent(BaseComponent):
         self._stepper = None
         
         # Wizard data
+        # Wizard data initialisieren aus CONTROLLER_SCHEMA
+        schema_props = self.config_service.CONTROLLER_SCHEMA['properties']
+
+        # Basisdaten aus Schema-Defaults übernehmen (falls vorhanden)
+        defaults = {
+            prop: definition.get('default')
+            for prop, definition in schema_props.items()
+            if 'default' in definition
+        }
+
+        # Wizard-Spezialfelder ergänzen
         self._wizard_data: Dict[str, Any] = {
-            'controller_id': '',
-            'name': '',
-            'type': 'reactor_state',
-            'enabled': True,
+            'controller_id': self.config_service.generate_next_controller_id(),
+            'name': defaults.get('name', ''),
+            'type': defaults.get('type', schema_props['type']['enum'][0]),
+            'enabled': defaults.get('enabled', True),
             'show_on_dashboard': True,
             'selected_sensors': [],
             'selected_webcam': None,
             'webcam_config': {},
-            'parameters': {},
+            'parameters': {},      # wird später aus _controller_types gefüllt
             'algorithms': [],
             'state_output': []
         }
+        # anschließend evtl. controller-spezifische Defaults setzen
+        self._update_controller_defaults()
         
-        # UI elements for each step
-        self._step1_elements: Dict[str, Element] = {}
-        self._step2_elements: Dict[str, Element] = {}
-        self._step3_elements: Dict[str, Element] = {}
-        self._step4_elements: Dict[str, Element] = {}
+        # UI elements for each step (typed as Any to allow dynamic attribute access)
+        self._step1_elements: Dict[str, Any] = {}
+        self._step2_elements: Dict[str, Any] = {}
+        self._step3_elements: Dict[str, Any] = {}
+        self._step4_elements: Dict[str, Any] = {}
         
         # Available controller types and their configurations
+        # statt hart codierter Definitionen: Controller-Typen aus dem Schema ziehen
+        controller_schema = self.config_service.CONTROLLER_SCHEMA
+        # enum-Werte für den "type"-Parameter
+        types = controller_schema['properties']['type']['enum']
+        # eine Minimalstruktur für jeden Typ anlegen
         self._controller_types: Dict[str, Dict[str, Any]] = {
-            'reactor_state': {
-                'name': 'Reactor State Controller',
-                'description': 'Monitors reactor operational state from sensor data',
-                'requires_sensors': True,
-                'requires_webcam': False,
-                'algorithms': ['reactor_status_detection'],
-                'default_state_output': ['Reaktor Fehler', 'Reaktor OK'],
-                'parameters': {
-                    'min_valid_sensors': {'type': 'int', 'default': 1, 'min': 1, 'max': 10, 'label': 'Min. Valid Sensors'},
-                    'alarm_threshold_high': {'type': 'float', 'default': 80.0, 'min': 0, 'max': 200, 'label': 'High Alarm Threshold (°C)'},
-                    'alarm_threshold_low': {'type': 'float', 'default': 10.0, 'min': -50, 'max': 100, 'label': 'Low Alarm Threshold (°C)'},
-                    'state_change_delay_s': {'type': 'int', 'default': 5, 'min': 1, 'max': 60, 'label': 'State Change Delay (s)'}
-                }
-            },
-            'motion_detection': {
-                'name': 'Motion Detection Controller',
-                'description': 'Detects motion using camera input',
-                'requires_sensors': False,
-                'requires_webcam': True,
-                'algorithms': ['bubble_detection'],
-                'default_state_output': ['Keine Bewegung erkannt', 'Bewegung erkannt'],
-                'parameters': {
-                    'sensitivity': {'type': 'float', 'default': 0.5, 'min': 0.1, 'max': 1.0, 'step': 0.1, 'label': 'Motion Sensitivity'},
-                    'min_area': {'type': 'int', 'default': 500, 'min': 100, 'max': 5000, 'label': 'Min. Motion Area (pixels)'},
-                    'background_learning_rate': {'type': 'float', 'default': 0.01, 'min': 0.001, 'max': 0.1, 'step': 0.001, 'label': 'Background Learning Rate'},
-                    'noise_threshold': {'type': 'int', 'default': 25, 'min': 5, 'max': 100, 'label': 'Noise Threshold'}
-                }
-            },
-            'camera': {
-                'name': 'Camera Controller',
-                'description': 'Controls camera capture and processing',
-                'requires_sensors': False,
-                'requires_webcam': True,
-                'algorithms': [],
-                'default_state_output': ['Kamera Fehler', 'Kamera OK'],
-                'parameters': {
-                    'fps': {'type': 'int', 'default': 30, 'min': 1, 'max': 60, 'label': 'Frames per Second'},
-                    'resolution_width': {'type': 'int', 'default': 640, 'min': 320, 'max': 1920, 'label': 'Resolution Width'},
-                    'resolution_height': {'type': 'int', 'default': 480, 'min': 240, 'max': 1080, 'label': 'Resolution Height'},
-                    'brightness': {'type': 'int', 'default': 128, 'min': 0, 'max': 255, 'label': 'Brightness'},
-                    'contrast': {'type': 'int', 'default': 32, 'min': 0, 'max': 100, 'label': 'Contrast'},
-                    'saturation': {'type': 'int', 'default': 64, 'min': 0, 'max': 100, 'label': 'Saturation'}
-                }
+            t: {
+            'name': t.replace('_', ' ').title(),
+            'description': '',                # könnt Ihr z.B. aus localization ziehen
+            'requires_sensors': False,        # nach Bedarf aus Schema oder Konvention ableiten
+            'requires_webcam': False,
+            'algorithms': [],                 # ggf. aus einem extra Algorithmus-Schema
+            'default_state_output': [],       # ebenso
+            # die Parameter-Definitionen aus dem Schema übernehmen
+            'parameters': controller_schema.get('properties', {})
             }
+            for t in types
         }
         
         # Sensor wizard for creating new sensors
@@ -321,7 +306,8 @@ class ControllerSetupWizardComponent(BaseComponent):
         new_id = self.config_service.generate_next_controller_id()
         self._wizard_data['controller_id'] = new_id
         if 'controller_id' in self._step1_elements:
-            self._step1_elements['controller_id'].set_value(new_id)
+            # Update input field via props to set new value
+            self._step1_elements['controller_id'].props(f"readonly outlined value={new_id}")
 
     def _on_controller_type_change(self, e: events.ValueChangeEventArguments) -> None:
         """Handle controller type change."""
@@ -592,7 +578,7 @@ class ControllerSetupWizardComponent(BaseComponent):
                 'type': self._wizard_data['type'],
                 'enabled': self._wizard_data['enabled'],
                 'show_on_dashboard': self._wizard_data['show_on_dashboard'],
-                'algorithm': self._wizard_data['algorithms'],
+                'algorithms': self._wizard_data['algorithms'],
                 'state_output': self._wizard_data['state_output']
             }
             

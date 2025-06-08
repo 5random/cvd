@@ -20,20 +20,6 @@
       }
     },
     {
-      "sen002": {
-        "name": "Mock_Sens_2",
-        "type": "temperature",
-        "source": "mock_rs232",
-        "interface": "serial",
-        "port": "COM3",
-        "channel": 0,
-        "poll_interval_ms": 1000,
-        "baudrate": 9600,
-        "timeout": 2.0,
-        "enabled": true
-      }
-    },
-    {
       "sen003": {
         "name": "rgfdgsg",
         "type": "temperature",
