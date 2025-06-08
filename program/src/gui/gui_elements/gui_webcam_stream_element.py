@@ -6,7 +6,7 @@ It integrates with the motion detection controller to show the same processed fr
 """
 
 import time
-from typing import Optional, Any
+from typing import Optional, Any, Dict
 import threading  # for protecting frame access
 import cv2
 import numpy as np
@@ -34,6 +34,8 @@ class CameraStreamComponent(BaseComponent):
         max_width: int = 640,
         max_height: int = 480,
         component_id: str = "camera_stream",
+        resolution: Optional[tuple[int, int]] = None,
+        overlay_options: Optional[Dict[str, Any]] = None,
     ):
         """
         Initialize camera stream component.
@@ -50,8 +52,15 @@ class CameraStreamComponent(BaseComponent):
 
         self.controller_manager = controller_manager
         self.update_interval = update_interval
-        self.max_width = max_width
-        self.max_height = max_height
+        if resolution is not None:
+            try:
+                self.max_width, self.max_height = int(resolution[0]), int(resolution[1])
+            except Exception:
+                self.max_width = max_width
+                self.max_height = max_height
+        else:
+            self.max_width = max_width
+            self.max_height = max_height
 
         # Component state
         self.is_streaming = False
@@ -60,6 +69,16 @@ class CameraStreamComponent(BaseComponent):
         self.show_motion_mask = False
         self.show_frame_diff = False
         self.overlay_opacity = 0.3
+
+        if overlay_options:
+            self.show_motion_overlay = bool(overlay_options.get("motion_overlay", True))
+            self.show_bounding_boxes = bool(overlay_options.get("bounding_boxes", True))
+            self.show_motion_mask = bool(overlay_options.get("motion_mask", False))
+            self.show_frame_diff = bool(overlay_options.get("frame_diff", False))
+            try:
+                self.overlay_opacity = float(overlay_options.get("overlay_opacity", 0.3))
+            except (TypeError, ValueError):
+                self.overlay_opacity = 0.3
 
         # UI elements
         self.image_element = None

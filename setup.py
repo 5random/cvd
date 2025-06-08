@@ -17,10 +17,11 @@ setup(
     install_requires=read_dependencies(),
     packages=find_packages('program'),
     package_dir={'': 'program'},
+
     data_files=[
-        ('cvd/config', glob('config/*.json')),
-        ('cvd/data', ['data/data_index.json']),
-        ('cvd/data/logs', glob('data/logs/*.log')),
-        ('cvd/data/notifications', glob('data/notifications/*.json')),
+        ("cvd/config", glob("config/*.json")),
+        ("cvd/data", ["data/data_index.json"]),
+        ("cvd/data/logs", glob("data/logs/*.log")),
+        ("cvd/data/notifications", glob("data/notifications/*.json")),
     ],
 )

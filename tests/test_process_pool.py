@@ -21,10 +21,6 @@ def hold(duration: float) -> None:
     time.sleep(duration)
 
 
-@pytest.fixture(autouse=True)
-def mute_logging(monkeypatch):
-    for name in ["debug", "info", "warning", "error"]:
-        monkeypatch.setattr(log_service, name, lambda *a, **k: None)
 
 
 @pytest.mark.asyncio

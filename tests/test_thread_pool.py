@@ -5,14 +5,6 @@ from src.utils.concurrency.thread_pool import ManagedThreadPool, ThreadPoolConfi
 from src.utils.log_utils import log_service
 
 
-@pytest.fixture(autouse=True)
-def mute_logging(monkeypatch):
-    monkeypatch.setattr(log_service, "debug", lambda *a, **k: None)
-    monkeypatch.setattr(log_service, "info", lambda *a, **k: None)
-    monkeypatch.setattr(log_service, "warning", lambda *a, **k: None)
-    monkeypatch.setattr(log_service, "error", lambda *a, **k: None)
-
-
 def _hold_event(evt: threading.Event) -> int:
     evt.wait()
     return 1

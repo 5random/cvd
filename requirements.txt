@@ -1,2 +1,3 @@
+<<<<<<< codex/refactor-dependency-management-workflow
 # Dependencies are defined in pyproject.toml.
 -e .

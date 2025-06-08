@@ -26,7 +26,10 @@ from src.utils.concurrency.process_pool import (
 )
 from src.utils.log_utils.log_service import info, warning, error, debug
 from src.utils.concurrency.thread_pool import run_camera_io
-from src.controllers.controller_utils.camera_utils import apply_uvc_settings, rotate_frame
+from src.controllers.controller_utils.camera_utils import (
+    apply_uvc_settings,
+    rotate_frame,
+)
 
 
 @dataclass
@@ -201,14 +204,27 @@ class MotionDetectionController(ImageController):
                     detectShadows=True, dist2Threshold=400.0, history=500
                 )
             else:
-                error(f"Unsupported background subtraction algorithm: {self.algorithm}")
+                error(
+                    "Unsupported background subtraction algorithm",
+                    controller_id=self.controller_id,
+                    algorithm=self.algorithm,
+                )
                 return False
 
-            info(f"Initialized motion detection controller with {self.algorithm} algorithm")
+            info(
+                "Motion detection controller initialized",
+                controller_id=self.controller_id,
+                algorithm=self.algorithm,
+            )
             return True
 
         except Exception as e:
-            error(f"Failed to initialize motion detection controller: {e}")
+            error(
+                "Failed to initialize motion detection controller",
+                controller_id=self.controller_id,
+                algorithm=self.algorithm,
+                error=str(e),
+            )
             return False
 
     async def process_image(
@@ -236,7 +252,11 @@ class MotionDetectionController(ImageController):
                     )
             # Explicitly handle case where background subtractor is still None
             if self._bg_subtractor is None:
-                error("Background subtractor still not initialized after initialize()")
+                error(
+                    "Background subtractor not initialized",
+                    controller_id=self.controller_id,
+                    algorithm=self.algorithm,
+                )
                 return ControllerResult.error_result(
                     "Background subtractor not initialized after initialization"
                 )
@@ -293,7 +313,12 @@ class MotionDetectionController(ImageController):
                 },
             )
         except Exception as e:
-            error(f"Error in motion detection: {e}")
+            error(
+                "Error in motion detection",
+                controller_id=self.controller_id,
+                algorithm=self.algorithm,
+                error=str(e),
+            )
             return ControllerResult.error_result(f"Motion detection error: {e}")
 
     def _convert_to_cv_frame(self, image_data: Any) -> Optional[np.ndarray]:
@@ -316,7 +341,12 @@ class MotionDetectionController(ImageController):
                 frame = np.array(image_data)
 
             else:
-                error(f"Unsupported image data type: {type(image_data)}")
+                error(
+                    "Unsupported image data type",
+                    controller_id=self.controller_id,
+                    algorithm=self.algorithm,
+                    data_type=str(type(image_data)),
+                )
                 return None
 
             # Ensure the frame is in the correct format
@@ -330,7 +360,12 @@ class MotionDetectionController(ImageController):
             return frame
 
         except Exception as e:
-            error(f"Error converting image data: {e}")
+            error(
+                "Error converting image data",
+                controller_id=self.controller_id,
+                algorithm=self.algorithm,
+                error=str(e),
+            )
             return None
 
     def _post_process_mask(self, fg_mask: np.ndarray) -> np.ndarray:
@@ -437,7 +472,10 @@ class MotionDetectionController(ImageController):
         self._bg_subtractor = None
         self._last_frame = None
         self._motion_history.clear()
-        info("Motion detection controller cleaned up")
+        info(
+            "Motion detection controller cleaned up",
+            controller_id=self.controller_id,
+        )
 
     async def start(self) -> bool:
         if not await super().start():
@@ -472,7 +510,11 @@ class MotionDetectionController(ImageController):
         while not self._stop_event.is_set():
             try:
                 if self._capture is None:
-                    warning("Camera capture missing, attempting reinitialization")
+                    warning(
+                        "Camera capture missing, attempting reinitialization",
+                        controller_id=self.controller_id,
+                        device_index=self.device_index,
+                    )
                     try:
                         self._capture = await run_camera_io(
                             cv2.VideoCapture, self.device_index
@@ -494,17 +536,30 @@ class MotionDetectionController(ImageController):
                                 await run_camera_io(
                                     self._capture.set, cv2.CAP_PROP_FPS, int(self.fps)
                                 )
-                            await apply_uvc_settings(self._capture, self.uvc_settings)
+                            await apply_uvc_settings(
+                                self._capture,
+                                self.uvc_settings,
+                                controller_id=self.controller_id,
+                            )
                             failure_count = 0
                             delay = base_delay
                         else:
                             raise RuntimeError("capture not opened")
                     except Exception as exc:
-                        error(f"Failed to reinitialize camera: {exc}")
+                        error(
+                            "Failed to reinitialize camera",
+                            controller_id=self.controller_id,
+                            device_index=self.device_index,
+                            error=str(exc),
+                        )
                         self._capture = None
                         failure_count += 1
                         if failure_count >= max_failures:
-                            error("Camera unavailable, retrying later")
+                            error(
+                                "Camera unavailable, retrying later",
+                                controller_id=self.controller_id,
+                                device_index=self.device_index,
+                            )
                             delay = reopen_delay
                             failure_count = 0
                         else:
@@ -533,11 +588,20 @@ class MotionDetectionController(ImageController):
                     if failure_count > max_failures:
                         opened = await run_camera_io(self._capture.isOpened)
                         if not opened:
-                            warning("Camera not opened, attempting to reinitialize")
+                            warning(
+                                "Camera not opened, reinitializing",
+                                controller_id=self.controller_id,
+                                device_index=self.device_index,
+                            )
                             await run_camera_io(self._capture.release)
                             self._capture = None
                             continue
             except Exception as e:
-                error(f"Camera capture error: {e}")
+                error(
+                    "Camera capture error",
+                    controller_id=self.controller_id,
+                    device_index=self.device_index,
+                    error=str(e),
+                )
 
             await asyncio.sleep(base_delay)
