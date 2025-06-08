@@ -18,6 +18,7 @@ from nicegui.elements.icon import Icon
 from nicegui.elements.card import Card
 
 from src.gui.gui_tab_components.gui_tab_base_component import BaseComponent, ComponentConfig
+from .dialog_utils import CancelableDialogMixin
 from src.experiment_handler.experiment_manager import (
     ExperimentManager, ExperimentConfig, ExperimentResult, ExperimentState, 
     ExperimentPhase, ExperimentDataPoint, get_experiment_manager, set_experiment_manager
@@ -49,7 +50,7 @@ class ExperimentInfo:
     estimated_remaining: Optional[str]
 
 
-class ExperimentConfigDialog:
+class ExperimentConfigDialog(CancelableDialogMixin):
     """Dialog for experiment configuration"""
     
     def __init__(self, 
@@ -211,10 +212,6 @@ class ExperimentConfigDialog:
         
         dialog.open()
     
-    def _cancel(self) -> None:
-        """Cancel dialog"""
-        if self._dialog:
-            self._dialog.close()
             
     def _create_only(self) -> None:
         """Create experiment without starting"""
