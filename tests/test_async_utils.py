@@ -10,18 +10,6 @@ from src.utils.log_utils import log_service
 from src.utils.concurrency import async_utils
 
 
-@pytest.fixture(autouse=True)
-def mute_logging(monkeypatch):
-    monkeypatch.setattr(log_service, "debug", lambda *a, **k: None)
-    monkeypatch.setattr(log_service, "info", lambda *a, **k: None)
-    monkeypatch.setattr(log_service, "warning", lambda *a, **k: None)
-    monkeypatch.setattr(log_service, "error", lambda *a, **k: None)
-    monkeypatch.setattr(async_utils, "debug", lambda *a, **k: None)
-    monkeypatch.setattr(async_utils, "info", lambda *a, **k: None)
-    monkeypatch.setattr(async_utils, "warning", lambda *a, **k: None)
-    monkeypatch.setattr(async_utils, "error", lambda *a, **k: None)
-
-
 @pytest.mark.asyncio
 async def test_run_with_timeout_expires():
     @run_with_timeout(0.05)
