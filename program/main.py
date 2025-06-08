@@ -42,7 +42,7 @@ def main():
         else:
             # Determine config directory relative to project root
             base_dir = Path(__file__).parent.resolve()
-            project_root = base_dir.parent  # one level above cvd-tracker-Neuentwicklung
+            project_root = base_dir.parent  # project root
             config_dir = project_root / "config"
 
         container = ApplicationContainer.create_sync(config_dir)
