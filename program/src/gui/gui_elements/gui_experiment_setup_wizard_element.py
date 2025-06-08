@@ -211,7 +211,7 @@ class ExperimentSetupWizardComponent(WizardMixin, BaseComponent):
                 self._render_step3()
                 with ui.stepper_navigation():
                     ui.button("Previous", on_click=self._stepper.previous)
-                    ui.button("Next", on_click=self._stepper.next).props("color=primary")
+                    ui.button("Next", on_click=self._validate_and_next_step3).props("color=primary")
                     ui.button("Cancel", on_click=self._close_dialog).props("flat")
             
             # Step 4: Review and Confirmation
@@ -403,6 +403,31 @@ class ExperimentSetupWizardComponent(WizardMixin, BaseComponent):
                         placeholder="Path to script file"
                     ).bind_value_to(self._wizard_data, 'script_path').props("outlined").classes("w-full")
 
+            # Phase configuration
+            with ui.card().classes("w-full"):
+                with ui.card_section():
+                    ui.label("Phase Configuration").classes("font-semibold text-lg mb-4")
+
+                    ui.label("Select a phase template or edit phases below:").classes("mb-2")
+                    self._step3_elements['phase_template'] = ui.select(
+                        list(self._phase_templates.keys()),
+                        with_input=False,
+                        placeholder="Choose template"
+                    ).props("outlined dense").classes("w-full")
+                    self._step3_elements['phase_template'].on(
+                        'update:model-value',
+                        lambda e: self._apply_phase_template(e.value)
+                    )
+
+                    phases_json = json.dumps(self._wizard_data['phases'], indent=2)
+                    self._step3_elements['phases'] = ui.textarea(
+                        value=phases_json
+                    ).props("outlined rows=6 class=mt-4")
+                    self._step3_elements['phases'].on(
+                        'blur',
+                        lambda e: self._update_phase_data(e.sender.value)
+                    )
+
     def _render_step4(self) -> None:
         """Render step 4: Review and confirmation."""
         ui.label("Review experiment configuration before creation").classes("text-lg mb-4")
@@ -453,6 +478,38 @@ class ExperimentSetupWizardComponent(WizardMixin, BaseComponent):
         self._load_available_sources()
         # Refresh step 2 display if needed
         ui.notify("Sensor configuration updated. Please review your selections.", color="info")
+
+    def _apply_phase_template(self, template_name: Optional[str]) -> None:
+        """Apply a predefined phase template to the wizard data."""
+        if not template_name or template_name not in self._phase_templates:
+            return
+
+        phases = self._phase_templates[template_name]['phases']
+        self._wizard_data['phases'] = [dict(p) for p in phases]
+
+        if 'phases' in self._step3_elements:
+            self._step3_elements['phases'].value = json.dumps(self._wizard_data['phases'], indent=2)
+        self._update_review_display()
+
+    def _update_phase_data(self, json_text: str) -> None:
+        """Parse phase configuration from JSON text area."""
+        if not json_text:
+            self._wizard_data['phases'] = []
+            return
+        try:
+            phases = json.loads(json_text)
+            if isinstance(phases, list):
+                self._wizard_data['phases'] = phases
+                self._update_review_display()
+        except json.JSONDecodeError as e:
+            warning(f"Failed to parse phases: {e}")
+
+    def _validate_and_next_step3(self) -> None:
+        """Handle leaving step 3 by parsing phase data."""
+        if 'phases' in self._step3_elements:
+            self._update_phase_data(self._step3_elements['phases'].value)
+        if self._stepper:
+            self._stepper.next()
 
     def _update_review_display(self) -> None:
         """Update the review display in step 4."""
@@ -520,6 +577,10 @@ class ExperimentSetupWizardComponent(WizardMixin, BaseComponent):
                         
                         if self._wizard_data['script_path']:
                             ui.label(f"Script path: {self._wizard_data['script_path']}")
+
+                        if self._wizard_data['phases']:
+                            phase_names = ', '.join(p.get('name', '?') for p in self._wizard_data['phases'])
+                            ui.label(f"Phases: {phase_names}")
 
     def _validate_and_next_step1(self) -> None:
         """Validate step 1 configuration and proceed to next step."""
