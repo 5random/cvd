@@ -2,12 +2,13 @@ plotly
 nicegui
 numpy
 pyserial
-opencv-python
+opencv - python
 Pillow
 pytest
-pytest-asyncio
+pytest - asyncio
 watchdog
 jsonschema
 setuptools
-types-jsonschema
-types-setuptools
+types - jsonschema
+types - setuptools
+psutil
