@@ -2,6 +2,8 @@
 
 from typing import Any, Optional, Callable, Dict, List
 from nicegui import ui
+from nicegui.element import Element
+from nicegui import events
 
 from src.gui.gui_tab_components.gui_tab_base_component import (
     BaseComponent,
@@ -36,7 +38,7 @@ class ControllerSetupWizardComponent(BaseComponent):
         self._stepper = None
         
         # Wizard data
-        self._wizard_data = {
+        self._wizard_data: Dict[str, Any] = {
             'controller_id': '',
             'name': '',
             'type': 'reactor_state',
@@ -51,20 +53,20 @@ class ControllerSetupWizardComponent(BaseComponent):
         }
         
         # UI elements for each step
-        self._step1_elements = {}
-        self._step2_elements = {}
-        self._step3_elements = {}
-        self._step4_elements = {}
+        self._step1_elements: Dict[str, Element] = {}
+        self._step2_elements: Dict[str, Element] = {}
+        self._step3_elements: Dict[str, Element] = {}
+        self._step4_elements: Dict[str, Element] = {}
         
         # Available controller types and their configurations
-        self._controller_types = {
+        self._controller_types: Dict[str, Dict[str, Any]] = {
             'reactor_state': {
                 'name': 'Reactor State Controller',
                 'description': 'Monitors reactor operational state from sensor data',
                 'requires_sensors': True,
                 'requires_webcam': False,
                 'algorithms': ['reactor_status_detection'],
-                'default_state_output': ['Reaktor fehler', 'Reaktor OK'],
+                'default_state_output': ['Reaktor Fehler', 'Reaktor OK'],
                 'parameters': {
                     'min_valid_sensors': {'type': 'int', 'default': 1, 'min': 1, 'max': 10, 'label': 'Min. Valid Sensors'},
                     'alarm_threshold_high': {'type': 'float', 'default': 80.0, 'min': 0, 'max': 200, 'label': 'High Alarm Threshold (°C)'},
@@ -92,7 +94,7 @@ class ControllerSetupWizardComponent(BaseComponent):
                 'requires_sensors': False,
                 'requires_webcam': True,
                 'algorithms': [],
-                'default_state_output': ['Kamera fehler', 'Kamera OK'],
+                'default_state_output': ['Kamera Fehler', 'Kamera OK'],
                 'parameters': {
                     'fps': {'type': 'int', 'default': 30, 'min': 1, 'max': 60, 'label': 'Frames per Second'},
                     'resolution_width': {'type': 'int', 'default': 640, 'min': 320, 'max': 1920, 'label': 'Resolution Width'},
@@ -321,7 +323,7 @@ class ControllerSetupWizardComponent(BaseComponent):
         if 'controller_id' in self._step1_elements:
             self._step1_elements['controller_id'].set_value(new_id)
 
-    def _on_controller_type_change(self, e) -> None:
+    def _on_controller_type_change(self, e: events.ValueChangeEventArguments) -> None:
         """Handle controller type change."""
         self._update_controller_defaults()
         self._update_type_description()
@@ -433,7 +435,7 @@ class ControllerSetupWizardComponent(BaseComponent):
         webcams = ["Built-in Camera", "USB Camera 1", "USB Camera 2", "Network Camera"]
         return webcams
 
-    def _on_webcam_change(self, e) -> None:
+    def _on_webcam_change(self, e: events.ValueChangeEventArguments) -> None:
         """Handle webcam selection change."""
         self._render_webcam_selection()
 

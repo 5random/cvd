@@ -69,3 +69,18 @@ def test_compress_logs(monkeypatch, tmp_path, minimal_log_service):
     assert compressed.exists()
     assert not log_file.exists()
     assert any("Log compression completed successfully" in m for m in messages)
+
+
+@pytest.mark.parametrize("ext", [".gz", ".bz2", ".xz", ".zip"])
+def test_compress_logs_skips_existing(monkeypatch, tmp_path, minimal_log_service, ext):
+    """Ensure compress_old_logs ignores already compressed files."""
+    log_service = minimal_log_service
+    log_file = log_service.log_dir / f"info.log.1{ext}"
+    log_file.parent.mkdir(parents=True, exist_ok=True)
+    log_file.write_text("abc")
+
+    log_service.compress_old_logs()
+
+    assert log_file.exists()
+    extra = log_service.log_dir / f"info.log.1{ext}.gz"
+    assert not extra.exists()

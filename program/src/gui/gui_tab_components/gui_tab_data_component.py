@@ -893,11 +893,13 @@ class DataFilesList(BaseComponent):
     def _on_table_select(self, event) -> None:
         """Handle row selection change in table"""
         try:
+
             # Derive selected IDs from event.selection or event.value
             selected = getattr(event, "selection", None)
             if selected is None:
                 selected = getattr(event, "value", [])
             selected_ids = set(selected or [])
+
             self.selected_files = selected_ids
             self._update_selection_info()
         except Exception as e:

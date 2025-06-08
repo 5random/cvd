@@ -43,8 +43,8 @@ class FileMaintenanceService:
                         # schedule rename and return the target path
                         futures.append(
                             pool.submit_task(
-                                lambda p=file_path, t=target: (p, (p.rename(t) or t)),
-                                task_id=f"rotate_{file_path.name}",
+                                lambda p=file_path, t=target: (p, p.rename(t)),
+                                task_id=f"rotate_{file_path.name}"
                             )
                         )
             # wait for renames to complete

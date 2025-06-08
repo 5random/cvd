@@ -98,17 +98,17 @@ class NotificationCenter(BaseComponent):
         
         # Notification storage
         self.notifications: List[Notification] = []
-        self.max_notifications = 500
-        self.notification_history_file = Path("data/notifications/history.json")
+        self.max_notifications: int = 500
+        self.notification_history_file: Path = Path("data/notifications/history.json")
         
         # UI elements
-        self._notification_list = None
-        self._badge_counter = None
-        self._dialog = None
-        self._menu = None
-        self._notification_list_container = None  # Container for dynamic updates
-        self._severity_filter = "all"
-        self._source_filter = "all"
+        self._notification_list: Optional[Any] = None
+        self._badge_counter: Optional[Any] = None
+        self._dialog: Optional[Any] = None
+        self._menu: Optional[Any] = None
+        self._notification_list_container: Optional[Any] = None  # Container for dynamic updates
+        self._severity_filter: str = "all"
+        self._source_filter: str = "all"
 
         # Track how long controllers remain in critical state
         self._controller_error_times: Dict[str, float] = {}
