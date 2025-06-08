@@ -90,7 +90,7 @@ class ControllerConfigDialog(CancelableDialogMixin):
                         self._form_data, "name"
                     ).props("outlined").classes("w-full")
                     ui.select(
-                        ConfigurationService.CONTROLLER_SCHEMA["valid_types"],
+                        ConfigurationService.CONTROLLER_SCHEMA["properties"]["type"]["enum"],
                         value=self._form_data["type"],
                         label="Type",
                     ).bind_value_to(self._form_data, "type").props("outlined").classes(
