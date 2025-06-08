@@ -192,12 +192,20 @@ class ReactorStateController(StateController):
                     "state": new_state.value,
                     "confidence": confidence,
                     "alarms": [alarm.value for alarm in alarms],
+
                     "data": result_data.to_dict(),
+
                 },
             )
 
         except Exception as e:
-            error(f"Error in reactor state derivation: {e}")
+
+            error(
+                "Error in reactor state derivation",
+                controller_id=self.controller_id,
+                error=str(e),
+            )
+            
             return ControllerResult.error_result(
                 f"Reactor state derivation failed: {e}"
             )
@@ -458,7 +466,11 @@ class ReactorStateController(StateController):
                 state_duration = 0.0
 
                 info(
-                    f"Reactor state changed to {new_state.value} (transition #{self._state_transitions})"
+                    "Reactor state changed",
+                    controller_id=self.controller_id,
+                    new_state=new_state.value,
+                    transitions=self._state_transitions,
+
                 )
 
         return state_duration
@@ -494,4 +506,7 @@ class ReactorStateController(StateController):
         self._state_history.clear()
         self._state_transitions = 0
         self._alarm_count = 0
-        info("Reactor state controller reset")
+        info(
+            "Reactor state controller reset",
+            controller_id=self.controller_id,
+        )
