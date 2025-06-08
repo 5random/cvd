@@ -21,7 +21,10 @@ from .algorithms.reactor_state import ReactorStateController
 from .controller_utils.controller_data_sources.camera_capture_controller import (
     CameraCaptureController,
 )
-from src.utils.config_utils.config_service import get_config_service
+from src.utils.config_utils.config_service import (
+    get_config_service,
+    ConfigurationError,
+)
 
 @dataclass
 class ControllerDependency:
@@ -70,9 +73,15 @@ class ControllerManager:
 
     def create_controller(self, config: Dict[str, Any]) -> Optional[ControllerStage]:
         """Create a controller instance from configuration dict."""
+        if "controller_id" not in config:
+            raise ConfigurationError(
+                "Controller configuration must include 'controller_id'"
+            )
+        if "type" not in config:
+            raise ConfigurationError("Controller configuration must include 'type'")
         try:
-            controller_id = config.get("controller_id")
-            controller_type = config.get("type")
+            controller_id = config["controller_id"]
+            controller_type = config["type"]
             cfg = ControllerConfig(
                 controller_id=controller_id,
                 controller_type=controller_type,
