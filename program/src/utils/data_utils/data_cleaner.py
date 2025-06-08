@@ -3,8 +3,8 @@ from __future__ import annotations
 import csv
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Iterable, Optional
-
+from typing import Dict, List, Iterable, Optional, Any
+from src.utils.log_utils.log_service import warning
 
 def _read_rows(path: Path) -> List[Dict[str, str]]:
     """Read CSV rows skipping duplicated headers."""
@@ -18,11 +18,16 @@ def _read_rows(path: Path) -> List[Dict[str, str]]:
     return rows
 
 
-def _normalize_rows(rows: Iterable[Dict[str, str]]) -> List[Dict[str, object]]:
+def _normalize_rows(rows: Iterable[Dict[str, str]]) -> List[Dict[str, Any]]:
     """Convert timestamp to datetime and sort rows."""
-    cleaned: List[Dict[str, object]] = []
+    cleaned: List[Dict[str, Any]] = []
     for row in rows:
-        ts = float(row["timestamp"])
+        # Parse timestamp, skip row if malformed
+        try:
+            ts = float(row["timestamp"])
+        except (ValueError, KeyError) as e:
+            warning(f"Skipping row with invalid timestamp '{row.get('timestamp',None)}': {e}")
+            continue
         dt = datetime.fromtimestamp(ts)
         value = row.get("value", "")
         value_float = float(value) if value else float("nan")
@@ -32,11 +37,11 @@ def _normalize_rows(rows: Iterable[Dict[str, str]]) -> List[Dict[str, object]]:
             "value": value_float,
             "status": row.get("status", "")
         })
-    cleaned.sort(key=lambda r: r["timestamp"])
+    cleaned.sort(key=lambda r: r["timestamp"])  # type: ignore  
     return cleaned
 
 
-def _write_rows(rows: Iterable[Dict[str, object]], path: Path) -> None:
+def _write_rows(rows: Iterable[Dict[str, Any]], path: Path) -> None:
     with open(path, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
         writer.writerow(["datetime", "timestamp", "value", "status"])

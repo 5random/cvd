@@ -7,6 +7,7 @@ It integrates with the motion detection controller to show the same processed fr
 
 import time
 from typing import Optional, Any
+import threading  # for protecting frame access
 import cv2
 import numpy as np
 from nicegui import ui
@@ -74,6 +75,8 @@ class CameraStreamComponent(BaseComponent):
         self._last_scale = 1.0
         # Latest frame for MJPEG streaming
         self._latest_frame: Optional[np.ndarray] = None
+        # Lock to protect latest frame access
+        self._frame_lock = threading.Lock()
 
     def render(self) -> ui.element:
         """Render the camera stream component."""
@@ -487,8 +490,14 @@ class CameraStreamComponent(BaseComponent):
             return frame
 
     def _update_image_display(self, frame: np.ndarray):
-        """Update the image element with the new frame."""
-        self._latest_frame = frame
+        """
+        Store the latest frame for MJPEG streaming.
+        The actual GUI image element (`/video_feed`) pulls this frame via the streaming endpoint.
+        """
+        # Protect latest frame update
+        with self._frame_lock:
+            # store a copy to avoid external modifications
+            self._latest_frame = frame.copy()
 
     def _update_fps_counter(self):
         """Update FPS counter."""
@@ -509,7 +518,9 @@ class CameraStreamComponent(BaseComponent):
 
     def get_latest_frame(self) -> Optional[np.ndarray]:
         """Return the most recent processed frame."""
-        return self._latest_frame
+        # Protect latest frame read
+        with self._frame_lock:
+            return None if self._latest_frame is None else self._latest_frame.copy()
 
     def _handle_no_controller(self):
         """Handle case when motion detection controller is not available."""

@@ -519,7 +519,8 @@ class DataFilesList(BaseComponent):
         """Generate unique ID for file to prevent collisions"""
         # Use file path, size, and creation time to create unique ID
         unique_string = f"{file_meta.file_path}_{file_meta.size_bytes}_{file_meta.created_at.timestamp()}"
-        return hashlib.md5(unique_string.encode()).hexdigest()[:12]
+        # Use full MD5 digest to reduce collision risk
+        return hashlib.md5(unique_string.encode()).hexdigest()
 
     def _format_status(self, status: FileStatus) -> str:
         """Format file status with icon"""
