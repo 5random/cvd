@@ -67,6 +67,8 @@ class LogViewerComponent(TimedComponent):
         self._auto_refresh: bool = False
         self._refresh_timer: Optional[ui.timer] = None
         self._max_lines = 1000  # Limit displayed lines for performance
+        self._file_offset: int = 0
+        self._inode: Optional[int] = None
 
     def render(self) -> ui.card:
         """Render log viewer card"""
@@ -177,6 +179,8 @@ class LogViewerComponent(TimedComponent):
         try:
             if not self.log_file_info.path.exists():
                 self._log_lines = [f"Log file not found: {self.log_file_info.path}"]
+                self._file_offset = 0
+                self._inode = None
                 return
 
             # Read log file (handle compressed files)
@@ -193,15 +197,34 @@ class LogViewerComponent(TimedComponent):
             else:
                 opener = open
 
-            with opener(self.log_file_info.path, "rt", encoding="utf-8") as f:
-                lines = deque(f, maxlen=self._max_lines)
+            if opener is open:
+                stat = self.log_file_info.path.stat()
+                inode = getattr(stat, "st_ino", None)
+                if self._inode != inode or stat.st_size < self._file_offset:
+                    self._file_offset = 0
+                    self._log_lines = []
+                    self._inode = inode
 
-            # Keep only recent lines for performance
-            self._log_lines = list(lines)
+                with opener(self.log_file_info.path, "r", encoding="utf-8") as f:
+                    f.seek(self._file_offset)
+                    new_lines = f.readlines()
+                    self._file_offset = f.tell()
+
+                self._log_lines.extend(new_lines)
+                if len(self._log_lines) > self._max_lines:
+                    self._log_lines = self._log_lines[-self._max_lines :]
+            else:
+                with opener(self.log_file_info.path, "rt", encoding="utf-8") as f:
+                    lines = deque(f, maxlen=self._max_lines)
+                self._log_lines = list(lines)
+                self._file_offset = 0
+                self._inode = None
 
         except Exception as e:
             error(f"Error loading log file {self.log_file_info.path}: {e}")
             self._log_lines = [f"Error loading log file: {str(e)}"]
+            self._file_offset = 0
+            self._inode = None
 
     def _apply_filters(self) -> None:
         """Apply current filters to log lines"""
@@ -290,7 +313,6 @@ class LogViewerComponent(TimedComponent):
         """Update element with new data"""
         # Auto-refresh handles updates
         pass
-
 
 
 class LogComponent(BaseComponent):
@@ -438,9 +460,9 @@ class LogComponent(BaseComponent):
                     ]:
                         ui.tab(log_type, label=log_type.capitalize())
 
-                with ui.tab_panels(recent_tabs, value=self._selected_recent_tab).classes(
-                    "w-full"
-                ):
+                with ui.tab_panels(
+                    recent_tabs, value=self._selected_recent_tab
+                ).classes("w-full"):
                     for log_type in [
                         "info",
                         "error",
