@@ -2,6 +2,7 @@
 
 from typing import Any, Optional, Callable, Dict, List
 from nicegui import ui
+from serial.tools import list_ports
 
 from src.gui.gui_tab_components.gui_tab_base_component import (
     BaseComponent,
@@ -372,11 +373,24 @@ class SensorSetupWizardComponent(WizardMixin, BaseComponent):
         with container:
             if interface in ["serial", "usb"]:
                 # Serial/USB configuration
+                port_names: List[str] = []
+                try:
+                    port_names = [p.device for p in list_ports.comports()]
+                except Exception as e:  # pragma: no cover - extremely unlikely
+                    warning(f"Failed to list serial ports: {e}")
+
                 with ui.row().classes("items-center gap-4"):
                     ui.label("Port:").classes("w-32 font-semibold")
-                    ui.input(placeholder="COM3 or /dev/ttyUSB0").bind_value_to(
-                        self._wizard_data, "port"
-                    ).props("outlined").classes("flex-1")
+                    ui.select(
+                        port_names,
+                        value=self._wizard_data["port"],
+                        with_input=True,
+                        new_value_mode="add-unique",
+                    ).bind_value_to(self._wizard_data, "port").props(
+                        "outlined"
+                    ).classes(
+                        "flex-1"
+                    )
 
                 with ui.row().classes("items-center gap-4"):
                     ui.label("Channel:").classes("w-32 font-semibold")
