@@ -133,10 +133,9 @@ class ApplicationContainer:
             config_dir: Directory containing configuration files
 
         Returns:
-            ApplicationContainer with background services started
+            Initialized ApplicationContainer
         """
         container = cls.create(config_dir)
-        container._start_background_services()
         return container
 
     def _start_background_services(self) -> None:
@@ -199,8 +198,19 @@ class ApplicationContainer:
 
             info(f"Starting web interface: {title} at {host}:{port}")
 
-            # Start NiceGUI
-            from nicegui import ui
+            # Start NiceGUI with lifecycle hooks to start/stop services
+            from nicegui import ui, app
+
+            @app.on_startup
+            async def _startup() -> None:
+                await self.web_application.startup()
+                await self.sensor_manager.start_all_configured_sensors()
+
+            @app.on_shutdown
+            async def _shutdown() -> None:
+                await self.sensor_manager.shutdown()
+                await self.web_application.shutdown()
+
             ui.run(title=title, host=host, port=port)
 
         except Exception as e:
