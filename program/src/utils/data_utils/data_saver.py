@@ -2,6 +2,7 @@ import csv
 import os
 from pathlib import Path
 from typing import Dict, Tuple, IO, Any, Optional, List
+import contextlib
 from concurrent.futures import Future
 from src.utils.concurrency.thread_pool import get_thread_pool_manager, ThreadPoolType
 from src.data_handler.interface.sensor_interface import SensorReading
@@ -253,7 +254,6 @@ class DataSaver:
                             file_size > self.compression_threshold_bytes / 2
                             and file_age > 3600
                         ):  # 1 hour since last access
-
                             self._compress_file_sync(file_path)
         except Exception as e:
             error(f"Error compressing inactive files: {e}")
@@ -270,6 +270,11 @@ class DataSaver:
         with self._writer_lock:
             sensor_map = self._writers[category]
             writer_data = sensor_map.get(sensor_id)
+
+        writer: Any
+        f: Optional[IO[Any]]
+        row_count: int
+        last_check_time: float
 
         if writer_data is None or writer_data[0] is None:
             file_path = output_dir / f"{sensor_id}.csv"
@@ -334,13 +339,19 @@ class DataSaver:
         """Close all open file handles and cleanup background operations."""
         # Signal shutdown to background loops
         self._shutdown_event.set()
-        # Cancel tracked background tasks only
-        for fut in self._tasks:
+        # Wait for tracked background tasks to finish instead of cancelling
+        for fut in list(self._tasks):
             try:
-                fut.cancel()
+                # give the worker some time to finish gracefully
+                fut.result(timeout=5)
             except Exception:
-                pass
-        self._tasks.clear()
+                try:
+                    fut.cancel()
+                except Exception:
+                    pass
+            finally:
+                with contextlib.suppress(ValueError):
+                    self._tasks.remove(fut)
 
         # Close all file handles
         for cat_map in self._writers.values():
@@ -364,9 +375,7 @@ class DataSaver:
         return {
             "operation_counts": self._operation_counts.copy(),
             "active_writers": {
-
                 category: len(writers) for category, writers in self._writers.items()
-
             },
             "compression_threshold_mb": self.compression_threshold_bytes
             / (1024 * 1024),
@@ -375,8 +384,7 @@ class DataSaver:
             "compression_available": self._compression_available,
             # maintenance tasks scheduled via thread pool
             "maintenance_tasks_scheduled": self.enable_background_operations,
-
-            "maintenance_thread_active": any(not t.done() for t in self._tasks)
+            "maintenance_thread_active": any(not t.done() for t in self._tasks),
         }
 
     def _track(self, fut: Future) -> None:
