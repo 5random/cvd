@@ -447,3 +447,199 @@
 2025-06-08 15:35:31 - cvd_tracker.info - INFO - Registered component: experiment_component
 2025-06-08 15:35:31 - cvd_tracker.info - INFO - Registered component: data_component
 2025-06-08 15:35:31 - cvd_tracker.info - INFO - Registered component: logs
+2025-06-08 15:38:36 - cvd_tracker.info - INFO - Added algorithm configuration: sen004_filter_1
+2025-06-08 15:38:36 - cvd_tracker.info - INFO - Added algorithm configuration: sen004_filter_2
+2025-06-08 15:38:36 - cvd_tracker.info - INFO - Added algorithm configuration: sen004_filter_3
+2025-06-08 15:38:36 - cvd_tracker.info - INFO - Created sensor configuration: sen004
+2025-06-08 15:40:33 - cvd_tracker.info - INFO - Initialized motion detection controller with MOG2 algorithm
+2025-06-08 15:40:33 - cvd_tracker.info - INFO - Started controller con001
+2025-06-08 15:41:09 - cvd_tracker.info - INFO - Using real Arduino TC Board library
+2025-06-08 15:41:12 - cvd_tracker.info - INFO - Starting CVD Tracker...
+2025-06-08 15:41:12 - cvd_tracker.info - INFO - Compression service initialized with algorithm: gzip
+2025-06-08 15:41:12 - cvd_tracker.info - INFO - Compression service initialized
+2025-06-08 15:41:12 - cvd_tracker.info - INFO - Email alert service initialized
+2025-06-08 15:41:12 - cvd_tracker.info - INFO - Added processing stage range_validation to pipeline temperature_pipeline
+2025-06-08 15:41:12 - cvd_tracker.info - INFO - Added processing stage outlier_detection to pipeline temperature_pipeline
+2025-06-08 15:41:12 - cvd_tracker.info - INFO - Added processing stage moving_average to pipeline temperature_pipeline
+2025-06-08 15:41:12 - cvd_tracker.info - INFO - Registered controller con001
+2025-06-08 15:41:12 - cvd_tracker.info - INFO - Registered component: notification_center
+2025-06-08 15:41:12 - cvd_tracker.info - INFO - Application container created successfully
+2025-06-08 15:41:12 - cvd_tracker.info - INFO - Background services started on dedicated daemon thread
+2025-06-08 15:41:12 - cvd_tracker.info - INFO - Created sensor: sen001 (temperature from mock_arduino_tc_board)
+2025-06-08 15:41:12 - cvd_tracker.info - INFO - Mock Arduino connected on COM3
+2025-06-08 15:41:12 - cvd_tracker.info - INFO - Mock Arduino TC sensor sen001 initialized on port COM3
+2025-06-08 15:41:12 - cvd_tracker.info - INFO - Registered sensor: sen001
+2025-06-08 15:41:12 - cvd_tracker.info - INFO - Started polling sensor sen001 every 1.0s
+2025-06-08 15:41:12 - cvd_tracker.info - INFO - Background maintenance worker started
+2025-06-08 15:41:12 - cvd_tracker.info - INFO - DataManager initialized
+2025-06-08 15:41:12 - cvd_tracker.info - INFO - Created sensor: sen003 (temperature from arduino_tc_board)
+2025-06-08 15:41:12 - cvd_tracker.info - INFO - UI components and routes registered
+2025-06-08 15:41:12 - cvd_tracker.info - INFO - Starting web interface: CVD Tracker at localhost:8080
+2025-06-08 15:41:12 - cvd_tracker.info - INFO - CVD Tracker stopped
+2025-06-08 15:41:12 - cvd_tracker.info - INFO - Started 1 sensors
+2025-06-08 15:41:12 - cvd_tracker.info - INFO - Started 1 sensors
+2025-06-08 15:42:21 - cvd_tracker.info - INFO - Initialized motion detection controller with MOG2 algorithm
+2025-06-08 15:42:21 - cvd_tracker.info - INFO - Started controller con001
+2025-06-08 15:42:21 - cvd_tracker.info - INFO - Started 1/1 controllers
+2025-06-08 15:42:28 - cvd_tracker.info - INFO - Using real Arduino TC Board library
+2025-06-08 15:42:31 - cvd_tracker.info - INFO - Starting CVD Tracker...
+2025-06-08 15:42:31 - cvd_tracker.info - INFO - Compression service initialized with algorithm: gzip
+2025-06-08 15:42:31 - cvd_tracker.info - INFO - Compression service initialized
+2025-06-08 15:42:31 - cvd_tracker.info - INFO - Email alert service initialized
+2025-06-08 15:42:31 - cvd_tracker.info - INFO - Added processing stage range_validation to pipeline temperature_pipeline
+2025-06-08 15:42:31 - cvd_tracker.info - INFO - Added processing stage outlier_detection to pipeline temperature_pipeline
+2025-06-08 15:42:31 - cvd_tracker.info - INFO - Added processing stage moving_average to pipeline temperature_pipeline
+2025-06-08 15:42:31 - cvd_tracker.info - INFO - Registered controller con001
+2025-06-08 15:42:31 - cvd_tracker.info - INFO - Registered component: notification_center
+2025-06-08 15:42:31 - cvd_tracker.info - INFO - Application container created successfully
+2025-06-08 15:42:31 - cvd_tracker.info - INFO - Background services started on dedicated daemon thread
+2025-06-08 15:42:31 - cvd_tracker.info - INFO - Created sensor: sen001 (temperature from mock_arduino_tc_board)
+2025-06-08 15:42:31 - cvd_tracker.info - INFO - Mock Arduino connected on COM3
+2025-06-08 15:42:31 - cvd_tracker.info - INFO - Background maintenance worker started
+2025-06-08 15:42:31 - cvd_tracker.info - INFO - DataManager initialized
+2025-06-08 15:42:31 - cvd_tracker.info - INFO - Mock Arduino TC sensor sen001 initialized on port COM3
+2025-06-08 15:42:31 - cvd_tracker.info - INFO - Registered sensor: sen001
+2025-06-08 15:42:31 - cvd_tracker.info - INFO - UI components and routes registered
+2025-06-08 15:42:31 - cvd_tracker.info - INFO - Started polling sensor sen001 every 1.0s
+2025-06-08 15:42:31 - cvd_tracker.info - INFO - Starting web interface: CVD Tracker at localhost:8080
+2025-06-08 15:42:31 - cvd_tracker.info - INFO - CVD Tracker stopped
+2025-06-08 15:42:31 - cvd_tracker.info - INFO - Created sensor: sen003 (temperature from arduino_tc_board)
+2025-06-08 15:42:31 - cvd_tracker.info - INFO - Started 1 sensors
+2025-06-08 15:42:31 - cvd_tracker.info - INFO - Started 1 sensors
+2025-06-08 16:58:52 - cvd_tracker.info - INFO - Using real Arduino TC Board library
+2025-06-08 16:58:55 - cvd_tracker.info - INFO - Starting CVD Tracker...
+2025-06-08 16:58:55 - cvd_tracker.info - INFO - Compression service initialized with algorithm: gzip
+2025-06-08 16:58:55 - cvd_tracker.info - INFO - Compression service initialized
+2025-06-08 16:58:55 - cvd_tracker.info - INFO - Email alert service initialized
+2025-06-08 16:58:55 - cvd_tracker.info - INFO - Added processing stage range_validation to pipeline temperature_pipeline
+2025-06-08 16:58:55 - cvd_tracker.info - INFO - Added processing stage outlier_detection to pipeline temperature_pipeline
+2025-06-08 16:58:55 - cvd_tracker.info - INFO - Added processing stage moving_average to pipeline temperature_pipeline
+2025-06-08 16:58:55 - cvd_tracker.info - INFO - Registered controller con001
+2025-06-08 16:58:55 - cvd_tracker.info - INFO - Registered component: notification_center
+2025-06-08 16:58:55 - cvd_tracker.info - INFO - Application container created successfully
+2025-06-08 16:58:55 - cvd_tracker.info - INFO - Background maintenance worker started
+2025-06-08 16:58:55 - cvd_tracker.info - INFO - DataManager initialized
+2025-06-08 16:58:55 - cvd_tracker.info - INFO - UI components and routes registered
+2025-06-08 16:58:55 - cvd_tracker.info - INFO - Starting web interface: CVD Tracker at localhost:8080
+2025-06-08 16:58:55 - cvd_tracker.info - INFO - Using real Arduino TC Board library
+2025-06-08 16:58:58 - cvd_tracker.info - INFO - Starting CVD Tracker...
+2025-06-08 16:58:58 - cvd_tracker.info - INFO - Compression service initialized with algorithm: gzip
+2025-06-08 16:58:58 - cvd_tracker.info - INFO - Compression service initialized
+2025-06-08 16:58:58 - cvd_tracker.info - INFO - Email alert service initialized
+2025-06-08 16:58:58 - cvd_tracker.info - INFO - Added processing stage range_validation to pipeline temperature_pipeline
+2025-06-08 16:58:58 - cvd_tracker.info - INFO - Added processing stage outlier_detection to pipeline temperature_pipeline
+2025-06-08 16:58:58 - cvd_tracker.info - INFO - Added processing stage moving_average to pipeline temperature_pipeline
+2025-06-08 16:58:58 - cvd_tracker.info - INFO - Registered controller con001
+2025-06-08 16:58:58 - cvd_tracker.info - INFO - Registered component: notification_center
+2025-06-08 16:58:58 - cvd_tracker.info - INFO - Application container created successfully
+2025-06-08 16:58:58 - cvd_tracker.info - INFO - Background maintenance worker started
+2025-06-08 16:58:58 - cvd_tracker.info - INFO - DataManager initialized
+2025-06-08 16:58:58 - cvd_tracker.info - INFO - UI components and routes registered
+2025-06-08 16:58:58 - cvd_tracker.info - INFO - Starting web interface: CVD Tracker at localhost:8080
+2025-06-08 16:58:58 - cvd_tracker.info - INFO - CVD Tracker stopped
+2025-06-08 16:58:58 - cvd_tracker.info - INFO - Web application starting up...
+2025-06-08 16:58:58 - cvd_tracker.info - INFO - Initialized motion detection controller with MOG2 algorithm
+2025-06-08 16:58:58 - cvd_tracker.info - INFO - Started controller con001
+2025-06-08 16:58:58 - cvd_tracker.info - INFO - Started 1/1 controllers
+2025-06-08 16:58:58 - cvd_tracker.info - INFO - Web application startup complete
+2025-06-08 16:58:58 - cvd_tracker.info - INFO - Created sensor: sen001 (temperature from mock_arduino_tc_board)
+2025-06-08 16:58:58 - cvd_tracker.info - INFO - Mock Arduino connected on COM3
+2025-06-08 16:58:58 - cvd_tracker.info - INFO - Mock Arduino TC sensor sen001 initialized on port COM3
+2025-06-08 16:58:58 - cvd_tracker.info - INFO - Registered sensor: sen001
+2025-06-08 16:58:58 - cvd_tracker.info - INFO - Started polling sensor sen001 every 1.0s
+2025-06-08 16:58:58 - cvd_tracker.info - INFO - Created sensor: sen003 (temperature from arduino_tc_board)
+2025-06-08 16:58:58 - cvd_tracker.info - INFO - Started 1 sensors
+2025-06-08 16:58:59 - cvd_tracker.info - INFO - Registered component: dashboard_camera_stream
+2025-06-08 16:58:59 - cvd_tracker.info - INFO - Registered component: sensors_component
+2025-06-08 16:58:59 - cvd_tracker.info - INFO - Registered component: controllers
+2025-06-08 16:58:59 - cvd_tracker.info - INFO - manager_created
+2025-06-08 16:58:59 - cvd_tracker.info - INFO - ExperimentManager initialized
+2025-06-08 16:58:59 - cvd_tracker.info - INFO - Registered component: experiment_component
+2025-06-08 16:58:59 - cvd_tracker.info - INFO - Registered component: data_component
+2025-06-08 16:58:59 - cvd_tracker.info - INFO - Registered component: logs
+2025-06-08 16:59:26 - cvd_tracker.info - INFO - Using real Arduino TC Board library
+2025-06-08 16:59:29 - cvd_tracker.info - INFO - Starting CVD Tracker...
+2025-06-08 16:59:29 - cvd_tracker.info - INFO - Compression service initialized with algorithm: gzip
+2025-06-08 16:59:29 - cvd_tracker.info - INFO - Compression service initialized
+2025-06-08 16:59:29 - cvd_tracker.info - INFO - Email alert service initialized
+2025-06-08 16:59:29 - cvd_tracker.info - INFO - Added processing stage range_validation to pipeline temperature_pipeline
+2025-06-08 16:59:29 - cvd_tracker.info - INFO - Added processing stage outlier_detection to pipeline temperature_pipeline
+2025-06-08 16:59:29 - cvd_tracker.info - INFO - Added processing stage moving_average to pipeline temperature_pipeline
+2025-06-08 16:59:29 - cvd_tracker.info - INFO - Registered controller con001
+2025-06-08 16:59:29 - cvd_tracker.info - INFO - Registered component: notification_center
+2025-06-08 16:59:29 - cvd_tracker.info - INFO - Application container created successfully
+2025-06-08 16:59:29 - cvd_tracker.info - INFO - Background maintenance worker started
+2025-06-08 16:59:29 - cvd_tracker.info - INFO - DataManager initialized
+2025-06-08 16:59:29 - cvd_tracker.info - INFO - UI components and routes registered
+2025-06-08 16:59:29 - cvd_tracker.info - INFO - Starting web interface: CVD Tracker at localhost:8080
+2025-06-08 16:59:29 - cvd_tracker.info - INFO - CVD Tracker stopped
+2025-06-08 16:59:41 - cvd_tracker.info - INFO - Initialized motion detection controller with MOG2 algorithm
+2025-06-08 16:59:41 - cvd_tracker.info - INFO - Started controller con001
+2025-06-08 16:59:41 - cvd_tracker.info - INFO - Started 1/1 controllers
+2025-06-08 17:00:16 - cvd_tracker.info - INFO - Using real Arduino TC Board library
+2025-06-08 17:00:19 - cvd_tracker.info - INFO - Starting CVD Tracker...
+2025-06-08 17:00:19 - cvd_tracker.info - INFO - Compression service initialized with algorithm: gzip
+2025-06-08 17:00:19 - cvd_tracker.info - INFO - Compression service initialized
+2025-06-08 17:00:19 - cvd_tracker.info - INFO - Email alert service initialized
+2025-06-08 17:00:19 - cvd_tracker.info - INFO - Added processing stage range_validation to pipeline temperature_pipeline
+2025-06-08 17:00:19 - cvd_tracker.info - INFO - Added processing stage outlier_detection to pipeline temperature_pipeline
+2025-06-08 17:00:19 - cvd_tracker.info - INFO - Added processing stage moving_average to pipeline temperature_pipeline
+2025-06-08 17:00:19 - cvd_tracker.info - INFO - Registered controller con001
+2025-06-08 17:00:19 - cvd_tracker.info - INFO - Registered component: notification_center
+2025-06-08 17:00:19 - cvd_tracker.info - INFO - Application container created successfully
+2025-06-08 17:00:19 - cvd_tracker.info - INFO - Background maintenance worker started
+2025-06-08 17:00:19 - cvd_tracker.info - INFO - DataManager initialized
+2025-06-08 17:00:19 - cvd_tracker.info - INFO - UI components and routes registered
+2025-06-08 17:00:19 - cvd_tracker.info - INFO - Starting web interface: CVD Tracker at localhost:8080
+2025-06-08 17:00:19 - cvd_tracker.info - INFO - Using real Arduino TC Board library
+2025-06-08 17:00:22 - cvd_tracker.info - INFO - Starting CVD Tracker...
+2025-06-08 17:00:22 - cvd_tracker.info - INFO - Compression service initialized with algorithm: gzip
+2025-06-08 17:00:22 - cvd_tracker.info - INFO - Compression service initialized
+2025-06-08 17:00:22 - cvd_tracker.info - INFO - Email alert service initialized
+2025-06-08 17:00:22 - cvd_tracker.info - INFO - Added processing stage range_validation to pipeline temperature_pipeline
+2025-06-08 17:00:22 - cvd_tracker.info - INFO - Added processing stage outlier_detection to pipeline temperature_pipeline
+2025-06-08 17:00:22 - cvd_tracker.info - INFO - Added processing stage moving_average to pipeline temperature_pipeline
+2025-06-08 17:00:22 - cvd_tracker.info - INFO - Registered controller con001
+2025-06-08 17:00:22 - cvd_tracker.info - INFO - Registered component: notification_center
+2025-06-08 17:00:22 - cvd_tracker.info - INFO - Application container created successfully
+2025-06-08 17:00:22 - cvd_tracker.info - INFO - Background maintenance worker started
+2025-06-08 17:00:22 - cvd_tracker.info - INFO - DataManager initialized
+2025-06-08 17:00:22 - cvd_tracker.info - INFO - UI components and routes registered
+2025-06-08 17:00:22 - cvd_tracker.info - INFO - Starting web interface: CVD Tracker at localhost:8080
+2025-06-08 17:00:22 - cvd_tracker.info - INFO - CVD Tracker stopped
+2025-06-08 17:00:22 - cvd_tracker.info - INFO - Web application starting up...
+2025-06-08 17:00:22 - cvd_tracker.info - INFO - Initialized motion detection controller with MOG2 algorithm
+2025-06-08 17:00:22 - cvd_tracker.info - INFO - Started controller con001
+2025-06-08 17:00:22 - cvd_tracker.info - INFO - Started 1/1 controllers
+2025-06-08 17:00:22 - cvd_tracker.info - INFO - Web application startup complete
+2025-06-08 17:00:22 - cvd_tracker.info - INFO - Created sensor: sen001 (temperature from mock_arduino_tc_board)
+2025-06-08 17:00:22 - cvd_tracker.info - INFO - Mock Arduino connected on COM3
+2025-06-08 17:00:22 - cvd_tracker.info - INFO - Mock Arduino TC sensor sen001 initialized on port COM3
+2025-06-08 17:00:22 - cvd_tracker.info - INFO - Registered sensor: sen001
+2025-06-08 17:00:22 - cvd_tracker.info - INFO - Started polling sensor sen001 every 1.0s
+2025-06-08 17:00:22 - cvd_tracker.info - INFO - Created sensor: sen003 (temperature from arduino_tc_board)
+2025-06-08 17:00:22 - cvd_tracker.info - INFO - Started 1 sensors
+2025-06-08 17:00:22 - cvd_tracker.info - INFO - Registered component: dashboard_camera_stream
+2025-06-08 17:00:22 - cvd_tracker.info - INFO - Registered component: sensors_component
+2025-06-08 17:00:22 - cvd_tracker.info - INFO - Registered component: controllers
+2025-06-08 17:00:22 - cvd_tracker.info - INFO - manager_created
+2025-06-08 17:00:22 - cvd_tracker.info - INFO - ExperimentManager initialized
+2025-06-08 17:00:22 - cvd_tracker.info - INFO - Registered component: experiment_component
+2025-06-08 17:00:23 - cvd_tracker.info - INFO - Registered component: data_component
+2025-06-08 17:00:23 - cvd_tracker.info - INFO - Registered component: logs
+2025-06-08 17:00:53 - cvd_tracker.info - INFO - Using real Arduino TC Board library
+2025-06-08 17:00:56 - cvd_tracker.info - INFO - Starting CVD Tracker...
+2025-06-08 17:00:56 - cvd_tracker.info - INFO - Compression service initialized with algorithm: gzip
+2025-06-08 17:00:56 - cvd_tracker.info - INFO - Compression service initialized
+2025-06-08 17:00:56 - cvd_tracker.info - INFO - Email alert service initialized
+2025-06-08 17:00:56 - cvd_tracker.info - INFO - Added processing stage range_validation to pipeline temperature_pipeline
+2025-06-08 17:00:56 - cvd_tracker.info - INFO - Added processing stage outlier_detection to pipeline temperature_pipeline
+2025-06-08 17:00:56 - cvd_tracker.info - INFO - Added processing stage moving_average to pipeline temperature_pipeline
+2025-06-08 17:00:56 - cvd_tracker.info - INFO - Registered controller con001
+2025-06-08 17:00:56 - cvd_tracker.info - INFO - Registered component: notification_center
+2025-06-08 17:00:56 - cvd_tracker.info - INFO - Application container created successfully
+2025-06-08 17:00:56 - cvd_tracker.info - INFO - Background maintenance worker started
+2025-06-08 17:00:56 - cvd_tracker.info - INFO - DataManager initialized
+2025-06-08 17:00:56 - cvd_tracker.info - INFO - UI components and routes registered
+2025-06-08 17:00:56 - cvd_tracker.info - INFO - Starting web interface: CVD Tracker at localhost:8080
+2025-06-08 17:00:56 - cvd_tracker.info - INFO - CVD Tracker stopped

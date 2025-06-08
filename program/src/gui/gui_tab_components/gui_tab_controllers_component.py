@@ -523,8 +523,10 @@ class ControllerCardComponent(TimedComponent):
         )
 
         with ui.dialog().props("persistent") as dialog:
-            if self._resume_refresh:
-                dialog.on("close", lambda _: self._resume_refresh())
+            # ensure resume_refresh is callable before binding
+            resume = self._resume_refresh
+            if resume:
+                dialog.on("close", lambda _: resume())
             with ui.card().classes("w-96"):
                 ui.label(f"Configure {self.controller_config.name}").classes(
                     "text-lg font-bold mb-4"
