@@ -2,14 +2,20 @@ import time
 
 import pytest
 
-from src.controllers.algorithms.reactor_state import ReactorStateController, ReactorState, ReactorAlarmType
+from src.controllers.algorithms.reactor_state import (
+    ReactorStateController,
+    ReactorState,
+    ReactorAlarmType,
+)
 from src.controllers.controller_base import ControllerConfig
 from src.data_handler.interface.sensor_interface import SensorReading, SensorStatus
+
 
 @pytest.mark.asyncio
 async def test_reactor_state_transitions(monkeypatch):
     # suppress logging
     from src.controllers.algorithms import reactor_state as module
+
     for name in ["info", "warning", "error", "debug"]:
         if hasattr(module, name):
             monkeypatch.setattr(module, name, lambda *a, **k: None)
@@ -43,11 +49,14 @@ async def test_reactor_state_transitions(monkeypatch):
     res4 = await ctrl.derive_state({"t1": reading(95)}, {}, {})
     assert ReactorAlarmType.OVERTEMPERATURE in res4.data.alarms
     assert res4.data.state == ReactorState.ALARM
+    assert res4.metadata["data"] == res4.data.to_dict()
+    assert res4.metadata["data"]["state"] == ReactorState.ALARM.value
 
 
 @pytest.mark.asyncio
 async def test_motion_metadata_multiple_controllers(monkeypatch):
     from src.controllers.algorithms import reactor_state as module
+
     monkeypatch.setattr(module, "info", lambda *a, **k: None)
     monkeypatch.setattr(module, "warning", lambda *a, **k: None)
     monkeypatch.setattr(module, "error", lambda *a, **k: None)
@@ -78,3 +87,5 @@ async def test_motion_metadata_multiple_controllers(monkeypatch):
     res = await ctrl.derive_state({"t1": reading}, controller_outputs, {})
     assert res.data.motion_detected is True
     assert res.data.state == ReactorState.PROCESSING
+    assert res.metadata["data"] == res.data.to_dict()
+    assert res.metadata["data"]["state"] == ReactorState.PROCESSING.value
