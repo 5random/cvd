@@ -384,7 +384,8 @@ class NotificationCenter(TimedComponent):
         """Check log files for recent errors and warnings"""
         try:
             # Check error log for recent entries
-            error_log_path = Path("data/logs/error.log")
+            # Use the configured log directory from the log service
+            error_log_path = self.log_service.log_dir / "error.log"
             if error_log_path.exists():
                 # Get modification time
                 mod_time = error_log_path.stat().st_mtime
