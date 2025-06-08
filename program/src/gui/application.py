@@ -66,6 +66,7 @@ class WebApplication:
         self._experiment_component: Optional[ExperimentComponent] = None
         self._data_component: Optional[DataComponent] = None
         self._sensor_readings_container: Optional[ui.column] = None
+        self._dashboard_component: Optional[DashboardComponent] = None
         self._live_plot: Optional[LivePlotComponent] = None
         self._sensor_list_container: Optional[ui.column] = None
         
@@ -105,6 +106,12 @@ class WebApplication:
             with contextlib.suppress(Exception):
                 await self._processing_task
         await self.controller_manager.stop_all_controllers()
+        if self._dashboard_component:
+            self.component_registry.unregister(self._dashboard_component.component_id)
+            self._dashboard_component = None
+        if self._live_plot:
+            self.component_registry.unregister(self._live_plot.component_id)
+            self._live_plot = None
         self.component_registry.cleanup_all()
         info("Web application shutdown complete")
 
@@ -277,26 +284,38 @@ class WebApplication:
         """Create dashboard tab content"""
         with ui.row().classes('w-full h-full gap-4'):
             # Left column - sensor dashboard
-            dashboard_sensors = [sid for sid, cfg in self.config_service.get_sensor_configs() if cfg.get('show_on_dashboard')]
+            dashboard_sensors = [
+                sid for sid, cfg in self.config_service.get_sensor_configs()
+                if cfg.get('show_on_dashboard')
+            ]
 
             with ui.column().classes('w-1/2'):
-                dashboard = DashboardComponent(
+                self._dashboard_component = DashboardComponent(
                     self.config_service,
                     self.sensor_manager,
                     self.controller_manager
                 )
-                dashboard.render()
+                self.component_registry.register(self._dashboard_component)
+                self._dashboard_component.render()
 
             # Right column - live plot
             if dashboard_sensors:
                 with ui.column().classes('w-1/2'):
+                    max_points = self.config_service.get('ui.liveplot.plot_max_points', int, 2000)
+                    history_seconds = self.config_service.get('ui.liveplot.history_seconds', int, 3600)
+                    sample_rate = self.config_service.get('ui.liveplot.sample_rate', int, 20)
+
+                    refresh_rate_ms = int(1000 / sample_rate) if sample_rate > 0 else 1000
+
                     plot_config = PlotConfig(
-                        max_points=2000,
-                        refresh_rate_ms=1000,
-                        history_seconds=3600
+                        max_points=max_points,
+                        refresh_rate_ms=refresh_rate_ms,
+                        history_seconds=history_seconds
                     )
-                    live_plot = LivePlotComponent(self.sensor_manager, plot_config, dashboard_sensors)
-                    live_plot.render()
+
+                    self._live_plot = LivePlotComponent(self.sensor_manager, plot_config, dashboard_sensors)
+                    self.component_registry.register(self._live_plot)
+                    self._live_plot.render()
     
     def _create_sensors_content(self) -> None:
         """Create sensors tab content"""
