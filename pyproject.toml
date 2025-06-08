@@ -2,6 +2,25 @@
 requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
+[project]
+name = "cvd"
+version = "0.1.0"
+dependencies = [
+    "plotly",
+    "nicegui",
+    "numpy",
+    "pyserial",
+    "opencv-python",
+    "Pillow",
+    "pytest",
+    "pytest-asyncio",
+    "watchdog",
+    "jsonschema",
+    "setuptools",
+    "types-jsonschema",
+    "types-setuptools",
+]
+
 [tool.black]
 line-length = 88
 target-version = ['py39']

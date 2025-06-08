@@ -1,14 +1,3 @@
-plotly
-nicegui
-numpy
-pyserial
-opencv - python
-Pillow
-pytest
-pytest - asyncio
-watchdog
-jsonschema
-setuptools
-types - jsonschema
-types - setuptools
-psutil
+<<<<<<< codex/refactor-dependency-management-workflow
+# Dependencies are defined in pyproject.toml.
+-e .

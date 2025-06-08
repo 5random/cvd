@@ -14,11 +14,12 @@ Example snippets demonstrating typical usage are available in
 To install dependencies and this package in editable mode, run:
 
 ```bash
-make install
+pip install -e .
 pip install pre-commit black
 ```
 
-The `requirements.txt` file lists the dependencies required by this project.
+All dependencies are defined in `pyproject.toml`. Both `setup.py` and
+`requirements.txt` read from this file so there is a single authoritative list.
 
 
 The installed package includes a `config/` directory containing the default
@@ -62,6 +63,9 @@ Attempting to execute `pytest` without installation will result in import
 errors.  Install everything with:
 
 ```bash
+
+pip install -e .
+make test
 make install    # or: pip install -e .
 ```
 
@@ -69,6 +73,7 @@ After installation run the test suite with:
 
 ```bash
 pytest          # or: make test
+
 ```
 
 The tests rely on the `cv2` module from OpenCV and the `nicegui` package. Ensure
