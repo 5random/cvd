@@ -54,7 +54,8 @@ def test_apply_settings_updates_deque_lengths():
     assert comp._data_store["s1"] is not original_queue
 
     expected_history = max(
-        1, int(comp.plot_config.history_seconds * 1000 / comp.plot_config.refresh_rate_ms)
+        1,
+        int(comp.plot_config.history_seconds * 1000 / comp.plot_config.refresh_rate_ms),
     )
     assert comp._time_store.maxlen == expected_history
     assert list(comp._time_store) == [0, 1, 2]
