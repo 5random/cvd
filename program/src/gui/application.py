@@ -42,6 +42,7 @@ from src.utils.log_utils.log_service import debug, error, info, warning
 from src.gui.gui_elements.gui_webcam_stream_element import CameraStreamComponent
 from starlette.staticfiles import StaticFiles
 from fastapi.responses import StreamingResponse
+from fastapi import Request
 
 
 class WebApplication:
@@ -157,12 +158,19 @@ class WebApplication:
             return self._create_status_page()
 
         @ui.page('/video_feed')
-        async def video_feed():
+        async def video_feed(request: Request):
             """Stream MJPEG frames from the dashboard camera"""
             camera = self.component_registry.get_component('dashboard_camera_stream')
 
             async def gen():
                 while True:
+                    try:
+                        if await request.is_disconnected():
+                            info('Client disconnected from video feed')
+                            break
+                    except asyncio.CancelledError:
+                        info('Video feed cancelled')
+                        break
                     if isinstance(camera, CameraStreamComponent):
                         frame = camera.get_latest_frame()
                         if frame is not None:
@@ -171,7 +179,9 @@ class WebApplication:
                                 jpeg_bytes = buf.tobytes()
                                 yield (b'--frame\r\nContent-Type: image/jpeg\r\n\r\n' +
                                        jpeg_bytes + b'\r\n')
-                    await asyncio.sleep(camera.update_interval if isinstance(camera, CameraStreamComponent) else 0.03)
+                    await asyncio.sleep(
+                        camera.update_interval if isinstance(camera, CameraStreamComponent) else 0.03
+                    )
 
             return StreamingResponse(gen(),
                                      media_type='multipart/x-mixed-replace; boundary=frame')
