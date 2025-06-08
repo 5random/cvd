@@ -244,11 +244,15 @@ class ControllerCardComponent(BaseComponent):
         controller_config: ControllerCardConfig,
         controller_manager: ControllerManager,
         config_service: ConfigurationService,
+        pause_refresh: Optional[Callable] = None,
+        resume_refresh: Optional[Callable] = None,
     ):
         super().__init__(config)
         self.controller_config = controller_config
         self.controller_manager = controller_manager
         self.config_service = config_service
+        self._pause_refresh = pause_refresh
+        self._resume_refresh = resume_refresh
 
         # UI elements
         self._status_icon: Optional[ui.icon] = None
@@ -503,6 +507,8 @@ class ControllerCardComponent(BaseComponent):
 
     def _show_config_dialog(self) -> None:
         """Show configuration dialog"""
+        if self._pause_refresh:
+            self._pause_refresh()
         self._create_config_dialog()
 
     def _create_config_dialog(self) -> None:
@@ -515,6 +521,8 @@ class ControllerCardComponent(BaseComponent):
         )
 
         with ui.dialog().props("persistent") as dialog:
+            if self._resume_refresh:
+                dialog.on("close", lambda _: self._resume_refresh())
             with ui.card().classes("w-96"):
                 ui.label(f"Configure {self.controller_config.name}").classes(
                     "text-lg font-bold mb-4"
@@ -531,13 +539,17 @@ class ControllerCardComponent(BaseComponent):
                                 with ui.row().classes("w-full items-center"):
                                     ui.label(f"{key}:").classes("min-w-24")
                                     if isinstance(value, bool):
-                                        parameter_inputs[key] = ui.checkbox("", value=value)
+                                        parameter_inputs[key] = ui.checkbox(
+                                            "", value=value
+                                        )
                                     elif isinstance(value, (int, float)):
                                         parameter_inputs[key] = ui.number(
                                             "", value=value, format="%.2f"
                                         )
                                     else:
-                                        parameter_inputs[key] = ui.input("", value=str(value))
+                                        parameter_inputs[key] = ui.input(
+                                            "", value=str(value)
+                                        )
 
                     if controller_settings:
                         ui.label("Settings").classes("font-semibold mt-2")
@@ -546,22 +558,30 @@ class ControllerCardComponent(BaseComponent):
                                 with ui.row().classes("w-full items-center"):
                                     ui.label(f"{key}:").classes("min-w-24")
                                     if isinstance(value, bool):
-                                        settings_inputs[key] = ui.checkbox("", value=value)
+                                        settings_inputs[key] = ui.checkbox(
+                                            "", value=value
+                                        )
                                     elif isinstance(value, (int, float)):
                                         settings_inputs[key] = ui.number(
                                             "", value=value, format="%.2f"
                                         )
                                     else:
-                                        settings_inputs[key] = ui.input("", value=str(value))
+                                        settings_inputs[key] = ui.input(
+                                            "", value=str(value)
+                                        )
 
                     with ui.row().classes("w-full justify-end gap-2 mt-4"):
                         ui.button("Cancel", color="grey").on("click", dialog.close)
                         ui.button("Save", color="primary").on(
                             "click",
-                            lambda: self._save_configuration(dialog, parameter_inputs, settings_inputs),
+                            lambda: self._save_configuration(
+                                dialog, parameter_inputs, settings_inputs
+                            ),
                         )
                 else:
-                    ui.label("No configurable settings available").classes("text-gray-500 mb-4")
+                    ui.label("No configurable settings available").classes(
+                        "text-gray-500 mb-4"
+                    )
                     ui.button("Close", color="grey").on("click", dialog.close)
 
         dialog.open()
@@ -635,6 +655,19 @@ class ControllersComponent(BaseComponent):
         self._refresh_timer: Optional[ui.timer] = None
         self._controllers_container: Optional[ui.row] = None
         self._config_dialog: Optional[ControllerConfigDialog] = None
+        self._dialog_open: bool = False
+
+    def pause_refresh_timer(self) -> None:
+        """Pause the automatic refresh timer."""
+        if self._refresh_timer:
+            self._refresh_timer.deactivate()
+        self._dialog_open = True
+
+    def resume_refresh_timer(self) -> None:
+        """Resume the automatic refresh timer."""
+        if self._refresh_timer:
+            self._refresh_timer.activate()
+        self._dialog_open = False
 
     def render(self) -> ui.column:
         """Render controllers component"""
@@ -749,6 +782,8 @@ class ControllersComponent(BaseComponent):
                         card_config,
                         self.controller_manager,
                         self.config_service,
+                        self.pause_refresh_timer,
+                        self.resume_refresh_timer,
                     )
                     card_component.render()
                     self._controller_cards[controller_id] = card_component
@@ -775,7 +810,8 @@ class ControllersComponent(BaseComponent):
                 ui.label("No execution order defined").classes("text-gray-500")
 
             # Dependencies info
-            if dependencies:                ui.label(f"Dependencies: {len(dependencies)} total").classes(
+            if dependencies:
+                ui.label(f"Dependencies: {len(dependencies)} total").classes(
                     "text-sm text-gray-500 mt-2"
                 )
 
@@ -797,7 +833,7 @@ class ControllersComponent(BaseComponent):
             config_service=self.config_service,
             controller_manager=self.controller_manager,
             sensor_manager=sensor_manager,
-            on_close=self._refresh_controllers
+            on_close=self._refresh_controllers,
         )
         wizard.show_dialog()
 
@@ -824,6 +860,9 @@ class ControllersComponent(BaseComponent):
 
     def _refresh_controllers(self) -> None:
         """Refresh controller display"""
+        if self._dialog_open:
+            debug("Refresh skipped because configuration dialog is open")
+            return
         try:
             # Re-render controller cards to pick up any new configurations
             self._render_controller_cards()
