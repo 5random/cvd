@@ -1,11 +1,10 @@
-"""
-Arduino TC Board sensor implementation using the SensorInterface.
-"""
+"""Arduino TC Board sensor implementation using :class:`BaseSensor`."""
 import asyncio
 import time
 from typing import Dict, Any, Optional
 from concurrent.futures import Executor
-from src.data_handler.interface.sensor_interface import SensorInterface, SensorReading, SensorStatus, SensorConfig
+from src.data_handler.interface.sensor_interface import SensorReading, SensorStatus, SensorConfig
+from .base_sensor import BaseSensor
 from src.utils.log_utils.log_service import info, warning, error, debug
 from src.data_handler.sources.mock_hardware import (
     MockArduinoTCBoardSerial,
@@ -21,27 +20,16 @@ except ImportError:
     ArduinoTCBoardSerial = MockArduinoTCBoardSerial
     find_arduino_port = mock_find_arduino_port
 
-class ArduinoTCSensor(SensorInterface):
+class ArduinoTCSensor(BaseSensor):
     """Arduino TC Board sensor implementation"""
 
     def __init__(self, config: SensorConfig, executor: Optional[Executor] = None):
-        self._config = config
-        self._connection = None
-        self._is_connected = False
+        super().__init__(config, executor)
         self._port: Optional[str] = None
-        self._executor = executor
-
-    @property
-    def sensor_id(self) -> str:
-        return self._config.sensor_id
 
     @property
     def sensor_type(self) -> str:
         return "arduino_tc_board"
-
-    @property
-    def is_connected(self) -> bool:
-        return self._is_connected and self._connection is not None
 
     async def initialize(self) -> bool:
         """Initialize Arduino TC Board connection"""
