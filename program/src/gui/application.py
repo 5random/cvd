@@ -641,7 +641,9 @@ class WebApplication:
             
             # Clear and rebuild readings display
             self._sensor_readings_container.clear()
-            
+
+            configs = dict(self.config_service.get_sensor_configs())
+
             with self._sensor_readings_container:
                 if not readings:
                     ui.label('No sensor data available').classes('text-body2 text-grey')
@@ -652,7 +654,8 @@ class WebApplication:
                         ui.label(sensor_id).classes('text-body1')
                         
                         if reading.is_valid():
-                            ui.label(f'{reading.value:.2f}°C').classes('cvd-sensor-value text-green')
+                            unit = reading.metadata.get('unit') or configs.get(sensor_id, {}).get('unit') or '°C'
+                            ui.label(f'{reading.value:.2f}{unit}').classes('cvd-sensor-value text-green')
                         else:
                             ui.label(f'Status: {reading.status.value}').classes('text-red')
 
