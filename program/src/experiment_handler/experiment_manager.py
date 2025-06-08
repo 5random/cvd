@@ -16,6 +16,7 @@ import csv
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Dict, List, Optional, Any, Set, Callable
+import shutil
 from dataclasses import dataclass, field, asdict
 from enum import Enum
 from contextlib import asynccontextmanager
@@ -830,6 +831,34 @@ class ExperimentManager:
                 str(result.compressed_archive) if result.compressed_archive else None
             ),
         }
+
+    def delete_experiment(self, experiment_id: str) -> bool:
+        """Delete experiment configuration and stored results."""
+        if experiment_id not in self._experiment_configs:
+            return False
+
+        if self._current_experiment == experiment_id and self._current_state not in [
+            ExperimentState.COMPLETED,
+            ExperimentState.FAILED,
+            ExperimentState.CANCELLED,
+            ExperimentState.IDLE,
+        ]:
+            warning("Cannot delete experiment while it is active")
+            return False
+
+        try:
+            self._experiment_configs.pop(experiment_id, None)
+            result = self._experiment_results.pop(experiment_id, None)
+
+            exp_dir = self.experiments_base_dir / experiment_id
+            if exp_dir.exists():
+                shutil.rmtree(exp_dir, ignore_errors=True)
+
+            info(f"Deleted experiment {experiment_id}")
+            return True
+        except Exception as e:  # pragma: no cover - best effort
+            error(f"Failed to delete experiment {experiment_id}: {e}")
+            return False
 
     async def cleanup(self) -> None:
         """Cleanup resources and stop any running experiments"""
