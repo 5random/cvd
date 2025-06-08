@@ -67,3 +67,18 @@ service.add_sensor_config({
     "show_on_dashboard": True,
 })
 ```
+
+## Registering custom sensors via entry points
+
+Third-party packages can contribute new sensor implementations without
+modifying the main repository. Expose a factory under the
+``cvd.sensors`` entry point group in your ``pyproject.toml``:
+
+```toml
+[project.entry-points."cvd.sensors"]
+my_sensor = "your_package.sensors:MySensor"
+```
+
+When ``sensor_source_manager`` is imported, all entry points in this group
+are loaded and added to ``SENSOR_REGISTRY`` so the sensor can be used in
+the configuration.
