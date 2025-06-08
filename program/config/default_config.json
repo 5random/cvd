@@ -189,7 +189,7 @@
         "name": "CVD-Status",
         "type": "reactor_state",
         "algorithm": ["alg003"],
-        "state_output": ["Reaktor fehler", "Reaktor OK"],
+        "state_output": ["Reaktor Fehler", "Reaktor OK"],
         "enabled": true
         }
     }
