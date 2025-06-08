@@ -261,7 +261,7 @@ class SensorCardComponent(BaseComponent):
                  sensor_manager: SensorManager,
                  config_service: ConfigurationService,
                  on_edit_callback=None,
-                 on_delete_callback=None):
+                 on_deleted=None):
         config = ComponentConfig(
             component_id=f"sensor_card_{sensor_info.sensor_id}",
             title=f"Sensor Card - {sensor_info.sensor_id}"
@@ -272,7 +272,7 @@ class SensorCardComponent(BaseComponent):
         self.sensor_manager = sensor_manager
         self.config_service = config_service
         self.on_edit_callback = on_edit_callback
-        self.on_delete_callback = on_delete_callback
+        self.on_deleted = on_deleted
         
         # UI elements
         self._container: Optional[Element] = None
@@ -409,8 +409,8 @@ class SensorCardComponent(BaseComponent):
                 # Remove configuration
                 if self.config_service.remove_sensor_config(self.sensor_info.sensor_id):
                     ui.notify(f'Sensor {self.sensor_info.sensor_id} deleted successfully', color='positive')
-                    if self.on_delete_callback:
-                        self.on_delete_callback(self.sensor_info)
+                    if self.on_deleted:
+                        self.on_deleted(self.sensor_info)
                 else:
                     ui.notify('Failed to delete sensor configuration', color='negative')
                     
@@ -639,7 +639,7 @@ class SensorsComponent(BaseComponent):
                 self.sensor_manager,
                 self.config_service,
                 self._edit_sensor,
-                self._delete_sensor
+                self._sensor_deleted,
             )
             
             with self._sensors_container:
@@ -710,40 +710,9 @@ class SensorsComponent(BaseComponent):
         if self._config_dialog:
             self._config_dialog.show_edit_dialog(sensor_info)
             
-    def _delete_sensor(self, sensor_info: SensorInfo) -> None:
-        """Delete sensor with confirmation"""
-        async def confirm_delete():
-            try:
-                # Stop sensor if running
-                if sensor_info.polling:
-                    await self.sensor_manager.stop_sensor(sensor_info.sensor_id)
-                
-                # Remove configuration
-                if self.config_service.remove_sensor_config(sensor_info.sensor_id):
-                    ui.notify(f'Sensor {sensor_info.sensor_id} deleted successfully', color='positive')
-                    self._refresh_sensors()
-                else:
-                    ui.notify('Failed to delete sensor configuration', color='negative')
-                    
-            except Exception as e:
-                error(f"Error deleting sensor: {e}")
-                ui.notify(f'Error: {str(e)}', color='negative')
-        
-        with ui.dialog() as dialog:
-            with ui.card():
-                ui.label(f'Delete Sensor: {sensor_info.sensor_id}').classes('text-lg font-bold')
-                ui.label('Are you sure you want to delete this sensor? This action cannot be undone.').classes('mt-2')
-                
-                with ui.row().classes('gap-2 justify-end mt-4'):
-                    ui.button('Cancel', on_click=dialog.close).props('flat')
-                    
-                    async def _on_delete_confirm():
-                        await confirm_delete()
-                        dialog.close()
-                    
-                    ui.button('Delete', on_click=_on_delete_confirm).props('color=negative')
-        
-        dialog.open()
+    def _sensor_deleted(self, sensor_info: SensorInfo) -> None:
+        """Refresh list after sensor deletion"""
+        self._refresh_sensors()
         
     async def _start_all_sensors(self) -> None:
         """Start all configured sensors"""
