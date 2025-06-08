@@ -2,7 +2,12 @@
   "ui": {
     "title": "CVD Tracker",
     "refresh_rate_ms": 1000,
-    "dark_mode": true
+    "dark_mode": true,
+    "notification_center": {
+      "max_notifications": 500,
+      "history_file": "data/notifications/history.json",
+      "update_interval_s": 5
+    }
   },
   "sensors": [
     {

@@ -104,8 +104,12 @@ class NotificationCenter(TimedComponent):
         
         # Notification storage
         self.notifications: List[Notification] = []
-        self.max_notifications: int = 500
-        self.notification_history_file: Path = Path("data/notifications/history.json")
+
+        notif_cfg = self.config_service.get("ui.notification_center", dict, {}) or {}
+        self.max_notifications: int = notif_cfg.get("max_notifications", 500)
+        history_file = notif_cfg.get("history_file", "data/notifications/history.json")
+        self.notification_history_file: Path = Path(history_file)
+        self.check_interval: float = float(notif_cfg.get("update_interval_s", 5.0))
         
         # UI elements
         self._notification_list: Optional[Any] = None
@@ -195,7 +199,7 @@ class NotificationCenter(TimedComponent):
         # Start background monitoring
         self._monitoring_active = True
         if not self._update_timer:
-            self._update_timer = ui.timer(5.0, self._check_for_new_notifications)
+            self._update_timer = ui.timer(self.check_interval, self._check_for_new_notifications)
 
     def _on_experiment_state_change(self, old_state: ExperimentState, new_state: ExperimentState) -> None:
         """Handle experiment state changes"""
