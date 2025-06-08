@@ -20,6 +20,7 @@
                 "baudrate": 9600,
                 "timeout": 2.0
             }
+
         }
     ],
     "webcams": [

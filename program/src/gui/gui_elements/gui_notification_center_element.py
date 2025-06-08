@@ -21,18 +21,15 @@ Features:
 """
 
 import time
-import asyncio
 import json
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Any, Callable
-from dataclasses import dataclass, field
-from enum import Enum
+
 from pathlib import Path
 
 from nicegui import ui
 from src.gui.gui_tab_components.gui_tab_base_component import (
     TimedComponent,
-    BaseComponent,
     ComponentConfig,
 )
 from src.utils.log_utils.log_service import get_log_service, LogService
@@ -42,7 +39,6 @@ from src.data_handler.sources.sensor_source_manager import SensorManager
 from src.controllers.controller_manager import ControllerManager
 from src.controllers.controller_base import ControllerStatus
 from src.utils.alert_system_utils.email_alert_service import get_email_alert_service
-
 
 class NotificationSeverity(Enum):
     """Severity levels for notifications"""
@@ -81,7 +77,17 @@ class Notification:
     action_callback: Optional[Callable] = None
 
 
-class NotificationCenter(TimedComponent):
+from src.gui.notifications import (
+    Notification,
+    NotificationSeverity,
+    NotificationSource,
+    NotificationMonitoringMixin,
+    NotificationUIMixin,
+)
+
+
+
+class NotificationCenter(NotificationMonitoringMixin, NotificationUIMixin, TimedComponent):
     """Notification center component for collecting and displaying system notifications"""
 
     timer_attributes = ["_update_timer"]
@@ -113,7 +119,7 @@ class NotificationCenter(TimedComponent):
         self.max_notifications: int = config_service.get(
             "ui.notification_center.max_notifications", int, 500
         )
-        self.notification_history_file: Path = Path("data/notifications/history.json")
+        self.notification_history_file: Path = Path("data/notifications/history.json")   
 
         # UI elements
         self._notification_list: Optional[Any] = None
@@ -482,6 +488,7 @@ class NotificationCenter(TimedComponent):
         action_label: Optional[str] = None,
         action_callback: Optional[Callable] = None,
     ) -> str:
+
         """Add a new notification"""
 
         notification_id = f"{source.value}_{int(time.time() * 1000)}"
