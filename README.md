@@ -47,11 +47,18 @@ in the GUI.
 
 ## Running tests
 
-Install the dependencies and run the test suite with:
+Before running the tests you must install this package and its dependencies.
+Attempting to execute `pytest` without installation will result in import
+errors.  Install everything with:
 
 ```bash
-make install
-make test
+make install    # or: pip install -e .
+```
+
+After installation run the test suite with:
+
+```bash
+pytest          # or: make test
 ```
 
 The tests rely on the `cv2` module from OpenCV and the `nicegui` package. Ensure
