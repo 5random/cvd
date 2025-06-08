@@ -20,11 +20,7 @@ from src.controllers.controller_base import (
 from src.data_handler.interface.sensor_interface import SensorReading
 from src.utils.log_utils.log_service import info, warning, error, debug
 
-from .algorithms.motion_detection import MotionDetectionController
-from .algorithms.reactor_state import ReactorStateController
-from .controller_utils.controller_data_sources.camera_capture_controller import (
-    CameraCaptureController,
-)
+from .controller_registry import CONTROLLER_CLASS_MAP
 from src.utils.config_utils.config_service import get_config_service
 
 # Registry mapping controller type names to classes
@@ -113,15 +109,12 @@ class ControllerManager:
                 output_name=config.get("output_name"),
             )
 
-            cls = CONTROLLER_REGISTRY.get(controller_type)
-            if cls is not None:
-                return cls(controller_id, cfg)
+            ctrl_cls = CONTROLLER_CLASS_MAP.get(controller_type)
+            if ctrl_cls is None:
+                raise ValueError(f"Unknown controller type: {controller_type}")
 
-            warning(
-                "Unknown controller type",
-                controller_id=controller_id,
-                controller_type=controller_type,
-            )
+            return ctrl_cls(controller_id, cfg)
+
         except Exception as exc:
             error(
                 "Failed to create controller from config",
@@ -134,7 +127,11 @@ class ControllerManager:
         self, config: Dict[str, Any]
     ) -> Optional[ControllerStage]:
         """Create and register a controller from configuration."""
-        controller = self.create_controller(config)
+        try:
+            controller = self.create_controller(config)
+        except Exception as exc:
+            error(f"Failed to create controller: {exc}")
+            return None
         if controller is not None:
             self.register_controller(controller)
             return controller
@@ -527,8 +524,12 @@ def create_cvd_controller_manager() -> ControllerManager:
             controller_type="motion_detection",
             parameters={"device_index": 0},
         )
-        cam_ctrl = CameraCaptureController("camera_capture", cam_cfg)
-        motion_ctrl = MotionDetectionController("motion_detection", motion_cfg)
+        cam_cls = CONTROLLER_CLASS_MAP.get("camera_capture")
+        motion_cls = CONTROLLER_CLASS_MAP.get("motion_detection")
+        if not cam_cls or not motion_cls:
+            raise RuntimeError("Required controller classes missing in registry")
+        cam_ctrl = cam_cls("camera_capture", cam_cfg)
+        motion_ctrl = motion_cls("motion_detection", motion_cfg)
         manager.register_controller(cam_ctrl)
         manager.register_controller(motion_ctrl)
         manager.add_dependency(
