@@ -14,11 +14,12 @@ Example snippets demonstrating typical usage are available in
 To install dependencies and this package in editable mode, run:
 
 ```bash
-make install
+pip install -e .
 pip install pre-commit black
 ```
 
-The `requirements.txt` file lists the dependencies required by this project.
+All dependencies are defined in `pyproject.toml`. Both `setup.py` and
+`requirements.txt` read from this file so there is a single authoritative list.
 
 
 The installed package includes a `config/` directory containing the default
@@ -50,7 +51,7 @@ in the GUI.
 Install the dependencies and run the test suite with:
 
 ```bash
-make install
+pip install -e .
 make test
 ```
 

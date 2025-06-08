@@ -1,13 +1,2 @@
-plotly
-nicegui
-numpy
-pyserial
-opencv-python
-Pillow
-pytest
-pytest-asyncio
-watchdog
-jsonschema
-setuptools
-types-jsonschema
-types-setuptools
+# Dependencies are defined in pyproject.toml.
+-e .
