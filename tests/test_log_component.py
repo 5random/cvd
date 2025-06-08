@@ -9,7 +9,13 @@ import pytest
 from src.utils.config_utils.config_service import ConfigurationService
 from src.utils.log_utils.log_service import LogService
 import src.gui.gui_tab_components.gui_tab_log_component as log_component
-from src.gui.gui_tab_components.gui_tab_log_component import LogComponent
+from src.gui.gui_tab_components.gui_tab_log_component import (
+    LogComponent,
+    LogViewerComponent,
+    LogFileInfo,
+    ComponentConfig,
+)
+from datetime import datetime
 
 
 @pytest.fixture
@@ -17,7 +23,9 @@ def minimal_log_service(tmp_path, monkeypatch):
     cfg = {"logging": {"log_dir": str(tmp_path / "logs"), "retention_days": 0}}
     (tmp_path / "config.json").write_text(json.dumps(cfg))
     (tmp_path / "default_config.json").write_text("{}")
-    service = ConfigurationService(tmp_path / "config.json", tmp_path / "default_config.json")
+    service = ConfigurationService(
+        tmp_path / "config.json", tmp_path / "default_config.json"
+    )
 
     logs_dir = tmp_path / "logs"
 
@@ -84,3 +92,49 @@ def test_compress_logs_skips_existing(monkeypatch, tmp_path, minimal_log_service
     assert log_file.exists()
     extra = log_service.log_dir / f"info.log.1{ext}.gz"
     assert not extra.exists()
+
+
+def _create_log_viewer(tmp_path: Path, name: str = "info.log") -> LogViewerComponent:
+    log_file = tmp_path / name
+    info = LogFileInfo(
+        name=name,
+        path=log_file,
+        size_bytes=0,
+        size_mb=0.0,
+        modified=datetime.now(),
+        log_type="info",
+        is_compressed=False,
+    )
+    return LogViewerComponent(ComponentConfig(name), info)
+
+
+def test_log_viewer_reads_incrementally(tmp_path: Path):
+    viewer = _create_log_viewer(tmp_path)
+    log_path = viewer.log_file_info.path
+    log_path.write_text("a\n")
+
+    viewer._load_log_content()
+    assert viewer._log_lines == ["a\n"]
+    first_offset = viewer._file_offset
+
+    with open(log_path, "a", encoding="utf-8") as f:
+        f.write("b\n")
+
+    viewer._load_log_content()
+    assert viewer._log_lines == ["a\n", "b\n"]
+    assert viewer._file_offset > first_offset
+
+
+def test_log_viewer_resets_on_rotation(tmp_path: Path):
+    viewer = _create_log_viewer(tmp_path)
+    log_path = viewer.log_file_info.path
+    log_path.write_text("a\n")
+    viewer._load_log_content()
+
+    log_path.write_text("")
+    viewer._load_log_content()
+
+    log_path.write_text("c\n")
+    viewer._load_log_content()
+
+    assert viewer._log_lines == ["c\n"]
