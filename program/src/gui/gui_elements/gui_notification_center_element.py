@@ -30,7 +30,11 @@ from enum import Enum
 from pathlib import Path
 
 from nicegui import ui
-from src.gui.gui_tab_components.gui_tab_base_component import BaseComponent, ComponentConfig
+from src.gui.gui_tab_components.gui_tab_base_component import (
+    TimedComponent,
+    BaseComponent,
+    ComponentConfig,
+)
 from src.utils.log_utils.log_service import get_log_service, LogService
 from src.utils.config_utils.config_service import ConfigurationService
 from src.experiment_handler.experiment_manager import ExperimentManager, ExperimentState
@@ -73,8 +77,10 @@ class Notification:
     action_callback: Optional[Callable] = None
 
 
-class NotificationCenter(BaseComponent):
+class NotificationCenter(TimedComponent):
     """Notification center component for collecting and displaying system notifications"""
+
+    timer_attributes = ["_update_timer"]
     
     def __init__(self, 
                  config_service: ConfigurationService,
@@ -747,8 +753,6 @@ class NotificationCenter(BaseComponent):
     def cleanup(self) -> None:
         """Cleanup component resources"""
         self._monitoring_active = False
-        if self._update_timer:
-            self._update_timer.cancel()
         self._save_notification_history()
         super().cleanup()
 

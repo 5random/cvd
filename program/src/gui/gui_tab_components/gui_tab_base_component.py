@@ -78,6 +78,26 @@ class BaseComponent(ABC):
         self._element = None
         self._rendered = False
 
+
+class TimedComponent(BaseComponent):
+    """Base component with timer cleanup support"""
+
+    #: names of timer attributes to cancel on cleanup
+    timer_attributes: List[str] = ["_timer"]
+
+    def cleanup(self) -> None:  # type: ignore[override]
+        """Cancel timers and clean up"""
+        for attr in self.timer_attributes:
+            timer = getattr(self, attr, None)
+            if timer:
+                try:
+                    timer.cancel()
+                except Exception:
+                    pass
+                setattr(self, attr, None)
+
+        super().cleanup()
+
 class ComponentRegistry:
     """Registry for managing UI components"""
     

@@ -20,6 +20,7 @@ from src.controllers.controller_base import (
     ControllerType,
 )
 from src.gui.gui_tab_components.gui_tab_base_component import (
+    TimedComponent,
     BaseComponent,
     ComponentConfig,
     get_component_registry,
@@ -234,8 +235,10 @@ class ControllerConfigDialog(CancelableDialogMixin):
             ui.notify(f"Error: {str(e)}", color="negative")
 
 
-class ControllerCardComponent(BaseComponent):
+class ControllerCardComponent(TimedComponent):
     """Individual controller display card"""
+
+    timer_attributes = ["_update_timer"]
 
     def __init__(
         self,
@@ -631,11 +634,6 @@ class ControllerCardComponent(BaseComponent):
         # Data updates are handled by timer
         pass
 
-    def cleanup(self) -> None:
-        """Cleanup component"""
-        if self._update_timer:
-            self._update_timer.cancel()
-        super().cleanup()
 
 
 class ControllersComponent(BaseComponent):

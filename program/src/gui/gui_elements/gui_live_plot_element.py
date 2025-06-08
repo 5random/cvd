@@ -12,7 +12,11 @@ from nicegui import ui
 
 from src.data_handler.sources.sensor_source_manager import SensorManager
 from src.data_handler.interface.sensor_interface import SensorReading, SensorStatus
-from src.gui.gui_tab_components.gui_tab_base_component import BaseComponent, ComponentConfig
+from src.gui.gui_tab_components.gui_tab_base_component import (
+    TimedComponent,
+    BaseComponent,
+    ComponentConfig,
+)
 from src.utils.log_utils.log_service import info, warning, error, debug
 
 @dataclass
@@ -35,8 +39,10 @@ class SeriesConfig:
     y_axis: str = "y1"
     visible: bool = True
 
-class LivePlotComponent(BaseComponent):
+class LivePlotComponent(TimedComponent):
     """Live plotting component for sensor data"""
+
+    timer_attributes = ["_update_timer"]
 
     def __init__(self, sensor_manager: SensorManager, plot_config: Optional[PlotConfig] = None, sensors_to_display: Optional[List[str]] = None):
         config = ComponentConfig(component_id="live_plot")
@@ -375,9 +381,3 @@ class LivePlotComponent(BaseComponent):
         """Update element with new data"""
         # Updates are handled by timer
         pass
-    
-    def cleanup(self) -> None:
-        """Cleanup component"""
-        if self._update_timer:
-            self._update_timer.cancel()
-        super().cleanup()

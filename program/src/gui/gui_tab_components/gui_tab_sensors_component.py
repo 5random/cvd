@@ -15,9 +15,13 @@ from nicegui.elements.label import Label
 from nicegui.elements.button import Button
 from nicegui.elements.icon import Icon
 
-from .dialog_utils import CancelableDialogMixin
+from src.gui.gui_tab_components.gui_tab_base_component import (
+    TimedComponent,
+    BaseComponent,
+    ComponentConfig,
+)
 
-from src.gui.gui_tab_components.gui_tab_base_component import BaseComponent, ComponentConfig
+from .dialog_utils import CancelableDialogMixin
 from src.controllers.controller_manager import create_cvd_controller_manager
 from src.data_handler.interface.sensor_interface import SensorStatus, SensorReading
 from src.data_handler.sources.sensor_source_manager import SensorManager, SENSOR_REGISTRY
@@ -443,8 +447,10 @@ class SensorCardComponent(BaseComponent):
         pass
 
 
-class SensorsComponent(BaseComponent):
+class SensorsComponent(TimedComponent):
     """Main sensors management component"""
+
+    timer_attributes = ["_refresh_timer"]
     
     def __init__(self, 
                  sensor_manager: SensorManager,
@@ -537,11 +543,6 @@ class SensorsComponent(BaseComponent):
             self._refresh_timer.cancel()
         self._refresh_timer = ui.timer(2.0, self._update_sensor_data)
         
-    def _stop_auto_refresh(self) -> None:
-        """Stop auto-refresh timer"""
-        if self._refresh_timer:
-            self._refresh_timer.cancel()
-            self._refresh_timer = None
             
     def _refresh_sensors(self) -> None:
         """Refresh sensor configurations and data"""
@@ -739,5 +740,4 @@ class SensorsComponent(BaseComponent):
             
     def cleanup(self) -> None:
         """Cleanup component resources"""
-        self._stop_auto_refresh()
         super().cleanup()
