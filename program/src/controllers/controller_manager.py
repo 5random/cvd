@@ -108,6 +108,13 @@ class ControllerManager:
                 input_controllers=config.get("input_controllers", []),
                 output_name=config.get("output_name"),
             )
+            
+            if controller_type == "motion_detection":
+                return MotionDetectionController(controller_id, cfg)
+            if controller_type == "reactor_state":
+                return ReactorStateController(controller_id, cfg)
+            if controller_type in ("camera_capture", "camera"):
+                return CameraCaptureController(controller_id, cfg)
 
             ctrl_cls = CONTROLLER_CLASS_MAP.get(controller_type)
             if ctrl_cls is None:
