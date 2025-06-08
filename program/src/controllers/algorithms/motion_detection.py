@@ -29,8 +29,6 @@ from src.utils.concurrency.thread_pool import run_camera_io
 from src.controllers.controller_utils.camera_utils import apply_uvc_settings, rotate_frame
 
 
-
-
 @dataclass
 class MotionDetectionResult:
     """Result from motion detection"""
@@ -127,6 +125,11 @@ class MotionDetectionController(ImageController):
             ProcessPoolConfig(), pool_type=ProcessPoolType.CPU
         )
 
+        # Runtime state
+        self._capture: Optional[cv2.VideoCapture] = None
+        self._capture_task: Optional[asyncio.Task] = None
+        self._stop_event = asyncio.Event()
+
         # Parameters from config
         params = config.parameters
         # Camera parameters
@@ -184,7 +187,6 @@ class MotionDetectionController(ImageController):
         self._stop_event = asyncio.Event()
         self._capture: Optional[cv2.VideoCapture] = None
         self._capture_task: Optional[asyncio.Task] = None
-
 
     async def initialize(self) -> bool:
         """Initialize the motion detection controller"""
@@ -539,4 +541,3 @@ class MotionDetectionController(ImageController):
                 error(f"Camera capture error: {e}")
 
             await asyncio.sleep(base_delay)
-
