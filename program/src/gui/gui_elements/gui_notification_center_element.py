@@ -25,7 +25,11 @@ import asyncio
 import json
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Any, Callable
-from src.gui.gui_elements.notifications.models import Notification, NotificationSeverity, NotificationSource
+from src.gui.gui_elements.notifications.models import (
+    Notification,
+    NotificationSeverity,
+    NotificationSource,
+)
 from pathlib import Path
 from nicegui import ui
 from src.gui.gui_tab_components.gui_tab_base_component import (
@@ -46,7 +50,9 @@ from src.gui.gui_elements.notifications import (
 )
 
 
-class NotificationCenter(NotificationMonitoringMixin, NotificationUIMixin, TimedComponent):
+class NotificationCenter(
+    NotificationMonitoringMixin, NotificationUIMixin, TimedComponent
+):
     """Notification center component for collecting and displaying system notifications"""
 
     timer_attributes = ["_update_timer"]
@@ -78,7 +84,16 @@ class NotificationCenter(NotificationMonitoringMixin, NotificationUIMixin, Timed
         self.max_notifications: int = config_service.get(
             "ui.notification_center.max_notifications", int, 500
         )
-        self.notification_history_file: Path = Path("data/notifications/history.json")   
+        self.notification_history_file: Path = Path(
+            config_service.get(
+                "ui.notification_center.history_file",
+                str,
+                "data/notifications/history.json",
+            )
+        )
+        self.check_interval: float = float(
+            config_service.get("ui.notification_center.update_interval_s", None, 5)
+        )
 
         # UI elements
         self._notification_list: Optional[Any] = None
@@ -171,7 +186,9 @@ class NotificationCenter(NotificationMonitoringMixin, NotificationUIMixin, Timed
         # Start background monitoring
         self._monitoring_active = True
         if not self._update_timer:
-            self._update_timer = ui.timer(5.0, self._check_for_new_notifications)
+            self._update_timer = ui.timer(
+                float(self.check_interval), self._check_for_new_notifications
+            )
 
     def _on_experiment_state_change(
         self, old_state: ExperimentState, new_state: ExperimentState
@@ -447,7 +464,6 @@ class NotificationCenter(NotificationMonitoringMixin, NotificationUIMixin, Timed
         action_label: Optional[str] = None,
         action_callback: Optional[Callable] = None,
     ) -> str:
-
         """Add a new notification"""
 
         notification_id = f"{source.value}_{int(time.time() * 1000)}"
