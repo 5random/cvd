@@ -167,8 +167,10 @@ class DataFilterPanel(BaseComponent):
         self._status_select = None
         self._sensor_input = None
         self._experiment_input = None
-        self._date_from = None
-        self._date_to = None
+        self._date_range_input = None
+        self._date_dialog = None
+        self._date_from_picker = None
+        self._date_to_picker = None
 
     def render(self) -> ui.card:
         """Render filter panel"""
@@ -209,18 +211,14 @@ class DataFilterPanel(BaseComponent):
                         on_change=self._on_experiment_change,
                     ).classes("w-full")
 
-                # Date From filter
-                with ui.column().classes("min-w-32"):
-                    ui.label("Date From").classes("text-sm font-medium")
-                    self._date_from = ui.date(
-                        on_change=self._on_date_from_change
-                    ).classes("w-full")
-
-                # Date To filter
-                with ui.column().classes("min-w-32"):
-                    ui.label("Date To").classes("text-sm font-medium")
-                    self._date_to = ui.date(on_change=self._on_date_to_change).classes(
-                        "w-full"
+                # Date range filter with dialog
+                with ui.column().classes("min-w-48"):
+                    ui.label("Date Range").classes("text-sm font-medium")
+                    self._date_range_input = (
+                        ui.input(placeholder="Select range")
+                        .props("readonly")
+                        .on("click", self._open_date_dialog)
+                        .classes("w-full")
                     )
 
                 # Clear filters button
@@ -259,36 +257,56 @@ class DataFilterPanel(BaseComponent):
         # Notify change
         self._emit_filter_change()
 
-    def _on_date_from_change(self, event) -> None:
-        """Handle start date change"""
-        raw = event.value or ""
-        if not raw:
-            from_date = None
-        else:
+    def _open_date_dialog(self) -> None:
+        """Open dialog to select date range"""
+        from_date, to_date = self.current_filters["date_range"]
+
+        with ui.dialog() as dialog:
+            self._date_dialog = dialog
+            with ui.card():
+                ui.label("Select Date Range").classes("text-lg font-bold")
+
+                self._date_from_picker = ui.date(
+                    value=from_date.strftime("%Y-%m-%d") if from_date else ""
+                )
+                self._date_to_picker = ui.date(
+                    value=to_date.strftime("%Y-%m-%d") if to_date else ""
+                )
+
+                with ui.row().classes("gap-2 justify-end"):
+                    ui.button("Cancel", on_click=dialog.close).props("flat")
+
+                    def _apply() -> None:
+                        self._apply_date_range()
+                        dialog.close()
+
+                    ui.button("Apply", on_click=_apply).props("color=primary")
+
+        dialog.open()
+
+    def _apply_date_range(self) -> None:
+        """Apply selected date range from dialog"""
+        raw_from = self._date_from_picker.value or ""
+        raw_to = self._date_to_picker.value or ""
+
+        from_date = None
+        to_date = None
+        if raw_from:
             try:
-                from_date = datetime.strptime(raw, "%Y-%m-%d").date()
+                from_date = datetime.strptime(raw_from, "%Y-%m-%d").date()
+            except ValueError:
+                ui.notify("Invalid date format", type="negative")
+                return
+        if raw_to:
+            try:
+                to_date = datetime.strptime(raw_to, "%Y-%m-%d").date()
             except ValueError:
                 ui.notify("Invalid date format", type="negative")
                 return
 
-        _, to_date = self.current_filters["date_range"]
         self.current_filters["date_range"] = (from_date, to_date)
-        self._emit_filter_change()
-
-    def _on_date_to_change(self, event) -> None:
-        """Handle end date change"""
-        raw = event.value or ""
-        if not raw:
-            to_date = None
-        else:
-            try:
-                to_date = datetime.strptime(raw, "%Y-%m-%d").date()
-            except ValueError:
-                ui.notify("Invalid date format", type="negative")
-                return
-
-        from_date, _ = self.current_filters["date_range"]
-        self.current_filters["date_range"] = (from_date, to_date)
+        if self._date_range_input:
+            self._date_range_input.value = self._format_date_range(from_date, to_date)
         self._emit_filter_change()
 
     def _clear_filters(self) -> None:
@@ -310,10 +328,8 @@ class DataFilterPanel(BaseComponent):
             self._sensor_input.value = ""
         if self._experiment_input:
             self._experiment_input.value = ""
-        if self._date_from:
-            self._date_from.value = ""
-        if self._date_to:
-            self._date_to.value = ""
+        if self._date_range_input:
+            self._date_range_input.value = ""
 
         self._emit_filter_change()
 
@@ -321,6 +337,20 @@ class DataFilterPanel(BaseComponent):
         """Emit filter change to parent"""
         if self.on_filter_change:
             self.on_filter_change(self.current_filters.copy())
+
+    def _format_date_range(
+        self, from_date: Optional[date], to_date: Optional[date]
+    ) -> str:
+        """Format date range for display"""
+        if not from_date and not to_date:
+            return ""
+        from_str = from_date.strftime("%Y-%m-%d") if from_date else ""
+        to_str = to_date.strftime("%Y-%m-%d") if to_date else ""
+        if from_str and to_str:
+            return f"{from_str} - {to_str}"
+        if from_str:
+            return f"from {from_str}"
+        return f"until {to_str}"
 
     def _update_element(self, data: Any) -> None:
         """Update filter panel - no action needed"""
