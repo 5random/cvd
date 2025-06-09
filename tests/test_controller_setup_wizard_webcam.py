@@ -4,6 +4,7 @@ import pytest
 import types
 from nicegui import ui
 import sys, os
+
 sys.path.insert(0, os.path.abspath("program"))
 
 from src.utils.config_utils.config_service import ConfigurationService
@@ -122,7 +123,11 @@ def test_test_webcam_notifies(monkeypatch, tmp_path, dummy_ui):
         def release(self):
             pass
 
-    monkeypatch.setattr(wizard_mod.cv2, "VideoCapture", lambda idx: DummyCap(idx))
+    monkeypatch.setattr(
+        wizard_mod.cv2,
+        "VideoCapture",
+        lambda idx, backend=None: DummyCap(idx),
+    )
 
     service = create_service(tmp_path)
     monkeypatch.setattr(
@@ -181,7 +186,11 @@ def test_test_webcam_uses_device_index(monkeypatch, tmp_path, dummy_ui):
         def release(self):
             pass
 
-    monkeypatch.setattr(wizard_mod.cv2, "VideoCapture", lambda idx: DummyCap(idx))
+    monkeypatch.setattr(
+        wizard_mod.cv2,
+        "VideoCapture",
+        lambda idx, backend=None: DummyCap(idx),
+    )
 
     service = create_service(tmp_path)
     monkeypatch.setattr(
@@ -200,7 +209,6 @@ def test_test_webcam_uses_device_index(monkeypatch, tmp_path, dummy_ui):
     assert used_index["value"] == 3
 
 
-
 def test_roi_updates_on_draw(monkeypatch, tmp_path, dummy_ui):
     messages = dummy_ui
 
@@ -217,10 +225,14 @@ def test_on_webcam_change_triggers_preview(monkeypatch, tmp_path):
         service, DummyControllerManager(), DummySensorManager()
     )
 
-
     monkeypatch.setattr(wizard, "_refresh_step3", lambda: None)
 
-    wizard._wizard_data["parameters"] = {"roi_x": 0, "roi_y": 0, "roi_width": 0, "roi_height": 0}
+    wizard._wizard_data["parameters"] = {
+        "roi_x": 0,
+        "roi_y": 0,
+        "roi_width": 0,
+        "roi_height": 0,
+    }
 
     wizard._show_roi_selector()
 
@@ -248,4 +260,3 @@ def test_on_webcam_change_triggers_preview(monkeypatch, tmp_path):
     wizard._on_webcam_change(types.SimpleNamespace(value="Camera 1 (USB)"))
 
     assert called.get("ok")
-

@@ -41,6 +41,7 @@ class CameraCaptureController(ControllerStage):
         self.width = params.get("width")
         self.height = params.get("height")
         self.fps = params.get("fps")
+        self.capture_backend = params.get("capture_backend")
         self.webcam_id = params.get("cam_id")
         self.rotation = params.get("rotation", 0)
         self.uvc_settings = {}
@@ -58,6 +59,9 @@ class CameraCaptureController(ControllerStage):
                         self.width, self.height = res
                     self.fps = cam_cfg.get("fps", self.fps)
                     self.rotation = cam_cfg.get("rotation", self.rotation)
+                    self.capture_backend = cam_cfg.get(
+                        "capture_backend", self.capture_backend
+                    )
                     self.uvc_settings.update(cam_cfg.get("uvc", {}))
                     self.uvc_settings.update(cam_cfg.get("uvc_settings", {}))
 
@@ -68,7 +72,12 @@ class CameraCaptureController(ControllerStage):
     async def initialize(self) -> bool:
         """Initialize camera capture using the camera I/O thread pool."""
         try:
-            self._capture = await run_camera_io(cv2.VideoCapture, self.device_index)
+            if self.capture_backend is not None:
+                self._capture = await run_camera_io(
+                    cv2.VideoCapture, self.device_index, self.capture_backend
+                )
+            else:
+                self._capture = await run_camera_io(cv2.VideoCapture, self.device_index)
             if not self._capture or not self._capture.isOpened():
                 error(
                     "Unable to open camera",
@@ -122,9 +131,16 @@ class CameraCaptureController(ControllerStage):
                         device_index=self.device_index,
                     )
                     try:
-                        self._capture = await run_camera_io(
-                            cv2.VideoCapture, self.device_index
-                        )
+                        if self.capture_backend is not None:
+                            self._capture = await run_camera_io(
+                                cv2.VideoCapture,
+                                self.device_index,
+                                self.capture_backend,
+                            )
+                        else:
+                            self._capture = await run_camera_io(
+                                cv2.VideoCapture, self.device_index
+                            )
                         if self._capture and self._capture.isOpened():
                             await apply_uvc_settings(
                                 self._capture,
