@@ -170,33 +170,25 @@ class WebApplication:
             """System status page"""
             return self._create_status_page()
 
-        @ui.page("/video_feed")
-        async def video_feed(request: Request):
-            """Stream MJPEG frames from the dashboard camera"""
-            # retrieve specific dashboard camera stream
-            camera = self.component_registry.get_component("dashboard_camera_stream")
+        async def _video_feed(request: Request, cid: Optional[str] = None):
+            """Stream MJPEG frames from the specified dashboard camera"""
+            camera = None
+            if cid:
+                camera = self.component_registry.get_component(
+                    f"dashboard_camera_stream_{cid}"
+                )
+                if camera is None:
+                    camera = self.component_registry.get_component(cid)
+
             if camera is None:
-                # fallback to first registered dashboard camera stream
+                camera = self.component_registry.get_component("dashboard_camera_stream")
+
+            if camera is None:
                 for comp in self.component_registry.get_all_components():
-                    cid = getattr(comp, "component_id", "")
-                    if str(cid).startswith("dashboard_camera_stream_"):
+                    comp_id = getattr(comp, "component_id", "")
+                    if str(comp_id).startswith("dashboard_camera_stream_"):
                         camera = comp
                         break
-
-            # if no registered camera is available, create a temporary one
-            if camera is None:
-                if self._temp_camera_stream is None:
-                    self._temp_camera_stream = CameraStreamComponent(
-                        controller_manager=self.controller_manager,
-                        component_id="temp_dashboard_camera_stream",
-                    )
-                    self.component_registry.register(self._temp_camera_stream)
-                    # start streaming to update frames for MJPEG output
-                    try:
-                        self._temp_camera_stream.start_streaming()
-                    except Exception as exc:  # pragma: no cover - best effort
-                        warning(f"Failed to start temporary camera stream: {exc}")
-                camera = self._temp_camera_stream
 
             if camera is None:
                 raise HTTPException(status_code=503, detail="Camera stream unavailable")
@@ -230,6 +222,14 @@ class WebApplication:
             return StreamingResponse(
                 gen(), media_type="multipart/x-mixed-replace; boundary=frame"
             )
+
+        @ui.page("/video_feed")
+        async def video_feed(request: Request):
+            return await _video_feed(request=request, cid=None)
+
+        @ui.page("/video_feed/{cid}")
+        async def video_feed_param(request: Request, cid: str):
+            return await _video_feed(request=request, cid=cid)
 
     def _setup_layout(self) -> None:
         """Setup common layout elements"""

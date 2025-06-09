@@ -42,14 +42,14 @@ async def test_video_feed_disconnect(monkeypatch):
         'dashboard_camera_stream'
     ] = DummyCam()
 
-    route = [r for r in app.routes if getattr(r, 'path', None) == '/video_feed'][0]
+    route = [r for r in app.routes if getattr(r, 'path', None) == '/video_feed/{cid}'][0]
     endpoint = route.endpoint.__wrapped__
 
     class DummyRequest:
         async def is_disconnected(self):
             return True
 
-    response = await endpoint(request=DummyRequest())
+    response = await endpoint(request=DummyRequest(), cid='dashboard_camera_stream')
     gen = response.body_iterator
     with pytest.raises(StopAsyncIteration):
         await gen.__anext__()
