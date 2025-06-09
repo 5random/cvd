@@ -172,6 +172,8 @@ class MotionDetectionController(ImageController):
         self.multi_frame_enabled = params.get("multi_frame_enabled", False)
         self.multi_frame_window = params.get("multi_frame_window", 30)
         self.multi_frame_threshold = params.get("multi_frame_threshold", 0.3)
+        self.warmup_frames = params.get("warmup_frames", 0)
+        self._warmup_counter = 0
 
         # Background subtractor
         self._bg_subtractor: Optional[cv2.BackgroundSubtractor] = None
@@ -481,6 +483,7 @@ class MotionDetectionController(ImageController):
         if not await super().start():
             return False
         self._stop_event.clear()
+        self._warmup_counter = self.warmup_frames
         self._capture_task = asyncio.create_task(self._capture_loop())
         return True
 
@@ -541,6 +544,8 @@ class MotionDetectionController(ImageController):
                                 self.uvc_settings,
                                 controller_id=self.controller_id,
                             )
+                            self._bg_subtractor = None
+                            self._warmup_counter = self.warmup_frames
                             failure_count = 0
                             delay = base_delay
                         else:
@@ -571,6 +576,11 @@ class MotionDetectionController(ImageController):
                 if ret:
                     if self.rotation:
                         frame = rotate_frame(frame, self.rotation)
+                    if self._warmup_counter > 0:
+                        self._warmup_counter -= 1
+                        failure_count = 0
+                        delay = base_delay
+                        continue
                     result = await self.process_image(
                         frame,
                         {
