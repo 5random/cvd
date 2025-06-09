@@ -182,7 +182,7 @@ class DashboardComponent(BaseComponent):
         self,
         config_service: ConfigurationService,
         sensor_manager: SensorManager,
-        controller_manager: ControllerManager,
+        controller_manager: Optional[ControllerManager],
         notification_center: Optional[NotificationCenter] = None,
     ):
 
@@ -190,7 +190,7 @@ class DashboardComponent(BaseComponent):
         super().__init__(config)
         self.config_service = config_service
         self.sensor_manager = sensor_manager
-        self.controller_manager = controller_manager
+        self.controller_manager: Optional[ControllerManager] = controller_manager
         self._notification_center = notification_center
         self.component_registry = get_component_registry()
         self._sensor_cards: Dict[str, SensorCardComponent] = {}
@@ -534,6 +534,8 @@ class DashboardComponent(BaseComponent):
 
     def refresh_controllers(self) -> None:
         """Reload dashboard controllers and re-render cards."""
+        if self.controller_manager is None:
+            return
         self._dashboard_controllers = [
             cid
             for cid, cfg in self.config_service.get_controller_configs()
@@ -620,6 +622,8 @@ class DashboardComponent(BaseComponent):
             self._sensor_cards[sensor_id] = sensor_card
 
     def _render_controller_cards(self) -> None:
+        if self.controller_manager is None:
+            return
         for controller_id in self._dashboard_controllers:
             controller = self.controller_manager.get_controller(controller_id)
             if not controller:
