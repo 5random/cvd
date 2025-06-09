@@ -22,6 +22,7 @@ async def apply_uvc_settings(
         "gamma": cv2.CAP_PROP_GAMMA,
         "gain": cv2.CAP_PROP_GAIN,
         "backlight_comp": cv2.CAP_PROP_BACKLIGHT,
+        "backlight_compensation": cv2.CAP_PROP_BACKLIGHT,
         "exposure": cv2.CAP_PROP_EXPOSURE,
     }
     for name, value in settings.items():
