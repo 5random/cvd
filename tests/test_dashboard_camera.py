@@ -154,6 +154,7 @@ def test_render_camera_stream_invalid_resolution(tmp_path, monkeypatch, dummy_ui
         DummyStream,
     )
     dashboard._render_camera_stream()
+    assert DummyStream.kwargs.get("controller_id") == "cam1"
 
 
 def test_render_camera_stream_string_resolution(tmp_path, monkeypatch, dummy_ui):
@@ -185,5 +186,6 @@ def test_render_camera_stream_string_resolution(tmp_path, monkeypatch, dummy_ui)
         RecStream,
     )
     dashboard._render_camera_stream()
+    assert RecStream.kwargs.get("controller_id") == "cam1"
     assert streams and streams[0] == (640, 480)
 

@@ -487,6 +487,7 @@ class DashboardComponent(BaseComponent):
 
                 stream = CameraStreamComponent(
                     controller_manager=self.controller_manager,
+                    controller_id=cid,
                     update_interval=1 / 15,
                     max_width=width,
                     max_height=height,
@@ -525,6 +526,7 @@ class DashboardComponent(BaseComponent):
             # Create camera stream component
             self._camera_stream = CameraStreamComponent(
                 controller_manager=self.controller_manager,
+                controller_id=camera_ids[0],
                 update_interval=1 / 15,  # 15 FPS for dashboard
                 max_width=480,
                 max_height=360,
