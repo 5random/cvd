@@ -522,20 +522,6 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
                     ui.image().classes("w-64 h-48 border").props('alt="Webcam preview"')
                 )
 
-                self._step2_elements["webcam_select"] = (
-                    ui.select(
-                        webcam_options,
-                        value=self._wizard_data["selected_webcam"],
-                        on_change=self._on_webcam_change,
-                    )
-                    .bind_value_to(self._wizard_data, "selected_webcam")
-                    .props("outlined")
-                    .classes("flex-1")
-                )
-                ui.button("Test Webcam", on_click=self._test_webcam).props(
-                    "color=secondary"
-                )
-
                 
             # Webcam configuration
             if self._wizard_data["selected_webcam"]:
