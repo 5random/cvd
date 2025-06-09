@@ -373,6 +373,7 @@ class ExperimentCard(BaseComponent):
         self._progress_label: Any = None
         self._state_label: Optional[Label] = None
         self._action_buttons: List[Button] = []
+        self._action_row: Optional[Element] = None
 
     def render(self) -> Element:
         """Render experiment card"""
@@ -443,7 +444,8 @@ class ExperimentCard(BaseComponent):
                             )
 
                 # Action buttons
-                with ui.row().classes("gap-2 justify-end w-full mt-4"):
+                with ui.row().classes("gap-2 justify-end w-full mt-4") as action_row:
+                    self._action_row = action_row
                     self._render_action_buttons()
 
         self._update_display()
@@ -807,17 +809,13 @@ class ExperimentCard(BaseComponent):
         self._update_display()
 
         # Re-render action buttons if state changed
-        if self._container:
-            # Clear existing buttons
+        if self._action_row:
             for btn in self._action_buttons:
                 btn.delete()
             self._action_buttons.clear()
-
-            # Re-render buttons
-            with self._container:
-                with ui.card_section():
-                    with ui.row().classes("gap-2 justify-end w-full mt-4"):
-                        self._render_action_buttons()
+            self._action_row.clear()
+            with self._action_row:
+                self._render_action_buttons()
 
     def _update_element(self, data: Any) -> None:
         """Update element with new data (required by BaseComponent)"""
