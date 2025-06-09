@@ -174,6 +174,93 @@ class SensorCardComponent(TimedComponent):
         pass
 
 
+@dataclass
+class ControllerCardConfig:
+    """Configuration for controller display cards"""
+
+    controller_id: str
+    title: str
+
+
+class ControllerCardComponent(TimedComponent):
+    """Dashboard card for a controller"""
+
+    timer_attributes = ["_update_timer"]
+
+    def __init__(
+        self,
+        config: ComponentConfig,
+        card_config: ControllerCardConfig,
+        controller_manager: ControllerManager,
+    ):
+        super().__init__(config)
+        self.card_config = card_config
+        self.controller_manager = controller_manager
+        self._status_icon: Optional[ui.icon] = None
+        self._output_label: Optional[ui.label] = None
+        self._update_timer: Optional[ui.timer] = None
+
+    def render(self) -> ui.card:
+        with ui.card().classes("p-4 cvd-card min-w-48") as card:
+            with ui.row().classes("items-center mb-2"):
+                ui.label(self.card_config.title).classes(
+                    "text-lg font-semibold flex-grow"
+                )
+                self._status_icon = ui.icon("circle", size="sm")
+
+            self._output_label = ui.label("-").classes("text-sm")
+
+            self._update_timer = ui.timer(1.0, self._update_display)
+
+        self._rendered = True
+        self._element = card
+        return card
+
+    def _update_display(self) -> None:
+        try:
+            controller = self.controller_manager.get_controller(
+                self.card_config.controller_id
+            )
+            if controller is None:
+                if self._output_label:
+                    self._output_label.text = "Unavailable"
+                if self._status_icon:
+                    self._status_icon.name = "warning"
+                    self._status_icon.classes(replace="text-orange-500")
+                return
+
+            output = None
+            try:
+                output = controller.get_output()
+            except Exception:
+                pass
+
+            if self._output_label:
+                self._output_label.text = (
+                    str(output) if output is not None else "No output"
+                )
+
+            if self._status_icon:
+                status_config = {
+                    ControllerStatus.RUNNING: ("play_circle", "text-green-500"),
+                    ControllerStatus.STOPPED: ("stop_circle", "text-gray-500"),
+                    ControllerStatus.ERROR: ("error", "text-red-500"),
+                    ControllerStatus.PAUSED: ("pause_circle", "text-yellow-500"),
+                }
+                icon, color = status_config.get(
+                    controller.status, ("help", "text-gray-400")
+                )
+                self._status_icon.name = icon
+                self._status_icon.classes(replace=color)
+        except Exception as exc:
+            error(
+                f"Error updating controller card {self.card_config.controller_id}: {exc}"
+            )
+
+    def _update_element(self, data: Any) -> None:  # pragma: no cover - handled by timer
+        pass
+
+
 class DashboardComponent(BaseComponent):
     """Main dashboard component"""
 
@@ -191,7 +278,7 @@ class DashboardComponent(BaseComponent):
         self.controller_manager: Optional[ControllerManager] = controller_manager
         self.component_registry = get_component_registry()
         self._sensor_cards: Dict[str, SensorCardComponent] = {}
-        self._controller_cards: Dict[str, ui.card] = {}
+        self._controller_cards: Dict[str, ControllerCardComponent] = {}
         self._camera_stream: Optional[CameraStreamComponent] = None
         self._camera_streams: Dict[str, CameraStreamComponent] = {}
 
@@ -307,7 +394,10 @@ class DashboardComponent(BaseComponent):
                     try:
                         for cid in self.controller_manager.list_controllers():
                             ctrl = self.controller_manager.get_controller(cid)
-                            if ctrl is not None and ctrl.status == ControllerStatus.RUNNING:
+                            if (
+                                ctrl is not None
+                                and ctrl.status == ControllerStatus.RUNNING
+                            ):
                                 active_controllers.append(cid)
                     except Exception as exc:  # pragma: no cover - log and continue
                         error(f"Failed to get active controllers: {exc}")
@@ -513,9 +603,7 @@ class DashboardComponent(BaseComponent):
                     if cid in self._dashboard_controllers
                 ]
                 ordered += [
-                    cid
-                    for cid in self._dashboard_controllers
-                    if cid not in ordered
+                    cid for cid in self._dashboard_controllers if cid not in ordered
                 ]
                 self._dashboard_controllers = ordered
 
@@ -523,10 +611,7 @@ class DashboardComponent(BaseComponent):
             return
 
         for card in self._controller_cards.values():
-            try:
-                card.delete()
-            except Exception:
-                pass
+            card.cleanup()
         self._controller_cards.clear()
         self._controller_row.clear()
         self._render_controller_cards()
@@ -540,8 +625,7 @@ class DashboardComponent(BaseComponent):
 
         except Exception as e:
             log_service.error(f"Invalid value '{value}': {e}")
-            ui.notify(f"Invalid resolution: {value}", type='negative')
-
+            ui.notify(f"Invalid resolution: {value}", type="negative")
 
     def _render_sensor_cards(self) -> None:
         """Render sensor cards"""
@@ -565,7 +649,6 @@ class DashboardComponent(BaseComponent):
                 error_threshold=sensor_config.get("error_threshold"),
             )
 
-
             # Create and render sensor card
             component_config = ComponentConfig(f"sensor_card_{sensor_id}")
             sensor_card = SensorCardComponent(
@@ -585,29 +668,35 @@ class DashboardComponent(BaseComponent):
     def _render_controller_cards(self) -> None:
         if self.controller_manager is None:
             return
+        cfgs = {cid: cfg for cid, cfg in self.config_service.get_controller_configs()}
         for controller_id in self._dashboard_controllers:
-            controller = self.controller_manager.get_controller(controller_id)
-            if not controller:
-                continue
+            cfg = cfgs.get(controller_id)
+            title = cfg.get("display_name", controller_id) if cfg else controller_id
 
-            with (
-                ui.card()
-                .classes("p-4 cvd-card min-w-48")
-                .props("draggable=true") as card
-            ):
-                ui.label(controller_id).classes("text-lg font-semibold mb-2")
-                output = controller.get_output()
-                ui.label(str(output) if output is not None else "No output").classes(
-                    "text-sm"
-                )
-            card.on(
+            card_config = ControllerCardConfig(
+                controller_id=controller_id,
+                title=title,
+            )
+
+            component_config = ComponentConfig(f"controller_card_{controller_id}")
+
+            card_component = ControllerCardComponent(
+                component_config,
+                card_config,
+                self.controller_manager,
+            )
+
+            card_el = card_component.render()
+            card_el.props("draggable=true")
+            card_el.on(
                 "dragstart",
                 lambda e, cid=controller_id: self._start_controller_drag(cid),
             )
-            card.on("drop", lambda e, cid=controller_id: self._drop_controller_on(cid))
-            # prevent default dragover to allow drop
-            card.on("dragover.prevent", lambda _: None)
-            self._controller_cards[controller_id] = card
+            card_el.on(
+                "drop", lambda e, cid=controller_id: self._drop_controller_on(cid)
+            )
+            card_el.on("dragover.prevent", lambda _: None)
+            self._controller_cards[controller_id] = card_component
 
     def _start_sensor_drag(self, sensor_id: str) -> None:
         self._drag_sensor_id = sensor_id
@@ -642,8 +731,10 @@ class DashboardComponent(BaseComponent):
         if not source or not target:
             return
         row_children = list(self._controller_row.default_slot.children)
-        target_index = row_children.index(target)
-        source.move(target_container=self._controller_row, target_index=target_index)
+        target_index = row_children.index(target.get_element())
+        source.get_element().move(
+            target_container=self._controller_row, target_index=target_index
+        )
         self._update_controller_layout()
         self._drag_controller_id = None
 
@@ -666,7 +757,7 @@ class DashboardComponent(BaseComponent):
         order: list[str] = []
         for child in self._controller_row.default_slot.children:
             for cid, card in self._controller_cards.items():
-                if card is child:
+                if card.get_element() is child:
                     order.append(cid)
                     break
         layout = self.config_service.get_dashboard_layout()
@@ -690,7 +781,10 @@ class DashboardComponent(BaseComponent):
             self._filter_timer = None
         self._sensor_row = None
 
+        for card in self._controller_cards.values():
+            card.cleanup()
         self._controller_cards.clear()
+        self._controller_row = None
 
         # Cleanup camera streams
         for stream in self._camera_streams.values():
