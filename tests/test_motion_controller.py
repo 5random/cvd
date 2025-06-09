@@ -1,5 +1,6 @@
 import numpy as np
 import pytest
+import asyncio
 from PIL import Image
 import cv2
 
@@ -237,5 +238,16 @@ def test_convert_to_cv_frame_bgr_passthrough():
 
     converted = ctrl._convert_to_cv_frame(bgr)
     assert np.array_equal(converted, bgr)
+
+
+@pytest.mark.asyncio
+async def test_stop_event_initialized_and_persistent():
+    cfg = ControllerConfig(controller_id="md", controller_type="motion_detection")
+    ctrl = MotionDetectionController("md", cfg)
+    assert isinstance(ctrl._stop_event, asyncio.Event)
+    started = await ctrl.start()
+    assert started
+    assert isinstance(ctrl._stop_event, asyncio.Event)
+    await ctrl.stop()
 
 
