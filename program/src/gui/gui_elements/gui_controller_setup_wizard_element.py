@@ -148,8 +148,8 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
                 "requires_webcam": False,
                 "algorithms": [],  # ggf. aus einem extra Algorithmus-Schema
                 "default_state_output": [],  # ebenso
-                # die Parameter-Definitionen aus dem Schema übernehmen
-                "parameters": controller_schema.get("properties", {}),
+                "parameters": _PARAM_TEMPLATES.get(t, {}),
+
             }
             for t in types
         }
@@ -667,7 +667,6 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
             return
 
         parameters = self._controller_types[controller_type]["parameters"]
-
         with container:
             for param_name, param_config in parameters.items():
                 with ui.row().classes("items-center gap-4"):
@@ -682,11 +681,7 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
                             max=param_config.get("max"),
                         ).bind_value_to(
                             self._wizard_data["parameters"], param_name
-                        ).props(
-                            "outlined"
-                        ).classes(
-                            "flex-1"
-                        )
+                        ).props("outlined").classes("flex-1")
                     elif param_config["type"] == "float":
                         ui.number(
                             value=self._wizard_data["parameters"].get(
@@ -697,11 +692,9 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
                             step=param_config.get("step", 0.1),
                         ).bind_value_to(
                             self._wizard_data["parameters"], param_name
-                        ).props(
-                            "outlined"
-                        ).classes(
-                            "flex-1"
-                        )
+
+                        ).props("outlined").classes("flex-1")
+
                     elif param_config["type"] == "str":
                         ui.input(
                             value=self._wizard_data["parameters"].get(
@@ -709,11 +702,12 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
                             )
                         ).bind_value_to(
                             self._wizard_data["parameters"], param_name
-                        ).props(
-                            "outlined"
-                        ).classes(
-                            "flex-1"
-                        )
+                        ).props("outlined").classes("flex-1")
+
+            if controller_type == "motion_detection":
+                ui.button("Select ROI", on_click=self._show_roi_selector).props(
+                    "outlined"
+                )
 
             if controller_type == "motion_detection":
                 ui.button("Select ROI", on_click=self._show_roi_selector).props(
