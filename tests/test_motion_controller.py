@@ -9,6 +9,8 @@ from src.controllers.algorithms.motion_detection import (
 )
 from src.controllers.controller_base import ControllerConfig
 
+messages: list[str] = []
+
 
 @pytest.mark.asyncio
 async def test_motion_detection_on_black_frame(monkeypatch):
@@ -73,13 +75,167 @@ async def test_initialize_logs_algorithm(monkeypatch):
     ctrl = MotionDetectionController("md", config)
 
     import src.controllers.algorithms.motion_detection as md
-    messages = []
     monkeypatch.setattr(md, "info", lambda msg, **kwargs: messages.append(msg))
 
     success = await ctrl.initialize()
     await ctrl.cleanup()
 
     assert success
+
     assert any(
         m == "Initialized motion detection controller with MOG2 algorithm" for m in messages
     )
+
+
+@pytest.mark.asyncio
+async def test_multi_frame_threshold_mode(monkeypatch):
+    cfg = ControllerConfig(
+        controller_id="md",
+        controller_type="motion_detection",
+        parameters={
+            "multi_frame_enabled": True,
+            "multi_frame_method": "threshold",
+            "multi_frame_window": 3,
+            "multi_frame_threshold": 0.6,
+        },
+    )
+    ctrl = MotionDetectionController("md", cfg)
+
+    results = [
+        MotionDetectionResult(True, 0, 0, 0, None, None, 0.9),
+        MotionDetectionResult(False, 0, 0, 0, None, None, 0.2),
+        MotionDetectionResult(False, 0, 0, 0, None, None, 0.1),
+    ]
+
+    async def fake_submit(*a, **k):
+        return results.pop(0)
+
+    monkeypatch.setattr(ctrl._motion_pool, "submit_async", fake_submit)
+
+    await ctrl.start()
+    frame = np.zeros((10, 10, 3), dtype=np.uint8)
+    await ctrl.process_image(frame, {})
+    await ctrl.process_image(frame, {})
+    res = await ctrl.process_image(frame, {})
+    assert res.data.motion_detected is False
+    await ctrl.stop()
+
+
+@pytest.mark.asyncio
+async def test_multi_frame_probability_mode(monkeypatch):
+    cfg = ControllerConfig(
+        controller_id="md",
+        controller_type="motion_detection",
+        parameters={
+            "multi_frame_enabled": True,
+            "multi_frame_method": "probability",
+            "multi_frame_decay": 0.5,
+            "multi_frame_threshold": 0.2,
+        },
+    )
+    ctrl = MotionDetectionController("md", cfg)
+
+    results = [
+        MotionDetectionResult(False, 0, 0, 0, None, None, 0.0),
+        MotionDetectionResult(True, 0, 0, 0, None, None, 1.0),
+        MotionDetectionResult(False, 0, 0, 0, None, None, 0.0),
+    ]
+
+    async def fake_submit(*a, **k):
+        return results.pop(0)
+
+    monkeypatch.setattr(ctrl._motion_pool, "submit_async", fake_submit)
+
+    await ctrl.start()
+    frame = np.zeros((10, 10, 3), dtype=np.uint8)
+    await ctrl.process_image(frame, {})
+    await ctrl.process_image(frame, {})
+    res = await ctrl.process_image(frame, {})
+    assert res.data.motion_detected is True
+    await ctrl.stop()
+
+    assert any(m == "Motion detection controller initialized" for m in messages)
+
+
+@pytest.mark.asyncio
+async def test_bg_subtractor_mog2_params(monkeypatch):
+    params = {
+        "algorithm": "MOG2",
+        "var_threshold": 12,
+        "history": 321,
+        "detect_shadows": False,
+    }
+    config = ControllerConfig(controller_id="md", controller_type="motion_detection", parameters=params)
+    ctrl = MotionDetectionController("md", config)
+
+    called = {}
+
+    def fake_mog2(*, detectShadows=True, varThreshold=16, history=500):
+        called["detectShadows"] = detectShadows
+        called["varThreshold"] = varThreshold
+        called["history"] = history
+
+        class Dummy:
+            def apply(self, *a, **k):
+                return np.zeros((1, 1), dtype=np.uint8)
+
+        return Dummy()
+
+    monkeypatch.setattr(cv2, "createBackgroundSubtractorMOG2", fake_mog2)
+
+    success = await ctrl.initialize()
+    await ctrl.cleanup()
+
+    assert success
+    assert called == {"detectShadows": False, "varThreshold": 12, "history": 321}
+
+
+@pytest.mark.asyncio
+async def test_bg_subtractor_knn_params(monkeypatch):
+    params = {
+        "algorithm": "KNN",
+        "dist2_threshold": 42.0,
+        "history": 111,
+        "detect_shadows": False,
+    }
+    config = ControllerConfig(controller_id="md", controller_type="motion_detection", parameters=params)
+    ctrl = MotionDetectionController("md", config)
+
+    called = {}
+
+    def fake_knn(*, detectShadows=True, dist2Threshold=400.0, history=500):
+        called["detectShadows"] = detectShadows
+        called["dist2Threshold"] = dist2Threshold
+        called["history"] = history
+
+        class Dummy:
+            def apply(self, *a, **k):
+                return np.zeros((1, 1), dtype=np.uint8)
+
+        return Dummy()
+
+    monkeypatch.setattr(cv2, "createBackgroundSubtractorKNN", fake_knn)
+
+    success = await ctrl.initialize()
+    await ctrl.cleanup()
+
+    assert success
+    assert called == {
+        "detectShadows": False,
+        "dist2Threshold": 42.0,
+        "history": 111,
+    }
+
+
+def test_convert_to_cv_frame_bgr_passthrough():
+    config = ControllerConfig(controller_id="md", controller_type="motion_detection")
+    ctrl = MotionDetectionController("md", config)
+    bgr = np.zeros((5, 5, 3), dtype=np.uint8)
+    bgr[:, :, 0] = 10
+    bgr[:, :, 1] = 20
+    bgr[:, :, 2] = 30
+
+    converted = ctrl._convert_to_cv_frame(bgr)
+    assert np.array_equal(converted, bgr)
+
+

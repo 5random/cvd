@@ -413,7 +413,13 @@ class WebApplication:
                 )
                 self._refresh_rate_input.classes("w-full mb-2")
 
-                ui.button("Save Settings", on_click=self._save_settings).classes("mt-4")
+                with ui.row().classes("gap-2 mt-4"):
+                    ui.button(
+                        "Save Settings", on_click=self._save_settings
+                    ).props("color=primary")
+                    ui.button(
+                        "Reset Config", on_click=self._open_reset_config_dialog
+                    ).props("outline")
 
             # System status section
             with ui.card().classes("w-1/2 p-4"):
@@ -500,15 +506,46 @@ class WebApplication:
         else:
             ui.notify("Configuration saved successfully", type="positive")
 
-    def _reset_configuration(self, config_textarea) -> None:
+    def _reset_configuration(self, config_textarea=None) -> None:
         """Reset configuration to defaults"""
         try:
             self.config_service.reset_to_defaults()
-            config_textarea.value = self.config_service.get_raw_config_as_json()
+            if config_textarea is not None:
+                config_textarea.value = self.config_service.get_raw_config_as_json()
+            # Update settings inputs if available
+            if hasattr(self, "_title_input") and self._title_input is not None:
+                self._title_input.value = self.config_service.get("ui.title", str, "CVD Tracker")
+            if hasattr(self, "_refresh_rate_input") and self._refresh_rate_input is not None:
+                self._refresh_rate_input.value = self.config_service.get(
+                    "ui.refresh_rate_ms", int, 1000
+                )
         except (OSError, ConfigurationError) as e:
             ui.notify(f"Error resetting configuration: {e}", type="negative")
         else:
             ui.notify("Configuration reset to defaults", type="positive")
+
+    def _open_reset_config_dialog(self) -> None:
+        """Show confirmation dialog before resetting configuration"""
+
+        with ui.dialog() as dialog:
+            with ui.card():
+                ui.label("Reset Configuration").classes("text-lg font-bold")
+                ui.label(
+                    "Are you sure you want to reset the configuration to defaults?"
+                ).classes("mt-2")
+
+                with ui.row().classes("gap-2 justify-end mt-4"):
+                    ui.button("Cancel", on_click=dialog.close).props("flat")
+
+                    def _on_reset_confirm() -> None:
+                        self._reset_configuration()
+                        dialog.close()
+
+                    ui.button("Reset", on_click=_on_reset_confirm).props(
+                        "color=negative"
+                    )
+
+        dialog.open()
 
     def _create_sensor_page(self) -> None:
         """Create standalone sensor management page"""

@@ -157,6 +157,10 @@ class MotionDetectionController(ImageController):
                     self.rotation = cam_cfg.get("rotation", self.rotation)
                     self.uvc_settings.update(cam_cfg.get("uvc_settings", {}))
         self.algorithm = params.get("algorithm", "MOG2")  # MOG2, KNN, or GMG
+        self.var_threshold = params.get("var_threshold", 16)
+        self.dist2_threshold = params.get("dist2_threshold", 400.0)
+        self.history = params.get("history", 500)
+        self.detect_shadows = params.get("detect_shadows", True)
         self.learning_rate = params.get("learning_rate", 0.01)
         self.threshold = params.get("threshold", 25)
         self.min_contour_area = params.get("min_contour_area", 500)
@@ -173,6 +177,19 @@ class MotionDetectionController(ImageController):
         self.multi_frame_window = params.get("multi_frame_window", 30)
         self.multi_frame_threshold = params.get("multi_frame_threshold", 0.3)
 
+        self.multi_frame_method = params.get("multi_frame_method", "threshold")
+        self.multi_frame_decay = params.get("multi_frame_decay", 0.5)
+
+        self.warmup_frames = params.get("warmup_frames", 0)
+        self._warmup_counter = 0
+
+        # Optional region of interest for motion analysis
+        self.roi_x = params.get("roi_x", 0)
+        self.roi_y = params.get("roi_y", 0)
+        self.roi_width = params.get("roi_width")
+        self.roi_height = params.get("roi_height")
+
+
         # Background subtractor
         self._bg_subtractor: Optional[cv2.BackgroundSubtractor] = None
         self._frame_count = 0
@@ -180,16 +197,11 @@ class MotionDetectionController(ImageController):
         self._frame_size: Optional[Tuple[int, int]] = None
 
         # Statistics
-        self._motion_history = []
+        self._motion_history: list[dict[str, Any]] = []
         self._max_history = params.get("max_history", 100)
 
         # Lock to protect shared state in async processing
         self._state_lock = asyncio.Lock()
-
-        # Camera capture state
-        self._stop_event = asyncio.Event()
-        self._capture: Optional[cv2.VideoCapture] = None
-        self._capture_task: Optional[asyncio.Task] = None
 
     async def initialize(self) -> bool:
         """Initialize the motion detection controller"""
@@ -197,11 +209,15 @@ class MotionDetectionController(ImageController):
             # Create background subtractor based on algorithm
             if self.algorithm == "MOG2":
                 self._bg_subtractor = cv2.createBackgroundSubtractorMOG2(
-                    detectShadows=True, varThreshold=16, history=500
+                    detectShadows=self.detect_shadows,
+                    varThreshold=self.var_threshold,
+                    history=self.history,
                 )
             elif self.algorithm == "KNN":
                 self._bg_subtractor = cv2.createBackgroundSubtractorKNN(
-                    detectShadows=True, dist2Threshold=400.0, history=500
+                    detectShadows=self.detect_shadows,
+                    dist2Threshold=self.dist2_threshold,
+                    history=self.history,
                 )
             else:
                 error(
@@ -211,6 +227,11 @@ class MotionDetectionController(ImageController):
                 )
                 return False
 
+            info(
+                f"Initialized motion detection controller with {self.algorithm} algorithm",
+                controller_id=self.controller_id,
+                algorithm=self.algorithm,
+            )
             info(
                 "Motion detection controller initialized",
                 controller_id=self.controller_id,
@@ -238,6 +259,14 @@ class MotionDetectionController(ImageController):
                 return ControllerResult.error_result(
                     "Failed to convert image data to OpenCV format"
                 )
+
+            # Crop to region of interest if configured
+            if self.roi_width is not None and self.roi_height is not None:
+                x1 = max(0, int(self.roi_x))
+                y1 = max(0, int(self.roi_y))
+                x2 = min(frame.shape[1], x1 + int(self.roi_width))
+                y2 = min(frame.shape[0], y1 + int(self.roi_height))
+                frame = frame[y1:y2, x1:x2]
 
             # Store frame size for calculations
             if self._frame_size is None:
@@ -284,14 +313,27 @@ class MotionDetectionController(ImageController):
                 # Update raw detection history
                 self._update_statistics(motion_result)
                 # Robust multi-frame decision
-                if (
-                    self.multi_frame_enabled
-                    and len(self._motion_history) >= self.multi_frame_window
-                ):
-                    recent = self._motion_history[-self.multi_frame_window :]
-                    count = sum(1 for h in recent if h["motion_detected"])
-                    if count / self.multi_frame_window < self.multi_frame_threshold:
-                        motion_result.motion_detected = False
+                if self.multi_frame_enabled:
+                    probability = motion_result.confidence
+                    if self.multi_frame_method == "threshold":
+                        if len(self._motion_history) >= self.multi_frame_window:
+                            recent = self._motion_history[-self.multi_frame_window :]
+                            count = sum(1 for h in recent if h["motion_detected"])
+                            probability = count / self.multi_frame_window
+                    elif self.multi_frame_method == "probability":
+                        recent = self._motion_history[-self.multi_frame_window :]
+                        if recent:
+                            probability = float(np.mean([h["confidence"] for h in recent]))
+                        else:
+                            probability = 0.0
+
+                    if self.multi_frame_method == "probability":
+                        motion_result.motion_detected = (
+                            probability >= self.multi_frame_threshold
+                        )
+                    else:
+                        if probability < self.multi_frame_threshold:
+                            motion_result.motion_detected = False
 
                 # Attach frame and mask for optional visualization
                 motion_result.frame = frame
@@ -322,22 +364,26 @@ class MotionDetectionController(ImageController):
             return ControllerResult.error_result(f"Motion detection error: {e}")
 
     def _convert_to_cv_frame(self, image_data: Any) -> Optional[np.ndarray]:
-        """Convert various image data formats to OpenCV frame"""
+        """Convert various image data formats to an OpenCV BGR frame"""
         try:
             rgb_source = False
+
             if isinstance(image_data, np.ndarray):
                 # Already an OpenCV frame (assumed BGR/BGRA)
                 frame = image_data
 
             elif isinstance(image_data, bytes):
-                # Raw image bytes (often RGB order)
+                # Raw image bytes decoded with OpenCV (already BGR)
                 nparr = np.frombuffer(image_data, np.uint8)
                 frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
 
-            elif hasattr(image_data, "__array__") or isinstance(
-                image_data, Image.Image
-            ):
-                # Objects implementing the numpy array protocol or PIL images
+            elif isinstance(image_data, Image.Image):
+                # PIL images are in RGB order by default
+                frame = np.array(image_data)
+                rgb_source = True
+
+            elif hasattr(image_data, "__array__"):
+                # Generic array-like objects, orientation unknown
                 frame = np.array(image_data)
 
             else:
@@ -349,13 +395,12 @@ class MotionDetectionController(ImageController):
                 )
                 return None
 
-            # Ensure the frame is in the correct format
-            if len(frame.shape) == 3 and frame.shape[2] == 3:
-                # Convert RGB to BGR for OpenCV (expects BGR format)
-                frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
-            elif len(frame.shape) == 3 and frame.shape[2] == 4:
-                # Convert RGBA to BGR
-                frame = cv2.cvtColor(frame, cv2.COLOR_RGBA2BGR)
+            # Convert to BGR only when the source is known to be RGB
+            if rgb_source and len(frame.shape) == 3:
+                if frame.shape[2] == 3:
+                    frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+                elif frame.shape[2] == 4:
+                    frame = cv2.cvtColor(frame, cv2.COLOR_RGBA2BGR)
 
             return frame
 
@@ -481,6 +526,7 @@ class MotionDetectionController(ImageController):
         if not await super().start():
             return False
         self._stop_event.clear()
+        self._warmup_counter = self.warmup_frames
         self._capture_task = asyncio.create_task(self._capture_loop())
         return True
 
@@ -541,6 +587,8 @@ class MotionDetectionController(ImageController):
                                 self.uvc_settings,
                                 controller_id=self.controller_id,
                             )
+                            self._bg_subtractor = None
+                            self._warmup_counter = self.warmup_frames
                             failure_count = 0
                             delay = base_delay
                         else:
@@ -571,6 +619,11 @@ class MotionDetectionController(ImageController):
                 if ret:
                     if self.rotation:
                         frame = rotate_frame(frame, self.rotation)
+                    if self._warmup_counter > 0:
+                        self._warmup_counter -= 1
+                        failure_count = 0
+                        delay = base_delay
+                        continue
                     result = await self.process_image(
                         frame,
                         {
@@ -604,4 +657,4 @@ class MotionDetectionController(ImageController):
                     error=str(e),
                 )
 
-            await asyncio.sleep(base_delay)
+            await asyncio.sleep(delay)

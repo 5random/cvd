@@ -36,8 +36,13 @@ For more details see the source files referenced above such as [`program/src/uti
 ## UML Diagram
 
 The full class diagram below is generated automatically from the source
-tree using `scripts/generate_uml.py`.  It lists every class defined under
-`program/src` and highlights inheritance relationships.
+tree using `scripts/generate_uml.py`. It lists every class defined under
+`program/src` along with detected attributes and methods. Comments
+preceding classes, variables and functions contain short descriptions
+extracted from their docstrings or type hints and highlight inheritance
+relationships. Inline comments next to variable definitions are also
+captured so the diagram explains what each field represents. Private
+attributes and methods are omitted to keep the diagram concise.
 
 ```{literalinclude} full_class_diagram.mmd
 :language: mermaid

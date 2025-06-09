@@ -256,10 +256,16 @@ class CameraStreamComponent(BaseComponent):
             self.status_label.classes("text-green-600")
 
     def _get_motion_detection_controller(self) -> Optional[MotionDetectionController]:
-        """Get the motion detection controller instance."""
-        controller = self.controller_manager.get_controller("motion_detection")
-        if isinstance(controller, MotionDetectionController):
-            return controller
+        """Get the first motion detection controller instance if available."""
+        try:
+            # Iterate over registered controllers and return the first instance
+            for cid in self.controller_manager.list_controllers():
+                ctrl = self.controller_manager.get_controller(cid)
+                if isinstance(ctrl, MotionDetectionController):
+                    return ctrl
+        except Exception as exc:
+            # Any issues should be logged but not raise exceptions during UI update
+            warning(f"Error retrieving motion controller: {exc}")
         return None
 
     def _get_latest_frame_data(
