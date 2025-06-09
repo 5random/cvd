@@ -3,6 +3,7 @@ Controllers component for displaying and managing all configured controllers.
 """
 
 from typing import Dict, Any, Optional, List, Callable
+from datetime import datetime, timedelta
 from dataclasses import dataclass
 from nicegui import ui
 import time
@@ -433,13 +434,26 @@ class ControllerCardComponent(TimedComponent):
 
         # Last success
         last_success = stats.get("last_success", None)
-        success_text = (
-            "Yes" if last_success else "No" if last_success is False else "Unknown"
-        )
+        if isinstance(last_success, bool):
+            success_text = "Yes" if last_success else "No"
+        elif last_success:
+            try:
+                ts = float(last_success)
+                success_text = datetime.fromtimestamp(ts).strftime("%Y-%m-%d %H:%M:%S")
+            except Exception:
+                success_text = str(last_success)
+        else:
+            success_text = "Unknown"
+
         self._stats_labels["last_success"].text = f"Last Success: {success_text}"
 
-        # Uptime (placeholder - would need to track start time)
-        self._stats_labels["uptime"].text = "Uptime: --"
+        start_time = stats.get("start_time")
+        if start_time is not None:
+            uptime_s = time.time() - start_time
+            uptime_text = str(timedelta(seconds=int(uptime_s)))
+        else:
+            uptime_text = "--"
+        self._stats_labels["uptime"].text = f"Uptime: {uptime_text}"
 
     def _show_not_registered(self) -> None:
         """Show state when controller is not registered"""

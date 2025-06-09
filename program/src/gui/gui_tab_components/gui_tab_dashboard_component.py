@@ -1,6 +1,7 @@
 """
 Dashboard component for displaying sensor data and system status.
 """
+
 from typing import Dict, Any, Optional, List
 from dataclasses import dataclass
 from nicegui import ui
@@ -9,6 +10,7 @@ import psutil
 
 from src.utils.config_utils.config_service import ConfigurationService
 from src.utils.log_utils.log_service import info, warning, error, debug
+from src.utils.log_utils import log_service
 
 from src.data_handler.sources.sensor_source_manager import SensorManager
 from src.data_handler.interface.sensor_interface import SensorReading, SensorStatus
@@ -176,8 +178,13 @@ class SensorCardComponent(TimedComponent):
 class DashboardComponent(BaseComponent):
     """Main dashboard component"""
 
-
-    def __init__(self, config_service: ConfigurationService, sensor_manager: SensorManager, controller_manager: ControllerManager, notification_center: Optional[NotificationCenter] = None):
+    def __init__(
+        self,
+        config_service: ConfigurationService,
+        sensor_manager: SensorManager,
+        controller_manager: ControllerManager,
+        notification_center: Optional[NotificationCenter] = None,
+    ):
 
         config = ComponentConfig("dashboard")
         super().__init__(config)
@@ -189,6 +196,7 @@ class DashboardComponent(BaseComponent):
         self._sensor_cards: Dict[str, SensorCardComponent] = {}
         self._controller_cards: Dict[str, ui.card] = {}
         self._camera_stream: Optional[CameraStreamComponent] = None
+        self._camera_streams: Dict[str, CameraStreamComponent] = {}
 
         # Filter state and timer
         self._sensor_filter: List[str] = []
@@ -213,30 +221,38 @@ class DashboardComponent(BaseComponent):
 
         layout = self.config_service.get_dashboard_layout()
         if isinstance(layout, dict):
-            sensor_layout = layout.get('sensors', [])
-            controller_layout = layout.get('controllers', [])
+            sensor_layout = layout.get("sensors", [])
+            controller_layout = layout.get("controllers", [])
             if sensor_layout:
-                ordered = [sid for sid in sensor_layout if sid in self._dashboard_sensors]
-                ordered += [sid for sid in self._dashboard_sensors if sid not in ordered]
+                ordered = [
+                    sid for sid in sensor_layout if sid in self._dashboard_sensors
+                ]
+                ordered += [
+                    sid for sid in self._dashboard_sensors if sid not in ordered
+                ]
                 self._dashboard_sensors = ordered
             if controller_layout:
-                ordered = [cid for cid in controller_layout if cid in self._dashboard_controllers]
-                ordered += [cid for cid in self._dashboard_controllers if cid not in ordered]
+                ordered = [
+                    cid
+                    for cid in controller_layout
+                    if cid in self._dashboard_controllers
+                ]
+                ordered += [
+                    cid for cid in self._dashboard_controllers if cid not in ordered
+                ]
                 self._dashboard_controllers = ordered
 
     def render(self) -> ui.column:
         """Render dashboard"""
         with ui.column().classes("w-full") as dashboard:
             # Dashboard header
-            ui.label('CVD Tracker Dashboard').classes('text-2xl font-bold mb-4')
-
+            ui.label("CVD Tracker Dashboard").classes("text-2xl font-bold mb-4")
 
             # System status overview
             self._render_system_status()
 
             if self._notification_center is not None:
                 self._render_notification_panel()
-            
 
             # Main content area with camera stream and sensor data
             with ui.row().classes("w-full gap-4"):
@@ -248,24 +264,30 @@ class DashboardComponent(BaseComponent):
 
                 # Sensor data section (right side)
                 if self._dashboard_sensors:
-                    with ui.column().classes('flex-1'):
-                        ui.label('Sensor Data').classes('text-lg font-semibold mb-2')
+                    with ui.column().classes("flex-1"):
+                        ui.label("Sensor Data").classes("text-lg font-semibold mb-2")
 
                         ui.select(
                             self._dashboard_sensors,
                             multiple=True,
                             value=self._sensor_filter,
                             on_change=self._on_sensor_filter_change,
-                        ).props('outlined use-chips clearable').classes('w-full mb-2')
-                        with ui.row().classes('w-full gap-4 flex-wrap') as sensor_row:
+                        ).props("outlined use-chips clearable").classes("w-full mb-2")
+                        with ui.row().classes("w-full gap-4 flex-wrap") as sensor_row:
                             self._sensor_row = sensor_row
 
                             self._render_sensor_cards()
 
                 if self._dashboard_controllers:
-                    with ui.column().classes('flex-1'):
-                        ui.label('Controller States').classes('text-lg font-semibold mb-2')
-                        with ui.row().classes('w-full gap-4 flex-wrap').on('dragover', lambda e: e.prevent_default()) as row:
+                    with ui.column().classes("flex-1"):
+                        ui.label("Controller States").classes(
+                            "text-lg font-semibold mb-2"
+                        )
+                        with (
+                            ui.row()
+                            .classes("w-full gap-4 flex-wrap")
+                            .on("dragover", lambda e: e.prevent_default()) as row
+                        ):
                             self._controller_row = row
                             self._render_controller_cards()
 
@@ -329,12 +351,22 @@ class DashboardComponent(BaseComponent):
 
     def _render_notification_panel(self) -> None:
         """Collapsible panel displaying notifications"""
-        unread = self._notification_center.get_unread_count() if self._notification_center else 0
-        with ui.expansion('Benachrichtigungen', icon='notifications', on_value_change=self._on_notification_toggle) as exp:
-            with exp.add_slot('header'):
-                with ui.row().classes('items-center'):
-                    ui.label('Benachrichtigungen').classes('font-medium')
-                    self._badge = ui.badge(str(unread) if unread else '', color='red').classes('ml-2')
+        unread = (
+            self._notification_center.get_unread_count()
+            if self._notification_center
+            else 0
+        )
+        with ui.expansion(
+            "Benachrichtigungen",
+            icon="notifications",
+            on_value_change=self._on_notification_toggle,
+        ) as exp:
+            with exp.add_slot("header"):
+                with ui.row().classes("items-center"):
+                    ui.label("Benachrichtigungen").classes("font-medium")
+                    self._badge = ui.badge(
+                        str(unread) if unread else "", color="red"
+                    ).classes("ml-2")
                     if unread == 0:
                         self._badge.set_visibility(False)
             with exp:
@@ -351,7 +383,7 @@ class DashboardComponent(BaseComponent):
         if not self._notification_center or not self._badge:
             return
         count = self._notification_center.get_unread_count()
-        self._badge.set_text(str(count) if count else '')
+        self._badge.set_text(str(count) if count else "")
         self._badge.set_visibility(count > 0)
 
     def _should_show_camera(self) -> bool:
@@ -363,14 +395,14 @@ class DashboardComponent(BaseComponent):
         for cid, cfg in self.config_service.get_controller_configs():
             if self._dashboard_controllers and cid not in self._dashboard_controllers:
                 continue
-            if not cfg.get('enabled', True):
+            if not cfg.get("enabled", True):
                 continue
-            ctype = str(cfg.get('type', '')).lower()
-            if ctype == 'camera':
+            ctype = str(cfg.get("type", "")).lower()
+            if ctype == "camera":
                 camera_ids.append(cid)
                 continue
-            if ctype == 'motion_detection':
-                params = cfg.get('parameters', {})
+            if ctype == "motion_detection":
+                params = cfg.get("parameters", {})
 
                 if isinstance(params, dict) and (
                     "cam_id" in params or "device_index" in params
@@ -378,7 +410,6 @@ class DashboardComponent(BaseComponent):
 
                     camera_ids.append(cid)
         return camera_ids
-    
 
     def _render_camera_stream(self) -> None:
         """Render camera stream component"""
@@ -393,7 +424,9 @@ class DashboardComponent(BaseComponent):
                     width, height = int(resolution[0]), int(resolution[1])
                 else:
                     width, height = 480, 360
-                overlay = settings.get("overlay") if isinstance(settings, dict) else None
+                overlay = (
+                    settings.get("overlay") if isinstance(settings, dict) else None
+                )
 
                 stream = CameraStreamComponent(
                     controller_manager=self.controller_manager,
@@ -405,19 +438,23 @@ class DashboardComponent(BaseComponent):
                     overlay_options=overlay,
                 )
 
-                with ui.card().classes('p-2 cvd-card mb-2'):
-                    ui.label(f"Camera {cid}").classes('text-sm font-semibold mb-2')
+                with ui.card().classes("p-2 cvd-card mb-2"):
+                    ui.label(f"Camera {cid}").classes("text-sm font-semibold mb-2")
                     stream.render()
-                    with ui.row().classes('gap-2 mt-2'):
+                    with ui.row().classes("gap-2 mt-2"):
                         ui.select(
                             ["320x240", "640x480", "1280x720"],
                             value=f"{width}x{height}",
-                            on_change=lambda e, s=stream: self._set_stream_resolution(s, e.value),
-                        ).classes('w-32')
+                            on_change=lambda e, s=stream: self._set_stream_resolution(
+                                s, e.value
+                            ),
+                        ).classes("w-32")
                         ui.checkbox(
                             "Overlay",
                             value=stream.show_motion_overlay,
-                            on_change=lambda e, s=stream: setattr(s, 'show_motion_overlay', e.value),
+                            on_change=lambda e, s=stream: setattr(
+                                s, "show_motion_overlay", e.value
+                            ),
                         )
 
                 self.component_registry.register(stream)
@@ -436,15 +473,14 @@ class DashboardComponent(BaseComponent):
             self._camera_stream.render()
             self.component_registry.register(self._camera_stream)
 
-
         except Exception as e:
             error(f"Error rendering camera stream: {e}")
             # Show error message instead
-            with ui.card().classes('p-4 cvd-card'):
-                with ui.column().classes('items-center'):
-                    ui.icon('videocam_off', size='lg').classes('text-gray-400 mb-2')
-                    ui.label('Camera Stream Unavailable').classes('text-gray-600')
-                    ui.label(f'Error: {str(e)}').classes('text-xs text-red-500')
+            with ui.card().classes("p-4 cvd-card"):
+                with ui.column().classes("items-center"):
+                    ui.icon("videocam_off", size="lg").classes("text-gray-400 mb-2")
+                    ui.label("Camera Stream Unavailable").classes("text-gray-600")
+                    ui.label(f"Error: {str(e)}").classes("text-xs text-red-500")
 
     def _on_sensor_filter_change(self, e) -> None:
         """Handle sensor filter selection"""
@@ -466,19 +502,13 @@ class DashboardComponent(BaseComponent):
     def _set_stream_resolution(self, stream: CameraStreamComponent, value: str) -> None:
         """Update resolution of a camera stream from dropdown selection."""
         try:
-            width, height = (int(v) for v in value.split('x'))
+            width, height = (int(v) for v in value.split("x"))
             stream.max_width = width
             stream.max_height = height
-        except Exception:
-            pass
 
-    
-
-            with ui.card().classes("p-4 cvd-card"):
-                with ui.column().classes("items-center"):
-                    ui.icon("videocam_off", size="lg").classes("text-gray-400 mb-2")
-                    ui.label("Camera Stream Unavailable").classes("text-gray-600")
-                    ui.label(f"Error: {str(e)}").classes("text-xs text-red-500")
+        except Exception as e:
+            log_service.error(f"Invalid value '{value}': {e}")
+            ui.notify(f"Invalid resolution: {value}", type='negative')
 
 
     def _render_sensor_cards(self) -> None:
@@ -487,12 +517,12 @@ class DashboardComponent(BaseComponent):
 
         for sensor_id in self._dashboard_sensors:
             sensor_config = cfgs.get(sensor_id)
-            if not sensor_config or not sensor_config.get('enabled', True):
+            if not sensor_config or not sensor_config.get("enabled", True):
                 continue
 
             if self._sensor_filter and sensor_id not in self._sensor_filter:
                 continue
-            
+
             # Create sensor card config
             card_config = SensorCardConfig(
                 sensor_id=sensor_id,
@@ -503,18 +533,19 @@ class DashboardComponent(BaseComponent):
                 error_threshold=sensor_config.get("error_threshold"),
             )
 
+
             # Create and render sensor card
             component_config = ComponentConfig(f"sensor_card_{sensor_id}")
-            sensor_card = SensorCardComponent(component_config, card_config, self.sensor_manager)
-            sensor_card.render()
-
+            sensor_card = SensorCardComponent(
+                component_config, card_config, self.sensor_manager
+            )
             card_el = sensor_card.render()
-            card_el.props('draggable=true')
-            card_el.on('dragstart', lambda e, sid=sensor_id: self._start_sensor_drag(sid))
-            card_el.on('drop', lambda e, sid=sensor_id: self._drop_sensor_on(sid))
-            card_el.on('dragover', lambda e: e.prevent_default())
-            
-            sensor_card.render()
+            card_el.props("draggable=true")
+            card_el.on(
+                "dragstart", lambda e, sid=sensor_id: self._start_sensor_drag(sid)
+            )
+            card_el.on("drop", lambda e, sid=sensor_id: self._drop_sensor_on(sid))
+            card_el.on("dragover", lambda e: e.prevent_default())
 
             self._sensor_cards[sensor_id] = sensor_card
 
@@ -523,14 +554,23 @@ class DashboardComponent(BaseComponent):
             controller = self.controller_manager.get_controller(controller_id)
             if not controller:
                 continue
-                
-            with ui.card().classes('p-4 cvd-card min-w-48').props('draggable=true') as card:
-                ui.label(controller_id).classes('text-lg font-semibold mb-2')
+
+            with (
+                ui.card()
+                .classes("p-4 cvd-card min-w-48")
+                .props("draggable=true") as card
+            ):
+                ui.label(controller_id).classes("text-lg font-semibold mb-2")
                 output = controller.get_output()
-                ui.label(str(output) if output is not None else 'No output').classes('text-sm')
-            card.on('dragstart', lambda e, cid=controller_id: self._start_controller_drag(cid))
-            card.on('drop', lambda e, cid=controller_id: self._drop_controller_on(cid))
-            card.on('dragover', lambda e: e.prevent_default())
+                ui.label(str(output) if output is not None else "No output").classes(
+                    "text-sm"
+                )
+            card.on(
+                "dragstart",
+                lambda e, cid=controller_id: self._start_controller_drag(cid),
+            )
+            card.on("drop", lambda e, cid=controller_id: self._drop_controller_on(cid))
+            card.on("dragover", lambda e: e.prevent_default())
             self._controller_cards[controller_id] = card
 
     def _start_sensor_drag(self, sensor_id: str) -> None:
@@ -547,7 +587,9 @@ class DashboardComponent(BaseComponent):
             return
         row_children = list(self._sensor_row.default_slot.children)
         target_index = row_children.index(target.get_element())
-        source.get_element().move(target_container=self._sensor_row, target_index=target_index)
+        source.get_element().move(
+            target_container=self._sensor_row, target_index=target_index
+        )
         self._update_sensor_layout()
         self._drag_sensor_id = None
 
@@ -594,7 +636,6 @@ class DashboardComponent(BaseComponent):
         layout = self.config_service.get_dashboard_layout()
         layout["controllers"] = order
         self.config_service.set_dashboard_layout(layout)
-    
 
     def _update_element(self, data: Any) -> None:
         """Update dashboard with new data"""
@@ -615,12 +656,15 @@ class DashboardComponent(BaseComponent):
 
         self._controller_cards.clear()
 
-        # Cleanup camera stream
+        # Cleanup camera streams
+        for stream in self._camera_streams.values():
+            stream.cleanup()
+        self._camera_streams.clear()
+
         if self._camera_stream:
             self._camera_stream.cleanup()
             self._camera_stream = None
 
         self._badge = None
-
 
         super().cleanup()

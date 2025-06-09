@@ -58,6 +58,7 @@ def test_check_log_notifications_uses_configured_dir(minimal_services, monkeypat
 
     assert any(msg in n.message for n in center.notifications)
 
+
 @pytest.fixture
 def notification_center(tmp_path, minimal_services, monkeypatch):
     config_service, _ = minimal_services
@@ -170,6 +171,7 @@ def test_notification_history_persistence(
     assert loaded[ids[0]].read is True
     assert loaded[ids[1]].read is False
 
+
 def test_init_uses_configuration(tmp_path, monkeypatch):
     cfg = {
         "logging": {"log_dir": str(tmp_path / "logs"), "retention_days": 0},
@@ -199,4 +201,3 @@ def test_init_uses_configuration(tmp_path, monkeypatch):
     assert center.max_notifications == 10
     assert center.notification_history_file == Path(tmp_path / "history.json")
     assert center.check_interval == 3
-

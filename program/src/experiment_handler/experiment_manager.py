@@ -33,7 +33,11 @@ from src.utils.data_utils.compression_service import get_compression_service
 from src.utils.data_utils.file_management_service import FileMaintenanceService
 from src.utils.log_utils.log_service import info, warning, error, debug
 from src.controllers.controller_manager import ControllerManager
-from src.utils.concurrency.async_utils import AsyncTaskManager, install_signal_handlers
+from src.utils.concurrency.async_utils import (
+    AsyncTaskManager,
+    install_signal_handlers,
+    TaskHandle,
+)
 from src.utils.concurrency.thread_pool import get_thread_pool_manager, ThreadPoolType
 
 
@@ -173,7 +177,7 @@ class ExperimentManager:
         self._experiment_results: Dict[str, ExperimentResult] = {}
 
         # Data collection
-        self._data_collection_task: Optional[asyncio.Task] = None
+        self._data_collection_handle: Optional[TaskHandle[Any]] = None
         self._collected_data: List[ExperimentDataPoint] = []
         self._collection_lock = threading.Lock()
 

@@ -22,6 +22,7 @@ from ...controllers.algorithms.motion_detection import (
     MotionDetectionResult,
 )
 from src.utils.log_utils.log_service import warning, error, debug
+from src.utils.log_utils import log_service
 
 
 class CameraStreamComponent(BaseComponent):
@@ -55,7 +56,8 @@ class CameraStreamComponent(BaseComponent):
         if resolution is not None:
             try:
                 self.max_width, self.max_height = int(resolution[0]), int(resolution[1])
-            except Exception:
+            except Exception as e:
+                log_service.error(f"Invalid resolution {resolution}: {e}")
                 self.max_width = max_width
                 self.max_height = max_height
         else:
