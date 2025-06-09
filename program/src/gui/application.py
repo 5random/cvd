@@ -149,15 +149,16 @@ class WebApplication:
 
 
         @ui.page("/video_feed")
-        async def video_feed():
+        async def video_feed(request: Request):
 
             """Stream MJPEG frames from the dashboard camera"""
             camera = self.component_registry.get_component('dashboard_camera_stream')
             if camera is None:
                 # fallback to first registered camera stream
-                for cid in self.component_registry.components:
+                for comp in self.component_registry.get_all_components():
+                    cid = getattr(comp, "component_id", "")
                     if str(cid).startswith('dashboard_camera_stream_'):
-                        camera = self.component_registry.get_component(cid)
+                        camera = comp
                         break
 
 
@@ -275,6 +276,10 @@ class WebApplication:
         with ui.row().classes("w-full h-full gap-4"):
             # Left column - sensor dashboard
             dashboard_sensors = [
+                sid
+                for sid, cfg in self.config_service.get_sensor_configs()
+                if cfg.get("show_on_dashboard")
+            ]
 
             with ui.column().classes('w-1/2'):
                 dashboard = DashboardComponent(

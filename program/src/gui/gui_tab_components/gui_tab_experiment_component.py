@@ -1265,8 +1265,6 @@ class ExperimentHistoryTable(BaseComponent):
         self._load_experiments()
 
 
-            return f'{hours:.1f}h'
-
     def _on_view(self, e) -> None:
         row = e.args
         exp_id = row.get('id') if isinstance(row, dict) else None
