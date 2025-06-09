@@ -16937,3 +16937,11 @@ To fix this, enter the target slot explicitly using `with container_element:`.
 2025-06-09 20:04:41 - cvd_tracker.error - ERROR - log_service.py:607 - error - Sensor not found: sen002
 2025-06-09 20:04:41 - cvd_tracker.error - ERROR - log_service.py:607 - error - Sensor not found: sen002
 2025-06-09 20:04:41 - cvd_tracker.error - ERROR - log_service.py:607 - error - Sensor not found: sen002
+2025-06-09 20:13:40 - cvd_tracker.error - ERROR - log_service.py:607 - error - Sensor not found: sen002
+2025-06-09 20:16:13 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 is already polling
+2025-06-09 20:17:37 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen002 status: SensorStatus.OFFLINE
+2025-06-09 20:17:38 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen002 status: SensorStatus.OFFLINE
+2025-06-09 20:17:39 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen002 after 3 failures
+2025-06-09 20:17:39 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen002 status: SensorStatus.OFFLINE
+2025-06-09 20:33:19 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error rendering camera stream: Invalid value: 480x360
+2025-06-09 20:38:22 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error rendering camera stream: Invalid value: 480x360

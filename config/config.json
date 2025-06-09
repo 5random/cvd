@@ -2,7 +2,7 @@
   "ui": {
     "title": "CVD Tracker",
     "refresh_rate_ms": 1000,
-    "dark_mode": true
+    "dark_mode": false
   },
   "sensor_reconnect_attempts": 3,
   "sensors": [
@@ -30,7 +30,7 @@
         "enabled": true,
         "show_on_dashboard": true,
         "port": "COM3",
-        "channel": 0.0,
+        "channel": 0,
         "poll_interval_ms": 1000,
         "baudrate": 9600,
         "timeout": 2.0,
