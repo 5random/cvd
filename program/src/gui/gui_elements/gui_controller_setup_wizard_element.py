@@ -3,6 +3,7 @@
 # mypy: ignore-errors
 
 from typing import Any, Optional, Callable, Dict, List
+import copy
 from nicegui import ui
 from nicegui.element import Element
 from nicegui import events
@@ -138,21 +139,20 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
         controller_schema = self.config_service.CONTROLLER_SCHEMA
         # enum-Werte für den "type"-Parameter
         types = controller_schema["properties"]["type"]["enum"]
-        # eine Minimalstruktur für jeden Typ anlegen
-
-        self._controller_types: Dict[str, Dict[str, Any]] = {
-            t: {
+        # eine Minimalstruktur für jeden Typ anlegen und Parameter-Templates 
+        # aus _PARAM_TEMPLATES verwenden
+        self._controller_types: Dict[str, Dict[str, Any]] = {}
+        for t in types:
+            param_template = copy.deepcopy(_PARAM_TEMPLATES.get(t, {}))
+            self._controller_types[t] = {
                 "name": t.replace("_", " ").title(),
                 "description": "",
                 "requires_sensors": False,
                 "requires_webcam": False,
                 "algorithms": [],  # ggf. aus einem extra Algorithmus-Schema
                 "default_state_output": [],  # ebenso
-                # die Parameter-Definitionen aus dem Schema übernehmen
-                "parameters": controller_schema.get("properties", {}),
+                "parameters": param_template,
             }
-            for t in types
-        }
 
         # Additional parameters for motion detection
         motion_params = {
