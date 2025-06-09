@@ -467,10 +467,20 @@ class DashboardComponent(BaseComponent):
             for cid in camera_ids:
                 settings = self.config_service.get_controller_settings(cid) or {}
                 resolution = settings.get("resolution")
+                width, height = 480, 360
                 if isinstance(resolution, list) and len(resolution) == 2:
                     width, height = int(resolution[0]), int(resolution[1])
-                else:
-                    width, height = 480, 360
+                elif isinstance(resolution, str):
+                    try:
+                        parts = resolution.lower().split("x")
+                        if len(parts) == 2:
+                            width, height = int(parts[0]), int(parts[1])
+                        else:
+                            raise ValueError
+                    except Exception:
+                        error(
+                            "Invalid resolution setting", resolution=resolution, controller_id=cid
+                        )
                 overlay = (
                     settings.get("overlay") if isinstance(settings, dict) else None
                 )
