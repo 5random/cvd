@@ -219,7 +219,8 @@ class WebApplication:
                     if isinstance(camera, CameraStreamComponent):
                         frame = camera.get_latest_frame()
                         if frame is not None:
-                            success, buf = cv2.imencode("jpg", frame)
+                            # imencode expects the file extension to start with a dot
+                            success, buf = cv2.imencode(".jpg", frame)
                             if success:
                                 jpeg_bytes = buf.tobytes()
                                 yield (
