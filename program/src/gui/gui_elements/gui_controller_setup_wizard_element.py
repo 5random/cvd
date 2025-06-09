@@ -143,13 +143,12 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
         self._controller_types: Dict[str, Dict[str, Any]] = {
             t: {
                 "name": t.replace("_", " ").title(),
-                "description": "",  # könnt Ihr z.B. aus localization ziehen
-                "requires_sensors": False,  # nach Bedarf aus Schema oder Konvention ableiten
+                "description": "",
+                "requires_sensors": False,
                 "requires_webcam": False,
                 "algorithms": [],  # ggf. aus einem extra Algorithmus-Schema
                 "default_state_output": [],  # ebenso
                 "parameters": _PARAM_TEMPLATES.get(t, {}),
-
             }
             for t in types
         }
@@ -522,6 +521,21 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
                     ui.image().classes("w-64 h-48 border").props('alt="Webcam preview"')
                 )
 
+                self._step2_elements["webcam_select"] = (
+                    ui.select(
+                        webcam_options,
+                        value=self._wizard_data["selected_webcam"],
+                        on_change=self._on_webcam_change,
+                    )
+                    .bind_value_to(self._wizard_data, "selected_webcam")
+                    .props("outlined")
+                    .classes("flex-1")
+                )
+                ui.button("Test Webcam", on_click=self._test_webcam).props(
+                    "color=secondary"
+                )
+
+                
             # Webcam configuration
             if self._wizard_data["selected_webcam"]:
                 ui.separator().classes("my-4")
@@ -622,6 +636,15 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
 
     def _on_webcam_change(self, e: events.ValueChangeEventArguments) -> None:
         """Handle webcam selection change."""
+        selected = e.value if e is not None else None
+        if isinstance(selected, str):
+            try:
+                index = int(selected.split()[1])
+                self._wizard_data.setdefault("webcam_config", {})[
+                    "device_index"
+                ] = index
+            except (IndexError, ValueError):
+                pass
         self._render_webcam_selection()
 
     def _test_webcam(self) -> None:
@@ -690,10 +713,8 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
                             min=param_config.get("min"),
                             max=param_config.get("max"),
                             step=param_config.get("step", 0.1),
-                        ).bind_value_to(
-                            self._wizard_data["parameters"], param_name
+                        ).bind_value_to(self._wizard_data["parameters"], param_name).props("outlined").classes("flex-1")
 
-                        ).props("outlined").classes("flex-1")
 
                     elif param_config["type"] == "str":
                         ui.input(

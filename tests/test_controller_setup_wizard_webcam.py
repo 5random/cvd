@@ -1,6 +1,7 @@
 import json
 import numpy as np
 import pytest
+import types
 from nicegui import ui
 
 from src.utils.config_utils.config_service import ConfigurationService
@@ -107,10 +108,71 @@ def test_test_webcam_notifies(monkeypatch, tmp_path, dummy_ui):
         "_update_controller_defaults",
         lambda self: None,
     )
-    wizard = ControllerSetupWizardComponent(service, DummyControllerManager(), DummySensorManager())
+    wizard = ControllerSetupWizardComponent(
+        service, DummyControllerManager(), DummySensorManager()
+    )
     wizard._wizard_data["selected_webcam"] = "cam1"
     wizard._step2_elements["webcam_preview"] = DummyImage()
     wizard._test_webcam()
 
     assert any("successful" in m.lower() for m in messages)
     assert wizard._step2_elements["webcam_preview"].source is not None
+
+
+def test_on_webcam_change_updates_index(monkeypatch, tmp_path):
+    service = create_service(tmp_path)
+    monkeypatch.setattr(
+        ControllerSetupWizardComponent,
+        "_update_controller_defaults",
+        lambda self: None,
+    )
+    wizard = ControllerSetupWizardComponent(
+        service, DummyControllerManager(), DummySensorManager()
+    )
+
+    monkeypatch.setattr(wizard, "_render_webcam_selection", lambda: None)
+
+    wizard._on_webcam_change(types.SimpleNamespace(value="Camera 2 (USB)"))
+
+    assert wizard._wizard_data["webcam_config"]["device_index"] == 2
+
+
+def test_test_webcam_uses_device_index(monkeypatch, tmp_path, dummy_ui):
+    messages = dummy_ui
+
+    used_index = {}
+
+    class DummyCap:
+        def __init__(self, index):
+            used_index["value"] = index
+
+        def isOpened(self):
+            return True
+
+        def set(self, *a):
+            pass
+
+        def read(self):
+            frame = np.zeros((1, 1, 3), dtype=np.uint8)
+            return True, frame
+
+        def release(self):
+            pass
+
+    monkeypatch.setattr(wizard_mod.cv2, "VideoCapture", lambda idx: DummyCap(idx))
+
+    service = create_service(tmp_path)
+    monkeypatch.setattr(
+        ControllerSetupWizardComponent,
+        "_update_controller_defaults",
+        lambda self: None,
+    )
+    wizard = ControllerSetupWizardComponent(
+        service, DummyControllerManager(), DummySensorManager()
+    )
+    wizard._wizard_data["webcam_config"]["device_index"] = 3
+    wizard._wizard_data["selected_webcam"] = "cam1"
+    wizard._step2_elements["webcam_preview"] = DummyImage()
+    wizard._test_webcam()
+
+    assert used_index["value"] == 3
