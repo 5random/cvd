@@ -1,0 +1,179 @@
+```mermaid
+classDiagram
+    class ExperimentState
+    class ExperimentPhase
+    class ExperimentConfig
+    class ExperimentResult
+    class ExperimentDataPoint
+    class ExperimentManager
+    class ControllerType
+    class ControllerStatus
+    class ControllerInput
+    class ControllerResult
+    class ControllerConfig
+    class ControllerStage
+    class ImageController
+    class StateController
+    class ControllerDependency
+    class ControllerManager
+    class WebApplication
+    class ApplicationContainer
+    class EmailAlertService
+    class ConfigSection
+    class ConfigurationError
+    class ValidationError
+    class ConfigurationService
+    class DataCategory
+    class FileStatus
+    class FileMetadata
+    class DataIndex
+    class DownloadRequest
+    class DirectoryEventHandler
+    class Indexer
+    class DataSaver
+    class DataManager
+    class MaintenanceManager
+    class CompressionSettings
+    class RotationSettings
+    class CompressionError
+    class CompressionService
+    class CompressionManager
+    class FileMaintenanceService
+    class LogLevel
+    class LogContext
+    class StructuredFormatter
+    class LogService
+    class ProcessPoolType
+    class ProcessPoolConfig
+    class _Telemetry
+    class ManagedProcessPool
+    class SecurityError
+    class ThreadPoolType
+    class ThreadPoolConfig
+    class _PoolStats
+    class ManagedThreadPool
+    class ThreadPoolManager
+    class AsyncRateLimiter
+    class TaskHandle
+    class AsyncTaskManager
+    class LogFileInfo
+    class LogViewerComponent
+    class LogComponent
+    class SetupWizardComponent
+    class ControllerCardConfig
+    class ControllerConfigDialog
+    class ControllerCardComponent
+    class ControllersComponent
+    class ExperimentInfo
+    class ExperimentConfigDialog
+    class ExperimentCard
+    class CurrentExperimentDisplay
+    class ExperimentHistoryTable
+    class ExperimentComponent
+    class SensorInfo
+    class SensorConfigDialog
+    class SensorCardComponent
+    class SensorsComponent
+    class DataComponentConfig
+    class DataOverviewCard
+    class DataFilterPanel
+    class DataFilesList
+    class DataComponent
+    class ComponentConfig
+    class BaseComponent
+    class TimedComponent
+    class ComponentRegistry
+    class CardComponent
+    class TabComponent
+    class CancelableDialogMixin
+    class SensorCardConfig
+    class DashboardComponent
+    class PlotConfig
+    class SeriesConfig
+    class LivePlotComponent
+    class ControllerSetupWizardComponent
+    class WizardMixin
+    class CameraStreamComponent
+    class NotificationCenter
+    class ExperimentSetupWizardComponent
+    class SensorSetupWizardComponent
+    class NotificationSeverity
+    class NotificationSource
+    class Notification
+    class NotificationMonitoringMixin
+    class NotificationUIMixin
+    class ReactorState
+    class ReactorAlarmType
+    class ReactorStateData
+    class ReactorStateConfig
+    class ReactorStateController
+    class MotionDetectionResult
+    class MotionDetectionController
+    class CameraCaptureController
+    class SensorManager
+    class ProcessingStageType
+    class ProcessingResult
+    class ProcessingStage
+    class SensorStatus
+    class SensorReading
+    class SensorInterface
+    class SensorConfig
+    class RangeValidationFilter
+    class OutlierDetectionFilter
+    class MovingAverageFilter
+    class DataPipeline
+    class BaseSensor
+    class ArduinoTCSensor
+    class RS232Sensor
+    class MockArduinoTCBoardSerial
+    class MockRS232Serial
+    class MockRS232Sensor
+    class MockArduinoTCSensor
+    ControllerStage <|-- ImageController
+    ControllerStage <|-- StateController
+    ConfigurationError <|-- ValidationError
+    TimedComponent <|-- LogViewerComponent
+    BaseComponent <|-- LogComponent
+    SensorSetupWizardComponent <|-- SetupWizardComponent
+    CancelableDialogMixin <|-- ControllerConfigDialog
+    TimedComponent <|-- ControllerCardComponent
+    BaseComponent <|-- ControllersComponent
+    CancelableDialogMixin <|-- ExperimentConfigDialog
+    BaseComponent <|-- ExperimentCard
+    BaseComponent <|-- CurrentExperimentDisplay
+    BaseComponent <|-- ExperimentHistoryTable
+    BaseComponent <|-- ExperimentComponent
+    CancelableDialogMixin <|-- SensorConfigDialog
+    TimedComponent <|-- SensorCardComponent
+    TimedComponent <|-- SensorsComponent
+    BaseComponent <|-- DataOverviewCard
+    BaseComponent <|-- DataFilterPanel
+    BaseComponent <|-- DataFilesList
+    BaseComponent <|-- DataComponent
+    BaseComponent <|-- TimedComponent
+    BaseComponent <|-- CardComponent
+    BaseComponent <|-- TabComponent
+    BaseComponent <|-- DashboardComponent
+    TimedComponent <|-- LivePlotComponent
+    WizardMixin <|-- ControllerSetupWizardComponent
+    BaseComponent <|-- ControllerSetupWizardComponent
+    BaseComponent <|-- CameraStreamComponent
+    NotificationMonitoringMixin <|-- NotificationCenter
+    NotificationUIMixin <|-- NotificationCenter
+    TimedComponent <|-- NotificationCenter
+    WizardMixin <|-- ExperimentSetupWizardComponent
+    BaseComponent <|-- ExperimentSetupWizardComponent
+    WizardMixin <|-- SensorSetupWizardComponent
+    BaseComponent <|-- SensorSetupWizardComponent
+    StateController <|-- ReactorStateController
+    ImageController <|-- MotionDetectionController
+    ControllerStage <|-- CameraCaptureController
+    ProcessingStage <|-- RangeValidationFilter
+    ProcessingStage <|-- OutlierDetectionFilter
+    ProcessingStage <|-- MovingAverageFilter
+    SensorInterface <|-- BaseSensor
+    BaseSensor <|-- ArduinoTCSensor
+    BaseSensor <|-- RS232Sensor
+    RS232Sensor <|-- MockRS232Sensor
+    ArduinoTCSensor <|-- MockArduinoTCSensor
+```
