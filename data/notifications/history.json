@@ -1,5 +1,5 @@
 {
-  "last_updated": "2025-06-07T15:22:17.284134",
+  "last_updated": "2025-06-09T23:44:02.134949",
   "notifications": [
     {
       "id": "system_1749274716645",
@@ -2468,6 +2468,130 @@
       "severity": "error",
       "source": "system",
       "timestamp": "2025-06-07T15:22:17.284127",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749504965469",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:607 - error - Error starting experiment: The current slot cannot be determined because the slot stack for this task is empty.",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-09T23:36:05.469120",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "sensor_1749505065613",
+      "title": "Sensor Issue: sen004",
+      "message": "Sensor sen004 status: ERROR - could not convert string to float: '=== Mock Arduino TCBoard Ready ==='",
+      "severity": "error",
+      "source": "sensor",
+      "timestamp": "2025-06-09T23:37:45.613540",
+      "read": false,
+      "metadata": {
+        "sensor_id": "sen004",
+        "status": "ERROR",
+        "error_message": "could not convert string to float: '=== Mock Arduino TCBoard Ready ==='"
+      }
+    },
+    {
+      "id": "system_1749505065943",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: could not convert string to float: '=== Mock Arduino TCBoard Ready ==='",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-09T23:37:45.943438",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749505066215",
+      "title": "System Error",
+      "message": "WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-09T23:37:46.215587",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749505070660",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: could not convert string to float: \"Type 'HELP' for available commands\"",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-09T23:37:50.660709",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749505070953",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-09T23:37:50.953368",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "sensor_1749505366595",
+      "title": "Sensor Issue: sen004",
+      "message": "Sensor sen004 status: ERROR - Sensor index 0 is not valid or not configured.",
+      "severity": "error",
+      "source": "sensor",
+      "timestamp": "2025-06-09T23:42:46.595442",
+      "read": false,
+      "metadata": {
+        "sensor_id": "sen004",
+        "status": "ERROR",
+        "error_message": "Sensor index 0 is not valid or not configured."
+      }
+    },
+    {
+      "id": "system_1749505441719",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: WriteFile failed (PermissionError(13, 'Das Gerät erkennt den Befehl nicht.', None, 22))",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-09T23:44:01.719791",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749505441941",
+      "title": "System Error",
+      "message": "ERROR - log_service.py:607 - error - Failed to initialize Arduino TC sensor sen004: could not open port 'COM3': FileNotFoundError(2, 'Das System kann die angegebene Datei nicht finden.', None, 2)",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-09T23:44:01.941311",
+      "read": false,
+      "metadata": {
+        "log_source": "error.log"
+      }
+    },
+    {
+      "id": "system_1749505442134",
+      "title": "System Error",
+      "message": "WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR",
+      "severity": "error",
+      "source": "system",
+      "timestamp": "2025-06-09T23:44:02.134938",
       "read": false,
       "metadata": {
         "log_source": "error.log"

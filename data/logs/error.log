@@ -16968,3 +16968,604 @@ To fix this, enter the target slot explicitly using `with container_element:`.
 This may happen if you try to create UI from a background task.
 To fix this, enter the target slot explicitly using `with container_element:`.
 2025-06-09 21:54:31 - cvd_tracker.error - ERROR - gui_notification_center_element.py:502 - add_notification - NOTIFICATION: System Error - ERROR - log_service.py:607 - error - Error starting experiment: The current slot cannot be determined because the slot stack for this task is empty.
+2025-06-09 23:30:49 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Camera capture missing, attempting reinitialization
+2025-06-09 23:30:54 - cvd_tracker.error - ERROR - gui_notification_center_element.py:502 - add_notification - NOTIFICATION: System Error - ERROR - log_service.py:607 - error - Error starting experiment: The current slot cannot be determined because the slot stack for this task is empty.
+2025-06-09 23:36:00 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Camera capture missing, attempting reinitialization
+2025-06-09 23:36:01 - cvd_tracker.error - WARNING - log_service.py:602 - warning - No experiment manager available - creating new instance
+2025-06-09 23:36:05 - cvd_tracker.error - ERROR - gui_notification_center_element.py:502 - add_notification - NOTIFICATION: System Error - ERROR - log_service.py:607 - error - Error starting experiment: The current slot cannot be determined because the slot stack for this task is empty.
+2025-06-09 23:37:42 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 is already polling
+2025-06-09 23:37:42 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen002 is already polling
+2025-06-09 23:37:42 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen003 is already polling
+2025-06-09 23:37:44 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: could not convert string to float: '=== Mock Arduino TCBoard Ready ==='
+2025-06-09 23:37:44 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:37:45 - cvd_tracker.error - ERROR - gui_notification_center_element.py:502 - add_notification - NOTIFICATION: Sensor Issue: sen004 - Sensor sen004 status: ERROR - could not convert string to float: '=== Mock Arduino TCBoard Ready ==='
+2025-06-09 23:37:46 - cvd_tracker.error - ERROR - gui_notification_center_element.py:502 - add_notification - NOTIFICATION: System Error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: could not convert string to float: '=== Mock Arduino TCBoard Ready ==='
+2025-06-09 23:37:46 - cvd_tracker.error - ERROR - gui_notification_center_element.py:502 - add_notification - NOTIFICATION: System Error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:37:46 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: could not convert string to float: "Type 'HELP' for available commands"
+2025-06-09 23:37:46 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:37:47 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:37:47 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:37:49 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:37:50 - cvd_tracker.error - ERROR - gui_notification_center_element.py:502 - add_notification - NOTIFICATION: System Error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: could not convert string to float: "Type 'HELP' for available commands"
+2025-06-09 23:37:51 - cvd_tracker.error - ERROR - gui_notification_center_element.py:502 - add_notification - NOTIFICATION: System Error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:37:51 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:37:51 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:37:52 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:37:52 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:37:53 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:37:53 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:37:55 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:37:56 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:37:56 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:37:57 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:37:57 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:37:58 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:37:58 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:38:00 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:38:01 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:38:01 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:38:02 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:38:02 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:38:03 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:38:03 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:38:05 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:38:06 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:38:06 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:38:07 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:38:07 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:38:08 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:38:08 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:38:10 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:38:11 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:38:11 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:38:12 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:38:12 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:38:13 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:38:13 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:38:16 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:38:17 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:38:17 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:38:18 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:38:18 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:38:19 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:38:19 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:38:21 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:38:22 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:38:22 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:38:23 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:38:23 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:38:24 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:38:24 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:38:26 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:38:27 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:38:27 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:38:28 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:38:28 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:38:29 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:38:29 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:38:31 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:38:32 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:38:32 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:38:33 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:38:33 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:38:34 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:38:34 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:38:36 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:38:37 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:38:37 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:38:38 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:38:38 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:38:39 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:38:39 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:38:41 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:38:42 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:38:42 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:38:43 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:38:43 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:38:44 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:38:44 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:38:47 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:38:48 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:38:48 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:38:49 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:38:49 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:38:50 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:38:50 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:38:52 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:38:53 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:38:53 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:38:55 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:38:55 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:38:56 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:38:56 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:38:58 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:38:59 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:38:59 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:39:00 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:39:00 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:39:01 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:39:01 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:39:03 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:39:04 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:39:04 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:39:05 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:39:05 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:39:06 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:39:06 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:39:08 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:39:09 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:39:09 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:39:10 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:39:10 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:39:11 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:39:11 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:39:13 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:39:14 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:39:14 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:39:15 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:39:15 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:39:16 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:39:16 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:39:18 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:39:19 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:39:19 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:39:20 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:39:20 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:39:21 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:39:21 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:39:23 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:39:24 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:39:24 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:39:25 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:39:25 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:39:26 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:39:26 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:39:28 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:39:29 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:39:29 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:39:30 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:39:30 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:39:31 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:39:31 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:39:33 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:39:34 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:39:34 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:39:35 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:39:35 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:39:36 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:39:36 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:39:38 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:39:39 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:39:39 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:39:40 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:39:40 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:39:41 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:39:41 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:39:43 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:39:44 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:39:44 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:39:45 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:39:45 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:39:46 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:39:46 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:39:48 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:39:49 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:39:49 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:39:50 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:39:50 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:39:51 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:39:51 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:39:53 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:39:54 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:39:54 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:39:55 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:39:55 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:39:56 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:39:56 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:39:59 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:40:00 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:40:00 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:40:01 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:40:01 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:40:02 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:40:02 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:40:04 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:40:05 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:40:05 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:40:06 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:40:06 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:40:07 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:40:07 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:40:09 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:40:10 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:40:10 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:40:11 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:40:11 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:40:12 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:40:12 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:40:14 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:40:15 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:40:15 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:40:16 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:40:16 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:40:17 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:40:17 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:40:19 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:40:20 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:40:20 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:40:21 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:40:21 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:40:22 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:40:22 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:40:24 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:40:25 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:40:25 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:40:26 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:40:26 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:40:27 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:40:27 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:40:29 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:40:30 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:40:30 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:40:31 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:40:31 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:40:32 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:40:32 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:40:34 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:40:35 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:40:35 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:40:36 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:40:36 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:40:37 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:40:37 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:40:39 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:40:40 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:40:40 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:40:41 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:40:41 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:40:42 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:40:42 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:40:44 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:40:45 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:40:45 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:40:46 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:40:46 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:40:47 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:40:47 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:40:49 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:40:50 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:40:50 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:40:51 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:40:51 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:40:52 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:40:52 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:40:54 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:40:55 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:40:55 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:40:56 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:40:56 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:40:57 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:40:57 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:40:59 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:41:00 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:41:00 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:41:01 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:41:01 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:41:02 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:41:02 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:41:04 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:41:05 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:41:05 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:41:06 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:41:06 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:41:07 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:41:07 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:41:09 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:41:10 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:41:10 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:41:11 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:41:11 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:41:12 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:41:12 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:41:14 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:41:15 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:41:15 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:41:16 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:41:16 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:41:17 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:41:17 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:41:19 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:41:20 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:41:20 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:41:21 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:41:21 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:41:22 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:41:22 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:41:24 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:41:25 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:41:25 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:41:26 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:41:26 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:41:27 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:41:27 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:41:29 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:41:30 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:41:30 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:41:31 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:41:31 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:41:32 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:41:32 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:41:35 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:41:36 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:41:36 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:41:37 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:41:37 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:41:38 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:41:38 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:41:40 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:41:41 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:41:41 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:41:42 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:41:42 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:41:43 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:41:43 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:41:45 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:41:46 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:41:46 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:41:47 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:41:47 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:41:48 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:41:48 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:41:50 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:41:51 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:41:51 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:41:52 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:41:52 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:41:53 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:41:53 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:41:55 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:41:56 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:41:56 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:41:57 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:41:57 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:41:58 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:41:58 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:42:00 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:42:01 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:42:01 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:42:02 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:42:02 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:42:03 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:42:03 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:42:05 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:42:06 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:42:06 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:42:07 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:42:07 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:42:09 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:42:09 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:42:11 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:42:12 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:42:12 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:42:13 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:42:13 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:42:14 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:42:14 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:42:16 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:42:17 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:42:17 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:42:18 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:42:18 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:42:19 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:42:19 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:42:21 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:42:22 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:42:22 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:42:23 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:42:23 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:42:24 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:42:24 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:42:26 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:42:27 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:42:27 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:42:28 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:42:28 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:42:29 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:42:29 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:42:31 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:42:32 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:42:32 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:42:33 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:42:33 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:42:34 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:42:34 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:42:36 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:42:37 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:42:37 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:42:38 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:42:38 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:42:39 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:42:39 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:42:41 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:42:42 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:42:42 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:42:43 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:42:43 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:42:44 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:42:44 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:42:46 - cvd_tracker.error - ERROR - gui_notification_center_element.py:502 - add_notification - NOTIFICATION: Sensor Issue: sen004 - Sensor sen004 status: ERROR - Sensor index 0 is not valid or not configured.
+2025-06-09 23:42:46 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:42:47 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:42:47 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:42:48 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:42:48 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:42:49 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:42:49 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:42:51 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:42:52 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:42:52 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:42:54 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:42:54 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:42:55 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:42:55 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:42:57 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:42:58 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:42:58 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:42:59 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:42:59 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:43:00 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:43:00 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:43:02 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:43:03 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:43:03 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:43:04 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:43:04 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:43:05 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:43:05 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:43:07 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:43:08 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:43:08 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:43:09 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:43:09 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:43:10 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:43:10 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:43:12 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:43:13 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:43:13 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:43:14 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:43:14 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:43:15 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:43:15 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:43:17 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:43:18 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:43:18 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:43:19 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:43:19 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:43:20 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:43:20 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:43:22 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:43:23 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:43:23 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:43:24 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:43:24 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:43:25 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:43:25 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:43:27 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:43:28 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:43:28 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:43:29 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:43:29 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:43:30 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:43:30 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:43:32 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:43:33 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:43:33 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:43:34 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:43:34 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:43:35 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:43:35 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:43:37 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:43:38 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:43:38 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:43:39 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:43:39 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:43:40 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:43:40 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:43:42 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:43:43 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:43:43 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:43:44 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:43:44 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:43:45 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:43:45 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:43:47 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:43:48 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:43:48 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:43:49 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:43:49 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:43:50 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:43:50 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:43:52 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:43:53 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:43:53 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:43:54 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:43:54 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:43:56 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:43:56 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:43:58 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:43:59 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:43:59 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:44:00 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: Sensor index 0 is not valid or not configured.
+2025-06-09 23:44:00 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:44:01 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: WriteFile failed (PermissionError(13, 'Das Gerät erkennt den Befehl nicht.', None, 22))
+2025-06-09 23:44:01 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:44:01 - cvd_tracker.error - ERROR - log_service.py:607 - error - Failed to initialize Arduino TC sensor sen004: could not open port 'COM3': FileNotFoundError(2, 'Das System kann die angegebene Datei nicht finden.', None, 2)
+2025-06-09 23:44:01 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:44:01 - cvd_tracker.error - ERROR - gui_notification_center_element.py:502 - add_notification - NOTIFICATION: System Error - ERROR - log_service.py:607 - error - Error reading from Arduino TC sensor sen004: WriteFile failed (PermissionError(13, 'Das Gerät erkennt den Befehl nicht.', None, 22))
+2025-06-09 23:44:02 - cvd_tracker.error - ERROR - gui_notification_center_element.py:502 - add_notification - NOTIFICATION: System Error - ERROR - log_service.py:607 - error - Failed to initialize Arduino TC sensor sen004: could not open port 'COM3': FileNotFoundError(2, 'Das System kann die angegebene Datei nicht finden.', None, 2)
+2025-06-09 23:44:02 - cvd_tracker.error - ERROR - gui_notification_center_element.py:502 - add_notification - NOTIFICATION: System Error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.ERROR
+2025-06-09 23:44:02 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.OFFLINE
+2025-06-09 23:44:03 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.OFFLINE
+2025-06-09 23:44:04 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:44:04 - cvd_tracker.error - ERROR - log_service.py:607 - error - Failed to initialize Arduino TC sensor sen004: could not open port 'COM3': FileNotFoundError(2, 'Das System kann die angegebene Datei nicht finden.', None, 2)
+2025-06-09 23:44:04 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.OFFLINE
+2025-06-09 23:44:05 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.OFFLINE
+2025-06-09 23:44:06 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.OFFLINE
+2025-06-09 23:44:07 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:44:07 - cvd_tracker.error - ERROR - log_service.py:607 - error - Failed to initialize Arduino TC sensor sen004: could not open port 'COM3': FileNotFoundError(2, 'Das System kann die angegebene Datei nicht finden.', None, 2)
+2025-06-09 23:44:07 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.OFFLINE
+2025-06-09 23:44:08 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.OFFLINE
+2025-06-09 23:44:09 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.OFFLINE
+2025-06-09 23:44:10 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:44:10 - cvd_tracker.error - ERROR - log_service.py:607 - error - Failed to initialize Arduino TC sensor sen004: could not open port 'COM3': FileNotFoundError(2, 'Das System kann die angegebene Datei nicht finden.', None, 2)
+2025-06-09 23:44:10 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.OFFLINE
+2025-06-09 23:44:11 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.OFFLINE
+2025-06-09 23:44:12 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.OFFLINE
+2025-06-09 23:44:13 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:44:13 - cvd_tracker.error - ERROR - log_service.py:607 - error - Failed to initialize Arduino TC sensor sen004: could not open port 'COM3': FileNotFoundError(2, 'Das System kann die angegebene Datei nicht finden.', None, 2)
+2025-06-09 23:44:13 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.OFFLINE
+2025-06-09 23:44:14 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.OFFLINE
+2025-06-09 23:44:15 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.OFFLINE
+2025-06-09 23:44:16 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:44:16 - cvd_tracker.error - ERROR - log_service.py:607 - error - Failed to initialize Arduino TC sensor sen004: could not open port 'COM3': FileNotFoundError(2, 'Das System kann die angegebene Datei nicht finden.', None, 2)
+2025-06-09 23:44:16 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.OFFLINE
+2025-06-09 23:44:17 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.OFFLINE
+2025-06-09 23:44:18 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.OFFLINE
+2025-06-09 23:44:19 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:44:19 - cvd_tracker.error - ERROR - log_service.py:607 - error - Failed to initialize Arduino TC sensor sen004: could not open port 'COM3': FileNotFoundError(2, 'Das System kann die angegebene Datei nicht finden.', None, 2)
+2025-06-09 23:44:19 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.OFFLINE
+2025-06-09 23:44:20 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.OFFLINE
+2025-06-09 23:44:21 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.OFFLINE
+2025-06-09 23:44:22 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:44:22 - cvd_tracker.error - ERROR - log_service.py:607 - error - Failed to initialize Arduino TC sensor sen004: could not open port 'COM3': FileNotFoundError(2, 'Das System kann die angegebene Datei nicht finden.', None, 2)
+2025-06-09 23:44:22 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.OFFLINE
+2025-06-09 23:44:23 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.OFFLINE
+2025-06-09 23:44:24 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.OFFLINE
+2025-06-09 23:44:25 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:44:26 - cvd_tracker.error - ERROR - log_service.py:607 - error - Failed to initialize Arduino TC sensor sen004: could not open port 'COM3': FileNotFoundError(2, 'Das System kann die angegebene Datei nicht finden.', None, 2)
+2025-06-09 23:44:26 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.OFFLINE
+2025-06-09 23:44:27 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.OFFLINE
+2025-06-09 23:44:28 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.OFFLINE
+2025-06-09 23:44:29 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:44:29 - cvd_tracker.error - ERROR - log_service.py:607 - error - Failed to initialize Arduino TC sensor sen004: could not open port 'COM3': FileNotFoundError(2, 'Das System kann die angegebene Datei nicht finden.', None, 2)
+2025-06-09 23:44:29 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.OFFLINE
+2025-06-09 23:44:30 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.OFFLINE
+2025-06-09 23:44:31 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.OFFLINE
+2025-06-09 23:44:32 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:44:32 - cvd_tracker.error - ERROR - log_service.py:607 - error - Failed to initialize Arduino TC sensor sen004: could not open port 'COM3': FileNotFoundError(2, 'Das System kann die angegebene Datei nicht finden.', None, 2)
+2025-06-09 23:44:32 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.OFFLINE
+2025-06-09 23:44:33 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.OFFLINE
+2025-06-09 23:44:34 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.OFFLINE
+2025-06-09 23:44:35 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:44:35 - cvd_tracker.error - ERROR - log_service.py:607 - error - Failed to initialize Arduino TC sensor sen004: could not open port 'COM3': FileNotFoundError(2, 'Das System kann die angegebene Datei nicht finden.', None, 2)
+2025-06-09 23:44:35 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.OFFLINE
+2025-06-09 23:44:36 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.OFFLINE
+2025-06-09 23:44:37 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.OFFLINE
+2025-06-09 23:44:38 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Reconnecting sensor sen004 after 3 failures
+2025-06-09 23:44:38 - cvd_tracker.error - ERROR - log_service.py:607 - error - Failed to initialize Arduino TC sensor sen004: could not open port 'COM3': FileNotFoundError(2, 'Das System kann die angegebene Datei nicht finden.', None, 2)
+2025-06-09 23:44:38 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen004 status: SensorStatus.OFFLINE
+2025-06-10 00:06:16 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Camera capture missing, attempting reinitialization
+2025-06-10 00:06:16 - cvd_tracker.error - ERROR - log_service.py:607 - error - Failed to initialize Arduino TC sensor sen004: could not open port 'COM3': FileNotFoundError(2, 'Das System kann die angegebene Datei nicht finden.', None, 2)
+2025-06-10 00:06:16 - cvd_tracker.error - ERROR - log_service.py:607 - error - Failed to initialize sensor sen004
+2025-06-10 00:06:17 - cvd_tracker.error - WARNING - log_service.py:602 - warning - No experiment manager available - creating new instance
+2025-06-10 00:06:21 - cvd_tracker.error - ERROR - gui_notification_center_element.py:502 - add_notification - NOTIFICATION: System Error - ERROR - log_service.py:607 - error - Failed to initialize sensor sen004

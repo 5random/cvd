@@ -360,8 +360,7 @@ class WebApplication:
                 self._dashboard_component = DashboardComponent(
                     self.config_service,
                     self.sensor_manager,
-                    self.controller_manager,
-                    self._notification_center,
+                    self.controller_manager
                 )
                 self.component_registry.register(self._dashboard_component)
                 self._dashboard_component.render()

@@ -55,6 +55,21 @@
         "baudrate": 9600,
         "timeout": 2.0
       }
+    },
+    {
+      "sen004": {
+        "name": "Test",
+        "type": "temperature",
+        "source": "arduino_tc_board",
+        "interface": "usb",
+        "enabled": true,
+        "show_on_dashboard": true,
+        "port": "COM3",
+        "channel": 1,
+        "poll_interval_ms": 1000,
+        "baudrate": 9600,
+        "timeout": 2.0
+      }
     }
   ],
   "webcams": [
@@ -123,6 +138,32 @@
           "cam_id": null
         },
         "input_sensors": []
+      }
+    },
+    {
+      "con003": {
+        "name": "Test",
+        "type": "reactor_state",
+        "enabled": true,
+        "show_on_dashboard": true,
+        "algorithm": [],
+        "state_output": [],
+        "sensor_thresholds": {},
+        "controller_states": {},
+        "parameters": {
+          "idle_temp_max": 35.0,
+          "processing_temp_min": 80.0,
+          "processing_temp_max": 150.0
+        },
+        "input_sensors": [
+          "sen001",
+          "sen002",
+          "sen003"
+        ],
+        "input_controllers": [
+          "con001",
+          "con002"
+        ]
       }
     }
   ],

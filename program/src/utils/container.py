@@ -211,7 +211,7 @@ class ApplicationContainer:
                 await self.sensor_manager.shutdown()
                 await self.web_application.shutdown()
 
-            ui.run(title=title, host=host, port=port)
+            ui.run(title=title, favicon="https://www.tuhh.de/favicon.ico", host=host, port=port)
 
         except Exception as e:
             error(f"Failed to start web interface: {e}")
