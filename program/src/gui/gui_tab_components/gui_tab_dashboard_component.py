@@ -503,18 +503,19 @@ class DashboardComponent(BaseComponent):
                 error_threshold=sensor_config.get("error_threshold"),
             )
 
+
             # Create and render sensor card
             component_config = ComponentConfig(f"sensor_card_{sensor_id}")
-            sensor_card = SensorCardComponent(component_config, card_config, self.sensor_manager)
-            sensor_card.render()
-
+            sensor_card = SensorCardComponent(
+                component_config, card_config, self.sensor_manager
+            )
             card_el = sensor_card.render()
-            card_el.props('draggable=true')
-            card_el.on('dragstart', lambda e, sid=sensor_id: self._start_sensor_drag(sid))
-            card_el.on('drop', lambda e, sid=sensor_id: self._drop_sensor_on(sid))
-            card_el.on('dragover', lambda e: e.prevent_default())
-            
-            sensor_card.render()
+            card_el.props("draggable=true")
+            card_el.on(
+                "dragstart", lambda e, sid=sensor_id: self._start_sensor_drag(sid)
+            )
+            card_el.on("drop", lambda e, sid=sensor_id: self._drop_sensor_on(sid))
+            card_el.on("dragover", lambda e: e.prevent_default())
 
             self._sensor_cards[sensor_id] = sensor_card
 
