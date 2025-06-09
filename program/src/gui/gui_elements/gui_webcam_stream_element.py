@@ -37,6 +37,7 @@ class CameraStreamComponent(BaseComponent):
         component_id: str = "camera_stream",
         resolution: Optional[tuple[int, int]] = None,
         overlay_options: Optional[Dict[str, Any]] = None,
+        stream_path: str = "/video_feed",
     ):
         """
         Initialize camera stream component.
@@ -47,12 +48,14 @@ class CameraStreamComponent(BaseComponent):
             max_width: Maximum display width in pixels
             max_height: Maximum display height in pixels
             component_id: Unique identifier for this component
+            stream_path: Endpoint path for the MJPEG stream
         """
         config = ComponentConfig(component_id, "Camera Stream", "w-full")
         super().__init__(config)
 
         self.controller_manager = controller_manager
         self.update_interval = update_interval
+        self.stream_path = stream_path
         if resolution is not None:
             try:
                 self.max_width, self.max_height = int(resolution[0]), int(resolution[1])
@@ -161,9 +164,9 @@ class CameraStreamComponent(BaseComponent):
 
             # Image display area
             with ui.column().classes("w-full items-center"):
-                # Display MJPEG feed from /video_feed
+                # Display MJPEG feed from configured stream path
                 self.image_element = (
-                    ui.image("/video_feed")
+                    ui.image(self.stream_path)
                     .classes("border rounded")
                     .props('alt="Webcam stream"')
                 )
@@ -519,7 +522,7 @@ class CameraStreamComponent(BaseComponent):
     def _update_image_display(self, frame: np.ndarray):
         """
         Store the latest frame for MJPEG streaming.
-        The actual GUI image element (`/video_feed`) pulls this frame via the streaming endpoint.
+        The GUI image element pointing to ``self.stream_path`` pulls this frame via the streaming endpoint.
         """
         # Protect latest frame update
         with self._frame_lock:
@@ -614,6 +617,7 @@ def create_camera_stream_component(
     update_interval: float = 1 / 30,
     max_width: int = 640,
     max_height: int = 480,
+    stream_path: str = "/video_feed",
 ) -> CameraStreamComponent:
     """
     Factory function to create a camera stream component.
@@ -632,4 +636,5 @@ def create_camera_stream_component(
         update_interval=update_interval,
         max_width=max_width,
         max_height=max_height,
+        stream_path=stream_path,
     )

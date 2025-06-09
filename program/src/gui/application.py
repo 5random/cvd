@@ -66,6 +66,12 @@ class WebApplication:
         self._title_label: Optional[ui.label] = None
         self._title_input: Optional[ui.input] = None
         self._refresh_rate_input: Optional[ui.number] = None
+        self._storage_base_input: Optional[ui.input] = None
+        self._flush_interval_input: Optional[ui.number] = None
+        self._max_notifications_input: Optional[ui.number] = None
+        self._network_host_input: Optional[ui.input] = None
+        self._network_port_input: Optional[ui.number] = None
+        self._network_https_checkbox: Optional[ui.checkbox] = None
         self._sensors_component: Optional[SensorsComponent] = None
         self._controllers_component: Optional[ControllersComponent] = None
         self._log_component: Optional[LogComponent] = None
@@ -73,6 +79,8 @@ class WebApplication:
         self._data_component: Optional[DataComponent] = None
         self._dashboard_component: Optional[DashboardComponent] = None
         self._live_plot: Optional[LivePlotComponent] = None
+        # Temporary camera stream used when dashboard stream is not yet available
+        self._temp_camera_stream: Optional[CameraStreamComponent] = None
 
         # Initialize notification center with error handling
         try:
@@ -113,6 +121,9 @@ class WebApplication:
         if self._live_plot:
             self.component_registry.unregister(self._live_plot.component_id)
             self._live_plot = None
+        if self._temp_camera_stream:
+            self.component_registry.unregister(self._temp_camera_stream.component_id)
+            self._temp_camera_stream = None
         self.component_registry.cleanup_all()
         info("Web application shutdown complete")
 
@@ -165,20 +176,26 @@ class WebApplication:
             """System status page"""
             return self._create_status_page()
 
-        @ui.page("/video_feed")
-        async def video_feed(request: Request):
-            """Stream MJPEG frames from the dashboard camera"""
-            # retrieve specific dashboard camera stream or fallback to first CameraStreamComponent
-            camera = self.component_registry.get_component("dashboard_camera_stream")
-            if camera is None:
-                # fallback to first registered camera stream
-                for comp in self.component_registry.get_all_components():
-                    cid = getattr(comp, "component_id", "")
-                    if str(cid).startswith("dashboard_camera_stream_"):
+        async def _video_feed(request: Request, cid: Optional[str] = None):
+            """Stream MJPEG frames from the specified dashboard camera"""
+            camera = None
+            if cid:
+                camera = self.component_registry.get_component(
+                    f"dashboard_camera_stream_{cid}"
+                )
+                if camera is None:
+                    camera = self.component_registry.get_component(cid)
 
+            if camera is None:
+                camera = self.component_registry.get_component("dashboard_camera_stream")
+
+            if camera is None:
+                for comp in self.component_registry.get_all_components():
+                    comp_id = getattr(comp, "component_id", "")
+                    if str(comp_id).startswith("dashboard_camera_stream_"):
                         camera = comp
                         break
-            # if still no camera available, return error to client
+
             if camera is None:
                 raise HTTPException(status_code=503, detail="Camera stream unavailable")
 
@@ -211,6 +228,14 @@ class WebApplication:
             return StreamingResponse(
                 gen(), media_type="multipart/x-mixed-replace; boundary=frame"
             )
+
+        @ui.page("/video_feed")
+        async def video_feed(request: Request):
+            return await _video_feed(request=request, cid=None)
+
+        @ui.page("/video_feed/{cid}")
+        async def video_feed_param(request: Request, cid: str):
+            return await _video_feed(request=request, cid=cid)
 
     def _setup_layout(self) -> None:
         """Setup common layout elements"""
@@ -332,6 +357,12 @@ class WebApplication:
                 )
                 self.component_registry.register(self._dashboard_component)
                 self._dashboard_component.render()
+                # Remove temporary stream if a proper dashboard stream gets registered
+                if self._temp_camera_stream:
+                    self.component_registry.unregister(
+                        self._temp_camera_stream.component_id
+                    )
+                    self._temp_camera_stream = None
             # use dashboard's configured sensors for live plot
 
             dashboard_sensors = getattr(self._dashboard_component, '_dashboard_sensors', [])
@@ -413,6 +444,85 @@ class WebApplication:
                 )
                 self._refresh_rate_input.classes("w-full mb-2")
 
+                self._storage_base_input = ui.input(
+                    label="Data Storage Base Path",
+                    value=self.config_service.get(
+                        "data_storage.storage_paths.base", str, "data"
+                    ),
+                )
+                self._storage_base_input.classes("w-full mb-2")
+
+                self._flush_interval_input = ui.number(
+                    label="Data Flush Interval (s)",
+                    value=self.config_service.get(
+                        "data_storage.flush_interval", int, 10
+                    ),
+                    min=1,
+                    max=3600,
+                )
+                self._flush_interval_input.classes("w-full mb-2")
+
+                self._max_notifications_input = ui.number(
+                    label="Max Notifications",
+                    value=self.config_service.get(
+                        "ui.notification_center.max_notifications", int, 500
+                    ),
+                    min=1,
+                    max=10000,
+                )
+                self._max_notifications_input.classes("w-full mb-2")
+                # Logging settings
+                ui.label("Logging").classes("text-md font-semibold mt-4")
+                self._log_level_input = ui.select(
+                    ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
+                    label="Log Level",
+                    value=self.config_service.get("logging.level", str, "INFO"),
+                )
+                self._log_level_input.classes("w-full mb-2")
+
+                self._log_dir_input = ui.input(
+                    label="Log Directory",
+                    value=self.config_service.get("logging.log_dir", str, "data/logs"),
+                )
+                self._log_dir_input.classes("w-full mb-2")
+
+                self._log_rotation_input = ui.number(
+                    label="Log File Rotation (MB)",
+                    value=self.config_service.get(
+                        "logging.log_file_rotation_mb", int, 10
+                    ),
+                    min=1,
+                )
+                self._log_rotation_input.classes("w-full mb-2")
+
+                self._log_retention_input = ui.number(
+                    label="Retention Days",
+                    value=self.config_service.get("logging.retention_days", int, 30),
+                    min=0,
+                )
+                self._log_retention_input.classes("w-full mb-2")
+
+                self._network_host_input = ui.input(
+                    label="Host",
+                    value=self.config_service.get("network.host", str, "0.0.0.0"),
+                )
+                self._network_host_input.classes("w-full mb-2")
+
+                self._network_port_input = ui.number(
+                    label="Port",
+                    value=self.config_service.get("network.port", int, 8080),
+                    min=1,
+                    max=65535,
+                )
+                self._network_port_input.classes("w-full mb-2")
+
+                self._network_https_checkbox = ui.checkbox(
+                    "Enable HTTPS",
+                    value=self.config_service.get("network.enable_https", bool, False),
+                )
+                self._network_https_checkbox.classes("mb-2")
+
+
                 with ui.row().classes("gap-2 mt-4"):
                     ui.button(
                         "Save Settings", on_click=self._save_settings
@@ -446,6 +556,90 @@ class WebApplication:
                     "ui.refresh_rate_ms", int(self._refresh_rate_input.value)
                 )
 
+            if (
+                hasattr(self, "_storage_base_input")
+                and self._storage_base_input is not None
+            ):
+                self.config_service.set(
+                    "data_storage.storage_paths.base",
+                    str(self._storage_base_input.value),
+                )
+
+            if (
+                hasattr(self, "_flush_interval_input")
+                and self._flush_interval_input is not None
+            ):
+                self.config_service.set(
+                    "data_storage.flush_interval",
+                    int(self._flush_interval_input.value),
+                )
+
+            if (
+                hasattr(self, "_max_notifications_input")
+                and self._max_notifications_input is not None
+            ):
+                self.config_service.set(
+                    "ui.notification_center.max_notifications",
+                    int(self._max_notifications_input.value),
+                )
+
+            if (
+                hasattr(self, "_log_level_input")
+                and self._log_level_input is not None
+            ):
+                self.config_service.set(
+                    "logging.level", str(self._log_level_input.value)
+                )
+
+            if (
+                hasattr(self, "_log_dir_input")
+                and self._log_dir_input is not None
+            ):
+                self.config_service.set(
+                    "logging.log_dir", str(self._log_dir_input.value)
+                )
+
+            if (
+                hasattr(self, "_log_rotation_input")
+                and self._log_rotation_input is not None
+            ):
+                self.config_service.set(
+                    "logging.log_file_rotation_mb", int(self._log_rotation_input.value)
+                )
+
+            if (
+                hasattr(self, "_log_retention_input")
+                and self._log_retention_input is not None
+            ):
+                self.config_service.set(
+                    "logging.retention_days", int(self._log_retention_input.value)
+                )
+
+            if (
+                hasattr(self, "_network_host_input")
+                and self._network_host_input is not None
+            ):
+                self.config_service.set(
+                    "network.host", str(self._network_host_input.value)
+                )
+
+            if (
+                hasattr(self, "_network_port_input")
+                and self._network_port_input is not None
+            ):
+                self.config_service.set(
+                    "network.port", int(self._network_port_input.value)
+                )
+
+            if (
+                hasattr(self, "_network_https_checkbox")
+                and self._network_https_checkbox is not None
+            ):
+                self.config_service.set(
+                    "network.enable_https",
+                    bool(self._network_https_checkbox.value),
+                )
+
             ui.notify("Settings saved successfully!", type="positive")
         except Exception as e:
             error(f"Error saving settings: {e}")
@@ -472,10 +666,18 @@ class WebApplication:
             ).props("flat round")
 
             # Full screen button
+            def toggle_fullscreen() -> None:
+                """Toggle fullscreen mode using JavaScript"""
+                ui.run_javascript(
+                    "document.fullscreenElement"
+                    " ? document.exitFullscreen()"
+                    " : document.documentElement.requestFullscreen()"
+                )
+
             ui.button(
                 icon="fullscreen",
                 color="#5898d4",
-                on_click=lambda: ui.notify("Fullscreen mode"),
+                on_click=toggle_fullscreen,
             ).props("flat round")
 
             # Notification center button
@@ -518,6 +720,50 @@ class WebApplication:
             if hasattr(self, "_refresh_rate_input") and self._refresh_rate_input is not None:
                 self._refresh_rate_input.value = self.config_service.get(
                     "ui.refresh_rate_ms", int, 1000
+                )
+            if hasattr(self, "_storage_base_input") and self._storage_base_input is not None:
+                self._storage_base_input.value = self.config_service.get(
+                    "data_storage.storage_paths.base", str, "data"
+                )
+            if hasattr(self, "_flush_interval_input") and self._flush_interval_input is not None:
+                self._flush_interval_input.value = self.config_service.get(
+                    "data_storage.flush_interval", int, 10
+                )
+            if hasattr(self, "_max_notifications_input") and self._max_notifications_input is not None:
+                self._max_notifications_input.value = self.config_service.get(
+                    "ui.notification_center.max_notifications", int, 500
+                )
+            if hasattr(self, "_log_level_input") and self._log_level_input is not None:
+                self._log_level_input.value = self.config_service.get(
+                    "logging.level", str, "INFO"
+                )
+            if hasattr(self, "_log_dir_input") and self._log_dir_input is not None:
+                self._log_dir_input.value = self.config_service.get(
+                    "logging.log_dir", str, "data/logs"
+                )
+            if hasattr(self, "_log_rotation_input") and self._log_rotation_input is not None:
+                self._log_rotation_input.value = self.config_service.get(
+                    "logging.log_file_rotation_mb", int, 10
+                )
+            if hasattr(self, "_log_retention_input") and self._log_retention_input is not None:
+                self._log_retention_input.value = self.config_service.get(
+                    "logging.retention_days", int, 30
+                )
+            if hasattr(self, "_network_host_input") and self._network_host_input is not None:
+                self._network_host_input.value = self.config_service.get(
+                    "network.host", str, "0.0.0.0"
+                )
+            if hasattr(self, "_network_port_input") and self._network_port_input is not None:
+                self._network_port_input.value = self.config_service.get(
+                    "network.port", int, 8080
+                )
+            if (
+                hasattr(self, "_network_https_checkbox")
+                and self._network_https_checkbox is not None
+            ):
+                self._network_https_checkbox.value = self.config_service.get(
+                    "network.enable_https", bool, False
+
                 )
         except (OSError, ConfigurationError) as e:
             ui.notify(f"Error resetting configuration: {e}", type="negative")

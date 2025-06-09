@@ -20,6 +20,7 @@ from src.gui.gui_tab_components.gui_tab_base_component import (
     TimedComponent,
     BaseComponent,
     ComponentConfig,
+    get_component_registry,
 )
 
 from .dialog_utils import CancelableDialogMixin
@@ -382,15 +383,16 @@ class SensorCardComponent(BaseComponent):
                                 ui.menu_item("Delete", on_click=self._delete_sensor)
 
                 # Status and value display
-                with ui.row().classes('items-center gap-4 w-full'):
-                    with ui.column().classes('gap-1 flex-1'):
-                        ui.label('Current Value').classes('text-sm text-gray-600')
-                        self._value_label = ui.label('--').classes('text-xl font-mono')
-                        
-                    with ui.column().classes('gap-1'):
-                        ui.label('Status').classes('text-sm text-gray-600')
-                        self._status_label = ui.label(self.sensor_info.status.upper()).classes('text-sm font-semibold')
-                
+                with ui.row().classes("items-center gap-4 w-full"):
+                    with ui.column().classes("gap-1 flex-1"):
+                        ui.label("Current Value").classes("text-sm text-gray-600")
+                        self._value_label = ui.label("--").classes("text-xl font-mono")
+
+                    with ui.column().classes("gap-1"):
+                        ui.label("Status").classes("text-sm text-gray-600")
+                        self._status_label = ui.label(
+                            self.sensor_info.status.upper()
+                        ).classes("text-sm font-semibold")
 
                 # Connection info
                 with ui.row().classes("items-center gap-4 w-full mt-2"):
@@ -422,7 +424,6 @@ class SensorCardComponent(BaseComponent):
         # Update status label
         if self._status_label:
             self._status_label.text = self.sensor_info.status.upper()
-
 
         # Update value
         if self._value_label:
@@ -810,13 +811,17 @@ class SensorsComponent(TimedComponent):
             self._setup_wizard = None
             self._refresh_sensors()
 
+            registry = get_component_registry()
+            dashboard = registry.get_component("dashboard")
+            if dashboard and hasattr(dashboard, "refresh_sensors"):
+                dashboard.refresh_sensors()
+
         self._setup_wizard = SensorSetupWizardComponent(
             self.config_service,
             self.sensor_manager,
             on_close=_on_close,
         )
         self._setup_wizard.show_dialog()
-            
 
     def _edit_sensor(self, sensor_info: SensorInfo) -> None:
         """Edit sensor configuration"""
@@ -826,6 +831,11 @@ class SensorsComponent(TimedComponent):
     def _sensor_deleted(self, sensor_info: SensorInfo) -> None:
         """Refresh list after sensor deletion"""
         self._refresh_sensors()
+
+        registry = get_component_registry()
+        dashboard = registry.get_component("dashboard")
+        if dashboard and hasattr(dashboard, "refresh_sensors"):
+            dashboard.refresh_sensors()
 
     async def _start_all_sensors(self) -> None:
         """Start all configured sensors"""
