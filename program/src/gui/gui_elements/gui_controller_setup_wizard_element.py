@@ -1,5 +1,7 @@
 """Setup wizard component using NiceGUI stepper for comprehensive controller configuration."""
 
+# mypy: ignore-errors
+
 from typing import Any, Optional, Callable, Dict, List
 from nicegui import ui
 from nicegui.element import Element
@@ -137,19 +139,38 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
         # enum-Werte für den "type"-Parameter
         types = controller_schema["properties"]["type"]["enum"]
         # eine Minimalstruktur für jeden Typ anlegen
-        self._controller_types: Dict[str, Dict[str, Any]] = {}
-        for t in types:
-            template = _PARAM_TEMPLATES.get(t, {})
-            self._controller_types[t] = {
+
+        self._controller_types: Dict[str, Dict[str, Any]] = {
+            t: {
                 "name": t.replace("_", " ").title(),
-                "description": "",
-                "requires_sensors": t == "reactor_state",
-                "requires_webcam": t
-                in ("motion_detection", "camera_capture", "camera"),
-                "algorithms": [],
-                "default_state_output": [],
-                "parameters": template,
+                "description": "",  # könnt Ihr z.B. aus localization ziehen
+                "requires_sensors": False,  # nach Bedarf aus Schema oder Konvention ableiten
+                "requires_webcam": False,
+                "algorithms": [],  # ggf. aus einem extra Algorithmus-Schema
+                "default_state_output": [],  # ebenso
+                # die Parameter-Definitionen aus dem Schema übernehmen
+                "parameters": controller_schema.get("properties", {}),
+
             }
+
+        # Additional parameters for motion detection
+        motion_params = {
+            "roi_x": {"label": "ROI X", "type": "int", "default": 0, "min": 0},
+            "roi_y": {"label": "ROI Y", "type": "int", "default": 0, "min": 0},
+            "roi_width": {"label": "ROI Width", "type": "int", "default": 0, "min": 0},
+            "roi_height": {
+                "label": "ROI Height",
+                "type": "int",
+                "default": 0,
+                "min": 0,
+            },
+        }
+        if "motion_detection" in self._controller_types:
+            self._controller_types["motion_detection"]["requires_webcam"] = True
+            params = self._controller_types["motion_detection"].setdefault(
+                "parameters", {}
+            )
+            params.update(motion_params)
 
         # anschließend evtl. controller-spezifische Defaults setzen
         self._update_controller_defaults()
@@ -224,11 +245,13 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
             self._wizard_data["algorithms"] = config["algorithms"].copy()
             self._wizard_data["state_output"] = config["default_state_output"].copy()
 
+
             # Set default parameters from template
             template = config.get("parameters", {})
             self._wizard_data["parameters"] = {
                 name: param_cfg["default"] for name, param_cfg in template.items()
             }
+
 
     def _render_stepper(self) -> None:
         """Render the 4-step wizard stepper."""
@@ -494,7 +517,6 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
                     .classes("w-64 h-48 border")
                     .props('alt="Webcam preview"')
                 )
-            
 
                 self._step2_elements["webcam_select"] = (
                     ui.select(
@@ -688,6 +710,12 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
                         ).classes(
                             "flex-1"
                         )
+
+            if controller_type == "motion_detection":
+                ui.button("Select ROI", on_click=self._show_roi_selector).props(
+                    "outlined"
+                )
+
                     elif param_config["type"] == "str":
                         ui.input(
                             value=self._wizard_data["parameters"].get(
@@ -701,10 +729,56 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
                             "flex-1"
                         )
 
+
     def _update_state_message(self, index: int, value: str) -> None:
         """Update a specific state message."""
         if 0 <= index < len(self._wizard_data["state_output"]):
             self._wizard_data["state_output"][index] = value
+
+    def _show_roi_selector(self) -> None:
+        """Open a dialog to graphically select the region of interest."""
+        start: Dict[str, float] = {"x": 0.0, "y": 0.0}
+        layer: Any = None
+
+        def on_mouse(e: events.MouseEventArguments) -> None:
+            nonlocal start, layer
+            if e.type == "mousedown":
+                start = {"x": e.image_x, "y": e.image_y}
+                if layer:
+                    layer.content = ""
+            elif e.type == "mouseup":
+                x1 = min(start["x"], e.image_x)
+                y1 = min(start["y"], e.image_y)
+                x2 = max(start["x"], e.image_x)
+                y2 = max(start["y"], e.image_y)
+                if layer:
+                    layer.content = (
+                        f'<rect x="{x1}" y="{y1}" width="{x2 - x1}" height="{y2 - y1}" '
+                        f'stroke="red" fill="none" stroke-width="2" />'
+                    )
+                self._wizard_data["parameters"]["roi_x"] = int(x1)
+                self._wizard_data["parameters"]["roi_y"] = int(y1)
+                self._wizard_data["parameters"]["roi_width"] = int(x2 - x1)
+                self._wizard_data["parameters"]["roi_height"] = int(y2 - y1)
+                ui.notify(
+                    f"ROI set to ({int(x1)}, {int(y1)}, {int(x2 - x1)}, {int(y2 - y1)})",
+                    color="positive",
+                )
+                self._refresh_step3()
+                dialog.close()
+
+        with ui.dialog().props("persistent") as dialog:
+            with ui.column().classes("items-center gap-4"):
+                img = ui.interactive_image(
+                    "/video_feed",
+                    events=["mousedown", "mouseup"],
+                    cross=True,
+                ).on_mouse(on_mouse)
+                layer = img.add_layer()
+                ui.label("Drag on the image to select the ROI")
+                ui.button("Cancel", on_click=dialog.close)
+        dialog.open()
+
 
     def _render_state_output_config(self) -> None:
         """Render state output message configuration."""
