@@ -304,6 +304,11 @@ class DataFilterPanel(BaseComponent):
                 ui.notify("Invalid date format", type="negative")
                 return
 
+        # Validate range
+        if from_date and to_date and to_date < from_date:
+            ui.notify("Invalid date range", type="negative")
+            return
+
         self.current_filters["date_range"] = (from_date, to_date)
         date_input = self._date_range_input
         if date_input is not None:
