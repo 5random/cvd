@@ -200,8 +200,12 @@ def test_test_webcam_uses_device_index(monkeypatch, tmp_path, dummy_ui):
     assert used_index["value"] == 3
 
 
+
 def test_roi_updates_on_draw(monkeypatch, tmp_path, dummy_ui):
     messages = dummy_ui
+
+
+def test_on_webcam_change_triggers_preview(monkeypatch, tmp_path):
 
     service = create_service(tmp_path)
     monkeypatch.setattr(
@@ -212,6 +216,7 @@ def test_roi_updates_on_draw(monkeypatch, tmp_path, dummy_ui):
     wizard = ControllerSetupWizardComponent(
         service, DummyControllerManager(), DummySensorManager()
     )
+
 
     monkeypatch.setattr(wizard, "_refresh_step3", lambda: None)
 
@@ -229,3 +234,18 @@ def test_roi_updates_on_draw(monkeypatch, tmp_path, dummy_ui):
     assert wizard._wizard_data["parameters"]["roi_y"] == 20
     assert wizard._wizard_data["parameters"]["roi_width"] == 30
     assert wizard._wizard_data["parameters"]["roi_height"] == 40
+
+    # stub render method to create preview element
+    monkeypatch.setattr(
+        wizard,
+        "_render_webcam_selection",
+        lambda: wizard._step2_elements.update({"webcam_preview": DummyImage()}),
+    )
+
+    called = {}
+    monkeypatch.setattr(wizard, "_test_webcam", lambda: called.setdefault("ok", True))
+
+    wizard._on_webcam_change(types.SimpleNamespace(value="Camera 1 (USB)"))
+
+    assert called.get("ok")
+

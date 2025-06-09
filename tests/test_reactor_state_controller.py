@@ -70,6 +70,7 @@ async def test_motion_metadata_multiple_controllers(monkeypatch):
             "processing_temp_min": 50.0,
             "processing_temp_max": 80.0,
             "min_state_duration": 0.0,
+            "controller_state_defs": {"other": "motion_detected"},
         },
     )
     ctrl = ReactorStateController("rs", cfg)
@@ -77,11 +78,7 @@ async def test_motion_metadata_multiple_controllers(monkeypatch):
     reading = SensorReading("t1", 60, time.time(), SensorStatus.OK)
 
     controller_outputs = {
-        "other": {"motion_detected": False},
-        "md": {
-            "data": {"motion_detected": True},
-            "metadata": {"controller_type": "motion_detection"},
-        },
+        "other": {"motion_detected": True}
     }
 
     res = await ctrl.derive_state({"t1": reading}, controller_outputs, {})
@@ -89,3 +86,31 @@ async def test_motion_metadata_multiple_controllers(monkeypatch):
     assert res.data.state == ReactorState.PROCESSING
     assert res.metadata["data"] == res.data.to_dict()
     assert res.metadata["data"]["state"] == ReactorState.PROCESSING.value
+
+
+@pytest.mark.asyncio
+async def test_sensor_thresholds_trigger_alarm(monkeypatch):
+    from src.controllers.algorithms import reactor_state as module
+
+    for name in ["info", "warning", "error", "debug"]:
+        if hasattr(module, name):
+            monkeypatch.setattr(module, name, lambda *a, **k: None)
+
+    cfg = ControllerConfig(
+        controller_id="rs",
+        controller_type="reactor_state",
+        parameters={
+            "idle_temp_max": 30.0,
+            "processing_temp_min": 50.0,
+            "processing_temp_max": 100.0,
+            "min_state_duration": 0.0,
+            "sensor_thresholds": {"t1": {"max": 70.0}},
+            "motion_required_for_processing": False,
+        },
+    )
+    ctrl = ReactorStateController("rs", cfg)
+
+    reading = SensorReading("t1", 75, time.time(), SensorStatus.OK)
+    res = await ctrl.derive_state({"t1": reading}, {}, {})
+    assert ReactorAlarmType.OVERTEMPERATURE in res.data.alarms
+    assert res.data.state == ReactorState.ALARM

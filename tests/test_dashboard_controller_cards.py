@@ -61,11 +61,12 @@ def test_refresh_controllers_no_manager(tmp_path, dummy_ui):
             {
                 "c1": {
                     "name": "c1",
-                    "type": "camera",
+                    "type": "motion_detection",
                     "interface": "usb_camera",
                     "device_index": 0,
                     "show_on_dashboard": True,
                     "enabled": True,
+                    "parameters": {"device_index": 0},
                 }
             }
         ]

@@ -121,11 +121,14 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
             "enabled": defaults.get("enabled", True),
             "show_on_dashboard": True,
             "selected_sensors": [],
+            "selected_controllers": [],
             "selected_webcam": None,
             "webcam_config": {},
             "parameters": {},  # wird später aus _controller_types gefüllt
             "algorithm": [],
             "state_output": [],
+            "sensor_thresholds": {},
+            "controller_states": {},
         }
 
         # UI elements for each step (typed as Any to allow dynamic attribute access)
@@ -152,6 +155,7 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
                 "description": "",
                 "requires_sensors": False,
                 "requires_webcam": False,
+                "requires_controllers": False,
                 "algorithms": [],  # ggf. aus einem extra Algorithmus-Schema
                 "default_state_output": [],  # ebenso
                 "parameters": param_template,
@@ -175,6 +179,9 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
                 "parameters", {}
             )
             params.update(motion_params)
+
+        if "reactor_state" in self._controller_types:
+            self._controller_types["reactor_state"]["requires_sensors"] = True
 
         # anschließend evtl. controller-spezifische Defaults setzen
         self._update_controller_defaults()
@@ -225,6 +232,7 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
             "enabled": True,
             "show_on_dashboard": True,
             "selected_sensors": [],
+            "selected_controllers": [],
             "selected_webcam": None,
             "webcam_config": {
                 "device_index": 0,
@@ -239,6 +247,8 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
             "parameters": {},
             "algorithm": [],
             "state_output": [],
+            "sensor_thresholds": {},
+            "controller_states": {},
         }
         self._update_controller_defaults()
 
@@ -390,6 +400,18 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
                                 icon="add",
                             ).props("color=primary outlined")
 
+                # Controller selection
+                with ui.card().classes("w-full"):
+                    with ui.card_section():
+                        ui.label("Controller Dependencies").classes(
+                            "font-semibold mb-2"
+                        )
+
+                    self._step2_elements["controller_container"] = ui.column().classes(
+                        "gap-2"
+                    )
+                    self._refresh_controller_list()
+
             # Webcam selection (if required by controller type)
             if self._controller_types[self._wizard_data["type"]]["requires_webcam"]:
                 with ui.card().classes("w-full"):
@@ -431,6 +453,25 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
                         "gap-4"
                     )
                     self._render_controller_parameters()
+
+                if self._wizard_data["type"] == "reactor_state":
+                    with ui.card().classes("w-full"):
+                        with ui.card_section():
+                            ui.label("Sensor Thresholds").classes("font-semibold mb-2")
+
+                            self._step3_elements["threshold_container"] = ui.column().classes(
+                                "gap-2"
+                            )
+                            self._render_sensor_thresholds()
+
+                    with ui.card().classes("w-full"):
+                        with ui.card_section():
+                            ui.label("Controller States").classes("font-semibold mb-2")
+
+                            self._step3_elements["controller_state_container"] = ui.column().classes(
+                                "gap-2"
+                            )
+                            self._render_controller_state_selection()
 
             # State output configuration
             with ui.card().classes("w-full"):
@@ -510,12 +551,50 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
                         "text-sm text-gray-600"
                     )
 
+    def _refresh_controller_list(self) -> None:
+        """Refresh the list of available controllers."""
+        if "controller_container" not in self._step2_elements:
+            return
+
+        container = self._step2_elements["controller_container"]
+        container.clear()
+
+        available_controllers = self.config_service.get_controller_configs()
+
+        if not available_controllers:
+            with container:
+                ui.label("No controllers configured.").classes("text-gray-500")
+            return
+
+        with container:
+            for ctrl_id, ctrl_cfg in available_controllers:
+                with ui.row().classes("items-center gap-2"):
+                    ui.checkbox(
+                        f"{ctrl_cfg.get('name', ctrl_id)} ({ctrl_id})",
+                        value=ctrl_id in self._wizard_data["selected_controllers"],
+                        on_change=lambda e, cid=ctrl_id: self._toggle_controller_selection(
+                            cid, e.value
+                        ),
+                    )
+                    ui.label(f"Type: {ctrl_cfg.get('type', 'unknown')}").classes(
+                        "text-sm text-gray-600"
+                    )
+
     def _toggle_sensor_selection(self, sensor_id: str, selected: bool) -> None:
         """Toggle sensor selection."""
         if selected and sensor_id not in self._wizard_data["selected_sensors"]:
             self._wizard_data["selected_sensors"].append(sensor_id)
         elif not selected and sensor_id in self._wizard_data["selected_sensors"]:
             self._wizard_data["selected_sensors"].remove(sensor_id)
+
+    def _toggle_controller_selection(self, controller_id: str, selected: bool) -> None:
+        """Toggle controller selection."""
+        if selected and controller_id not in self._wizard_data["selected_controllers"]:
+            self._wizard_data["selected_controllers"].append(controller_id)
+        elif (
+            not selected and controller_id in self._wizard_data["selected_controllers"]
+        ):
+            self._wizard_data["selected_controllers"].remove(controller_id)
 
     def _show_sensor_wizard(self) -> None:
         """Show the sensor setup wizard."""
@@ -675,9 +754,14 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
             except (IndexError, ValueError):
                 pass
         self._render_webcam_selection()
+        self._test_webcam()
 
     def _test_webcam(self) -> None:
         """Open the selected webcam and capture a preview frame."""
+        preview = self._step2_elements.get("webcam_preview")
+        if not preview:
+            return
+
         config = self._wizard_data.get("webcam_config", {})
         device_index = config.get("device_index", 0)
 
@@ -703,9 +787,7 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
 
         try:
             image = Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
-            preview = self._step2_elements.get("webcam_preview")
-            if preview:
-                preview.set_source(image)
+            preview.set_source(image)
             ui.notify("Webcam capture successful", color="positive")
         except Exception as exc:
             ui.notify(f"Webcam preview failed: {exc}", color="negative")
@@ -839,6 +921,54 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
                 ui.button("Cancel", on_click=dialog.close)
         dialog.open()
 
+    def _render_sensor_thresholds(self) -> None:
+        """Render per-sensor threshold configuration."""
+        container = self._step3_elements.get("threshold_container")
+        if container is None:
+            return
+
+        container.clear()
+
+        for sensor_id in self._wizard_data.get("selected_sensors", []):
+            thresholds = self._wizard_data.setdefault("sensor_thresholds", {}).setdefault(
+                sensor_id, {"min": 0.0, "max": 100.0}
+            )
+            with ui.row().classes("items-center gap-2"):
+                ui.label(sensor_id).classes("w-32")
+                ui.number(value=thresholds["min"]).bind_value_to(
+                    thresholds, "min"
+                ).props("outlined").classes("w-24")
+                ui.number(value=thresholds["max"]).bind_value_to(
+                    thresholds, "max"
+                ).props("outlined").classes("w-24")
+
+    def _render_controller_state_selection(self) -> None:
+        """Render dropdowns to map controller states to positive/negative."""
+        container = self._step3_elements.get("controller_state_container")
+        if container is None:
+            return
+
+        container.clear()
+
+        configs = {cid: cfg for cid, cfg in self.config_service.get_controller_configs()}
+
+        for controller_id in self._wizard_data.get("controller_states", {}).keys():
+            config = configs.get(controller_id, {})
+            options = config.get("state_output", ["off", "on"])
+            if len(options) < 2:
+                options = ["off", "on"]
+
+            self._wizard_data["controller_states"].setdefault(controller_id, options[0])
+
+            with ui.row().classes("items-center gap-2"):
+                ui.label(controller_id).classes("w-32")
+                ui.select(
+                    options,
+                    value=self._wizard_data["controller_states"].get(controller_id),
+                ).bind_value_to(
+                    self._wizard_data["controller_states"], controller_id
+                ).props("outlined").classes("flex-1")
+
     def _render_state_output_config(self) -> None:
         """Render state output message configuration."""
         container = self._step3_elements["state_container"]
@@ -904,6 +1034,13 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
                             )
                         else:
                             ui.label("Selected Sensors: None")
+
+                        if self._wizard_data["selected_controllers"]:
+                            ui.label(
+                                f"Selected Controllers: {', '.join(self._wizard_data['selected_controllers'])}"
+                            )
+                        else:
+                            ui.label("Selected Controllers: None")
 
                         if self._wizard_data["selected_webcam"]:
                             ui.label(
@@ -975,6 +1112,14 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
         if config["requires_webcam"] and not self._wizard_data["selected_webcam"]:
             errors.append("A webcam must be selected for this controller type")
 
+        if (
+            config.get("requires_controllers")
+            and not self._wizard_data["selected_controllers"]
+        ):
+            errors.append(
+                "At least one controller must be selected for this controller type"
+            )
+
         if errors:
             ui.notify("; ".join(errors), color="negative")
             return
@@ -993,6 +1138,8 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
                 "show_on_dashboard": self._wizard_data["show_on_dashboard"],
                 "algorithm": self._wizard_data["algorithm"],
                 "state_output": self._wizard_data["state_output"],
+                "sensor_thresholds": self._wizard_data.get("sensor_thresholds", {}),
+                "controller_states": self._wizard_data.get("controller_states", {}),
             }
 
             # Add type-specific configuration
@@ -1045,6 +1192,11 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
                     "cam_id": self._wizard_data["selected_webcam"],
                     **self._wizard_data["parameters"],
                 }
+
+            if self._wizard_data["selected_controllers"]:
+                controller_config["input_controllers"] = self._wizard_data[
+                    "selected_controllers"
+                ]
 
             # Add controller_id to controller config
             controller_config["controller_id"] = self._wizard_data["controller_id"]
