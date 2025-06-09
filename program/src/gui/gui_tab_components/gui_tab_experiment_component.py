@@ -924,6 +924,15 @@ class CurrentExperimentDisplay(BaseComponent):
             # Determine sensor count
             if config.sensor_ids:
                 sensor_count = len(config.sensor_ids)
+
+            elif self.experiment_manager.sensor_manager:
+                try:
+                    sensor_count = len(
+                        self.experiment_manager.sensor_manager.get_all_sensors()
+                    )
+                except Exception:
+                    sensor_count = 0
+
             else:
                 sensor_count = 0
                 sensor_mgr = getattr(self.experiment_manager, "sensor_manager", None)
@@ -933,14 +942,26 @@ class CurrentExperimentDisplay(BaseComponent):
                         active = sensor_mgr.get_all_sensors()
                     sensor_count = len(active)
 
+
             # Determine controller count
             if config.controller_ids:
                 controller_count = len(config.controller_ids)
+
+            elif self.experiment_manager.controller_manager:
+                try:
+                    controller_count = len(
+                        self.experiment_manager.controller_manager.list_controllers()
+                    )
+                except Exception:
+                    controller_count = 0
             else:
+                controller_count = 0
+
                 controller_count = 0
                 ctrl_mgr = getattr(self.experiment_manager, "controller_manager", None)
                 if ctrl_mgr:
                     controller_count = len(ctrl_mgr.list_controllers())
+
 
             return ExperimentInfo(
                 experiment_id=experiment_id,
