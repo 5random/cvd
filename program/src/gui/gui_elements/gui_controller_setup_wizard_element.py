@@ -663,6 +663,7 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
 
         if not capture.isOpened():
             ui.notify("Failed to open webcam", color="negative")
+            capture.release()
             return
 
         ret, frame = capture.read()
