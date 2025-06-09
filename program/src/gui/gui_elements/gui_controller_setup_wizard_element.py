@@ -417,6 +417,16 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
                     with ui.card_section():
                         ui.label("Controller Parameters").classes("font-semibold mb-2")
 
+                        with ui.row().classes("items-start gap-4"):
+                            ui.image("/video_feed").classes("w-48 h-36 border").props('alt="Live preview"')
+                            with ui.column().classes("gap-2 flex-1"):
+                                ui.label("Brightness:").classes("w-24")
+                                ui.slider(min=0, max=255, value=self._wizard_data["webcam_config"].get("brightness", 128)).bind_value_to(self._wizard_data["webcam_config"], "brightness").classes("flex-1")
+                                ui.label("Contrast:").classes("w-24")
+                                ui.slider(min=0, max=100, value=self._wizard_data["webcam_config"].get("contrast", 32)).bind_value_to(self._wizard_data["webcam_config"], "contrast").classes("flex-1")
+                                ui.label("Saturation:").classes("w-24")
+                                ui.slider(min=0, max=100, value=self._wizard_data["webcam_config"].get("saturation", 64)).bind_value_to(self._wizard_data["webcam_config"], "saturation").classes("flex-1")
+
                     self._step3_elements["parameters_container"] = ui.column().classes(
                         "gap-4"
                     )
@@ -717,8 +727,9 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
                         "w-48 font-semibold"
                     )
 
+                    element = None
                     if param_config["type"] == "int":
-                        ui.number(
+                        element = ui.number(
                             value=self._wizard_data["parameters"].get(
                                 param_name, param_config["default"]
                             ),
@@ -732,7 +743,7 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
                             "flex-1"
                         )
                     elif param_config["type"] == "float":
-                        ui.number(
+                        element = ui.number(
                             value=self._wizard_data["parameters"].get(
                                 param_name, param_config["default"]
                             ),
@@ -748,7 +759,7 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
                         )
 
                     elif param_config["type"] == "str":
-                        ui.input(
+                        element = ui.input(
                             value=self._wizard_data["parameters"].get(
                                 param_name, param_config["default"]
                             )
@@ -759,6 +770,8 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
                         ).classes(
                             "flex-1"
                         )
+                    if element is not None and param_name in {"roi_x", "roi_y", "roi_width", "roi_height"}:
+                        self._step3_elements[param_name] = element
 
             if controller_type == "motion_detection":
                 ui.button("Select ROI", on_click=self._show_roi_selector).props(
@@ -775,13 +788,27 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
         start: Dict[str, float] = {"x": 0.0, "y": 0.0}
         layer: Any = None
 
+        def _update_roi(x1: float, y1: float, x2: float, y2: float) -> None:
+            self._wizard_data["parameters"]["roi_x"] = int(x1)
+            self._wizard_data["parameters"]["roi_y"] = int(y1)
+            self._wizard_data["parameters"]["roi_width"] = int(x2 - x1)
+            self._wizard_data["parameters"]["roi_height"] = int(y2 - y1)
+            if "roi_x" in self._step3_elements:
+                self._step3_elements["roi_x"].set_value(int(x1))
+            if "roi_y" in self._step3_elements:
+                self._step3_elements["roi_y"].set_value(int(y1))
+            if "roi_width" in self._step3_elements:
+                self._step3_elements["roi_width"].set_value(int(x2 - x1))
+            if "roi_height" in self._step3_elements:
+                self._step3_elements["roi_height"].set_value(int(y2 - y1))
+
         def on_mouse(e: events.MouseEventArguments) -> None:
             nonlocal start, layer
             if e.type == "mousedown":
                 start = {"x": e.image_x, "y": e.image_y}
                 if layer:
                     layer.content = ""
-            elif e.type == "mouseup":
+            elif e.type in {"mousemove", "mouseup"}:
                 x1 = min(start["x"], e.image_x)
                 y1 = min(start["y"], e.image_y)
                 x2 = max(start["x"], e.image_x)
@@ -791,22 +818,20 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
                         f'<rect x="{x1}" y="{y1}" width="{x2 - x1}" height="{y2 - y1}" '
                         f'stroke="red" fill="none" stroke-width="2" />'
                     )
-                self._wizard_data["parameters"]["roi_x"] = int(x1)
-                self._wizard_data["parameters"]["roi_y"] = int(y1)
-                self._wizard_data["parameters"]["roi_width"] = int(x2 - x1)
-                self._wizard_data["parameters"]["roi_height"] = int(y2 - y1)
-                ui.notify(
-                    f"ROI set to ({int(x1)}, {int(y1)}, {int(x2 - x1)}, {int(y2 - y1)})",
-                    color="positive",
-                )
-                self._refresh_step3()
-                dialog.close()
+                _update_roi(x1, y1, x2, y2)
+                if e.type == "mouseup":
+                    ui.notify(
+                        f"ROI set to ({int(x1)}, {int(y1)}, {int(x2 - x1)}, {int(y2 - y1)})",
+                        color="positive",
+                    )
+                    self._refresh_step3()
+                    dialog.close()
 
         with ui.dialog().props("persistent") as dialog:
             with ui.column().classes("items-center gap-4"):
                 img = ui.interactive_image(
                     "/video_feed",
-                    events=["mousedown", "mouseup"],
+                    events=["mousedown", "mousemove", "mouseup"],
                     cross=True,
                 ).on_mouse(on_mouse)
                 layer = img.add_layer()
