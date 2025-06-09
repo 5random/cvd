@@ -74,4 +74,8 @@ def test_wizard_parameter_defaults(tmp_path):
         wizard._wizard_data["type"] = ctype
         wizard._update_controller_defaults()
         expected = {k: v["default"] for k, v in template.items()}
+        if ctype == "motion_detection":
+            expected.update(
+                {"roi_x": 0, "roi_y": 0, "roi_width": 0, "roi_height": 0}
+            )
         assert wizard._wizard_data["parameters"] == expected

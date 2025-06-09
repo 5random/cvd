@@ -124,7 +124,7 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
             "selected_webcam": None,
             "webcam_config": {},
             "parameters": {},  # wird später aus _controller_types gefüllt
-            "algorithms": [],
+            "algorithm": [],
             "state_output": [],
         }
 
@@ -134,12 +134,15 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
         self._step3_elements: Dict[str, Any] = {}
         self._step4_elements: Dict[str, Any] = {}
 
+        self._step2_container: ui.column | None = None
+        self._step3_container: ui.column | None = None
+
         # Available controller types and their configurations
         # statt hart codierter Definitionen: Controller-Typen aus dem Schema ziehen
         controller_schema = self.config_service.CONTROLLER_SCHEMA
         # enum-Werte für den "type"-Parameter
         types = controller_schema["properties"]["type"]["enum"]
-        # eine Minimalstruktur für jeden Typ anlegen und Parameter-Templates 
+        # eine Minimalstruktur für jeden Typ anlegen und Parameter-Templates
         # aus _PARAM_TEMPLATES verwenden
         self._controller_types: Dict[str, Dict[str, Any]] = {}
         for t in types:
@@ -228,12 +231,13 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
                 "width": 640,
                 "height": 480,
                 "fps": 30,
+                "rotation": 0,
                 "brightness": 128,
                 "contrast": 32,
                 "saturation": 64,
             },
             "parameters": {},
-            "algorithms": [],
+            "algorithm": [],
             "state_output": [],
         }
         self._update_controller_defaults()
@@ -243,7 +247,7 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
         controller_type = self._wizard_data["type"]
         if controller_type in self._controller_types:
             config = self._controller_types[controller_type]
-            self._wizard_data["algorithms"] = config["algorithms"].copy()
+            self._wizard_data["algorithm"] = config["algorithms"].copy()
             self._wizard_data["state_output"] = config["default_state_output"].copy()
 
             # Set default parameters from template
@@ -268,7 +272,8 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
 
             # Step 2: Source Selection
             with ui.step("source_config", title="Source Selection", icon="input"):
-                self._render_step2()
+                self._step2_container = ui.column().classes("gap-4 w-full")
+                self._render_step2(self._step2_container)
                 with ui.stepper_navigation():
                     ui.button("Previous", on_click=self._stepper.previous)
                     ui.button("Next", on_click=self._validate_and_next_step2).props(
@@ -278,7 +283,8 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
 
             # Step 3: Controller Settings
             with ui.step("settings", title="Controller Settings", icon="tune"):
-                self._render_step3()
+                self._step3_container = ui.column().classes("gap-4 w-full")
+                self._render_step3(self._step3_container)
                 with ui.stepper_navigation():
                     ui.button("Previous", on_click=self._stepper.previous)
                     ui.button("Next", on_click=self._stepper.next).props(
@@ -350,16 +356,25 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
                     "Show on Dashboard", value=self._wizard_data["show_on_dashboard"]
                 ).bind_value_to(self._wizard_data, "show_on_dashboard")
 
-    def _render_step2(self) -> None:
+    def _render_step2(self, container: ui.column | None = None) -> None:
         """Render step 2: Source selection."""
-        ui.label("Select data sources for the controller").classes("text-lg mb-4")
+        container = container or self._step2_container
+        if container is None:
+            return
 
-        with ui.column().classes("gap-4 w-full"):
-            # Sensor selection (if required by controller type)
-            if self._controller_types[self._wizard_data["type"]]["requires_sensors"]:
-                with ui.card().classes("w-full"):
-                    with ui.card_section():
-                        ui.label("Sensor Data Sources").classes("font-semibold mb-2")
+        with container:
+            ui.label("Select data sources for the controller").classes("text-lg mb-4")
+
+            with ui.column().classes("gap-4 w-full"):
+                # Sensor selection (if required by controller type)
+                if self._controller_types[self._wizard_data["type"]][
+                    "requires_sensors"
+                ]:
+                    with ui.card().classes("w-full"):
+                        with ui.card_section():
+                            ui.label("Sensor Data Sources").classes(
+                                "font-semibold mb-2"
+                            )
 
                         # Available sensors
                         self._step2_elements["sensor_container"] = ui.column().classes(
@@ -387,15 +402,20 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
                         )
                         self._render_webcam_selection()
 
-    def _render_step3(self) -> None:
+    def _render_step3(self, container: ui.column | None = None) -> None:
         """Render step 3: Controller-specific settings."""
-        ui.label("Configure controller-specific parameters").classes("text-lg mb-4")
+        container = container or self._step3_container
+        if container is None:
+            return
 
-        with ui.column().classes("gap-4 w-full"):
-            # Controller parameters
-            with ui.card().classes("w-full"):
-                with ui.card_section():
-                    ui.label("Controller Parameters").classes("font-semibold mb-2")
+        with container:
+            ui.label("Configure controller-specific parameters").classes("text-lg mb-4")
+
+            with ui.column().classes("gap-4 w-full"):
+                # Controller parameters
+                with ui.card().classes("w-full"):
+                    with ui.card_section():
+                        ui.label("Controller Parameters").classes("font-semibold mb-2")
 
                     self._step3_elements["parameters_container"] = ui.column().classes(
                         "gap-4"
@@ -435,10 +455,10 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
         """Handle controller type change."""
         self._update_controller_defaults()
         self._update_type_description()
-        # Refresh step 2 and 3 if they exist
-        if hasattr(self, "_step2_elements"):
+        # Refresh step 2 and 3 if their containers are available
+        if self._step2_container is not None:
             self._refresh_step2()
-        if hasattr(self, "_step3_elements"):
+        if self._step3_container is not None:
             self._refresh_step3()
 
     def _update_type_description(self) -> None:
@@ -522,7 +542,6 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
                     ui.image().classes("w-64 h-48 border").props('alt="Webcam preview"')
                 )
 
-                
             # Webcam configuration
             if self._wizard_data["selected_webcam"]:
                 ui.separator().classes("my-4")
@@ -558,6 +577,19 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
                             max=60,
                         ).bind_value_to(
                             self._wizard_data["webcam_config"], "fps"
+                        ).classes(
+                            "w-24"
+                        )
+
+                    with ui.row().classes("items-center gap-4"):
+                        ui.label("Rotation:").classes("w-24")
+                        ui.number(
+                            value=self._wizard_data["webcam_config"].get("rotation", 0),
+                            min=0,
+                            max=270,
+                            step=90,
+                        ).bind_value_to(
+                            self._wizard_data["webcam_config"], "rotation"
                         ).classes(
                             "w-24"
                         )
@@ -681,9 +713,11 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
         with container:
             for param_name, param_config in parameters.items():
                 with ui.row().classes("items-center gap-4"):
-                    ui.label(f"{param_config.get('label', param_name)}:").classes("w-48 font-semibold")
-                    
-                    if param_config['type'] == 'int':
+                    ui.label(f"{param_config.get('label', param_name)}:").classes(
+                        "w-48 font-semibold"
+                    )
+
+                    if param_config["type"] == "int":
                         ui.number(
                             value=self._wizard_data["parameters"].get(
                                 param_name, param_config["default"]
@@ -692,7 +726,11 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
                             max=param_config.get("max"),
                         ).bind_value_to(
                             self._wizard_data["parameters"], param_name
-                        ).props("outlined").classes("flex-1")
+                        ).props(
+                            "outlined"
+                        ).classes(
+                            "flex-1"
+                        )
                     elif param_config["type"] == "float":
                         ui.number(
                             value=self._wizard_data["parameters"].get(
@@ -716,7 +754,11 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
                             )
                         ).bind_value_to(
                             self._wizard_data["parameters"], param_name
-                        ).props("outlined").classes("flex-1")
+                        ).props(
+                            "outlined"
+                        ).classes(
+                            "flex-1"
+                        )
 
             if controller_type == "motion_detection":
                 ui.button("Select ROI", on_click=self._show_roi_selector).props(
@@ -858,7 +900,7 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
 
                     with ui.column().classes("gap-1"):
                         ui.label(
-                            f"Algorithms: {', '.join(self._wizard_data['algorithms']) if self._wizard_data['algorithms'] else 'None'}"
+                            f"Algorithms: {', '.join(self._wizard_data['algorithm']) if self._wizard_data['algorithm'] else 'None'}"
                         )
 
                         if self._wizard_data["parameters"]:
@@ -924,7 +966,7 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
                 "type": self._wizard_data["type"],
                 "enabled": self._wizard_data["enabled"],
                 "show_on_dashboard": self._wizard_data["show_on_dashboard"],
-                "algorithms": self._wizard_data["algorithms"],
+                "algorithm": self._wizard_data["algorithm"],
                 "state_output": self._wizard_data["state_output"],
             }
 
@@ -933,13 +975,15 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
                 self._wizard_data["type"] == "motion_detection"
                 and self._wizard_data["selected_webcam"]
             ):
+                # Generate a unique webcam ID and use it for the controller
+                webcam_id = self.config_service.generate_next_webcam_id()
                 controller_config["parameters"] = {
-                    "cam_id": self._wizard_data["selected_webcam"],
+                    "cam_id": webcam_id,
                     **self._wizard_data["parameters"],
                 }
                 # Add webcam configuration
                 webcam_config = {
-                    "webcam_id": self._wizard_data["selected_webcam"],
+                    "webcam_id": webcam_id,
                     "name": self._wizard_data["selected_webcam"],
                     "device_index": self._wizard_data["webcam_config"]["device_index"],
                     "resolution": [
@@ -947,7 +991,7 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
                         self._wizard_data["webcam_config"]["height"],
                     ],
                     "fps": self._wizard_data["webcam_config"]["fps"],
-                    "rotation": 0,
+                    "rotation": self._wizard_data["webcam_config"].get("rotation", 0),
                     "uvc_settings": {
                         "brightness": self._wizard_data["webcam_config"]["brightness"],
                         "contrast": self._wizard_data["webcam_config"]["contrast"],
@@ -959,6 +1003,11 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
                     self.config_service.add_webcam_config(webcam_config)
                 except Exception as e:
                     warning(f"Failed to add webcam configuration: {e}")
+                    ui.notify(
+                        f"Failed to store webcam configuration: {e}",
+                        color="negative",
+                    )
+                    return
 
             elif self._wizard_data["type"] == "reactor_state":
                 controller_config["parameters"] = self._wizard_data["parameters"]
@@ -979,6 +1028,31 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
             self.config_service._validate_controller_config(controller_config)
             self.config_service.add_controller_config(controller_config)
 
+            # Instantiate the controller immediately
+            if self.controller_manager:
+                try:
+                    new_controller = self.controller_manager.add_controller_from_config(
+                        controller_config
+                    )
+                except Exception as exc:
+                    warning(
+                        f"Failed to register controller {controller_config['controller_id']}: {exc}"
+                    )
+                    ui.notify(
+                        f"Failed to instantiate controller: {exc}",
+                        color="negative",
+                    )
+                    new_controller = None
+                else:
+                    if new_controller is None:
+                        warning(
+                            f"Failed to register controller {controller_config['controller_id']}"
+                        )
+                        ui.notify(
+                            f"Failed to instantiate controller '{controller_config['name']}'",
+                            color="negative",
+                        )
+
             info(
                 f"Created controller configuration: {self._wizard_data['controller_id']}"
             )
@@ -996,13 +1070,21 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
 
     def _refresh_step2(self) -> None:
         """Refresh step 2 elements."""
-        if hasattr(self, "_step2_elements"):
-            self._render_step2()
+        if self._step2_container is None:
+            return
+
+        self._step2_container.clear()
+        self._step2_elements = {}
+        self._render_step2(self._step2_container)
 
     def _refresh_step3(self) -> None:
         """Refresh step 3 elements."""
-        if hasattr(self, "_step3_elements"):
-            self._render_step3()
+        if self._step3_container is None:
+            return
+
+        self._step3_container.clear()
+        self._step3_elements = {}
+        self._render_step3(self._step3_container)
 
 
 # Legacy compatibility class
