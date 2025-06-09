@@ -987,6 +987,11 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
                     self.config_service.add_webcam_config(webcam_config)
                 except Exception as e:
                     warning(f"Failed to add webcam configuration: {e}")
+                    ui.notify(
+                        f"Failed to store webcam configuration: {e}",
+                        color="negative",
+                    )
+                    return
 
             elif self._wizard_data["type"] == "reactor_state":
                 controller_config["parameters"] = self._wizard_data["parameters"]
