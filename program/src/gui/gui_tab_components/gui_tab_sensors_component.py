@@ -350,6 +350,7 @@ class SensorCardComponent(BaseComponent):
         self._container: Optional[Element] = None
         self._status_icon: Optional[Icon] = None
         self._value_label: Optional[Label] = None
+        self._status_label: Optional[Label] = None
         self._unit_label: Optional[Label] = None
         self._timestamp_label: Optional[Label] = None
         self._polling_button: Optional[Button] = None
@@ -381,22 +382,15 @@ class SensorCardComponent(BaseComponent):
                                 ui.menu_item("Delete", on_click=self._delete_sensor)
 
                 # Status and value display
-                with ui.row().classes("items-center gap-4 w-full"):
-                    with ui.column().classes("gap-1 flex-1"):
-                        ui.label("Current Value").classes("text-sm text-gray-600")
-                        with ui.row().classes("items-baseline"):
-                            self._value_label = ui.label("--").classes(
-                                "text-xl font-mono"
-                            )
-                            self._unit_label = ui.label(self.sensor_info.unit).classes(
-                                "text-sm text-gray-500 ml-1"
-                            )
-
-                    with ui.column().classes("gap-1"):
-                        ui.label("Status").classes("text-sm text-gray-600")
-                        ui.label(self.sensor_info.status.upper()).classes(
-                            "text-sm font-semibold"
-                        )
+                with ui.row().classes('items-center gap-4 w-full'):
+                    with ui.column().classes('gap-1 flex-1'):
+                        ui.label('Current Value').classes('text-sm text-gray-600')
+                        self._value_label = ui.label('--').classes('text-xl font-mono')
+                        
+                    with ui.column().classes('gap-1'):
+                        ui.label('Status').classes('text-sm text-gray-600')
+                        self._status_label = ui.label(self.sensor_info.status.upper()).classes('text-sm font-semibold')
+                
 
                 # Connection info
                 with ui.row().classes("items-center gap-4 w-full mt-2"):
@@ -424,6 +418,11 @@ class SensorCardComponent(BaseComponent):
 
         # Update status icon
         self._update_status_icon()
+
+        # Update status label
+        if self._status_label:
+            self._status_label.text = self.sensor_info.status.upper()
+
 
         # Update value
         if self._value_label:
