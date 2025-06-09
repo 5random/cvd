@@ -40,6 +40,13 @@ You may also set the ``CVD_CONFIG_DIR`` environment variable instead of passing
 
 Use the fullscreen button in the header to toggle between windowed and fullscreen mode.
 
+### Camera stream endpoints
+
+Each camera stream component exposes its frames via an HTTP endpoint.  The
+default stream remains available under ``/video_feed``.  Individual cameras can
+be accessed at ``/video_feed/{cid}`` where ``cid`` is the controller ID used on
+the dashboard.
+
 ### Dashboard visibility
 
 Sensors and controllers defined in the configuration will only appear on the
@@ -54,6 +61,12 @@ Set the ``CONTROLLER_MANAGER_CONCURRENCY_LIMIT`` environment variable to adjust
 this number. If unset, it defaults to ``10``. You can also provide the same
 value on startup using the ``--controller-concurrency-limit`` option of
 ``program/main.py`` which simply sets this environment variable for you.
+
+### Webcam UVC settings
+
+Webcam properties under ``uvc_settings`` follow OpenCV naming. The property
+``"backlight_compensation"`` can also be provided as ``"backlight_comp"`` and
+will be interpreted the same way.
 
 
 ## Running tests

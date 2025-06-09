@@ -27,3 +27,4 @@ def test_invalid_range_keeps_previous(monkeypatch):
     panel._apply_date_range()
     assert panel.current_filters["date_range"] == (None, None)
     assert 'Invalid date range' in messages[0]
+
