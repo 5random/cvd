@@ -3,7 +3,7 @@ Reactor State Controller - Derives reactor operational states from sensor data a
 """
 
 from typing import Dict, Any, Optional, List
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import Enum
 import time
 
@@ -93,6 +93,12 @@ class ReactorStateConfig:
     max_sensor_age: float = 10.0  # Max seconds for valid sensor data
     min_valid_sensors: int = 1
 
+    # Per-sensor temperature limits {sensor_id: {"min": float, "max": float}}
+    sensor_thresholds: Dict[str, Dict[str, float]] = field(default_factory=dict)
+
+    # Mapping of controller outputs to motion detection keys {controller_id: key}
+    controller_state_defs: Dict[str, str] = field(default_factory=dict)
+
 
 class ReactorStateController(StateController):
     """Controller for deriving reactor operational states"""
@@ -140,14 +146,20 @@ class ReactorStateController(StateController):
         try:
             current_time = time.time()
 
-            # Extract temperature data
-            temp_sensors = self._extract_temperature_data(sensor_data, current_time)
+            # Extract temperature data along with any threshold alarms
+            temp_sensors, threshold_alarms = self._extract_temperature_data(
+                sensor_data, current_time
+            )
 
             # Extract motion detection data
             motion_detected = self._extract_motion_data(controller_outputs)
 
             # Check for alarms
-            alarms = self._check_alarms(temp_sensors, motion_detected, current_time)
+            alarms = self._check_alarms(
+                temp_sensors, motion_detected, current_time
+            )
+            if threshold_alarms:
+                alarms.extend(threshold_alarms)
 
             # Derive reactor state
             new_state, confidence = self._derive_reactor_state(
@@ -212,9 +224,10 @@ class ReactorStateController(StateController):
 
     def _extract_temperature_data(
         self, sensor_data: Dict[str, SensorReading], current_time: float
-    ) -> Dict[str, Optional[float]]:
+    ) -> tuple[Dict[str, Optional[float]], List[ReactorAlarmType]]:
         """Extract valid temperature data from sensor readings"""
-        temp_data = {}
+        temp_data: Dict[str, Optional[float]] = {}
+        alarms: List[ReactorAlarmType] = []
 
         for sensor_id, reading in sensor_data.items():
             if reading is None:
@@ -231,51 +244,79 @@ class ReactorStateController(StateController):
             if reading.is_valid() and reading.value is not None:
                 # Basic temperature range validation
                 if -50.0 <= reading.value <= 300.0:  # Reasonable temperature range
-                    temp_data[sensor_id] = reading.value
+                    value = reading.value
+                    thresholds = self.reactor_config.sensor_thresholds.get(
+                        sensor_id, {}
+                    )
+                    max_v = thresholds.get("max")
+                    min_v = thresholds.get("min")
+                    if max_v is not None and value > max_v:
+                        alarms.append(ReactorAlarmType.OVERTEMPERATURE)
+                    if min_v is not None and value < min_v:
+                        alarms.append(ReactorAlarmType.UNDERTEMPERATURE)
+                    temp_data[sensor_id] = value
                 else:
                     temp_data[sensor_id] = None
             else:
                 temp_data[sensor_id] = None
 
-        return temp_data
+        return temp_data, alarms
 
     def _extract_motion_data(self, controller_outputs: Dict[str, Any]) -> bool:
         """Extract motion detection status from controller outputs"""
         motion_detected = False
 
-        for _, output in controller_outputs.items():
-            controller_type = None
-            data = output
-
-            if isinstance(output, dict):
-                controller_type = output.get("controller_type")
-                if "metadata" in output and isinstance(output["metadata"], dict):
-                    controller_type = output["metadata"].get(
-                        "controller_type", controller_type
-                    )
-                if "data" in output:
+        # First check explicit controller state mappings
+        for ctrl_id, key in self.reactor_config.controller_state_defs.items():
+            if ctrl_id in controller_outputs:
+                output = controller_outputs[ctrl_id]
+                data = output
+                if isinstance(output, dict) and "data" in output:
                     data = output["data"]
-            else:
-                controller_type = getattr(output, "controller_type", None)
-                if hasattr(output, "metadata") and isinstance(output.metadata, dict):
-                    controller_type = output.metadata.get(
-                        "controller_type", controller_type
-                    )
-                data = getattr(output, "data", data)
+                if isinstance(data, dict):
+                    value = data.get(key)
+                else:
+                    value = getattr(data, key, None)
+                if value is not None:
+                    motion_detected = bool(value)
+                    break
 
-            if controller_type == "motion_detection":
-                if isinstance(data, dict) and "motion_detected" in data:
-                    motion_detected = bool(data["motion_detected"])
-                elif isinstance(data, bool):
-                    motion_detected = bool(data)
-                elif (
-                    isinstance(data, dict)
-                    and "data" in data
-                    and isinstance(data["data"], dict)
-                ):
-                    if "motion_detected" in data["data"]:
-                        motion_detected = bool(data["data"]["motion_detected"])
-                break
+        if not motion_detected:
+            # Fallback to scanning controller outputs for motion_detection type
+            for _, output in controller_outputs.items():
+                controller_type = None
+                data = output
+
+                if isinstance(output, dict):
+                    controller_type = output.get("controller_type")
+                    if "metadata" in output and isinstance(output["metadata"], dict):
+                        controller_type = output["metadata"].get(
+                            "controller_type", controller_type
+                        )
+                    if "data" in output:
+                        data = output["data"]
+                else:
+                    controller_type = getattr(output, "controller_type", None)
+                    if hasattr(output, "metadata") and isinstance(output.metadata, dict):
+                        controller_type = output.metadata.get(
+                            "controller_type", controller_type
+                        )
+                    data = getattr(output, "data", data)
+
+                if controller_type == "motion_detection":
+                    if isinstance(data, dict) and "motion_detected" in data:
+                        motion_detected = bool(data["motion_detected"])
+                    elif isinstance(data, bool):
+                        motion_detected = bool(data)
+                    elif (
+                        isinstance(data, dict)
+                        and "data" in data
+                        and isinstance(data["data"], dict)
+                    ):
+                        if "motion_detected" in data["data"]:
+                            motion_detected = bool(data["data"]["motion_detected"])
+                    break
+
 
         # Update motion tracking
         if motion_detected:
