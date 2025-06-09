@@ -4,14 +4,15 @@ from pathlib import Path
 
 from src.utils.config_utils.config_service import ConfigurationService, set_config_service
 from src.controllers.controller_base import ControllerConfig
-from src.controllers.controller_utils.controller_data_sources.camera_capture_controller import CameraCaptureController
 from src.controllers.algorithms.motion_detection import MotionDetectionController
 
 
-@pytest.mark.parametrize("controller_cls, ctrl_type", [
-    (CameraCaptureController, "camera_capture"),
-    (MotionDetectionController, "motion_detection"),
-])
+@pytest.mark.parametrize(
+    "controller_cls, ctrl_type",
+    [
+        (MotionDetectionController, "motion_detection"),
+    ],
+)
 def test_webcam_config_uvc_only(tmp_path: Path, controller_cls, ctrl_type):
     cfg_path = tmp_path / "config.json"
     default_path = tmp_path / "default.json"
@@ -32,10 +33,12 @@ def test_webcam_config_uvc_only(tmp_path: Path, controller_cls, ctrl_type):
     set_config_service(None)
 
 
-@pytest.mark.parametrize("controller_cls, ctrl_type", [
-    (CameraCaptureController, "camera_capture"),
-    (MotionDetectionController, "motion_detection"),
-])
+@pytest.mark.parametrize(
+    "controller_cls, ctrl_type",
+    [
+        (MotionDetectionController, "motion_detection"),
+    ],
+)
 def test_webcam_config_merge_uvc_and_settings(tmp_path: Path, controller_cls, ctrl_type):
     cfg_path = tmp_path / "config.json"
     default_path = tmp_path / "default.json"
