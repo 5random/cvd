@@ -921,6 +921,27 @@ class CurrentExperimentDisplay(BaseComponent):
                     remaining_seconds = total_duration - elapsed
                     estimated_remaining = self._format_duration(remaining_seconds)
 
+            # Determine sensor count
+            if config.sensor_ids:
+                sensor_count = len(config.sensor_ids)
+            else:
+                sensor_count = 0
+                sensor_mgr = getattr(self.experiment_manager, "sensor_manager", None)
+                if sensor_mgr:
+                    active = sensor_mgr.get_active_sensors()
+                    if not active:
+                        active = sensor_mgr.get_all_sensors()
+                    sensor_count = len(active)
+
+            # Determine controller count
+            if config.controller_ids:
+                controller_count = len(config.controller_ids)
+            else:
+                controller_count = 0
+                ctrl_mgr = getattr(self.experiment_manager, "controller_manager", None)
+                if ctrl_mgr:
+                    controller_count = len(ctrl_mgr.list_controllers())
+
             return ExperimentInfo(
                 experiment_id=experiment_id,
                 name=config.name,
@@ -931,10 +952,8 @@ class CurrentExperimentDisplay(BaseComponent):
                 end_time=result.end_time,
                 duration_seconds=result.duration_seconds,
                 data_points_collected=result.data_points_collected,
-                sensor_count=len(config.sensor_ids) if config.sensor_ids else 0,
-                controller_count=(
-                    len(config.controller_ids) if config.controller_ids else 0
-                ),
+                sensor_count=sensor_count,
+                controller_count=controller_count,
                 errors_count=result.errors_count,
                 progress_percent=progress_percent,
                 estimated_remaining=estimated_remaining,
