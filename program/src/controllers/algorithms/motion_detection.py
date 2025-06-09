@@ -172,6 +172,8 @@ class MotionDetectionController(ImageController):
         self.multi_frame_enabled = params.get("multi_frame_enabled", False)
         self.multi_frame_window = params.get("multi_frame_window", 30)
         self.multi_frame_threshold = params.get("multi_frame_threshold", 0.3)
+        self.multi_frame_method = params.get("multi_frame_method", "threshold")
+        self.multi_frame_decay = params.get("multi_frame_decay", 0.5)
 
         # Background subtractor
         self._bg_subtractor: Optional[cv2.BackgroundSubtractor] = None
@@ -284,14 +286,27 @@ class MotionDetectionController(ImageController):
                 # Update raw detection history
                 self._update_statistics(motion_result)
                 # Robust multi-frame decision
-                if (
-                    self.multi_frame_enabled
-                    and len(self._motion_history) >= self.multi_frame_window
-                ):
-                    recent = self._motion_history[-self.multi_frame_window :]
-                    count = sum(1 for h in recent if h["motion_detected"])
-                    if count / self.multi_frame_window < self.multi_frame_threshold:
-                        motion_result.motion_detected = False
+                if self.multi_frame_enabled:
+                    probability = motion_result.confidence
+                    if self.multi_frame_method == "threshold":
+                        if len(self._motion_history) >= self.multi_frame_window:
+                            recent = self._motion_history[-self.multi_frame_window :]
+                            count = sum(1 for h in recent if h["motion_detected"])
+                            probability = count / self.multi_frame_window
+                    elif self.multi_frame_method == "probability":
+                        recent = self._motion_history[-self.multi_frame_window :]
+                        if recent:
+                            probability = float(np.mean([h["confidence"] for h in recent]))
+                        else:
+                            probability = 0.0
+
+                    if self.multi_frame_method == "probability":
+                        motion_result.motion_detected = (
+                            probability >= self.multi_frame_threshold
+                        )
+                    else:
+                        if probability < self.multi_frame_threshold:
+                            motion_result.motion_detected = False
 
                 # Attach frame and mask for optional visualization
                 motion_result.frame = frame
