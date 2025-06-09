@@ -184,6 +184,7 @@ class LogViewerComponent(TimedComponent):
                 return
 
             # Read log file (handle compressed files)
+            opener: Any
             if self.log_file_info.is_compressed:
                 suffix = self.log_file_info.path.suffix.lower()
                 if suffix == ".gz":
@@ -210,8 +211,11 @@ class LogViewerComponent(TimedComponent):
                     raw_lines = f.readlines()
                     self._file_offset = f.tell()
                     # decode bytes to str if necessary to satisfy type expectations
-                    new_lines = [line if isinstance(line, str) else bytes(line).decode('utf-8') for line in raw_lines]
-    
+                    new_lines = [
+                        line if isinstance(line, str) else bytes(line).decode("utf-8")
+                        for line in raw_lines
+                    ]
+
                 self._log_lines.extend(new_lines)
                 if len(self._log_lines) > self._max_lines:
                     self._log_lines = self._log_lines[-self._max_lines :]
@@ -275,14 +279,9 @@ class LogViewerComponent(TimedComponent):
         self._info_label.set_text(f"Showing {filtered_count} of {total_lines} lines")
 
         with self._log_column:
-            for i, line in enumerate(self._filtered_lines):
+            for line in self._filtered_lines:
                 line_class = self._get_line_class(line)
                 ui.label(line.rstrip()).classes(f"whitespace-pre {line_class}")
-                if i >= 500:
-                    ui.label(
-                        f"... and {len(self._filtered_lines) - 500} more lines"
-                    ).classes("text-gray-500 italic")
-                    break
 
         # Restore previous scroll position
         self._scroll_area.scroll_to(pixels=self._scroll_pos)
@@ -329,6 +328,7 @@ class LogComponent(BaseComponent):
         self._selected_recent_tab: str = "info"
         # Task handle for updating statistics; used to cancel previous tasks
         self._stats_task: Optional[asyncio.Task] = None
+        self._stats_row: Optional[Any] = None
         self._overview_container: Optional[Any] = None  # container for overview panel
         self._log_files_container: Optional[Any] = None  # container for log files panel
 
@@ -405,6 +405,7 @@ class LogComponent(BaseComponent):
         try:
             log_files = await asyncio.to_thread(self._get_log_files)
             # update UI
+            assert self._stats_row is not None
             self._stats_row.clear()
             with self._stats_row:
                 # Total log files
@@ -436,6 +437,7 @@ class LogComponent(BaseComponent):
                     ui.label("Retention Days").classes("text-sm text-gray-500")
         except Exception as e:
             error(f"Error getting log statistics: {e}")
+            assert self._stats_row is not None
             self._stats_row.clear()
             with self._stats_row:
                 ui.label(f"Error loading statistics: {str(e)}").classes("text-red-500")
@@ -461,9 +463,7 @@ class LogComponent(BaseComponent):
                     ]:
                         ui.tab(log_type, label=log_type.capitalize())
 
-                with ui.tab_panels(
-                    recent_tabs
-                ).classes("w-full"):
+                with ui.tab_panels(recent_tabs).classes("w-full"):
                     for log_type in [
                         "info",
                         "error",
@@ -543,7 +543,7 @@ class LogComponent(BaseComponent):
 
     def _get_log_files(self) -> List[LogFileInfo]:
         """Get list of available log files"""
-        log_files = []
+        log_files: List[LogFileInfo] = []
 
         try:
             log_dir = Path(self.log_service.log_dir)
