@@ -141,6 +141,10 @@ class ConfigurationService:
                                     "type": "string",
                                     "enum": ["MOG2", "KNN"],
                                 },
+                                "var_threshold": {"type": "number"},
+                                "dist2_threshold": {"type": "number"},
+                                "history": {"type": "integer"},
+                                "detect_shadows": {"type": "boolean"},
                             },
                             "additionalProperties": True,
                         }
