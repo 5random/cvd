@@ -31,6 +31,7 @@ class CameraStreamComponent(BaseComponent):
     def __init__(
         self,
         controller_manager: ControllerManager,
+        controller_id: Optional[str] = None,
         update_interval: float = 1 / 30,
         max_width: int = 640,
         max_height: int = 480,
@@ -44,6 +45,7 @@ class CameraStreamComponent(BaseComponent):
 
         Args:
             controller_manager: Controller manager instance
+            controller_id: ID of the motion detection controller to display
             update_interval: Update interval in seconds (default: ~30 FPS)
             max_width: Maximum display width in pixels
             max_height: Maximum display height in pixels
@@ -54,6 +56,7 @@ class CameraStreamComponent(BaseComponent):
         super().__init__(config)
 
         self.controller_manager = controller_manager
+        self.controller_id = controller_id
         self.update_interval = update_interval
         self.stream_path = stream_path
         if resolution is not None:
@@ -261,9 +264,13 @@ class CameraStreamComponent(BaseComponent):
             self.status_label.classes("text-green-600")
 
     def _get_motion_detection_controller(self) -> Optional[MotionDetectionController]:
-        """Get the first motion detection controller instance if available."""
+        """Get the configured motion detection controller instance."""
         try:
-            # Iterate over registered controllers and return the first instance
+            if self.controller_id:
+                ctrl = self.controller_manager.get_controller(self.controller_id)
+                if isinstance(ctrl, MotionDetectionController):
+                    return ctrl
+            # Fallback to first available motion detection controller
             for cid in self.controller_manager.list_controllers():
                 ctrl = self.controller_manager.get_controller(cid)
                 if isinstance(ctrl, MotionDetectionController):
@@ -629,6 +636,7 @@ class CameraStreamComponent(BaseComponent):
 
 def create_camera_stream_component(
     controller_manager: ControllerManager,
+    controller_id: Optional[str] = None,
     update_interval: float = 1 / 30,
     max_width: int = 640,
     max_height: int = 480,
@@ -639,6 +647,7 @@ def create_camera_stream_component(
 
     Args:
         controller_manager: Controller manager instance
+        controller_id: Controller to source frames from
         update_interval: Update interval in seconds (default: ~30 FPS)
         max_width: Maximum display width in pixels
         max_height: Maximum display height in pixels
@@ -648,6 +657,7 @@ def create_camera_stream_component(
     """
     return CameraStreamComponent(
         controller_manager=controller_manager,
+        controller_id=controller_id,
         update_interval=update_interval,
         max_width=max_width,
         max_height=max_height,
