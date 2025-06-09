@@ -124,7 +124,7 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
             "selected_webcam": None,
             "webcam_config": {},
             "parameters": {},  # wird später aus _controller_types gefüllt
-            "algorithms": [],
+            "algorithm": [],
             "state_output": [],
         }
 
@@ -236,7 +236,7 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
                 "saturation": 64,
             },
             "parameters": {},
-            "algorithms": [],
+            "algorithm": [],
             "state_output": [],
         }
         self._update_controller_defaults()
@@ -246,7 +246,7 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
         controller_type = self._wizard_data["type"]
         if controller_type in self._controller_types:
             config = self._controller_types[controller_type]
-            self._wizard_data["algorithms"] = config["algorithms"].copy()
+            self._wizard_data["algorithm"] = config["algorithms"].copy()
             self._wizard_data["state_output"] = config["default_state_output"].copy()
 
             # Set default parameters from template
@@ -886,7 +886,7 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
 
                     with ui.column().classes("gap-1"):
                         ui.label(
-                            f"Algorithms: {', '.join(self._wizard_data['algorithms']) if self._wizard_data['algorithms'] else 'None'}"
+                            f"Algorithms: {', '.join(self._wizard_data['algorithm']) if self._wizard_data['algorithm'] else 'None'}"
                         )
 
                         if self._wizard_data["parameters"]:
@@ -952,7 +952,7 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
                 "type": self._wizard_data["type"],
                 "enabled": self._wizard_data["enabled"],
                 "show_on_dashboard": self._wizard_data["show_on_dashboard"],
-                "algorithms": self._wizard_data["algorithms"],
+                "algorithm": self._wizard_data["algorithm"],
                 "state_output": self._wizard_data["state_output"],
             }
 
