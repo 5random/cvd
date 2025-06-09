@@ -657,4 +657,4 @@ class MotionDetectionController(ImageController):
                     error=str(e),
                 )
 
-            await asyncio.sleep(base_delay)
+            await asyncio.sleep(delay)
