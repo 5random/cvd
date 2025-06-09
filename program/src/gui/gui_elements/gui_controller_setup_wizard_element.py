@@ -418,10 +418,38 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
                         ).bind_value_to(self._wizard_data['webcam_config'], 'contrast').classes("flex-1")
 
     def _get_available_webcams(self) -> List[str]:
-        """Get list of available webcams."""
-        # This could be enhanced to detect actual webcams
-        webcams = ["Built-in Camera", "USB Camera 1", "USB Camera 2", "Network Camera"]
-        return webcams
+        """Detect connected webcams using OpenCV.
+
+        This probes camera indices 0-5 and returns a descriptive name for each
+        detected device.  If OpenCV is not available or no cameras are found,
+        a static fallback list is returned.
+        """
+
+        fallback = [
+            "Built-in Camera",
+            "USB Camera 1",
+            "USB Camera 2",
+            "Network Camera",
+        ]
+
+        try:
+            import cv2  # type: ignore
+        except Exception:  # pragma: no cover - opencv not installed
+            warning("OpenCV not available, using fallback webcam list")
+            return fallback
+
+        webcams: List[str] = []
+        for index in range(6):
+            try:
+                cap = cv2.VideoCapture(index)
+                if cap is not None and cap.isOpened():
+                    webcams.append(f"Camera {index} (USB)")
+                if cap is not None:
+                    cap.release()
+            except Exception:  # pragma: no cover - unexpected opencv failure
+                continue
+
+        return webcams or fallback
 
     def _on_webcam_change(self, e: events.ValueChangeEventArguments) -> None:
         """Handle webcam selection change."""
