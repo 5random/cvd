@@ -736,6 +736,11 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
                     "outlined"
                 )
 
+            if controller_type == "motion_detection":
+                ui.button("Select ROI", on_click=self._show_roi_selector).props(
+                    "outlined"
+                )
+
 
             if controller_type == "motion_detection":
                 ui.button("Select ROI", on_click=self._show_roi_selector).props(
