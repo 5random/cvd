@@ -9,6 +9,8 @@ from src.controllers.algorithms.motion_detection import (
 )
 from src.controllers.controller_base import ControllerConfig
 
+messages: list[str] = []
+
 
 @pytest.mark.asyncio
 async def test_motion_detection_on_black_frame(monkeypatch):
@@ -73,7 +75,6 @@ async def test_initialize_logs_algorithm(monkeypatch):
     ctrl = MotionDetectionController("md", config)
 
     import src.controllers.algorithms.motion_detection as md
-    messages = []
     monkeypatch.setattr(md, "info", lambda msg, **kwargs: messages.append(msg))
 
     success = await ctrl.initialize()
@@ -224,4 +225,17 @@ async def test_bg_subtractor_knn_params(monkeypatch):
         "dist2Threshold": 42.0,
         "history": 111,
     }
+
+
+def test_convert_to_cv_frame_bgr_passthrough():
+    config = ControllerConfig(controller_id="md", controller_type="motion_detection")
+    ctrl = MotionDetectionController("md", config)
+    bgr = np.zeros((5, 5, 3), dtype=np.uint8)
+    bgr[:, :, 0] = 10
+    bgr[:, :, 1] = 20
+    bgr[:, :, 2] = 30
+
+    converted = ctrl._convert_to_cv_frame(bgr)
+    assert np.array_equal(converted, bgr)
+
 
