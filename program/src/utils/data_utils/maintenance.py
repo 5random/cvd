@@ -29,7 +29,8 @@ class MaintenanceManager:
                 fut.cancel()
             try:
                 pool_type = getattr(pool, "pool_type", None)
-            except Exception:
+            except Exception as e:
+                error(f"Failed to get pool_type: {e}")
                 pool_type = None
             if pool_type is not ThreadPoolType.GENERAL:
                 pool.shutdown()
