@@ -32,3 +32,14 @@ The executable in `program/main.py` creates the container via `ApplicationContai
 4. `ControllerManager` processes sensor readings and controller outputs which can then be shown in the GUI or stored.
 
 For more details see the source files referenced above such as [`program/src/utils/container.py`](../program/src/utils/container.py) and [`program/main.py`](../program/main.py).
+
+## UML Diagram
+
+The full class diagram below is generated automatically from the source
+tree using `scripts/generate_uml.py`.  It lists every class defined under
+`program/src` and highlights inheritance relationships.
+
+```{literalinclude} full_class_diagram.mmd
+:language: mermaid
+```
+
