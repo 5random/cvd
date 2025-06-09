@@ -43,7 +43,9 @@ class CameraCaptureController(ControllerStage):
         self.fps = params.get("fps")
         self.webcam_id = params.get("cam_id")
         self.rotation = params.get("rotation", 0)
-        self.uvc_settings = params.get("uvc_settings", {})
+        self.uvc_settings = {}
+        self.uvc_settings.update(params.get("uvc", {}))
+        self.uvc_settings.update(params.get("uvc_settings", {}))
 
         if self.webcam_id:
 
@@ -57,6 +59,7 @@ class CameraCaptureController(ControllerStage):
                         self.width, self.height = res
                     self.fps = cam_cfg.get("fps", self.fps)
                     self.rotation = cam_cfg.get("rotation", self.rotation)
+                    self.uvc_settings.update(cam_cfg.get("uvc", {}))
                     self.uvc_settings.update(cam_cfg.get("uvc_settings", {}))
 
         self._capture: Optional[cv2.VideoCapture] = None
