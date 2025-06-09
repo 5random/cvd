@@ -148,7 +148,8 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
                 "requires_webcam": False,
                 "algorithms": [],  # ggf. aus einem extra Algorithmus-Schema
                 "default_state_output": [],  # ebenso
-                "parameters": _PARAM_TEMPLATES.get(t, {}),
+                # die Parameter-Definitionen aus dem Schema übernehmen
+                "parameters": controller_schema.get("properties", {}),
             }
             for t in types
         }
@@ -713,8 +714,13 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
                             min=param_config.get("min"),
                             max=param_config.get("max"),
                             step=param_config.get("step", 0.1),
-                        ).bind_value_to(self._wizard_data["parameters"], param_name).props("outlined").classes("flex-1")
-
+                        ).bind_value_to(
+                            self._wizard_data["parameters"], param_name
+                        ).props(
+                            "outlined"
+                        ).classes(
+                            "flex-1"
+                        )
 
                     elif param_config["type"] == "str":
                         ui.input(
@@ -729,6 +735,7 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
                 ui.button("Select ROI", on_click=self._show_roi_selector).props(
                     "outlined"
                 )
+
 
             if controller_type == "motion_detection":
                 ui.button("Select ROI", on_click=self._show_roi_selector).props(

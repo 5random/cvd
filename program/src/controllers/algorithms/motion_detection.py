@@ -228,6 +228,11 @@ class MotionDetectionController(ImageController):
                 return False
 
             info(
+                f"Initialized motion detection controller with {self.algorithm} algorithm",
+                controller_id=self.controller_id,
+                algorithm=self.algorithm,
+            )
+            info(
                 "Motion detection controller initialized",
                 controller_id=self.controller_id,
                 algorithm=self.algorithm,
@@ -359,21 +364,26 @@ class MotionDetectionController(ImageController):
             return ControllerResult.error_result(f"Motion detection error: {e}")
 
     def _convert_to_cv_frame(self, image_data: Any) -> Optional[np.ndarray]:
-        """Convert various image data formats to OpenCV frame"""
+        """Convert various image data formats to an OpenCV BGR frame"""
         try:
+            rgb_source = False
+
             if isinstance(image_data, np.ndarray):
                 # Already an OpenCV frame (assumed BGR/BGRA)
                 frame = image_data
 
             elif isinstance(image_data, bytes):
-                # Raw image bytes (often RGB order)
+                # Raw image bytes decoded with OpenCV (already BGR)
                 nparr = np.frombuffer(image_data, np.uint8)
                 frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
 
-            elif hasattr(image_data, "__array__") or isinstance(
-                image_data, Image.Image
-            ):
-                # Objects implementing the numpy array protocol or PIL images
+            elif isinstance(image_data, Image.Image):
+                # PIL images are in RGB order by default
+                frame = np.array(image_data)
+                rgb_source = True
+
+            elif hasattr(image_data, "__array__"):
+                # Generic array-like objects, orientation unknown
                 frame = np.array(image_data)
 
             else:
@@ -385,13 +395,12 @@ class MotionDetectionController(ImageController):
                 )
                 return None
 
-            # Ensure the frame is in the correct format
-            if len(frame.shape) == 3 and frame.shape[2] == 3:
-                # Convert RGB to BGR for OpenCV (expects BGR format)
-                frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
-            elif len(frame.shape) == 3 and frame.shape[2] == 4:
-                # Convert RGBA to BGR
-                frame = cv2.cvtColor(frame, cv2.COLOR_RGBA2BGR)
+            # Convert to BGR only when the source is known to be RGB
+            if rgb_source and len(frame.shape) == 3:
+                if frame.shape[2] == 3:
+                    frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+                elif frame.shape[2] == 4:
+                    frame = cv2.cvtColor(frame, cv2.COLOR_RGBA2BGR)
 
             return frame
 
