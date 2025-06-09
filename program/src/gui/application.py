@@ -73,6 +73,8 @@ class WebApplication:
         self._data_component: Optional[DataComponent] = None
         self._dashboard_component: Optional[DashboardComponent] = None
         self._live_plot: Optional[LivePlotComponent] = None
+        # Temporary camera stream used when dashboard stream is not yet available
+        self._temp_camera_stream: Optional[CameraStreamComponent] = None
 
         # Initialize notification center with error handling
         try:
@@ -113,6 +115,9 @@ class WebApplication:
         if self._live_plot:
             self.component_registry.unregister(self._live_plot.component_id)
             self._live_plot = None
+        if self._temp_camera_stream:
+            self.component_registry.unregister(self._temp_camera_stream.component_id)
+            self._temp_camera_stream = None
         self.component_registry.cleanup_all()
         info("Web application shutdown complete")
 
@@ -168,17 +173,31 @@ class WebApplication:
         @ui.page("/video_feed")
         async def video_feed(request: Request):
             """Stream MJPEG frames from the dashboard camera"""
-            # retrieve specific dashboard camera stream or fallback to first CameraStreamComponent
+            # retrieve specific dashboard camera stream
             camera = self.component_registry.get_component("dashboard_camera_stream")
             if camera is None:
-                # fallback to first registered camera stream
+                # fallback to first registered dashboard camera stream
                 for comp in self.component_registry.get_all_components():
                     cid = getattr(comp, "component_id", "")
                     if str(cid).startswith("dashboard_camera_stream_"):
-
                         camera = comp
                         break
-            # if still no camera available, return error to client
+
+            # if no registered camera is available, create a temporary one
+            if camera is None:
+                if self._temp_camera_stream is None:
+                    self._temp_camera_stream = CameraStreamComponent(
+                        controller_manager=self.controller_manager,
+                        component_id="temp_dashboard_camera_stream",
+                    )
+                    self.component_registry.register(self._temp_camera_stream)
+                    # start streaming to update frames for MJPEG output
+                    try:
+                        self._temp_camera_stream.start_streaming()
+                    except Exception as exc:  # pragma: no cover - best effort
+                        warning(f"Failed to start temporary camera stream: {exc}")
+                camera = self._temp_camera_stream
+
             if camera is None:
                 raise HTTPException(status_code=503, detail="Camera stream unavailable")
 
@@ -332,6 +351,12 @@ class WebApplication:
                 )
                 self.component_registry.register(self._dashboard_component)
                 self._dashboard_component.render()
+                # Remove temporary stream if a proper dashboard stream gets registered
+                if self._temp_camera_stream:
+                    self.component_registry.unregister(
+                        self._temp_camera_stream.component_id
+                    )
+                    self._temp_camera_stream = None
             # use dashboard's configured sensors for live plot
 
             dashboard_sensors = getattr(self._dashboard_component, '_dashboard_sensors', [])
