@@ -371,6 +371,7 @@ class ExperimentCard(BaseComponent):
         self._status_icon: Optional[Icon] = None
         self._progress_bar: Any = None
         self._progress_label: Any = None
+        self._progress_section: Optional[Element] = None
         self._state_label: Optional[Label] = None
         self._action_buttons: List[Button] = []
         self._action_row: Optional[Element] = None
@@ -403,11 +404,13 @@ class ExperimentCard(BaseComponent):
                                 self.experiment_info.state.value.upper()
                             ).classes("text-sm font-semibold")
 
-                # Progress bar for running experiments
-                if (
-                    self.experiment_info.state == ExperimentState.RUNNING
-                    and self.experiment_info.progress_percent > 0
-                ):
+            # Progress bar for running experiments
+            if (
+                self.experiment_info.state == ExperimentState.RUNNING
+                and self.experiment_info.progress_percent > 0
+            ):
+                with ui.card_section() as progress_section:
+                    self._progress_section = progress_section
                     self._progress_bar = ui.linear_progress(
                         value=self.experiment_info.progress_percent / 100
                     ).classes("w-full mt-2")
@@ -415,6 +418,7 @@ class ExperimentCard(BaseComponent):
                         f"Progress: {self.experiment_info.progress_percent:.1f}%"
                     ).classes("text-xs text-gray-600 mt-1")
 
+            with ui.card_section():
                 # Statistics row
                 with ui.row().classes("items-center gap-6 w-full mt-3"):
                     with ui.column().classes("gap-1"):
@@ -443,6 +447,7 @@ class ExperimentCard(BaseComponent):
                                 "text-sm font-mono text-red-600"
                             )
 
+            with ui.card_section():
                 # Action buttons
                 with ui.row().classes("gap-2 justify-end w-full mt-4") as action_row:
                     self._action_row = action_row
@@ -524,9 +529,10 @@ class ExperimentCard(BaseComponent):
         )
 
         if show_progress:
-            if not self._progress_bar:
+            if not self._progress_section:
                 with self._container:
-                    with ui.card_section():
+                    with ui.card_section() as progress_section:
+                        self._progress_section = progress_section
                         self._progress_bar = ui.linear_progress(
                             value=self.experiment_info.progress_percent / 100
                         ).classes("w-full mt-2")
@@ -534,18 +540,18 @@ class ExperimentCard(BaseComponent):
                             f"Progress: {self.experiment_info.progress_percent:.1f}%"
                         ).classes("text-xs text-gray-600 mt-1")
             else:
-                self._progress_bar.visible = True
-                self._progress_bar.value = self.experiment_info.progress_percent / 100
+                self._progress_section.visible = True
+                if self._progress_bar:
+                    self._progress_bar.value = (
+                        self.experiment_info.progress_percent / 100
+                    )
                 if self._progress_label:
-                    self._progress_label.visible = True
                     self._progress_label.text = (
                         f"Progress: {self.experiment_info.progress_percent:.1f}%"
                     )
         else:
-            if self._progress_bar:
-                self._progress_bar.visible = False
-            if self._progress_label:
-                self._progress_label.visible = False
+            if self._progress_section:
+                self._progress_section.visible = False
 
     def _update_status_icon(self) -> None:
         """Update status icon based on experiment state"""
