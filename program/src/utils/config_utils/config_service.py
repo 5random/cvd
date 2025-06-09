@@ -130,6 +130,23 @@ class ConfigurationService:
                 },
                 "then": {"required": ["ip_address", "port"]},
             },
+            {
+                "if": {"properties": {"type": {"const": "motion_detection"}}},
+                "then": {
+                    "properties": {
+                        "parameters": {
+                            "type": "object",
+                            "properties": {
+                                "algorithm": {
+                                    "type": "string",
+                                    "enum": ["MOG2", "KNN"],
+                                },
+                            },
+                            "additionalProperties": True,
+                        }
+                    }
+                },
+            },
         ],
     }
 
@@ -445,6 +462,24 @@ class ConfigurationService:
             config_with_id["webcam_id"] = cam_id
             result.append((cam_id, config_with_id))
         return result
+
+    def get_webcam_ids(self) -> List[str]:
+        """Return a list of available webcam IDs."""
+        return [cam_id for cam_id, _ in self.get_webcam_configs()]
+
+    def get_controller_type_options(self) -> List[str]:
+        """Return valid controller type strings from the schema."""
+        return list(self.CONTROLLER_SCHEMA["properties"]["type"]["enum"])
+
+    def get_controller_enum_options(self, *path: str) -> Optional[List[Any]]:
+        """Retrieve enum options for nested controller schema properties."""
+        schema = self.CONTROLLER_SCHEMA
+        for key in path:
+            props = schema.get("properties")
+            if not props or key not in props:
+                return None
+            schema = props[key]
+        return schema.get("enum")
 
     def add_sensor_config(self, sensor_config: Dict[str, Any]) -> None:
         """Add a new sensor configuration with validation"""

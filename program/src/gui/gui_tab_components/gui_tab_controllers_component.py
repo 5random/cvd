@@ -556,7 +556,19 @@ class ControllerCardComponent(TimedComponent):
                             for key, value in controller_parameters.items():
                                 with ui.row().classes("w-full items-center"):
                                     ui.label(f"{key}:").classes("min-w-24")
-                                    if isinstance(value, bool):
+                                    options = None
+                                    if key == "cam_id":
+                                        options = self.config_service.get_webcam_ids()
+                                    else:
+                                        options = self.config_service.get_controller_enum_options(
+                                            "parameters", key
+                                        )
+
+                                    if options:
+                                        parameter_inputs[key] = ui.select(
+                                            options, value=value
+                                        )
+                                    elif isinstance(value, bool):
                                         parameter_inputs[key] = ui.checkbox(
                                             "", value=value
                                         )
@@ -575,7 +587,15 @@ class ControllerCardComponent(TimedComponent):
                             for key, value in controller_settings.items():
                                 with ui.row().classes("w-full items-center"):
                                     ui.label(f"{key}:").classes("min-w-24")
-                                    if isinstance(value, bool):
+                                    options = self.config_service.get_controller_enum_options(
+                                        "settings", key
+                                    )
+
+                                    if options:
+                                        settings_inputs[key] = ui.select(
+                                            options, value=value
+                                        )
+                                    elif isinstance(value, bool):
                                         settings_inputs[key] = ui.checkbox(
                                             "", value=value
                                         )
