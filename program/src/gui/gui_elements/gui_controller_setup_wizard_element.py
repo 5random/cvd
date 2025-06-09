@@ -3,6 +3,7 @@
 # mypy: ignore-errors
 
 from typing import Any, Optional, Callable, Dict, List
+import copy
 from nicegui import ui
 from nicegui.element import Element
 from nicegui import events
@@ -138,21 +139,20 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
         controller_schema = self.config_service.CONTROLLER_SCHEMA
         # enum-Werte für den "type"-Parameter
         types = controller_schema["properties"]["type"]["enum"]
-        # eine Minimalstruktur für jeden Typ anlegen
-
-        self._controller_types: Dict[str, Dict[str, Any]] = {
-            t: {
+        # eine Minimalstruktur für jeden Typ anlegen und Parameter-Templates 
+        # aus _PARAM_TEMPLATES verwenden
+        self._controller_types: Dict[str, Dict[str, Any]] = {}
+        for t in types:
+            param_template = copy.deepcopy(_PARAM_TEMPLATES.get(t, {}))
+            self._controller_types[t] = {
                 "name": t.replace("_", " ").title(),
                 "description": "",
                 "requires_sensors": False,
                 "requires_webcam": False,
                 "algorithms": [],  # ggf. aus einem extra Algorithmus-Schema
                 "default_state_output": [],  # ebenso
-                # die Parameter-Definitionen aus dem Schema übernehmen
-                "parameters": controller_schema.get("properties", {}),
+                "parameters": param_template,
             }
-            for t in types
-        }
 
         # Additional parameters for motion detection
         motion_params = {
@@ -522,20 +522,6 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
                     ui.image().classes("w-64 h-48 border").props('alt="Webcam preview"')
                 )
 
-                self._step2_elements["webcam_select"] = (
-                    ui.select(
-                        webcam_options,
-                        value=self._wizard_data["selected_webcam"],
-                        on_change=self._on_webcam_change,
-                    )
-                    .bind_value_to(self._wizard_data, "selected_webcam")
-                    .props("outlined")
-                    .classes("flex-1")
-                )
-                ui.button("Test Webcam", on_click=self._test_webcam).props(
-                    "color=secondary"
-                )
-
                 
             # Webcam configuration
             if self._wizard_data["selected_webcam"]:
@@ -663,6 +649,7 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
 
         if not capture.isOpened():
             ui.notify("Failed to open webcam", color="negative")
+            capture.release()
             return
 
         ret, frame = capture.read()
@@ -730,17 +717,6 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
                         ).bind_value_to(
                             self._wizard_data["parameters"], param_name
                         ).props("outlined").classes("flex-1")
-
-            if controller_type == "motion_detection":
-                ui.button("Select ROI", on_click=self._show_roi_selector).props(
-                    "outlined"
-                )
-
-            if controller_type == "motion_detection":
-                ui.button("Select ROI", on_click=self._show_roi_selector).props(
-                    "outlined"
-                )
-
 
             if controller_type == "motion_detection":
                 ui.button("Select ROI", on_click=self._show_roi_selector).props(

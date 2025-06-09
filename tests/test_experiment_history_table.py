@@ -1,5 +1,7 @@
 from datetime import datetime, date
 import types
+from nicegui import ui
+
 
 from src.experiment_handler.experiment_manager import (
     ExperimentConfig,
@@ -89,7 +91,6 @@ def test_sorting_applied():
     table._load_experiments()
     names = [r["name"] for r in table._table.rows]
     assert names == ["Charlie", "Beta", "Alpha"]
-
 
 def test_clear_filters_resets_date_pickers():
     table = _create_table()

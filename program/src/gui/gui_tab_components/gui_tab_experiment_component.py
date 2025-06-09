@@ -1249,10 +1249,10 @@ class ExperimentHistoryTable(BaseComponent):
                 ui.label("Select Date Range").classes("text-lg font-bold")
 
                 self._date_from_picker = ui.date(
-                    value=from_date.strftime("%Y-%m-%d") if from_date else ""
+                    value=from_date.strftime("%Y-%m-%d") if from_date else None
                 )
                 self._date_to_picker = ui.date(
-                    value=to_date.strftime("%Y-%m-%d") if to_date else ""
+                    value=to_date.strftime("%Y-%m-%d") if to_date else None
                 )
 
                 with ui.row().classes("gap-2 justify-end"):
@@ -1268,8 +1268,8 @@ class ExperimentHistoryTable(BaseComponent):
 
     def _apply_date_range(self) -> None:
         """Apply date range from dialog"""
-        raw_from = self._date_from_picker.value or ""
-        raw_to = self._date_to_picker.value or ""
+        raw_from = self._date_from_picker.value
+        raw_to = self._date_to_picker.value
 
         from_date = None
         to_date = None
@@ -1285,6 +1285,11 @@ class ExperimentHistoryTable(BaseComponent):
             except ValueError:
                 ui.notify("Invalid date", color="negative")
                 return
+
+        # Validate range
+        if from_date and to_date and to_date < from_date:
+            ui.notify("Invalid date range", color="negative")
+            return
 
         self._from_date = from_date
         self._to_date = to_date

@@ -28,3 +28,4 @@ def test_clear_filters_resets_date_pickers():
     panel._open_date_dialog()
     assert panel._date_from_picker.value == ""
     assert panel._date_to_picker.value == ""
+

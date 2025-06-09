@@ -436,6 +436,7 @@ class DashboardComponent(BaseComponent):
                     component_id=f"dashboard_camera_stream_{cid}",
                     resolution=(width, height),
                     overlay_options=overlay,
+                    stream_path=f"/video_feed/{cid}",
                 )
 
                 with ui.card().classes("p-2 cvd-card mb-2"):
@@ -467,6 +468,7 @@ class DashboardComponent(BaseComponent):
                 max_width=480,
                 max_height=360,
                 component_id="dashboard_camera_stream",
+                stream_path="/video_feed",
             )
 
             # Render the camera stream
@@ -498,6 +500,73 @@ class DashboardComponent(BaseComponent):
         self._sensor_cards.clear()
         self._sensor_row.clear()
         self._render_sensor_cards()
+
+    def refresh_sensors(self) -> None:
+        """Reload dashboard sensors from configuration and re-render cards."""
+        # Determine which sensors should be displayed on the dashboard
+        self._dashboard_sensors = [
+            sid
+            for sid, cfg in self.config_service.get_sensor_configs()
+            if cfg.get("show_on_dashboard")
+        ]
+
+        # Apply persisted layout ordering
+        layout = self.config_service.get_dashboard_layout()
+        if isinstance(layout, dict):
+            sensor_layout = layout.get("sensors", [])
+            if sensor_layout:
+                ordered = [
+                    sid for sid in sensor_layout if sid in self._dashboard_sensors
+                ]
+                ordered += [
+                    sid for sid in self._dashboard_sensors if sid not in ordered
+                ]
+                self._dashboard_sensors = ordered
+
+        # Remove existing cards and rebuild them
+        if not self._sensor_row:
+            return
+        for card in self._sensor_cards.values():
+            card.cleanup()
+        self._sensor_cards.clear()
+        self._sensor_row.clear()
+        self._render_sensor_cards()
+
+    def refresh_controllers(self) -> None:
+        """Reload dashboard controllers and re-render cards."""
+        self._dashboard_controllers = [
+            cid
+            for cid, cfg in self.config_service.get_controller_configs()
+            if cfg.get("show_on_dashboard")
+        ]
+
+        layout = self.config_service.get_dashboard_layout()
+        if isinstance(layout, dict):
+            controller_layout = layout.get("controllers", [])
+            if controller_layout:
+                ordered = [
+                    cid
+                    for cid in controller_layout
+                    if cid in self._dashboard_controllers
+                ]
+                ordered += [
+                    cid
+                    for cid in self._dashboard_controllers
+                    if cid not in ordered
+                ]
+                self._dashboard_controllers = ordered
+
+        if not self._controller_row:
+            return
+
+        for card in self._controller_cards.values():
+            try:
+                card.delete()
+            except Exception:
+                pass
+        self._controller_cards.clear()
+        self._controller_row.clear()
+        self._render_controller_cards()
 
     def _set_stream_resolution(self, stream: CameraStreamComponent, value: str) -> None:
         """Update resolution of a camera stream from dropdown selection."""

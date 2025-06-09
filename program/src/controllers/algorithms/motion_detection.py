@@ -142,7 +142,9 @@ class MotionDetectionController(ImageController):
         self.height = params.get("height")
         self.fps = params.get("fps")
         self.rotation = params.get("rotation", 0)
-        self.uvc_settings = params.get("uvc_settings", {})
+        self.uvc_settings = {}
+        self.uvc_settings.update(params.get("uvc", {}))
+        self.uvc_settings.update(params.get("uvc_settings", {}))
 
         if self.webcam_id:
             service = get_config_service()
@@ -155,6 +157,7 @@ class MotionDetectionController(ImageController):
                         self.width, self.height = res
                     self.fps = cam_cfg.get("fps", self.fps)
                     self.rotation = cam_cfg.get("rotation", self.rotation)
+                    self.uvc_settings.update(cam_cfg.get("uvc", {}))
                     self.uvc_settings.update(cam_cfg.get("uvc_settings", {}))
         self.algorithm = params.get("algorithm", "MOG2")  # MOG2, KNN, or GMG
         self.var_threshold = params.get("var_threshold", 16)

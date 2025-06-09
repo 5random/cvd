@@ -267,10 +267,10 @@ class DataFilterPanel(BaseComponent):
                 ui.label("Select Date Range").classes("text-lg font-bold")
 
                 self._date_from_picker = ui.date(
-                    value=from_date.strftime("%Y-%m-%d") if from_date else ""
+                    value=from_date.strftime("%Y-%m-%d") if from_date else None
                 )
                 self._date_to_picker = ui.date(
-                    value=to_date.strftime("%Y-%m-%d") if to_date else ""
+                    value=to_date.strftime("%Y-%m-%d") if to_date else None
                 )
 
                 with ui.row().classes("gap-2 justify-end"):
@@ -286,8 +286,8 @@ class DataFilterPanel(BaseComponent):
 
     def _apply_date_range(self) -> None:
         """Apply selected date range from dialog"""
-        raw_from = self._date_from_picker.value or ""
-        raw_to = self._date_to_picker.value or ""
+        raw_from = self._date_from_picker.value
+        raw_to = self._date_to_picker.value
 
         from_date = None
         to_date = None
@@ -303,6 +303,11 @@ class DataFilterPanel(BaseComponent):
             except ValueError:
                 ui.notify("Invalid date format", type="negative")
                 return
+
+        # Validate range
+        if from_date and to_date and to_date < from_date:
+            ui.notify("Invalid date range", type="negative")
+            return
 
         self.current_filters["date_range"] = (from_date, to_date)
         date_input = self._date_range_input
