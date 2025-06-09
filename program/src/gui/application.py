@@ -581,7 +581,9 @@ class WebApplication:
                 self.config_service.set(
                     "ui.notification_center.max_notifications",
                     int(self._max_notifications_input.value),
+                )
 
+            if (
                 hasattr(self, "_log_level_input")
                 and self._log_level_input is not None
             ):
@@ -611,7 +613,9 @@ class WebApplication:
             ):
                 self.config_service.set(
                     "logging.retention_days", int(self._log_retention_input.value)
+                )
 
+            if (
                 hasattr(self, "_network_host_input")
                 and self._network_host_input is not None
             ):
@@ -728,7 +732,7 @@ class WebApplication:
             if hasattr(self, "_max_notifications_input") and self._max_notifications_input is not None:
                 self._max_notifications_input.value = self.config_service.get(
                     "ui.notification_center.max_notifications", int, 500
-
+                )
             if hasattr(self, "_log_level_input") and self._log_level_input is not None:
                 self._log_level_input.value = self.config_service.get(
                     "logging.level", str, "INFO"
@@ -744,7 +748,7 @@ class WebApplication:
             if hasattr(self, "_log_retention_input") and self._log_retention_input is not None:
                 self._log_retention_input.value = self.config_service.get(
                     "logging.retention_days", int, 30
-
+                )
             if hasattr(self, "_network_host_input") and self._network_host_input is not None:
                 self._network_host_input.value = self.config_service.get(
                     "network.host", str, "0.0.0.0"
