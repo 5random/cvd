@@ -921,6 +921,10 @@ class CurrentExperimentDisplay(BaseComponent):
                     remaining_seconds = total_duration - elapsed
                     estimated_remaining = self._format_duration(remaining_seconds)
 
+            duration_seconds = result.duration_seconds
+            if duration_seconds is None and result.start_time:
+                duration_seconds = (datetime.now() - result.start_time).total_seconds()
+
             # Determine sensor count
             if config.sensor_ids:
                 sensor_count = len(config.sensor_ids)
@@ -942,7 +946,6 @@ class CurrentExperimentDisplay(BaseComponent):
                         active = sensor_mgr.get_all_sensors()
                     sensor_count = len(active)
 
-
             # Determine controller count
             if config.controller_ids:
                 controller_count = len(config.controller_ids)
@@ -962,7 +965,6 @@ class CurrentExperimentDisplay(BaseComponent):
                 if ctrl_mgr:
                     controller_count = len(ctrl_mgr.list_controllers())
 
-
             return ExperimentInfo(
                 experiment_id=experiment_id,
                 name=config.name,
@@ -971,7 +973,7 @@ class CurrentExperimentDisplay(BaseComponent):
                 phase=self.experiment_manager.get_current_phase(),
                 start_time=result.start_time,
                 end_time=result.end_time,
-                duration_seconds=result.duration_seconds,
+                duration_seconds=duration_seconds,
                 data_points_collected=result.data_points_collected,
                 sensor_count=sensor_count,
                 controller_count=controller_count,
