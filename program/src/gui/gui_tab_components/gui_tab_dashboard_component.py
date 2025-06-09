@@ -540,8 +540,6 @@ class DashboardComponent(BaseComponent):
             sensor_card = SensorCardComponent(
                 component_config, card_config, self.sensor_manager
             )
-            sensor_card.render()
-
             card_el = sensor_card.render()
             card_el.props("draggable=true")
             card_el.on(
@@ -549,8 +547,6 @@ class DashboardComponent(BaseComponent):
             )
             card_el.on("drop", lambda e, sid=sensor_id: self._drop_sensor_on(sid))
             card_el.on("dragover", lambda e: e.prevent_default())
-
-            sensor_card.render()
 
             self._sensor_cards[sensor_id] = sensor_card
 
