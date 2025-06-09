@@ -59,6 +59,8 @@ class WebApplication:
         self._log_component: Optional[LogComponent] = None
         self._experiment_component: Optional[ExperimentComponent] = None
         self._data_component: Optional[DataComponent] = None
+        self._dashboard_component: Optional[DashboardComponent] = None
+        self._live_plot: Optional[LivePlotComponent] = None
 
         # Initialize notification center with error handling
         try:
@@ -289,22 +291,24 @@ class WebApplication:
             ]
 
             with ui.column().classes('w-1/2'):
-                dashboard = DashboardComponent(
+                self._dashboard_component = DashboardComponent(
                     self.config_service,
                     self.sensor_manager,
                     self.controller_manager,
                     self._notification_center,
                 )
-                dashboard.render()
+                self.component_registry.register(self._dashboard_component)
+                self._dashboard_component.render()
             # use dashboard's configured sensors for live plot
-            dashboard_sensors = getattr(dashboard, '_dashboard_sensors', [])
+            dashboard_sensors = getattr(self._dashboard_component, '_dashboard_sensors', [])
 
             # Right column - live plot
             if dashboard_sensors:
                 with ui.column().classes("w-1/2"):
                     plot_config = PlotConfig(max_points=2000, refresh_rate_ms=1000, history_seconds=3600)
-                    live_plot = LivePlotComponent(self.sensor_manager, plot_config, dashboard_sensors)
-                    live_plot.render()
+                    self._live_plot = LivePlotComponent(self.sensor_manager, plot_config, dashboard_sensors)
+                    self.component_registry.register(self._live_plot)
+                    self._live_plot.render()
 
     def _create_sensors_content(self) -> None:
         """Create sensors tab content"""

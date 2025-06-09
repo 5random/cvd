@@ -24,3 +24,11 @@ def mute_logging(monkeypatch: pytest.MonkeyPatch) -> None:
         if hasattr(async_utils, name):
             monkeypatch.setattr(async_utils, name, lambda *a, **k: None)
 
+    # Also patch any imported logging helpers in already loaded modules
+    import sys
+    for mod in list(sys.modules.values()):
+        if mod and getattr(mod, "__name__", "").startswith("src."):
+            for name in ["debug", "info", "warning", "error"]:
+                if hasattr(mod, name):
+                    monkeypatch.setattr(mod, name, lambda *a, **k: None, raising=False)
+
