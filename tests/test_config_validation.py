@@ -174,7 +174,7 @@ async def test_controller_invalid_interface_requirements(tmp_path):
     invalid_cfg = {
         "controller_id": "con1",
         "name": "c1",
-        "type": "camera_capture",
+        "type": "motion_detection",
         "interface": "usb_camera",
         "enabled": True,
     }
@@ -192,7 +192,7 @@ async def test_controller_minimal_valid(tmp_path):
 
     service = ConfigurationService(config_path, default_path)
 
-    cfg = {"controller_id": "con1", "name": "c1", "type": "camera_capture", "enabled": True}
+    cfg = {"controller_id": "con1", "name": "c1", "type": "motion_detection", "enabled": True}
 
     service._validate_controller_config(cfg)
 
@@ -209,7 +209,7 @@ async def test_controller_unexpected_key_warns(tmp_path, caplog):
     cfg = {
         "controller_id": "con1",
         "name": "c1",
-        "type": "camera_capture",
+        "type": "motion_detection",
         "enabled": True,
         "foo": "bar",
     }

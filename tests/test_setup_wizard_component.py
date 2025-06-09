@@ -29,7 +29,7 @@ def test_update_element_refreshes_lists(tmp_path):
             }
         ],
         "controllers": [
-            {"con1": {"name": "C1", "type": "camera_capture", "enabled": True}}
+            {"con1": {"name": "C1", "type": "motion_detection", "enabled": True}}
         ],
     }
     svc = create_service(tmp_path, cfg)
@@ -51,7 +51,7 @@ def test_update_element_refreshes_lists(tmp_path):
         }
     )
     svc.add_controller_config(
-        {"controller_id": "con2", "name": "C2", "type": "camera_capture", "enabled": True}
+        {"controller_id": "con2", "name": "C2", "type": "motion_detection", "enabled": True}
     )
 
     wizard._update_element({})

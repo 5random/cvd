@@ -70,7 +70,8 @@ def test_wizard_parameter_defaults(tmp_path):
     svc = create_service(tmp_path, {"controllers": []})
     wizard = ControllerSetupWizardComponent(svc, Dummy(), Dummy())
 
-    for ctype, template in _PARAM_TEMPLATES.items():
+    for ctype in wizard._controller_types:
+        template = _PARAM_TEMPLATES[ctype]
         wizard._wizard_data["type"] = ctype
         wizard._update_controller_defaults()
         expected = {k: v["default"] for k, v in template.items()}

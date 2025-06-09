@@ -37,8 +37,24 @@ def test_motion_detection_camera_detection(tmp_path):
 def test_multiple_cameras(tmp_path):
     cfg = {
         "controllers": [
-            {"cam1": {"name": "C1", "type": "camera", "show_on_dashboard": True, "enabled": True}},
-            {"cam2": {"name": "C2", "type": "camera", "show_on_dashboard": True, "enabled": True}},
+            {
+                "cam1": {
+                    "name": "C1",
+                    "type": "motion_detection",
+                    "show_on_dashboard": True,
+                    "enabled": True,
+                    "parameters": {"device_index": 0},
+                }
+            },
+            {
+                "cam2": {
+                    "name": "C2",
+                    "type": "motion_detection",
+                    "show_on_dashboard": True,
+                    "enabled": True,
+                    "parameters": {"device_index": 1},
+                }
+            },
         ]
     }
 
