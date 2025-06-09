@@ -157,6 +157,10 @@ class MotionDetectionController(ImageController):
                     self.rotation = cam_cfg.get("rotation", self.rotation)
                     self.uvc_settings.update(cam_cfg.get("uvc_settings", {}))
         self.algorithm = params.get("algorithm", "MOG2")  # MOG2, KNN, or GMG
+        self.var_threshold = params.get("var_threshold", 16)
+        self.dist2_threshold = params.get("dist2_threshold", 400.0)
+        self.history = params.get("history", 500)
+        self.detect_shadows = params.get("detect_shadows", True)
         self.learning_rate = params.get("learning_rate", 0.01)
         self.threshold = params.get("threshold", 25)
         self.min_contour_area = params.get("min_contour_area", 500)
@@ -200,11 +204,15 @@ class MotionDetectionController(ImageController):
             # Create background subtractor based on algorithm
             if self.algorithm == "MOG2":
                 self._bg_subtractor = cv2.createBackgroundSubtractorMOG2(
-                    detectShadows=True, varThreshold=16, history=500
+                    detectShadows=self.detect_shadows,
+                    varThreshold=self.var_threshold,
+                    history=self.history,
                 )
             elif self.algorithm == "KNN":
                 self._bg_subtractor = cv2.createBackgroundSubtractorKNN(
-                    detectShadows=True, dist2Threshold=400.0, history=500
+                    detectShadows=self.detect_shadows,
+                    dist2Threshold=self.dist2_threshold,
+                    history=self.history,
                 )
             else:
                 error(
