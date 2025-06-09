@@ -921,6 +921,32 @@ class CurrentExperimentDisplay(BaseComponent):
                     remaining_seconds = total_duration - elapsed
                     estimated_remaining = self._format_duration(remaining_seconds)
 
+            # Determine sensor count
+            if config.sensor_ids:
+                sensor_count = len(config.sensor_ids)
+            elif self.experiment_manager.sensor_manager:
+                try:
+                    sensor_count = len(
+                        self.experiment_manager.sensor_manager.get_all_sensors()
+                    )
+                except Exception:
+                    sensor_count = 0
+            else:
+                sensor_count = 0
+
+            # Determine controller count
+            if config.controller_ids:
+                controller_count = len(config.controller_ids)
+            elif self.experiment_manager.controller_manager:
+                try:
+                    controller_count = len(
+                        self.experiment_manager.controller_manager.list_controllers()
+                    )
+                except Exception:
+                    controller_count = 0
+            else:
+                controller_count = 0
+
             return ExperimentInfo(
                 experiment_id=experiment_id,
                 name=config.name,
@@ -931,10 +957,8 @@ class CurrentExperimentDisplay(BaseComponent):
                 end_time=result.end_time,
                 duration_seconds=result.duration_seconds,
                 data_points_collected=result.data_points_collected,
-                sensor_count=len(config.sensor_ids) if config.sensor_ids else 0,
-                controller_count=(
-                    len(config.controller_ids) if config.controller_ids else 0
-                ),
+                sensor_count=sensor_count,
+                controller_count=controller_count,
                 errors_count=result.errors_count,
                 progress_percent=progress_percent,
                 estimated_remaining=estimated_remaining,
