@@ -92,6 +92,7 @@ class ControllerStage(ABC):
         self._error_count = 0
         self._last_result: Optional[ControllerResult] = None
         self._output_cache: Dict[str, Any] = {}
+        self._start_time: Optional[float] = None
 
     @abstractmethod
     async def process(self, input_data: ControllerInput) -> ControllerResult:
@@ -147,6 +148,7 @@ class ControllerStage(ABC):
         try:
             if await self.initialize():
                 self.status = ControllerStatus.RUNNING
+                self._start_time = time.time()
                 info(
                     "Controller started",
                     controller_id=self.controller_id,
@@ -173,6 +175,7 @@ class ControllerStage(ABC):
         try:
             await self.cleanup()
             self.status = ControllerStatus.STOPPED
+            self._start_time = None
             info(
                 "Controller stopped",
                 controller_id=self.controller_id,
@@ -228,6 +231,8 @@ class ControllerStage(ABC):
             ),
             "last_success": self._last_result.success if self._last_result else None,
             "has_output": self.controller_id in self._output_cache,
+            "start_time": self._start_time,
+            "uptime_s": (time.time() - self._start_time) if self._start_time else None,
         }
 
 
