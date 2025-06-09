@@ -35,7 +35,7 @@ from src.utils.log_utils.log_service import debug, error, info, warning
 from src.gui.gui_elements.gui_webcam_stream_element import CameraStreamComponent
 from starlette.staticfiles import StaticFiles
 from fastapi.responses import StreamingResponse
-from fastapi import Request
+from fastapi import Request, HTTPException
 
 
 class WebApplication:
@@ -86,7 +86,9 @@ class WebApplication:
     async def shutdown(self) -> None:
         """Async shutdown for web application"""
         info("Web application shutting down...")
-        if hasattr(self, "_processing_task"):
+        # Cancel processing task if running
+        if self._processing_task:
+            # self._processing_task is an asyncio.Task
             self._processing_task.cancel()
             with contextlib.suppress(Exception):
                 await self._processing_task
@@ -147,19 +149,19 @@ class WebApplication:
             """System status page"""
             return self._create_status_page()
 
-
         @ui.page("/video_feed")
-        async def video_feed():
-
+        async def video_feed(request: Request):
             """Stream MJPEG frames from the dashboard camera"""
+            # retrieve specific dashboard camera stream or fallback to first CameraStreamComponent
             camera = self.component_registry.get_component('dashboard_camera_stream')
             if camera is None:
-                # fallback to first registered camera stream
-                for cid in self.component_registry.components:
-                    if str(cid).startswith('dashboard_camera_stream_'):
-                        camera = self.component_registry.get_component(cid)
+                for comp in self.component_registry.get_all_components():
+                    if isinstance(comp, CameraStreamComponent):
+                        camera = comp
                         break
-
+            # if still no camera available, return error to client
+            if camera is None:
+                raise HTTPException(status_code=503, detail="Camera stream unavailable")
 
             async def gen():
                 while True:
@@ -176,9 +178,10 @@ class WebApplication:
                             success, buf = cv2.imencode("jpg", frame)
                             if success:
                                 jpeg_bytes = buf.tobytes()
-
                                 yield (b"--frame\r\nContent-Type: image/jpeg\r\n\r\n" + jpeg_bytes + b"\r\n")
-                    await asyncio.sleep(camera.update_interval if isinstance(camera, CameraStreamComponent) else 0.03)
+                    await asyncio.sleep(
+                        camera.update_interval if isinstance(camera, CameraStreamComponent) else 0.03
+                    )
 
             return StreamingResponse(gen(), media_type="multipart/x-mixed-replace; boundary=frame")
 
@@ -274,8 +277,7 @@ class WebApplication:
         """Create dashboard tab content"""
         with ui.row().classes("w-full h-full gap-4"):
             # Left column - sensor dashboard
-            dashboard_sensors = [
-
+            # render dashboard component and collect sensors for live plot
             with ui.column().classes('w-1/2'):
                 dashboard = DashboardComponent(
                     self.config_service,
@@ -283,8 +285,9 @@ class WebApplication:
                     self.controller_manager,
                     self._notification_center,
                 )
-
                 dashboard.render()
+            # use dashboard's configured sensors for live plot
+            dashboard_sensors = getattr(dashboard, '_dashboard_sensors', [])
 
             # Right column - live plot
             if dashboard_sensors:

@@ -494,17 +494,17 @@ class SensorsComponent(TimedComponent):
                     ui.button('Refresh', 
                              on_click=self._refresh_sensors,
                              icon='refresh'
-                    ).props('outline')
+                    )
                     
                     ui.button('Start All', 
                              on_click=self._start_all_sensors,
                              icon='play_arrow'
-                    ).props('color=positive outline')
+                    ).props('color=positive')
                     
                     ui.button('Stop All', 
                              on_click=self._stop_all_sensors,
                              icon='stop'
-                    ).props('color=negative outline')
+                    ).props('color=negative')
             
             # Status summary
             with ui.card().classes('w-full'):
