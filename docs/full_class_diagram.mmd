@@ -1,179 +1,2110 @@
 ```mermaid
 classDiagram
-    class ExperimentState
-    class ExperimentPhase
-    class ExperimentConfig
-    class ExperimentResult
-    class ExperimentDataPoint
-    class ExperimentManager
-    class ControllerType
-    class ControllerStatus
-    class ControllerInput
-    class ControllerResult
-    class ControllerConfig
-    class ControllerStage
-    class ImageController
-    class StateController
-    class ControllerDependency
-    class ControllerManager
-    class WebApplication
-    class ApplicationContainer
-    class EmailAlertService
-    class ConfigSection
-    class ConfigurationError
-    class ValidationError
-    class ConfigurationService
-    class DataCategory
-    class FileStatus
-    class FileMetadata
-    class DataIndex
-    class DownloadRequest
-    class DirectoryEventHandler
-    class Indexer
-    class DataSaver
-    class DataManager
-    class MaintenanceManager
-    class CompressionSettings
-    class RotationSettings
-    class CompressionError
-    class CompressionService
-    class CompressionManager
-    class FileMaintenanceService
-    class LogLevel
-    class LogContext
-    class StructuredFormatter
-    class LogService
-    class ProcessPoolType
-    class ProcessPoolConfig
-    class _Telemetry
-    class ManagedProcessPool
-    class SecurityError
-    class ThreadPoolType
-    class ThreadPoolConfig
-    class _PoolStats
-    class ManagedThreadPool
-    class ThreadPoolManager
-    class AsyncRateLimiter
-    class TaskHandle
-    class AsyncTaskManager
-    class LogFileInfo
-    class LogViewerComponent
-    class LogComponent
-    class SetupWizardComponent
-    class ControllerCardConfig
-    class ControllerConfigDialog
-    class ControllerCardComponent
-    class ControllersComponent
-    class ExperimentInfo
-    class ExperimentConfigDialog
-    class ExperimentCard
-    class CurrentExperimentDisplay
-    class ExperimentHistoryTable
-    class ExperimentComponent
-    class SensorInfo
-    class SensorConfigDialog
-    class SensorCardComponent
-    class SensorsComponent
-    class DataComponentConfig
-    class DataOverviewCard
-    class DataFilterPanel
-    class DataFilesList
-    class DataComponent
-    class ComponentConfig
-    class BaseComponent
-    class TimedComponent
-    class ComponentRegistry
-    class CardComponent
-    class TabComponent
-    class CancelableDialogMixin
-    class SensorCardConfig
-    class DashboardComponent
-    class PlotConfig
-    class SeriesConfig
-    class LivePlotComponent
-    class ControllerSetupWizardComponent
-    class WizardMixin
-    class CameraStreamComponent
-    class NotificationCenter
-    class ExperimentSetupWizardComponent
-    class SensorSetupWizardComponent
-    class NotificationSeverity
-    class NotificationSource
-    class Notification
-    class NotificationMonitoringMixin
-    class NotificationUIMixin
-    class ReactorState
-    class ReactorAlarmType
-    class ReactorStateData
-    class ReactorStateConfig
-    class ReactorStateController
-    class MotionDetectionResult
-    class MotionDetectionController
-    class CameraCaptureController
-    class SensorManager
-    class ProcessingStageType
-    class ProcessingResult
-    class ProcessingStage
-    class SensorStatus
-    class SensorReading
-    class SensorInterface
-    class SensorConfig
-    class RangeValidationFilter
-    class OutlierDetectionFilter
-    class MovingAverageFilter
-    class DataPipeline
-    class BaseSensor
-    class ArduinoTCSensor
-    class RS232Sensor
-    class MockArduinoTCBoardSerial
-    class MockRS232Serial
-    class MockRS232Sensor
-    class MockArduinoTCSensor
-    ControllerStage <|-- ImageController
-    ControllerStage <|-- StateController
-    ConfigurationError <|-- ValidationError
-    TimedComponent <|-- LogViewerComponent
-    BaseComponent <|-- LogComponent
-    SensorSetupWizardComponent <|-- SetupWizardComponent
-    CancelableDialogMixin <|-- ControllerConfigDialog
-    TimedComponent <|-- ControllerCardComponent
-    BaseComponent <|-- ControllersComponent
-    CancelableDialogMixin <|-- ExperimentConfigDialog
-    BaseComponent <|-- ExperimentCard
-    BaseComponent <|-- CurrentExperimentDisplay
-    BaseComponent <|-- ExperimentHistoryTable
-    BaseComponent <|-- ExperimentComponent
-    CancelableDialogMixin <|-- SensorConfigDialog
-    TimedComponent <|-- SensorCardComponent
-    TimedComponent <|-- SensorsComponent
-    BaseComponent <|-- DataOverviewCard
-    BaseComponent <|-- DataFilterPanel
-    BaseComponent <|-- DataFilesList
-    BaseComponent <|-- DataComponent
-    BaseComponent <|-- TimedComponent
+    %% Container for all application services with dependency injection
+    class ApplicationContainer {
+        %% compression_service: CompressionService
+        +compression_service
+        %% config_service: ConfigurationService
+        +config_service
+        %% data_saver: DataSaver
+        +data_saver
+        %% email_alert_service: EmailAlertService
+        +email_alert_service
+        %% sensor_manager: SensorManager
+        +sensor_manager
+        %% web_application: 'WebApplication'
+        +web_application
+        %% create: Create application container with all services
+        +create()
+        %% create_sync: Synchronous factory for NiceGUI compatibility
+        +create_sync()
+        %% get_status: Get status of all services
+        +get_status()
+        %% shutdown_sync: Synchronous shutdown for cleanup
+        +shutdown_sync()
+        %% start_gui: Start NiceGUI application (synchronous)
+        +start_gui()
+    }
+    %% Arduino TC Board sensor implementation
+    class ArduinoTCSensor {
+        +__init__()
+        +sensor_type()
+    }
+    %% Token-bucket limiter with fairness & burst control.
+    class AsyncRateLimiter {
+        +__init__()
+        +release()
+    }
+    %% Structured Task manager providing handles and graceful shutdown.
+    class AsyncTaskManager {
+        +__init__()
+        %% create_task: Schedule *coro* and return a :class:`TaskHandle`.
+        +create_task()
+    }
+    %% Base class for all UI components
+    class BaseComponent {
+        %% config: = config
+        +config
+        +__init__()
+        %% add_child: Add a child component
+        +add_child()
+        %% cleanup: Cleanup component resources
+        +cleanup()
+        %% component_id: Get component ID
+        +component_id()
+        %% get_children: Get all child components
+        +get_children()
+        %% get_element: Get the rendered element, rendering if necessary
+        +get_element()
+        %% is_rendered: Check if component has been rendered
+        +is_rendered()
+        %% remove_child: Remove a child component
+        +remove_child()
+        %% render: Render the component and return NiceGUI element
+        +render()
+        %% update: Update component with new data
+        +update()
+    }
+    %% Common functionality shared by sensor implementations.
+    class BaseSensor {
+        +__init__()
+        %% is_connected: Return True if a connection object exists and the sensor is marked connected.
+        +is_connected()
+        %% sensor_id: Return the configured sensor id.
+        +sensor_id()
+    }
+    %% Controller that captures frames from a camera using cv2.VideoCapture.
+    class CameraCaptureController {
+        %% controller_type: = ControllerType.CUSTOM
+        +controller_type
+        %% device_index: = cam_cfg.get('device_index', self.device_index)
+        +device_index
+        %% fps: = cam_cfg.get('fps', self.fps)
+        +fps
+        %% height: = params.get('height')
+        +height
+        %% rotation: = cam_cfg.get('rotation', self.rotation)
+        +rotation
+        %% uvc_settings: = params.get('uvc_settings', {})
+        +uvc_settings
+        %% webcam_id: = params.get('cam_id')
+        +webcam_id
+        %% width: = params.get('width')
+        +width
+        +__init__()
+    }
+    %% Component for displaying live camera stream with motion detection overlays.
+    class CameraStreamComponent {
+        %% controller_manager: = controller_manager
+        +controller_manager
+        %% fps_counter: = 0
+        +fps_counter
+        %% fps_label: = ui.label('FPS: --').classes('text-sm text-gray-600')
+        +fps_label
+        %% frame_count: = 0
+        +frame_count
+        %% image_element: = ui.image('/video_feed').classes('border rounded').props('alt="Webcam stream"')
+        +image_element
+        %% is_streaming: = False
+        +is_streaming
+        %% last_fps_time: = time.time()
+        +last_fps_time
+        %% max_height: = max_height
+        +max_height
+        %% max_width: = max_width
+        +max_width
+        %% overlay_opacity: = 0.3
+        +overlay_opacity
+        %% show_bounding_boxes: = bool(overlay_options.get('bounding_boxes', True))
+        +show_bounding_boxes
+        %% show_frame_diff: = bool(overlay_options.get('frame_diff', False))
+        +show_frame_diff
+        %% show_motion_mask: = bool(overlay_options.get('motion_mask', False))
+        +show_motion_mask
+        %% show_motion_overlay: = bool(overlay_options.get('motion_overlay', True))
+        +show_motion_overlay
+        %% status_label: = ui.label('Stopped').classes('text-sm text-gray-600')
+        +status_label
+        %% timer: = None
+        +timer
+        %% update_interval: = update_interval
+        +update_interval
+        %% __init__: Initialize camera stream component.
+        +__init__()
+        %% cleanup: Clean up resources.
+        +cleanup()
+        %% get_latest_frame: Return the most recent processed frame.
+        +get_latest_frame()
+        %% pause_streaming: Pause/unpause the camera stream.
+        +pause_streaming()
+        %% render: Render the camera stream component.
+        +render()
+        %% start_streaming: Start the camera stream.
+        +start_streaming()
+        %% stop_streaming: Stop the camera stream.
+        +stop_streaming()
+    }
+    %% Mixin providing a standard :py:meth:`_cancel` implementation.
+    class CancelableDialogMixin {
+    }
+    %% Reusable card component
+    class CardComponent {
+        %% content_factory: = new_content_factory
+        +content_factory
+        +__init__()
+        %% render: Render card component
+        +render()
+        %% update_content: Update card content with new factory
+        +update_content()
+    }
+    %% Configuration for a UI component
+    class ComponentConfig {
+        %% classes: str = ''
+        +classes
+        %% component_id: str
+        +component_id
+        %% properties: Dict[str, Any] = field(default_factory=dict)
+        +properties
+        %% styles: Dict[str, str] = field(default_factory=dict)
+        +styles
+        %% title: Optional[str] = None
+        +title
+    }
+    %% Registry for managing UI components
+    class ComponentRegistry {
+        +__init__()
+        %% cleanup_all: Clean up all components
+        +cleanup_all()
+        %% get_all_components: Get all registered components
+        +get_all_components()
+        %% get_component: Get component by ID
+        +get_component()
+        %% register: Register a component
+        +register()
+        %% unregister: Unregister a component
+        +unregister()
+    }
+    %% Raised when compression operations fail
+    class CompressionError {
+    }
+    %% Handle compression queue operations for DataManager.
+    class CompressionManager {
+        +__init__()
+        +mark_for_compression()
+        +process_compression_queue()
+    }
+    %% Service for compressing and rotating data files.
+    class CompressionService {
+        %% COMPRESSION_ALGORITHMS: = {'gzip': {'extension': '.gz', 'compressor': gzip.compress, 'decompressor': gzip.decompress, 'open_func': gzip.open}, 'bz2': {'extension': '.bz2', 'compressor': bz2.compress, 'decompressor': bz2.decompress, 'open_func': bz2.open}, 'lzma': {'extension': '.xz', 'compressor': lzma.compress, 'decompressor': lzma.decompress, 'open_func': lzma.open}, 'zip': {'extension': '.zip', 'compressor': None, 'decompressor': None, 'open_func': None}}
+        +COMPRESSION_ALGORITHMS
+        %% __init__: Initialize compression service with configuration from config service
+        +__init__()
+        %% compress_directory: Compress all files in a directory matching a pattern.
+        +compress_directory()
+        %% compress_file: Compress a single file using configured compression algorithm.
+        +compress_file()
+        %% decompress_file: Decompress a compressed file.
+        +decompress_file()
+        %% get_compression_stats: Get statistics about compressed files
+        +get_compression_stats()
+        %% perform_maintenance: Perform routine maintenance: rotation and cleanup
+        +perform_maintenance()
+        %% reload_configuration: Reload configuration from config service
+        +reload_configuration()
+        %% rotate_experiment_data: Rotate experiment data files based on configuration
+        +rotate_experiment_data()
+        %% rotate_general_data: Rotate general data files based on configuration.
+        +rotate_general_data()
+        %% rotate_logs: Rotate log files based on configuration
+        +rotate_logs()
+    }
+    %% Configuration for compression operations
+    class CompressionSettings {
+        %% algorithm: str = 'gzip'
+        +algorithm
+        %% enabled: bool = True
+        +enabled
+        %% level: int = 5
+        +level
+        %% preserve_original: bool = False
+        +preserve_original
+    }
+    %% Represents a configuration section
+    class ConfigSection {
+        %% data: Dict[str, Any]
+        +data
+        %% schema: Optional[Dict[str, Any]] = None
+        +schema
+        %% section_name: str
+        +section_name
+    }
+    %% Raised when configuration operations fail
+    class ConfigurationError {
+    }
+    %% Centralized configuration management with type safety, persistence and schema validation
+    class ConfigurationService {
+        %% ALGORITHM_SCHEMA: = {'type': 'object', 'properties': {'name': {'type': 'string'}, 'type': {'type': 'string', 'enum': ['smoothing', 'motion_detection', 'state_detection', 'filtering']}, 'enabled': {'type': 'boolean'}, 'settings': {'type': 'object'}}, 'required': ['name', 'type', 'enabled']}
+        +ALGORITHM_SCHEMA
+        %% CONTROLLER_SCHEMA: = {'type': 'object', 'properties': {'name': {'type': 'string'}, 'type': {'type': 'string', 'enum': ['reactor_state', 'motion_detection', 'camera_capture', 'camera']}, 'interface': {'type': 'string', 'enum': ['usb_camera', 'network_camera', 'virtual']}, 'enabled': {'type': 'boolean'}, 'device_index': {'type': 'integer'}, 'ip_address': {'type': 'string'}, 'port': {'type': 'integer'}, 'parameters': {'type': 'object'}, 'settings': {'type': 'object'}, 'algorithm': {'type': 'array'}, 'state_output': {'type': 'array'}, 'show_on_dashboard': {'type': 'boolean'}, 'cam_id': {'type': 'string'}}, 'required': ['name', 'type', 'enabled'], 'allOf': [{'if': {'properties': {'interface': {'const': 'usb_camera'}}, 'required': ['interface']}, 'then': {'required': ['device_index']}}, {'if': {'properties': {'interface': {'const': 'network_camera'}}, 'required': ['interface']}, 'then': {'required': ['ip_address', 'port']}}]}
+        +CONTROLLER_SCHEMA
+        %% SENSOR_SCHEMA: = {'type': 'object', 'properties': {'name': {'type': 'string'}, 'type': {'type': 'string', 'enum': ['temperature', 'pressure', 'flow', 'level', 'ph']}, 'interface': {'type': 'string', 'enum': ['serial', 'usb', 'ethernet', 'modbus']}, 'enabled': {'type': 'boolean'}, 'source': {'type': 'string'}, 'port': {'type': 'string'}, 'channel': {'type': 'integer'}, 'address': {'type': 'string'}, 'baudrate': {'type': 'integer', 'default': 9600}, 'timeout': {'type': 'number', 'default': 2.0}, 'poll_interval_ms': {'type': 'integer'}, 'algorithm': {'type': 'array'}, 'state_output': {'type': 'array'}, 'show_on_dashboard': {'type': 'boolean'}}, 'required': ['name', 'type', 'interface', 'source', 'enabled'], 'allOf': [{'if': {'properties': {'interface': {'const': 'serial'}}, 'required': ['interface']}, 'then': {'required': ['port', 'channel']}}, {'if': {'properties': {'interface': {'const': 'modbus'}}, 'required': ['interface']}, 'then': {'required': ['port', 'address']}}]}
+        +SENSOR_SCHEMA
+        %% WEBCAM_SCHEMA: = {'type': 'object', 'properties': {'name': {'type': 'string'}, 'device_index': {'type': 'integer'}, 'resolution': {'type': 'array'}, 'fps': {'type': 'integer'}, 'rotation': {'type': 'integer', 'enum': [0, 90, 180, 270]}, 'uvc': {'type': 'object', 'properties': {'brightness': {'type': 'number'}, 'hue': {'type': 'number'}, 'contrast': {'type': 'number'}, 'saturation': {'type': 'number'}, 'sharpness': {'type': 'number'}, 'gamma': {'type': 'number'}, 'white_balance': {'type': 'number'}, 'white_balance_auto': {'type': 'boolean'}, 'gain': {'type': 'number'}, 'backlight_comp': {'type': 'number'}, 'exposure': {'type': 'number'}, 'exposure_auto': {'type': 'boolean'}}, 'additionalProperties': False}, 'uvc_settings': {'type': 'object'}, 'webcam_id': {'type': 'string'}}, 'required': ['name', 'device_index']}
+        +WEBCAM_SCHEMA
+        %% config_path: = Path(config_path)
+        +config_path
+        %% default_config_path: = Path(default_config_path)
+        +default_config_path
+        +__init__()
+        %% add_algorithm_config: Add a new algorithm configuration with validation
+        +add_algorithm_config()
+        %% add_controller_config: Add a new controller configuration with validation
+        +add_controller_config()
+        %% add_sensor_config: Add a new sensor configuration with validation
+        +add_sensor_config()
+        %% add_webcam_config: Add a new webcam configuration with validation
+        +add_webcam_config()
+        %% generate_next_controller_id: Return the next available controller ID.
+        +generate_next_controller_id()
+        %% generate_next_sensor_id: Return the next available sensor ID.
+        +generate_next_sensor_id()
+        %% generate_next_webcam_id: Return the next available webcam ID.
+        +generate_next_webcam_id()
+        %% get: Get configuration value by dot notation path
+        +get()
+        %% get_algorithm_config: Get configuration for a specific algorithm
+        +get_algorithm_config()
+        %% get_algorithm_configs: Get algorithm configs as list of (algorithm_id, config_dict), optionally filtered by algorithm_type
+        +get_algorithm_configs()
+        %% get_algorithm_settings: Get settings for a specific algorithm
+        +get_algorithm_settings()
+        %% get_algorithms_by_type: Get all algorithms of a specific type
+        +get_algorithms_by_type()
+        %% get_algorithms_for_entity: Get algorithm IDs referenced by a sensor or controller
+        +get_algorithms_for_entity()
+        %% get_configuration: Return the entire configuration cache as a dictionary
+        +get_configuration()
+        %% get_controller_configs: Get controller configs as list of (controller_id, config_dict), optionally filtered by interface_type
+        +get_controller_configs()
+        %% get_controller_parameters: Get parameters for a specific controller
+        +get_controller_parameters()
+        %% get_controller_settings: Get settings for a specific controller
+        +get_controller_settings()
+        %% get_dashboard_layout: Return stored dashboard layout configuration.
+        +get_dashboard_layout()
+        %% get_enabled_algorithms: Get all enabled algorithms
+        +get_enabled_algorithms()
+        %% get_ids: Get all IDs from a config section filtered by interface type.
+        +get_ids()
+        %% get_raw_config_as_json: Get raw configuration as JSON string
+        +get_raw_config_as_json()
+        %% get_section: Get raw configuration section value (dict, list, or other types)
+        +get_section()
+        %% get_sensor_configs: Get sensor configs as list of (sensor_id, config_dict), optionally filtered by interface_type
+        +get_sensor_configs()
+        %% get_webcam_config: Retrieve a specific webcam configuration by ID.
+        +get_webcam_config()
+        %% get_webcam_configs: Get webcam configs as list of (webcam_id, config_dict).
+        +get_webcam_configs()
+        %% reload: Reload configuration from files
+        +reload()
+        %% remove_algorithm_config: Remove algorithm configuration
+        +remove_algorithm_config()
+        %% remove_controller_config: Remove controller configuration
+        +remove_controller_config()
+        %% remove_sensor_config: Remove sensor configuration
+        +remove_sensor_config()
+        %% reset_to_defaults: Reset configuration to defaults
+        +reset_to_defaults()
+        %% set: Set configuration value by dot notation path
+        +set()
+        %% set_dashboard_layout: Persist dashboard layout configuration.
+        +set_dashboard_layout()
+        %% update_algorithm_config: Update existing algorithm configuration with validation
+        +update_algorithm_config()
+        %% update_algorithm_settings: Update settings for a specific algorithm
+        +update_algorithm_settings()
+        %% update_controller_config: Update existing controller configuration with validation
+        +update_controller_config()
+        %% update_controller_parameters: Update parameters for a specific controller
+        +update_controller_parameters()
+        %% update_controller_settings: Update settings for a specific controller
+        +update_controller_settings()
+        %% update_sensor_config: Update existing sensor configuration with validation
+        +update_sensor_config()
+        %% validate_all_configs: Validate all configurations and return errors by section
+        +validate_all_configs()
+        %% validate_sensor_config: Public wrapper for validating sensor configuration
+        +validate_sensor_config()
+    }
+    %% Individual controller display card
+    class ControllerCardComponent {
+        %% config_service: = config_service
+        +config_service
+        %% controller_config: = controller_config
+        +controller_config
+        %% controller_manager: = controller_manager
+        +controller_manager
+        %% timer_attributes: = ['_update_timer']
+        +timer_attributes
+        +__init__()
+        %% render: Render controller card
+        +render()
+    }
+    %% Configuration for controller display cards
+    class ControllerCardConfig {
+        %% controller_id: str
+        +controller_id
+        %% controller_type: str
+        +controller_type
+        %% enabled: bool = True
+        +enabled
+        %% name: str
+        +name
+    }
+    %% Configuration for a controller
+    class ControllerConfig {
+        %% controller_id: str
+        +controller_id
+        %% controller_type: str
+        +controller_type
+        %% enabled: bool = True
+        +enabled
+        %% input_controllers: List[str] = field(default_factory=list)
+        +input_controllers
+        %% input_sensors: List[str] = field(default_factory=list)
+        +input_sensors
+        %% output_name: Optional[str] = None
+        +output_name
+        %% parameters: Dict[str, Any] = field(default_factory=dict)
+        +parameters
+    }
+    %% Dialog for creating new controllers with webcam settings.
+    class ControllerConfigDialog {
+        %% config_service: = config_service
+        +config_service
+        %% controller_manager: = controller_manager
+        +controller_manager
+        %% on_save_callback: = on_save_callback
+        +on_save_callback
+        +__init__()
+        +show_add_dialog()
+    }
+    %% Represents a dependency between controllers
+    class ControllerDependency {
+        %% data_mapping: Optional[Dict[str, str]] = None Map output keys to input keys
+        +data_mapping
+        %% source_controller_id: str
+        +source_controller_id
+        %% target_controller_id: str
+        +target_controller_id
+    }
+    %% Input data for controllers
+    class ControllerInput {
+        %% controller_data: Dict[str, Any] = field(default_factory=dict)
+        +controller_data
+        %% metadata: Dict[str, Any] = field(default_factory=dict)
+        +metadata
+        %% sensor_data: Dict[str, SensorReading] = field(default_factory=dict)
+        +sensor_data
+        %% timestamp: float = field(default_factory=time.time)
+        +timestamp
+    }
+    %% Manages multiple controllers with dependency resolution and execution orchestration
+    class ControllerManager {
+        %% manager_id: = manager_id
+        +manager_id
+        +__init__()
+        %% add_controller_from_config: Create and register a controller from configuration.
+        +add_controller_from_config()
+        %% add_dependency: Add a dependency between controllers
+        +add_dependency()
+        %% create_controller: Create a controller instance from configuration dict.
+        +create_controller()
+        %% get_controller: Get a specific controller by ID
+        +get_controller()
+        %% get_controller_outputs: Get latest outputs from all controllers
+        +get_controller_outputs()
+        %% get_controller_stats: Get comprehensive statistics for all controllers
+        +get_controller_stats()
+        %% list_controllers: Get list of all registered controller IDs
+        +list_controllers()
+        %% register_controller: Register a controller with the manager
+        +register_controller()
+        %% save_configuration: Save controller configuration to file
+        +save_configuration()
+        %% unregister_controller: Unregister a controller
+        +unregister_controller()
+    }
+    %% Result from a controller processing stage
+    class ControllerResult {
+        %% data: Optional[T] = None
+        +data
+        %% error_message: Optional[str] = None
+        +error_message
+        %% metadata: Dict[str, Any] = field(default_factory=dict)
+        +metadata
+        %% processing_time_ms: Optional[float] = None
+        +processing_time_ms
+        %% success: bool
+        +success
+        %% error_result: Create an error result
+        +error_result()
+        %% success_result: Create a successful result
+        +success_result()
+    }
+    %% Comprehensive 4-step controller setup wizard using NiceGUI stepper.
+    class ControllerSetupWizardComponent {
+        %% config_service: = config_service
+        +config_service
+        %% controller_manager: = controller_manager
+        +controller_manager
+        %% on_close: = on_close
+        +on_close
+        %% sensor_manager: = sensor_manager
+        +sensor_manager
+        +__init__()
+        %% render: Render method required by BaseComponent.
+        +render()
+        %% show_dialog: Display the controller setup wizard in a dialog.
+        +show_dialog()
+    }
+    %% Base class for controller stages following ProcessingStage pattern
+    class ControllerStage {
+        %% config: = config
+        +config
+        %% controller_id: = controller_id
+        +controller_id
+        %% controller_type: = ControllerType.CUSTOM
+        +controller_type
+        %% enabled: = config.enabled
+        +enabled
+        %% status: = ControllerStatus.STOPPED
+        +status
+        +__init__()
+        %% get_output: Get the latest output from this controller
+        +get_output()
+        %% get_stats: Get controller statistics
+        +get_stats()
+    }
+    %% Controller status enumeration
+    class ControllerStatus {
+        %% ERROR: = 'error'
+        +ERROR
+        %% PAUSED: = 'paused'
+        +PAUSED
+        %% RUNNING: = 'running'
+        +RUNNING
+        %% STOPPED: = 'stopped'
+        +STOPPED
+    }
+    %% Types of controllers
+    class ControllerType {
+        %% CUSTOM: = 'custom'
+        +CUSTOM
+        %% MOTION_DETECTION: = 'motion_detection'
+        +MOTION_DETECTION
+        %% STATE_DERIVATION: = 'state_derivation'
+        +STATE_DERIVATION
+    }
+    %% Main controllers component
+    class ControllersComponent {
+        %% config_service: = config_service
+        +config_service
+        %% controller_manager: = controller_manager
+        +controller_manager
+        +__init__()
+        %% cleanup: Cleanup component
+        +cleanup()
+        %% pause_refresh_timer: Pause the automatic refresh timer.
+        +pause_refresh_timer()
+        %% render: Render controllers component
+        +render()
+        %% resume_refresh_timer: Resume the automatic refresh timer.
+        +resume_refresh_timer()
+    }
+    %% Display component for the currently active experiment
+    class CurrentExperimentDisplay {
+        %% experiment_manager: = experiment_manager
+        +experiment_manager
+        +__init__()
+        %% cleanup: Cleanup component resources
+        +cleanup()
+        %% render: Render current experiment display
+        +render()
+    }
+    %% Main dashboard component
+    class DashboardComponent {
+        %% component_registry: = get_component_registry()
+        +component_registry
+        %% config_service: = config_service
+        +config_service
+        %% controller_manager: = controller_manager
+        +controller_manager
+        %% sensor_manager: = sensor_manager
+        +sensor_manager
+        +__init__()
+        %% cleanup: Cleanup dashboard
+        +cleanup()
+        %% render: Render dashboard
+        +render()
+    }
+    %% Categories of data managed by the system
+    class DataCategory {
+        %% EXPERIMENTS: = 'experiments'
+        +EXPERIMENTS
+        %% LOGS: = 'logs'
+        +LOGS
+        %% PROCESSED: = 'processed'
+        +PROCESSED
+        %% RAW: = 'raw'
+        +RAW
+    }
+    %% Main data management component
+    class DataComponent {
+        %% component_config: = data_component_config or DataComponentConfig()
+        +component_config
+        %% data_manager: = data_manager
+        +data_manager
+        %% files_list: = DataFilesList(files_config, self.data_manager, self.component_config)
+        +files_list
+        %% filter_panel: = DataFilterPanel(filter_config, self.data_manager, self._on_filter_change)
+        +filter_panel
+        %% overview_card: = DataOverviewCard(overview_config, self.data_manager)
+        +overview_card
+        +__init__()
+        %% cleanup: Cleanup component resources
+        +cleanup()
+        %% render: Render the complete data management interface
+        +render()
+    }
+    %% Configuration for the data management component
+    class DataComponentConfig {
+        %% auto_refresh_interval: float = 5.0 seconds
+        +auto_refresh_interval
+        %% enable_bulk_operations: bool = True
+        +enable_bulk_operations
+        %% files_per_page: int = 50
+        +files_per_page
+        %% max_download_files: int = 100
+        +max_download_files
+        %% show_compressed_files: bool = True
+        +show_compressed_files
+    }
+    %% Files list with pagination and selection
+    class DataFilesList {
+        %% all_files: List[FileMetadata] = []
+        +all_files
+        %% component_config: = component_config
+        +component_config
+        %% current_files: = filtered_files
+        +current_files
+        %% current_page: = 1
+        +current_page
+        %% data_manager: = data_manager
+        +data_manager
+        %% selected_file_paths: = {fid: path for fid, path in self.selected_file_paths.items() if fid in current_file_ids}
+        +selected_file_paths
+        %% selected_files: = self.selected_files.intersection(current_file_ids)
+        +selected_files
+        %% total_pages: = 1
+        +total_pages
+        +__init__()
+        %% apply_filters: Apply filters to file list
+        +apply_filters()
+        %% cleanup: Cleanup component resources including stopping download timer
+        +cleanup()
+        %% render: Render files list
+        +render()
+    }
+    %% Filter panel for data files
+    class DataFilterPanel {
+        %% current_filters: = {'category': None, 'status': None, 'sensor_id': '', 'experiment_id': '', 'date_range': (None, None)}
+        +current_filters
+        %% data_manager: = data_manager
+        +data_manager
+        %% on_filter_change: = on_filter_change
+        +on_filter_change
+        +__init__()
+        %% render: Render filter panel
+        +render()
+    }
+    %% Index of all managed data files
+    class DataIndex {
+        %% dir_mtimes: Dict[str, float] = field(default_factory=dict)
+        +dir_mtimes
+        %% files: Dict[str, FileMetadata]
+        +files
+        %% last_updated: datetime
+        +last_updated
+        %% version: str = '1.0'
+        +version
+        +from_dict()
+        +to_dict()
+    }
+    %% High level interface aggregating indexing and maintenance components.
+    class DataManager {
+        %% compression_mgr: = CompressionManager(self)
+        +compression_mgr
+        %% indexer: = Indexer(self)
+        +indexer
+        %% maintenance_mgr: = MaintenanceManager(self)
+        +maintenance_mgr
+        +__init__()
+        +create_download_package()
+        +get_data_overview()
+        +get_download_file()
+        +get_download_status()
+        +list_files()
+        +mark_for_compression()
+        +scan_directories()
+        +shutdown()
+    }
+    %% Card component displaying data overview statistics
+    class DataOverviewCard {
+        %% data_manager: = data_manager
+        +data_manager
+        +__init__()
+        %% render: Render overview card
+        +render()
+    }
+    %% Data processing pipeline managing multiple stages
+    class DataPipeline {
+        %% pipeline_id: = pipeline_id
+        +pipeline_id
+        +__init__()
+        %% add_stage: Add processing stage to pipeline
+        +add_stage()
+        %% clear_stats: Clear pipeline statistics
+        +clear_stats()
+        %% get_pipeline_stats: Get pipeline statistics
+        +get_pipeline_stats()
+        %% get_stage: Get processing stage by ID
+        +get_stage()
+        %% remove_stage: Remove processing stage from pipeline
+        +remove_stage()
+        %% set_stage_enabled: Enable/disable processing stage
+        +set_stage_enabled()
+    }
+    %% Service for saving sensor readings (raw and processed) to CSV files with efficient compression and rotation.
+    class DataSaver {
+        %% compression_service: = None
+        +compression_service
+        %% compression_threshold_bytes: = compression_threshold_mb * 1024 * 1024
+        +compression_threshold_bytes
+        %% enable_background_operations: = enable_background_operations
+        +enable_background_operations
+        %% flush_interval: = flush_interval
+        +flush_interval
+        %% max_file_age_seconds: = max_file_age_hours * 3600
+        +max_file_age_seconds
+        %% proc_dir: = base_output_dir / 'processed'
+        +proc_dir
+        %% raw_dir: = base_output_dir / 'raw'
+        +raw_dir
+        %% rotation_check_interval: = rotation_check_interval
+        +rotation_check_interval
+        %% __init__: Initialize DataSaver using either base_output_dir or explicit storage_paths from configuration.
+        +__init__()
+        %% close: Close all open file handles and cleanup background operations.
+        +close()
+        %% flush_all: Flush all open buffers.
+        +flush_all()
+        %% get_performance_stats: Get performance statistics for monitoring.
+        +get_performance_stats()
+        %% save: Save a SensorReading under the given category ('raw' or 'processed') with performance optimizations.
+        +save()
+    }
+    %% Handle filesystem events to update the index incrementally.
+    class DirectoryEventHandler {
+        +__init__()
+        +on_created()
+        +on_modified()
+    }
+    %% Request for packaging and downloading data files
+    class DownloadRequest {
+        %% created_at: datetime
+        +created_at
+        %% download_path: Optional[Path] = None
+        +download_path
+        %% error_message: Optional[str] = None
+        +error_message
+        %% expires_at: datetime
+        +expires_at
+        %% format: str
+        +format
+        %% processed_files: int = 0
+        +processed_files
+        %% request_id: str
+        +request_id
+        %% requested_files: List[str]
+        +requested_files
+        %% status: str
+        +status
+        %% total_files: int = 0
+        +total_files
+        +to_dict()
+    }
+    %% Simple service for sending alert e-mails using SMTP.
+    class EmailAlertService {
+        +__init__()
+        %% send_alert: Send an alert e-mail. Returns True on success.
+        +send_alert()
+    }
+    %% Card component for displaying experiment information
+    class ExperimentCard {
+        %% experiment_info: = experiment_info
+        +experiment_info
+        %% experiment_manager: = experiment_manager
+        +experiment_manager
+        %% on_action_callback: = on_action_callback
+        +on_action_callback
+        +__init__()
+        %% render: Render experiment card
+        +render()
+        %% update_experiment_info: Update experiment information and refresh display
+        +update_experiment_info()
+    }
+    %% Main experiment management component
+    class ExperimentComponent {
+        %% config_dialog: Optional[ExperimentConfigDialog] = None
+        +config_dialog
+        %% config_service: = config_service
+        +config_service
+        %% controller_manager: = controller_manager
+        +controller_manager
+        %% current_experiment_display: = CurrentExperimentDisplay(cast(ExperimentManager, self.experiment_manager))
+        +current_experiment_display
+        %% experiment_manager: = ExperimentManager(config_service=config_service, sensor_manager=sensor_manager, controller_manager=controller_manager)
+        +experiment_manager
+        %% history_table: = ExperimentHistoryTable(cast(ExperimentManager, self.experiment_manager))
+        +history_table
+        %% sensor_manager: = sensor_manager
+        +sensor_manager
+        +__init__()
+        %% cleanup: Cleanup component resources
+        +cleanup()
+        %% render: Render experiment management interface
+        +render()
+    }
+    %% Configuration for an experiment
+    class ExperimentConfig {
+        %% auto_compress: bool = True
+        +auto_compress
+        %% auto_start_controllers: bool = True
+        +auto_start_controllers
+        %% auto_start_sensors: bool = True
+        +auto_start_sensors
+        %% controller_ids: List[str] = field(default_factory=list) Empty = all controllers
+        +controller_ids
+        %% custom_parameters: Dict[str, Any] = field(default_factory=dict)
+        +custom_parameters
+        %% data_collection_interval_ms: int = 1000
+        +data_collection_interval_ms
+        %% description: str = ''
+        +description
+        %% duration_minutes: Optional[int] = None None = unlimited
+        +duration_minutes
+        %% name: str
+        +name
+        %% phases: List[Dict[str, Any]] = field(default_factory=list)
+        +phases
+        %% script_path: Optional[str] = None Future: G-Code or Python scripts
+        +script_path
+        %% sensor_ids: List[str] = field(default_factory=list) Empty = all sensors
+        +sensor_ids
+    }
+    %% Dialog for experiment configuration
+    class ExperimentConfigDialog {
+        %% config_service: = config_service
+        +config_service
+        %% controller_manager: = controller_manager
+        +controller_manager
+        %% experiment_manager: = experiment_manager
+        +experiment_manager
+        %% on_save_callback: = on_save_callback
+        +on_save_callback
+        %% sensor_manager: = sensor_manager
+        +sensor_manager
+        +__init__()
+        %% show_dialog: Show dialog for creating new experiment
+        +show_dialog()
+    }
+    %% Single data point collected during experiment
+    class ExperimentDataPoint {
+        %% controller_outputs: Dict[str, Any] = field(default_factory=dict)
+        +controller_outputs
+        %% custom_data: Dict[str, Any] = field(default_factory=dict)
+        +custom_data
+        %% experiment_id: Optional[str]
+        +experiment_id
+        %% phase: ExperimentPhase
+        +phase
+        %% sensor_readings: Dict[str, SensorReading] = field(default_factory=dict)
+        +sensor_readings
+        %% timestamp: float
+        +timestamp
+    }
+    %% Table component for displaying experiment history
+    class ExperimentHistoryTable {
+        %% experiment_manager: = experiment_manager
+        +experiment_manager
+        +__init__()
+        %% render: Render experiment history table
+        +render()
+    }
+    %% Data class for experiment display information
+    class ExperimentInfo {
+        %% controller_count: int
+        +controller_count
+        %% data_points_collected: int
+        +data_points_collected
+        %% description: str
+        +description
+        %% duration_seconds: Optional[float]
+        +duration_seconds
+        %% end_time: Optional[datetime]
+        +end_time
+        %% errors_count: int
+        +errors_count
+        %% estimated_remaining: Optional[str]
+        +estimated_remaining
+        %% experiment_id: str
+        +experiment_id
+        %% name: str
+        +name
+        %% phase: ExperimentPhase
+        +phase
+        %% progress_percent: float
+        +progress_percent
+        %% sensor_count: int
+        +sensor_count
+        %% start_time: Optional[datetime]
+        +start_time
+        %% state: ExperimentState
+        +state
+    }
+    %% Central manager for experiment lifecycle and data collection.
+    class ExperimentManager {
+        %% compression_service: = get_compression_service()
+        +compression_service
+        %% config_service: = config_service
+        +config_service
+        %% controller_manager: = controller_manager
+        +controller_manager
+        %% data_saver: = data_saver
+        +data_saver
+        %% sensor_manager: = sensor_manager
+        +sensor_manager
+        %% __init__: Initialize experiment manager with service dependencies.
+        +__init__()
+        %% add_data_callback: Add callback for new data points
+        +add_data_callback()
+        %% add_state_change_callback: Add callback for state changes
+        +add_state_change_callback()
+        %% create_experiment: Create a new experiment with given configuration.
+        +create_experiment()
+        %% delete_experiment: Delete experiment configuration and stored results.
+        +delete_experiment()
+        %% get_current_experiment: Get currently active experiment ID
+        +get_current_experiment()
+        %% get_current_phase: Get current experiment phase
+        +get_current_phase()
+        %% get_current_state: Get current experiment state
+        +get_current_state()
+        %% get_experiment_config: Get configuration for an experiment
+        +get_experiment_config()
+        %% get_experiment_result: Get result data for an experiment
+        +get_experiment_result()
+        %% get_experiment_statistics: Get statistics for an experiment
+        +get_experiment_statistics()
+        %% list_experiments: List all experiment IDs
+        +list_experiments()
+    }
+    %% Phases within a running experiment
+    class ExperimentPhase {
+        %% CLEANUP: = 'cleanup'
+        +CLEANUP
+        %% COOLDOWN: = 'cooldown'
+        +COOLDOWN
+        %% INITIALIZATION: = 'initialization'
+        +INITIALIZATION
+        %% PROCESSING: = 'processing'
+        +PROCESSING
+        %% WARMUP: = 'warmup'
+        +WARMUP
+    }
+    %% Result data from a completed experiment
+    class ExperimentResult {
+        %% compressed_archive: Optional[Path] = None
+        +compressed_archive
+        %% controller_outputs_count: int = 0
+        +controller_outputs_count
+        %% data_points_collected: int = 0
+        +data_points_collected
+        %% duration_seconds: Optional[float] = None
+        +duration_seconds
+        %% end_time: Optional[datetime] = None
+        +end_time
+        %% errors_count: int = 0
+        +errors_count
+        %% experiment_id: str
+        +experiment_id
+        %% name: str
+        +name
+        %% processed_data_dir: Optional[Path] = None
+        +processed_data_dir
+        %% raw_data_dir: Optional[Path] = None
+        +raw_data_dir
+        %% result_directory: Optional[Path] = None
+        +result_directory
+        %% sensor_readings_count: int = 0
+        +sensor_readings_count
+        %% start_time: datetime
+        +start_time
+        %% state: ExperimentState
+        +state
+        %% summary: Dict[str, Any] = field(default_factory=dict)
+        +summary
+        %% warnings_count: int = 0
+        +warnings_count
+    }
+    %% Comprehensive 4-step experiment setup wizard using NiceGUI stepper.
+    class ExperimentSetupWizardComponent {
+        %% config_service: = config_service
+        +config_service
+        %% controller_manager: = controller_manager
+        +controller_manager
+        %% experiment_manager: = experiment_manager or get_experiment_manager()
+        +experiment_manager
+        %% on_close: = on_close
+        +on_close
+        %% sensor_manager: = sensor_manager
+        +sensor_manager
+        +__init__()
+        %% render: Render method required by BaseComponent.
+        +render()
+        %% show_dialog: Display the experiment setup wizard in a dialog.
+        +show_dialog()
+    }
+    %% States of an experiment lifecycle
+    class ExperimentState {
+        %% CANCELLED: = 'cancelled'
+        +CANCELLED
+        %% COMPLETED: = 'completed'
+        +COMPLETED
+        %% CONFIGURING: = 'configuring'
+        +CONFIGURING
+        %% FAILED: = 'failed'
+        +FAILED
+        %% IDLE: = 'idle'
+        +IDLE
+        %% PAUSED: = 'paused'
+        +PAUSED
+        %% RUNNING: = 'running'
+        +RUNNING
+        %% STARTING: = 'starting'
+        +STARTING
+        %% STOPPING: = 'stopping'
+        +STOPPING
+    }
+    %% Service for rotating and compressing old data files across multiple directories.
+    class FileMaintenanceService {
+        %% compression_service: = compression_service
+        +compression_service
+        %% max_age: = max_file_age_seconds
+        +max_age
+        %% threshold: = compression_threshold_bytes
+        +threshold
+        +__init__()
+        %% compress_directory: Compress all files matching pattern in a directory using compression service.
+        +compress_directory()
+        %% compress_inactive_files: Compress files exceeding threshold bytes into compressed subdirectory.
+        +compress_inactive_files()
+        %% rotate_old_files: Rotate files older than max_age seconds into a compressed subdirectory.
+        +rotate_old_files()
+    }
+    %% Metadata information for a data file
+    class FileMetadata {
+        %% category: DataCategory
+        +category
+        %% checksum: Optional[str] = None
+        +checksum
+        %% compressed_path: Optional[Path] = None
+        +compressed_path
+        %% created_at: datetime
+        +created_at
+        %% experiment_id: Optional[str] = None
+        +experiment_id
+        %% file_path: Path
+        +file_path
+        %% modified_at: datetime
+        +modified_at
+        %% sensor_id: Optional[str] = None
+        +sensor_id
+        %% size_bytes: int
+        +size_bytes
+        %% status: FileStatus
+        +status
+        %% tags: Optional[List[str]] = None
+        +tags
+        +from_dict()
+        +to_dict()
+    }
+    %% Status of files in the data management system
+    class FileStatus {
+        %% ACTIVE: = 'active'
+        +ACTIVE
+        %% ARCHIVED: = 'archived'
+        +ARCHIVED
+        %% COMPRESSED: = 'compressed'
+        +COMPRESSED
+        %% ERROR: = 'error'
+        +ERROR
+        %% PENDING_COMPRESSION: = 'pending_compression'
+        +PENDING_COMPRESSION
+    }
+    %% Base class for image-based controllers
+    class ImageController {
+        %% controller_type: = ControllerType.MOTION_DETECTION
+        +controller_type
+        +__init__()
+    }
+    %% Provides indexing operations for DataManager.
+    class Indexer {
+        +__init__()
+        +get_data_overview()
+        +list_files()
+        +load_index()
+        +save_index()
+        +scan_directories()
+    }
+    %% Live plotting component for sensor data
+    class LivePlotComponent {
+        %% plot_config: = plot_config or PlotConfig()
+        +plot_config
+        %% sensor_manager: = sensor_manager
+        +sensor_manager
+        %% sensors_to_display: = sensors_to_display
+        +sensors_to_display
+        %% timer_attributes: = ['_update_timer']
+        +timer_attributes
+        +__init__()
+        %% add_sensor: Add a new sensor to the plot
+        +add_sensor()
+        %% remove_sensor: Remove a sensor from the plot
+        +remove_sensor()
+        %% render: Render live plot component
+        +render()
+    }
+    %% Main log management component
+    class LogComponent {
+        %% log_service: = get_log_service()
+        +log_service
+        +__init__()
+        %% cleanup: Cleanup component
+        +cleanup()
+        %% render: Render log component
+        +render()
+    }
+    %% Context for tracking logging sessions and requests
+    class LogContext {
+        +__init__()
+        %% clear: Clear all context
+        +clear()
+        %% copy: Get copy of current context
+        +copy()
+        %% get: Get context value
+        +get()
+        %% set: Set context value
+        +set()
+        %% update: Update context with dictionary
+        +update()
+    }
+    %% Information about a log file
+    class LogFileInfo {
+        %% is_compressed: bool = False
+        +is_compressed
+        %% log_type: str
+        +log_type
+        %% modified: datetime
+        +modified
+        %% name: str
+        +name
+        %% path: Path
+        +path
+        %% size_bytes: int
+        +size_bytes
+        %% size_mb: float
+        +size_mb
+    }
+    %% Log level enumeration
+    class LogLevel {
+        %% CRITICAL: = 'CRITICAL'
+        +CRITICAL
+        %% DEBUG: = 'DEBUG'
+        +DEBUG
+        %% ERROR: = 'ERROR'
+        +ERROR
+        %% INFO: = 'INFO'
+        +INFO
+        %% WARNING: = 'WARNING'
+        +WARNING
+    }
+    %% Comprehensive logging service for CVD Tracker application.
+    class LogService {
+        %% config_service: = service
+        +config_service
+        %% log_context: = LogContext()
+        +log_context
+        %% __init__: Create a new :class:`LogService`.
+        +__init__()
+        %% audit: Log audit events
+        +audit()
+        %% cleanup_old_logs: Clean up old log files beyond retention period
+        +cleanup_old_logs()
+        %% clear_context: Clear logging context
+        +clear_context()
+        %% compress_old_logs: Compress old log files to save space
+        +compress_old_logs()
+        %% critical: Log critical message
+        +critical()
+        %% debug: Log debug message
+        +debug()
+        %% error: Log error message
+        +error()
+        %% get_log_stats: Get logging statistics
+        +get_log_stats()
+        %% info: Log info message
+        +info()
+        %% log_controller_event: Log controller actions
+        +log_controller_event()
+        %% log_data_processing: Log data processing events
+        +log_data_processing()
+        %% log_experiment_event: Log experiment-related events
+        +log_experiment_event()
+        %% log_sensor_event: Log sensor-related events
+        +log_sensor_event()
+        %% logging_context: Context manager for setting temporary context
+        +logging_context()
+        %% performance: Log performance metrics
+        +performance()
+        %% rotate_logs: Manually rotate all logs
+        +rotate_logs()
+        %% set_context: Set logging context
+        +set_context()
+        %% structured: Log structured data as JSON
+        +structured()
+        %% timer: Context manager for timing operations
+        +timer()
+        %% warning: Log warning message
+        +warning()
+    }
+    %% Log file viewer component
+    class LogViewerComponent {
+        %% log_file_info: = log_file_info
+        +log_file_info
+        %% timer_attributes: = ['_refresh_timer']
+        +timer_attributes
+        +__init__()
+        %% render: Render log viewer card
+        +render()
+    }
+    %% Background maintenance and watcher management for DataManager.
+    class MaintenanceManager {
+        +__init__()
+        +shutdown()
+        +start_watchers()
+        +start_worker()
+    }
+    class ManagedProcessPool {
+        %% config: = config
+        +config
+        %% pool_type: = pool_type
+        +pool_type
+        +__init__()
+        +scale_workers()
+        +shutdown()
+        +submit()
+    }
+    %% Thread-pool mit Back-Pressure, Robustness, Observability **und** Sandbox.
+    class ManagedThreadPool {
+        %% config: = cfg
+        +config
+        %% pool_type: = cfg.pool_type
+        +pool_type
+        +__init__()
+        +cancel_task()
+        +get_stats()
+        +shutdown()
+        +submit_task()
+    }
+    %% Mock Arduino TC Board for testing when hardware is not available.
+    class MockArduinoTCBoardSerial {
+        %% baudrate: = baudrate
+        +baudrate
+        %% connected: = False
+        +connected
+        %% port: = port
+        +port
+        %% timeout: = timeout
+        +timeout
+        +__init__()
+        +connect()
+        +disconnect()
+        +read_temperature()
+    }
+    %% Arduino TC Board sensor using mock hardware.
+    class MockArduinoTCSensor {
+    }
+    %% RS232 sensor that always uses the mock serial connection.
+    class MockRS232Sensor {
+    }
+    %% Mock RS232 for testing when hardware is not available.
+    class MockRS232Serial {
+        %% baudrate: = baudrate
+        +baudrate
+        %% is_open: = False
+        +is_open
+        %% port: = port
+        +port
+        %% timeout: = timeout
+        +timeout
+        +__init__()
+        +close()
+        +open()
+        +readline()
+    }
+    %% Controller for detecting motion in camera images using background subtraction
+    class MotionDetectionController {
+        %% algorithm: = params.get('algorithm', 'MOG2') MOG2, KNN, or GMG
+        +algorithm
+        %% confidence_threshold: = params.get('confidence_threshold', 0.5)
+        +confidence_threshold
+        %% device_index: = cam_cfg.get('device_index', self.device_index)
+        +device_index
+        %% fps: = cam_cfg.get('fps', self.fps)
+        +fps
+        %% gaussian_blur_kernel: = params.get('gaussian_blur_kernel', (5, 5))
+        +gaussian_blur_kernel
+        %% height: = params.get('height')
+        +height
+        %% learning_rate: = params.get('learning_rate', 0.01)
+        +learning_rate
+        %% min_contour_area: = params.get('min_contour_area', 500)
+        +min_contour_area
+        %% morphology_kernel_size: = params.get('morphology_kernel_size', 5)
+        +morphology_kernel_size
+        %% motion_threshold_percentage: = params.get('motion_threshold_percentage', 1.0)
+        +motion_threshold_percentage
+        %% multi_frame_enabled: = params.get('multi_frame_enabled', False)
+        +multi_frame_enabled
+        %% multi_frame_threshold: = params.get('multi_frame_threshold', 0.3)
+        +multi_frame_threshold
+        %% multi_frame_window: = params.get('multi_frame_window', 30)
+        +multi_frame_window
+        %% rotation: = cam_cfg.get('rotation', self.rotation)
+        +rotation
+        %% roundness_enabled: = params.get('roundness_enabled', False)
+        +roundness_enabled
+        %% roundness_threshold: = params.get('roundness_threshold', 0.7)
+        +roundness_threshold
+        %% threshold: = params.get('threshold', 25)
+        +threshold
+        %% uvc_settings: = params.get('uvc_settings', {})
+        +uvc_settings
+        %% webcam_id: = params.get('cam_id')
+        +webcam_id
+        %% width: = params.get('width')
+        +width
+        +__init__()
+        %% get_motion_statistics: Get motion detection statistics
+        +get_motion_statistics()
+    }
+    %% Result from motion detection
+    class MotionDetectionResult {
+        %% confidence: float Confidence score
+        +confidence
+        %% frame: Optional[np.ndarray] = None Original frame (for visualization)
+        +frame
+        %% frame_delta: Optional[np.ndarray] = None Frame difference (for visualization)
+        +frame_delta
+        %% motion_area: float Total area of motion
+        +motion_area
+        %% motion_bbox: Optional[Tuple[int, int, int, int]] Bounding box (x, y, w, h)
+        +motion_bbox
+        %% motion_center: Optional[Tuple[int, int]] Center of motion
+        +motion_center
+        %% motion_detected: bool
+        +motion_detected
+        %% motion_mask: Optional[np.ndarray] = None Motion mask (for visualization)
+        +motion_mask
+        %% motion_percentage: float Percentage of frame with motion
+        +motion_percentage
+        %% motion_regions: int Number of motion regions
+        +motion_regions
+    }
+    %% Moving average filter for sensor readings
+    class MovingAverageFilter {
+        %% stage_type: = ProcessingStageType.FILTER
+        +stage_type
+        %% window_size: = window_size
+        +window_size
+        +__init__()
+    }
+    %% Individual notification entry
+    class Notification {
+        %% action_callback: Optional[Callable] = None
+        +action_callback
+        %% action_label: Optional[str] = None
+        +action_label
+        %% id: str
+        +id
+        %% message: str
+        +message
+        %% metadata: Dict[str, Any] = field(default_factory=dict)
+        +metadata
+        %% read: bool = False
+        +read
+        %% severity: NotificationSeverity
+        +severity
+        %% source: NotificationSource
+        +source
+        %% timestamp: datetime
+        +timestamp
+        %% title: str
+        +title
+    }
+    %% Notification center component for collecting and displaying system notifications
+    class NotificationCenter {
+        %% check_interval: float = float(config_service.get('ui.notification_center.update_interval_s', None, 5))
+        +check_interval
+        %% config_service: = config_service
+        +config_service
+        %% controller_manager: = controller_manager
+        +controller_manager
+        %% experiment_manager: = experiment_manager
+        +experiment_manager
+        %% log_service: = get_log_service()
+        +log_service
+        %% max_notifications: int = config_service.get('ui.notification_center.max_notifications', int, 500)
+        +max_notifications
+        %% notification_history_file: Path = Path(config_service.get('ui.notification_center.history_file', str, 'data/notifications/history.json'))
+        +notification_history_file
+        %% notifications: = [n for n in self.notifications if n.id != notification_id]
+        +notifications
+        %% sensor_manager: = sensor_manager
+        +sensor_manager
+        %% timer_attributes: = ['_update_timer']
+        +timer_attributes
+        %% __init__: Initialize notification center
+        +__init__()
+        %% add_notification: Add a new notification
+        +add_notification()
+        %% cleanup: Cleanup component resources
+        +cleanup()
+        %% clear_notifications: Clear all notifications
+        +clear_notifications()
+        %% create_notification_button: Create the notification center button for the header
+        +create_notification_button()
+        %% delete_notification: Delete a specific notification
+        +delete_notification()
+        %% get_unread_count: Get count of unread notifications
+        +get_unread_count()
+        %% mark_all_as_read: Mark all notifications as read
+        +mark_all_as_read()
+        %% mark_as_read: Mark a notification as read
+        +mark_as_read()
+        %% render: Render the component (not used - button is created on demand)
+        +render()
+        %% show_notification_dialog: Show the notification center menu as a dropdown
+        +show_notification_dialog()
+    }
+    %% Mixin providing monitoring helpers for NotificationCenter.
+    class NotificationMonitoringMixin {
+        %% config_service: Any
+        +config_service
+        %% controller_manager: Optional[Any]
+        +controller_manager
+        %% experiment_manager: Optional[Any]
+        +experiment_manager
+        %% log_service: Any
+        +log_service
+        %% notifications: list
+        +notifications
+        %% sensor_manager: Optional[Any]
+        +sensor_manager
+        %% __init__: Initialize monitoring state defaults
+        +__init__()
+    }
+    %% Severity levels for notifications
+    class NotificationSeverity {
+        %% ERROR: = 'error'
+        +ERROR
+        %% INFO: = 'info'
+        +INFO
+        %% SUCCESS: = 'success'
+        +SUCCESS
+        %% WARNING: = 'warning'
+        +WARNING
+    }
+    %% Sources of notifications
+    class NotificationSource {
+        %% AUDIT: = 'audit'
+        +AUDIT
+        %% CONFIG: = 'config'
+        +CONFIG
+        %% CONTROLLER: = 'controller'
+        +CONTROLLER
+        %% DATA_PROCESSING: = 'data_processing'
+        +DATA_PROCESSING
+        %% EXPERIMENT: = 'experiment'
+        +EXPERIMENT
+        %% SENSOR: = 'sensor'
+        +SENSOR
+        %% SYSTEM: = 'system'
+        +SYSTEM
+    }
+    %% Mixin providing UI rendering helpers for NotificationCenter.
+    class NotificationUIMixin {
+        %% notifications: = []
+        +notifications
+        %% clear_notifications: Clear all notifications.
+        +clear_notifications()
+        +create_notification_button()
+        %% delete_notification: Delete a notification.
+        +delete_notification()
+        %% get_unread_count: Return count of unread notifications.
+        +get_unread_count()
+        %% mark_all_as_read: Mark all notifications as read.
+        +mark_all_as_read()
+        %% mark_as_read: Mark a single notification as read.
+        +mark_as_read()
+        +show_notification_dialog()
+    }
+    %% Outlier detection and removal filter
+    class OutlierDetectionFilter {
+        %% min_samples: = min_samples
+        +min_samples
+        %% stage_type: = ProcessingStageType.VALIDATE
+        +stage_type
+        %% threshold_std: = threshold_std
+        +threshold_std
+        +__init__()
+    }
+    %% Configuration for live plot
+    class PlotConfig {
+        %% auto_scale: bool = True
+        +auto_scale
+        %% history_seconds: int = 3600
+        +history_seconds
+        %% line_width: int = 2
+        +line_width
+        %% max_points: int = 2000
+        +max_points
+        %% refresh_rate_ms: int = 500
+        +refresh_rate_ms
+        %% show_grid: bool = True
+        +show_grid
+    }
+    class ProcessPoolConfig {
+        %% kill_on_timeout: bool = False
+        +kill_on_timeout
+        %% kill_signal: int = signal.SIGTERM
+        +kill_signal
+        %% max_workers: int | None = None
+        +max_workers
+        %% timeout: float | None = None
+        +timeout
+    }
+    class ProcessPoolType {
+        %% CPU: = 'cpu'
+        +CPU
+        %% DEFAULT: = 'default'
+        +DEFAULT
+        %% ML: = 'ml'
+        +ML
+    }
+    %% Result from a processing stage
+    class ProcessingResult {
+        %% data: Optional[T] = None
+        +data
+        %% error_message: Optional[str] = None
+        +error_message
+        %% metadata: Dict[str, Any] = field(default_factory=dict)
+        +metadata
+        %% success: bool
+        +success
+        %% error_result: Create an error result
+        +error_result()
+        %% success_result: Create a successful result
+        +success_result()
+    }
+    %% Base class for data processing stages
+    class ProcessingStage {
+        %% enabled: = enabled
+        +enabled
+        %% stage_id: = stage_id
+        +stage_id
+        %% stage_type: = ProcessingStageType.FILTER
+        +stage_type
+        +__init__()
+        %% get_stats: Get processing statistics
+        +get_stats()
+    }
+    %% Types of processing stages
+    class ProcessingStageType {
+        %% AGGREGATE: = 'aggregate'
+        +AGGREGATE
+        %% FILTER: = 'filter'
+        +FILTER
+        %% TRANSFORM: = 'transform'
+        +TRANSFORM
+        %% VALIDATE: = 'validate'
+        +VALIDATE
+    }
+    %% RS232 sensor implementation
+    class RS232Sensor {
+        +__init__()
+        +sensor_type()
+    }
+    %% Validate sensor readings are within expected range
+    class RangeValidationFilter {
+        %% max_value: = max_value
+        +max_value
+        %% min_value: = min_value
+        +min_value
+        %% stage_type: = ProcessingStageType.VALIDATE
+        +stage_type
+        +__init__()
+    }
+    %% Types of reactor alarms
+    class ReactorAlarmType {
+        %% MOTION_ANOMALY: = 'motion_anomaly'
+        +MOTION_ANOMALY
+        %% NO_DATA: = 'no_data'
+        +NO_DATA
+        %% OVERTEMPERATURE: = 'overtemperature'
+        +OVERTEMPERATURE
+        %% SENSOR_FAILURE: = 'sensor_failure'
+        +SENSOR_FAILURE
+        %% TEMPERATURE_GRADIENT: = 'temperature_gradient'
+        +TEMPERATURE_GRADIENT
+        %% UNDERTEMPERATURE: = 'undertemperature'
+        +UNDERTEMPERATURE
+    }
+    %% Reactor operational states
+    class ReactorState {
+        %% ALARM: = 'alarm'
+        +ALARM
+        %% COOLING: = 'cooling'
+        +COOLING
+        %% HEATING: = 'heating'
+        +HEATING
+        %% IDLE: = 'idle'
+        +IDLE
+        %% PROCESSING: = 'processing'
+        +PROCESSING
+        %% UNKNOWN: = 'unknown'
+        +UNKNOWN
+    }
+    %% Configuration for reactor state derivation
+    class ReactorStateConfig {
+        %% alarm_temp_max: float = 200.0
+        +alarm_temp_max
+        %% alarm_temp_min: float = 0.0
+        +alarm_temp_min
+        %% confidence_threshold: float = 0.7
+        +confidence_threshold
+        %% heating_temp_min: float = 40.0
+        +heating_temp_min
+        %% idle_temp_max: float = 35.0
+        +idle_temp_max
+        %% max_sensor_age: float = 10.0 Max seconds for valid sensor data
+        +max_sensor_age
+        %% max_temp_gradient: float = 50.0 Max °C difference between sensors
+        +max_temp_gradient
+        %% min_sensor_count: int = 1
+        +min_sensor_count
+        %% min_state_duration: float = 5.0 Minimum seconds before state change
+        +min_state_duration
+        %% min_valid_sensors: int = 1
+        +min_valid_sensors
+        %% motion_alarm_threshold: float = 30.0 seconds of no motion in processing
+        +motion_alarm_threshold
+        %% motion_required_for_processing: bool = True
+        +motion_required_for_processing
+        %% processing_temp_max: float = 150.0
+        +processing_temp_max
+        %% processing_temp_min: float = 80.0
+        +processing_temp_min
+    }
+    %% Controller for deriving reactor operational states
+    class ReactorStateController {
+        %% reactor_config: = defaults
+        +reactor_config
+        +__init__()
+    }
+    %% Reactor state information
+    class ReactorStateData {
+        %% alarms: List[ReactorAlarmType]
+        +alarms
+        %% confidence: float 0.0 to 1.0
+        +confidence
+        %% metadata: Dict[str, Any]
+        +metadata
+        %% motion_detected: bool
+        +motion_detected
+        %% primary_temperature: Optional[float]
+        +primary_temperature
+        %% state: ReactorState
+        +state
+        %% state_duration: float seconds in current state
+        +state_duration
+        %% temperature_sensors: Dict[str, Optional[float]] allow None for invalid readings
+        +temperature_sensors
+        %% to_dict: Return a serializable dictionary representation of this data.
+        +to_dict()
+    }
+    %% Configuration for file rotation
+    class RotationSettings {
+        %% enabled: bool = True
+        +enabled
+        %% max_age_days: int = 7
+        +max_age_days
+        %% max_files: int = 10
+        +max_files
+        %% max_size_mb: int = 100
+        +max_size_mb
+    }
+    %% Raised when a callable violates sandbox rules.
+    class SecurityError {
+    }
+    %% Individual sensor display card
+    class SensorCardComponent {
+        %% config_service: = config_service
+        +config_service
+        %% on_deleted: = on_deleted
+        +on_deleted
+        %% on_edit_callback: = on_edit_callback
+        +on_edit_callback
+        %% sensor_info: = sensor_info
+        +sensor_info
+        %% sensor_manager: = sensor_manager
+        +sensor_manager
+        +__init__()
+        %% render: Render sensor card
+        +render()
+        %% update_sensor_info: Update sensor information and refresh display
+        +update_sensor_info()
+    }
+    %% Configuration for sensor display cards
+    class SensorCardConfig {
+        %% error_threshold: Optional[float] = None
+        +error_threshold
+        %% precision: int = 1
+        +precision
+        %% sensor_id: str
+        +sensor_id
+        %% title: str
+        +title
+        %% unit: str = '°C'
+        +unit
+        %% warning_threshold: Optional[float] = None
+        +warning_threshold
+    }
+    %% Configuration for a sensor instance
+    class SensorConfig {
+        %% enabled: bool = True
+        +enabled
+        %% parameters: Dict[str, Any] = field(default_factory=dict)
+        +parameters
+        %% poll_interval_ms: int = 1000
+        +poll_interval_ms
+        %% sensor_id: str
+        +sensor_id
+        %% sensor_type: str
+        +sensor_type
+        %% get_poll_interval_seconds: Get polling interval in seconds
+        +get_poll_interval_seconds()
+    }
+    %% Dialog for sensor configuration
+    class SensorConfigDialog {
+        %% config_service: = config_service
+        +config_service
+        %% on_save_callback: = on_save_callback
+        +on_save_callback
+        %% sensor_manager: = sensor_manager
+        +sensor_manager
+        +__init__()
+        %% show_add_dialog: Show dialog for adding new sensor
+        +show_add_dialog()
+        %% show_edit_dialog: Show dialog for editing existing sensor
+        +show_edit_dialog()
+    }
+    %% Data class for sensor information
+    class SensorInfo {
+        %% config: Dict[str, Any]
+        +config
+        %% connected: bool
+        +connected
+        %% current_value: Optional[float]
+        +current_value
+        %% enabled: bool
+        +enabled
+        %% interface: str
+        +interface
+        %% last_reading: Optional[float]
+        +last_reading
+        %% name: str
+        +name
+        %% poll_interval_ms: int
+        +poll_interval_ms
+        %% polling: bool
+        +polling
+        %% port: str
+        +port
+        %% sensor_id: str
+        +sensor_id
+        %% sensor_type: str
+        +sensor_type
+        %% source: str
+        +source
+        %% status: str
+        +status
+        %% unit: str = '°C'
+        +unit
+    }
+    %% Base interface for all sensor types
+    class SensorInterface {
+        %% is_connected: Check if sensor is connected and ready
+        +is_connected()
+        %% sensor_id: Unique identifier for this sensor
+        +sensor_id()
+        %% sensor_type: Type identifier for this sensor (e.g., 'arduino_tc_board', 'rs232')
+        +sensor_type()
+    }
+    %% Manages sensor lifecycle, polling, and data collection
+    class SensorManager {
+        %% config_service: = config_service
+        +config_service
+        %% data_pipeline: = data_pipeline
+        +data_pipeline
+        %% data_saver: = data_saver
+        +data_saver
+        +__init__()
+        %% create_sensor: Create sensor instance from configuration
+        +create_sensor()
+        %% executor: Thread pool executor used for sensor operations.
+        +executor()
+        %% get_active_sensors: Get list of active sensor IDs
+        +get_active_sensors()
+        %% get_all_sensors: Get list of all registered sensor IDs
+        +get_all_sensors()
+        %% get_latest_readings: Get latest readings from all sensors
+        +get_latest_readings()
+        %% get_sensor_reading: Get latest reading from specific sensor
+        +get_sensor_reading()
+        %% get_sensor_status: Get status information for all sensors
+        +get_sensor_status()
+        %% register_sensor_type: Register a new sensor type
+        +register_sensor_type()
+    }
+    %% Data structure for sensor readings
+    class SensorReading {
+        %% error_message: Optional[str] = None
+        +error_message
+        %% metadata: Dict[str, Any] = field(default_factory=dict)
+        +metadata
+        %% sensor_id: str
+        +sensor_id
+        %% status: SensorStatus = SensorStatus.OK
+        +status
+        %% timestamp: float
+        +timestamp
+        %% value: Optional[float]
+        +value
+        %% create_error: Create an error reading
+        +create_error()
+        %% create_offline: Create an offline reading
+        +create_offline()
+        %% is_valid: Check if reading contains valid data
+        +is_valid()
+    }
+    %% Comprehensive 4-step sensor setup wizard using NiceGUI stepper.
+    class SensorSetupWizardComponent {
+        %% config_service: = config_service
+        +config_service
+        %% on_close: = on_close
+        +on_close
+        %% sensor_manager: = sensor_manager
+        +sensor_manager
+        +__init__()
+        %% render: Render method required by BaseComponent.
+        +render()
+        %% show_dialog: Display the sensor setup wizard in a dialog.
+        +show_dialog()
+    }
+    %% Status enumeration for sensor readings
+    class SensorStatus {
+        %% CALIBRATING: = 'calibrating'
+        +CALIBRATING
+        %% ERROR: = 'error'
+        +ERROR
+        %% OFFLINE: = 'offline'
+        +OFFLINE
+        %% OK: = 'ok'
+        +OK
+        %% TIMEOUT: = 'timeout'
+        +TIMEOUT
+    }
+    %% Main sensors management component
+    class SensorsComponent {
+        %% config_service: = config_service
+        +config_service
+        %% sensor_manager: = sensor_manager
+        +sensor_manager
+        %% timer_attributes: = ['_refresh_timer']
+        +timer_attributes
+        +__init__()
+        %% cleanup: Cleanup component resources
+        +cleanup()
+        %% render: Render the sensors component
+        +render()
+    }
+    %% Configuration for individual data series
+    class SeriesConfig {
+        %% color: str
+        +color
+        %% label: str
+        +label
+        %% sensor_id: str
+        +sensor_id
+        %% unit: str = '°C'
+        +unit
+        %% visible: bool = True
+        +visible
+        %% y_axis: str = 'y1'
+        +y_axis
+    }
+    %% Wizard to guide initial setup of sensors and controllers.
+    class SetupWizardComponent {
+        %% config_service: = config_service
+        +config_service
+        %% controller_manager: = controller_manager
+        +controller_manager
+        %% sensor_manager: = sensor_manager
+        +sensor_manager
+        +__init__()
+        %% close_dialog: Close the setup wizard dialog if open.
+        +close_dialog()
+        %% render: Render stepper UI.
+        +render()
+        %% show_dialog: Display the setup wizard inside a dialog.
+        +show_dialog()
+    }
+    %% Base class for state derivation controllers
+    class StateController {
+        %% controller_type: = ControllerType.STATE_DERIVATION
+        +controller_type
+        +__init__()
+    }
+    %% Custom formatter for structured JSON logging
+    class StructuredFormatter {
+        %% context: = context
+        +context
+        +__init__()
+        %% format: Format log record as JSON
+        +format()
+    }
+    %% Tab component for organizing content
+    class TabComponent {
+        %% tabs_config: = tabs_config
+        +tabs_config
+        %% __init__: Initialize TabComponent with tabs configuration
+        +__init__()
+        %% create_tab_panels: Create tab panels for the tabs
+        +create_tab_panels()
+        %% render: Render tab component
+        +render()
+    }
+    %% A lightweight wrapper around ``asyncio.Task`` for fluent use.
+    class TaskHandle {
+        +cancel()
+        +done()
+        +exception()
+        +result()
+    }
+    class ThreadPoolConfig {
+        %% allowed_callables: Optional[Set[str]] = None {"module.func", ...}
+        +allowed_callables
+        %% allowed_modules: Optional[Set[str]] = None {"src.sensors", ...}
+        +allowed_modules
+        %% circuit_breaker_failures: int | None = None
+        +circuit_breaker_failures
+        %% circuit_breaker_reset_timeout: float | None = 60.0
+        +circuit_breaker_reset_timeout
+        %% cpu_factor: float = 4.0
+        +cpu_factor
+        %% deny_cpu_bound: bool = False simple heuristic
+        +deny_cpu_bound
+        %% enable_metrics: bool = False
+        +enable_metrics
+        %% enable_tracing: bool = False
+        +enable_tracing
+        %% hysteresis_seconds: float = 1.0 NEU: Verzögerung für Circuit-Breaker Hysterese
+        +hysteresis_seconds
+        %% max_workers: int | None = None
+        +max_workers
+        %% nice: int | None = None
+        +nice
+        %% pool_type: ThreadPoolType = ThreadPoolType.GENERAL
+        +pool_type
+        %% queue_block: bool = True
+        +queue_block
+        %% queue_maxsize: int | None = None
+        +queue_maxsize
+        %% retries: int = 0
+        +retries
+        %% retry_backoff_base: float = 0.5
+        +retry_backoff_base
+        %% retry_backoff_max: float = 5.0
+        +retry_backoff_max
+        %% shutdown_timeout: float | None = 30.0
+        +shutdown_timeout
+        %% thread_name_prefix: str = 'CVDTracker'
+        +thread_name_prefix
+        %% timeout: float | None = None
+        +timeout
+    }
+    %% Singleton-Orchestrator für mehrere ManagedThreadPools.
+    class ThreadPoolManager {
+        +__init__()
+        +get_all_stats()
+        +get_pool()
+    }
+    class ThreadPoolType {
+        %% CAMERA_IO: = 'camera_io'
+        +CAMERA_IO
+        %% FILE_IO: = 'file_io'
+        +FILE_IO
+        %% GENERAL: = 'general'
+        +GENERAL
+        %% NETWORK_IO: = 'network_io'
+        +NETWORK_IO
+        %% SENSOR_IO: = 'sensor_io'
+        +SENSOR_IO
+    }
+    %% Base component with timer cleanup support
+    class TimedComponent {
+        %% timer_attributes: List[str] = ['_timer']
+        +timer_attributes
+        %% cleanup: Cancel timers and clean up
+        +cleanup()
+    }
+    %% Raised when configuration validation fails
+    class ValidationError {
+    }
+    %% Main web application managing NiceGUI interface and routing
+    class WebApplication {
+        %% component_registry: = get_component_registry()
+        +component_registry
+        %% config_service: = config_service
+        +config_service
+        %% controller_manager: = create_cvd_controller_manager()
+        +controller_manager
+        %% sensor_manager: = sensor_manager
+        +sensor_manager
+        +__init__()
+        %% register_components: Register all UI components and routes with NiceGUI
+        +register_components()
+    }
+    %% Common functionality for wizard-like GUI components.
+    class WizardMixin {
+        %% on_close: Optional[Callable[[], None]] = None
+        +on_close
+    }
+    class _PoolStats {
+        %% active_tasks: int = 0
+        +active_tasks
+        %% cb_open_events: int = 0
+        +cb_open_events
+        %% rejected_tasks: int = 0
+        +rejected_tasks
+        %% retries_performed: int = 0
+        +retries_performed
+        %% sandbox_violations: int = 0
+        +sandbox_violations
+        %% tasks_completed: int = 0
+        +tasks_completed
+        %% tasks_failed: int = 0
+        +tasks_failed
+        %% tasks_submitted: int = 0
+        +tasks_submitted
+        +as_dict()
+    }
+    class _Telemetry {
+        %% active: int = 0
+        +active
+        %% cancelled: int = 0
+        +cancelled
+        %% failed: int = 0
+        +failed
+        %% finished: int = 0
+        +finished
+        %% submitted: int = 0
+        +submitted
+        %% timed_out: int = 0
+        +timed_out
+        %% total_wall_time: float = 0.0
+        +total_wall_time
+        +inc()
+    }
+    BaseSensor <|-- ArduinoTCSensor
+    SensorInterface <|-- BaseSensor
+    ControllerStage <|-- CameraCaptureController
+    BaseComponent <|-- CameraStreamComponent
     BaseComponent <|-- CardComponent
-    BaseComponent <|-- TabComponent
-    BaseComponent <|-- DashboardComponent
-    TimedComponent <|-- LivePlotComponent
+    TimedComponent <|-- ControllerCardComponent
+    CancelableDialogMixin <|-- ControllerConfigDialog
     WizardMixin <|-- ControllerSetupWizardComponent
     BaseComponent <|-- ControllerSetupWizardComponent
-    BaseComponent <|-- CameraStreamComponent
+    BaseComponent <|-- ControllersComponent
+    BaseComponent <|-- CurrentExperimentDisplay
+    BaseComponent <|-- DashboardComponent
+    BaseComponent <|-- DataComponent
+    BaseComponent <|-- DataFilesList
+    BaseComponent <|-- DataFilterPanel
+    BaseComponent <|-- DataOverviewCard
+    BaseComponent <|-- ExperimentCard
+    BaseComponent <|-- ExperimentComponent
+    CancelableDialogMixin <|-- ExperimentConfigDialog
+    BaseComponent <|-- ExperimentHistoryTable
+    WizardMixin <|-- ExperimentSetupWizardComponent
+    BaseComponent <|-- ExperimentSetupWizardComponent
+    ControllerStage <|-- ImageController
+    TimedComponent <|-- LivePlotComponent
+    BaseComponent <|-- LogComponent
+    TimedComponent <|-- LogViewerComponent
+    ArduinoTCSensor <|-- MockArduinoTCSensor
+    RS232Sensor <|-- MockRS232Sensor
+    ImageController <|-- MotionDetectionController
+    ProcessingStage <|-- MovingAverageFilter
     NotificationMonitoringMixin <|-- NotificationCenter
     NotificationUIMixin <|-- NotificationCenter
     TimedComponent <|-- NotificationCenter
-    WizardMixin <|-- ExperimentSetupWizardComponent
-    BaseComponent <|-- ExperimentSetupWizardComponent
+    ProcessingStage <|-- OutlierDetectionFilter
+    BaseSensor <|-- RS232Sensor
+    ProcessingStage <|-- RangeValidationFilter
+    StateController <|-- ReactorStateController
+    BaseComponent <|-- SensorCardComponent
+    CancelableDialogMixin <|-- SensorConfigDialog
     WizardMixin <|-- SensorSetupWizardComponent
     BaseComponent <|-- SensorSetupWizardComponent
-    StateController <|-- ReactorStateController
-    ImageController <|-- MotionDetectionController
-    ControllerStage <|-- CameraCaptureController
-    ProcessingStage <|-- RangeValidationFilter
-    ProcessingStage <|-- OutlierDetectionFilter
-    ProcessingStage <|-- MovingAverageFilter
-    SensorInterface <|-- BaseSensor
-    BaseSensor <|-- ArduinoTCSensor
-    BaseSensor <|-- RS232Sensor
-    RS232Sensor <|-- MockRS232Sensor
-    ArduinoTCSensor <|-- MockArduinoTCSensor
+    TimedComponent <|-- SensorsComponent
+    BaseComponent <|-- SetupWizardComponent
+    ControllerStage <|-- StateController
+    BaseComponent <|-- TabComponent
+    BaseComponent <|-- TimedComponent
+    ConfigurationError <|-- ValidationError
 ```
