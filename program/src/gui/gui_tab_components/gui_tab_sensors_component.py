@@ -442,9 +442,8 @@ class SensorCardComponent(BaseComponent):
         self._update_display()
         
     def _update_element(self, data: Any) -> None:
-        """Update element with new data (required by BaseComponent)"""
-        # Data updates are handled by update_sensor_info
-        pass
+        """Refresh the card UI when updated through the BaseComponent API."""
+        self._update_display()
 
 
 class SensorsComponent(TimedComponent):
