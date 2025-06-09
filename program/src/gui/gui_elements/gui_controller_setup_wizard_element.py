@@ -4,6 +4,8 @@ from typing import Any, Optional, Callable, Dict, List
 from nicegui import ui
 from nicegui.element import Element
 from nicegui import events
+import cv2
+from PIL import Image
 
 from src.gui.gui_tab_components.gui_tab_base_component import (
     BaseComponent,
@@ -380,6 +382,15 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
                     value=self._wizard_data['selected_webcam'],
                     on_change=self._on_webcam_change
                 ).bind_value_to(self._wizard_data, 'selected_webcam').props("outlined").classes("flex-1")
+                ui.button("Test Webcam", on_click=self._test_webcam).props("color=secondary")
+
+            # Preview image container
+            with ui.row().classes("items-center"):
+                self._step2_elements['webcam_preview'] = (
+                    ui.image()
+                    .classes("w-64 h-48 border")
+                    .props('alt="Webcam preview"')
+                )
             
             # Webcam configuration
             if self._wizard_data['selected_webcam']:
@@ -426,6 +437,39 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
     def _on_webcam_change(self, e: events.ValueChangeEventArguments) -> None:
         """Handle webcam selection change."""
         self._render_webcam_selection()
+
+    def _test_webcam(self) -> None:
+        """Open the selected webcam and capture a preview frame."""
+        config = self._wizard_data.get('webcam_config', {})
+        device_index = config.get('device_index', 0)
+
+        capture = cv2.VideoCapture(device_index)
+        if config.get('width'):
+            capture.set(cv2.CAP_PROP_FRAME_WIDTH, int(config['width']))
+        if config.get('height'):
+            capture.set(cv2.CAP_PROP_FRAME_HEIGHT, int(config['height']))
+        if config.get('fps'):
+            capture.set(cv2.CAP_PROP_FPS, int(config['fps']))
+
+        if not capture.isOpened():
+            ui.notify('Failed to open webcam', color='negative')
+            return
+
+        ret, frame = capture.read()
+        capture.release()
+
+        if not ret or frame is None:
+            ui.notify('Failed to capture frame', color='negative')
+            return
+
+        try:
+            image = Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
+            preview = self._step2_elements.get('webcam_preview')
+            if preview:
+                preview.set_source(image)
+            ui.notify('Webcam capture successful', color='positive')
+        except Exception as exc:
+            ui.notify(f'Webcam preview failed: {exc}', color='negative')
 
     def _render_controller_parameters(self) -> None:
         """Render controller-specific parameters."""
