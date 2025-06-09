@@ -43,10 +43,11 @@ class CameraCaptureController(ControllerStage):
         self.fps = params.get("fps")
         self.webcam_id = params.get("cam_id")
         self.rotation = params.get("rotation", 0)
-        self.uvc_settings = params.get("uvc_settings", {})
+        self.uvc_settings = {}
+        self.uvc_settings.update(params.get("uvc", {}))
+        self.uvc_settings.update(params.get("uvc_settings", {}))
 
         if self.webcam_id:
-
             service = get_config_service()
             if service:
                 cam_cfg = service.get_webcam_config(self.webcam_id)
@@ -57,6 +58,7 @@ class CameraCaptureController(ControllerStage):
                         self.width, self.height = res
                     self.fps = cam_cfg.get("fps", self.fps)
                     self.rotation = cam_cfg.get("rotation", self.rotation)
+                    self.uvc_settings.update(cam_cfg.get("uvc", {}))
                     self.uvc_settings.update(cam_cfg.get("uvc_settings", {}))
 
         self._capture: Optional[cv2.VideoCapture] = None
@@ -73,6 +75,9 @@ class CameraCaptureController(ControllerStage):
                     controller_id=self.controller_id,
                     device_index=self.device_index,
                 )
+                if self._capture is not None:
+                    await run_camera_io(self._capture.release)
+                self._capture = None
                 return False
 
             if self.width:

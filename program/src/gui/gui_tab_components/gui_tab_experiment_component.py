@@ -925,6 +925,46 @@ class CurrentExperimentDisplay(BaseComponent):
             if duration_seconds is None and result.start_time:
                 duration_seconds = (datetime.now() - result.start_time).total_seconds()
 
+            # Determine sensor count
+            if config.sensor_ids:
+                sensor_count = len(config.sensor_ids)
+
+            elif self.experiment_manager.sensor_manager:
+                try:
+                    sensor_count = len(
+                        self.experiment_manager.sensor_manager.get_all_sensors()
+                    )
+                except Exception:
+                    sensor_count = 0
+
+            else:
+                sensor_count = 0
+                sensor_mgr = getattr(self.experiment_manager, "sensor_manager", None)
+                if sensor_mgr:
+                    active = sensor_mgr.get_active_sensors()
+                    if not active:
+                        active = sensor_mgr.get_all_sensors()
+                    sensor_count = len(active)
+
+            # Determine controller count
+            if config.controller_ids:
+                controller_count = len(config.controller_ids)
+
+            elif self.experiment_manager.controller_manager:
+                try:
+                    controller_count = len(
+                        self.experiment_manager.controller_manager.list_controllers()
+                    )
+                except Exception:
+                    controller_count = 0
+            else:
+                controller_count = 0
+
+                controller_count = 0
+                ctrl_mgr = getattr(self.experiment_manager, "controller_manager", None)
+                if ctrl_mgr:
+                    controller_count = len(ctrl_mgr.list_controllers())
+
             return ExperimentInfo(
                 experiment_id=experiment_id,
                 name=config.name,
@@ -935,10 +975,8 @@ class CurrentExperimentDisplay(BaseComponent):
                 end_time=result.end_time,
                 duration_seconds=duration_seconds,
                 data_points_collected=result.data_points_collected,
-                sensor_count=len(config.sensor_ids) if config.sensor_ids else 0,
-                controller_count=(
-                    len(config.controller_ids) if config.controller_ids else 0
-                ),
+                sensor_count=sensor_count,
+                controller_count=controller_count,
                 errors_count=result.errors_count,
                 progress_percent=progress_percent,
                 estimated_remaining=estimated_remaining,
@@ -1253,10 +1291,10 @@ class ExperimentHistoryTable(BaseComponent):
                 ui.label("Select Date Range").classes("text-lg font-bold")
 
                 self._date_from_picker = ui.date(
-                    value=from_date.strftime("%Y-%m-%d") if from_date else ""
+                    value=from_date.strftime("%Y-%m-%d") if from_date else None
                 )
                 self._date_to_picker = ui.date(
-                    value=to_date.strftime("%Y-%m-%d") if to_date else ""
+                    value=to_date.strftime("%Y-%m-%d") if to_date else None
                 )
 
                 with ui.row().classes("gap-2 justify-end"):
@@ -1272,8 +1310,8 @@ class ExperimentHistoryTable(BaseComponent):
 
     def _apply_date_range(self) -> None:
         """Apply date range from dialog"""
-        raw_from = self._date_from_picker.value or ""
-        raw_to = self._date_to_picker.value or ""
+        raw_from = self._date_from_picker.value
+        raw_to = self._date_to_picker.value
 
         from_date = None
         to_date = None
@@ -1289,6 +1327,11 @@ class ExperimentHistoryTable(BaseComponent):
             except ValueError:
                 ui.notify("Invalid date", color="negative")
                 return
+
+        # Validate range
+        if from_date and to_date and to_date < from_date:
+            ui.notify("Invalid date range", color="negative")
+            return
 
         self._from_date = from_date
         self._to_date = to_date
@@ -1307,6 +1350,14 @@ class ExperimentHistoryTable(BaseComponent):
             self._state_select.value = "All"
         if self._date_range_input:
             self._date_range_input.value = ""
+
+        # Reset any existing date pickers so the dialog opens blank next time
+        if self._date_from_picker:
+            self._date_from_picker.value = ""
+            self._date_from_picker = None
+        if self._date_to_picker:
+            self._date_to_picker.value = ""
+            self._date_to_picker = None
         self._load_experiments()
 
     def _on_view(self, e) -> None:
@@ -1529,7 +1580,7 @@ class ExperimentComponent(BaseComponent):
             experiment_manager=cast(ExperimentManager, self.experiment_manager),
             sensor_manager=self.sensor_manager,
             controller_manager=self.controller_manager,
-            on_close=None,
+            on_close=self._on_experiment_created,
         )
         experiment_wizard.show_dialog()
 

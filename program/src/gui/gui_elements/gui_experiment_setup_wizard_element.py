@@ -262,18 +262,16 @@ class ExperimentSetupWizardComponent(WizardMixin, BaseComponent):
                 value=self._wizard_data['duration_enabled']
             ).bind_value_to(self._wizard_data, 'duration_enabled')
             
-            with ui.row().classes("items-center gap-4"):
+            with ui.row().classes("items-center gap-4") as duration_row:
                 ui.label("Duration (minutes):").classes("w-40 font-semibold")
                 self._step1_elements['duration_minutes'] = ui.number(
-                    min=1, max=43200, step=1, 
+                    min=1, max=43200, step=1,
                     value=self._wizard_data['duration_minutes'],
                     placeholder="Leave empty for unlimited duration"
                 ).bind_value_to(self._wizard_data, 'duration_minutes').props("outlined").classes("flex-1")
-            
+
             # Bind duration input visibility to checkbox
-            self._step1_elements['duration_minutes'].bind_visibility_from(
-                self._wizard_data, 'duration_enabled'
-            )
+            duration_row.bind_visibility_from(self._wizard_data, 'duration_enabled')
 
     def _render_step2(self) -> None:
         """Render step 2: Data sources selection."""

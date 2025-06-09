@@ -726,12 +726,12 @@ class ControllersComponent(BaseComponent):
             self._render_execution_order()
 
             # Start refresh timer
-            self._refresh_timer = ui.timer(5.0, self._refresh_controllers)
+        self._refresh_timer = ui.timer(5.0, self._refresh_controllers)
 
         self._config_dialog = ControllerConfigDialog(
             self.config_service,
             self.controller_manager,
-            self._refresh_controllers,
+            self._on_config_saved,
         )
 
         return controllers
@@ -854,11 +854,19 @@ class ControllersComponent(BaseComponent):
             return
 
         # Use the new controller setup wizard
+        def _on_close() -> None:
+            self._refresh_controllers()
+
+            registry = get_component_registry()
+            dashboard = registry.get_component("dashboard")
+            if dashboard and hasattr(dashboard, "refresh_controllers"):
+                dashboard.refresh_controllers()
+
         wizard = ControllerSetupWizardComponent(
             config_service=self.config_service,
             controller_manager=self.controller_manager,
             sensor_manager=sensor_manager,
-            on_close=self._refresh_controllers,
+            on_close=_on_close,
         )
         wizard.show_dialog()
 
@@ -894,6 +902,15 @@ class ControllersComponent(BaseComponent):
             debug("Refreshed controllers display")
         except Exception as e:
             error(f"Error refreshing controllers: {e}")
+
+    def _on_config_saved(self) -> None:
+        """Refresh controllers list and update dashboard."""
+        self._refresh_controllers()
+
+        registry = get_component_registry()
+        dashboard = registry.get_component("dashboard")
+        if dashboard and hasattr(dashboard, "refresh_controllers"):
+            dashboard.refresh_controllers()
 
     def _update_element(self, data: Any) -> None:
         """Update element with new data"""
