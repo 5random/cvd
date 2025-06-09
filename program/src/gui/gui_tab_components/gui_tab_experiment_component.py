@@ -921,6 +921,10 @@ class CurrentExperimentDisplay(BaseComponent):
                     remaining_seconds = total_duration - elapsed
                     estimated_remaining = self._format_duration(remaining_seconds)
 
+            duration_seconds = result.duration_seconds
+            if duration_seconds is None and result.start_time:
+                duration_seconds = (datetime.now() - result.start_time).total_seconds()
+
             return ExperimentInfo(
                 experiment_id=experiment_id,
                 name=config.name,
@@ -929,7 +933,7 @@ class CurrentExperimentDisplay(BaseComponent):
                 phase=self.experiment_manager.get_current_phase(),
                 start_time=result.start_time,
                 end_time=result.end_time,
-                duration_seconds=result.duration_seconds,
+                duration_seconds=duration_seconds,
                 data_points_collected=result.data_points_collected,
                 sensor_count=len(config.sensor_ids) if config.sensor_ids else 0,
                 controller_count=(
