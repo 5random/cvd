@@ -397,6 +397,7 @@ class DataFilesList(BaseComponent):
         self._pagination_info = None
         self._selection_info = None
         self._download_button = None
+        self._refresh_button = None
         self._download_status = None
         self._download_progress = None
         self._download_spinner = None
@@ -406,12 +407,17 @@ class DataFilesList(BaseComponent):
         # Download monitoring
         self._download_timer = None
 
+
     def render(self) -> ui.card:
         """Render files list"""
         with ui.card().classes("cvd-card p-4") as card:
             # Header with selection info and download button
             with ui.row().classes("justify-between items-center mb-3"):
                 ui.label("Data Files").classes("text-lg font-semibold")
+
+                self._refresh_button = ui.button(
+                    "Refresh", on_click=self._refresh_files
+                ).classes("bg-gray-300")
 
                 with ui.row().classes("gap-2 items-center"):
                     self._selection_info = ui.label("No files selected").classes(
@@ -517,6 +523,14 @@ class DataFilesList(BaseComponent):
             self._update_display()
         except Exception as e:
             error(f"Error loading files: {e}")
+
+    def _refresh_files(self) -> None:
+        """Refresh file list by rescanning directories"""
+        try:
+            self.data_manager.scan_directories()
+        except Exception as e:
+            error(f"Error scanning directories: {e}")
+        self._load_files()
 
     def _update_display(self) -> None:
         """Update table and pagination display"""
