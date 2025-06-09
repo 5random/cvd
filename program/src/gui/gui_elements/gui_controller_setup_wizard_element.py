@@ -134,12 +134,15 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
         self._step3_elements: Dict[str, Any] = {}
         self._step4_elements: Dict[str, Any] = {}
 
+        self._step2_container: ui.column | None = None
+        self._step3_container: ui.column | None = None
+
         # Available controller types and their configurations
         # statt hart codierter Definitionen: Controller-Typen aus dem Schema ziehen
         controller_schema = self.config_service.CONTROLLER_SCHEMA
         # enum-Werte für den "type"-Parameter
         types = controller_schema["properties"]["type"]["enum"]
-        # eine Minimalstruktur für jeden Typ anlegen und Parameter-Templates 
+        # eine Minimalstruktur für jeden Typ anlegen und Parameter-Templates
         # aus _PARAM_TEMPLATES verwenden
         self._controller_types: Dict[str, Dict[str, Any]] = {}
         for t in types:
@@ -268,7 +271,8 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
 
             # Step 2: Source Selection
             with ui.step("source_config", title="Source Selection", icon="input"):
-                self._render_step2()
+                self._step2_container = ui.column().classes("gap-4 w-full")
+                self._render_step2(self._step2_container)
                 with ui.stepper_navigation():
                     ui.button("Previous", on_click=self._stepper.previous)
                     ui.button("Next", on_click=self._validate_and_next_step2).props(
@@ -278,7 +282,8 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
 
             # Step 3: Controller Settings
             with ui.step("settings", title="Controller Settings", icon="tune"):
-                self._render_step3()
+                self._step3_container = ui.column().classes("gap-4 w-full")
+                self._render_step3(self._step3_container)
                 with ui.stepper_navigation():
                     ui.button("Previous", on_click=self._stepper.previous)
                     ui.button("Next", on_click=self._stepper.next).props(
@@ -350,16 +355,25 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
                     "Show on Dashboard", value=self._wizard_data["show_on_dashboard"]
                 ).bind_value_to(self._wizard_data, "show_on_dashboard")
 
-    def _render_step2(self) -> None:
+    def _render_step2(self, container: ui.column | None = None) -> None:
         """Render step 2: Source selection."""
-        ui.label("Select data sources for the controller").classes("text-lg mb-4")
+        container = container or self._step2_container
+        if container is None:
+            return
 
-        with ui.column().classes("gap-4 w-full"):
-            # Sensor selection (if required by controller type)
-            if self._controller_types[self._wizard_data["type"]]["requires_sensors"]:
-                with ui.card().classes("w-full"):
-                    with ui.card_section():
-                        ui.label("Sensor Data Sources").classes("font-semibold mb-2")
+        with container:
+            ui.label("Select data sources for the controller").classes("text-lg mb-4")
+
+            with ui.column().classes("gap-4 w-full"):
+                # Sensor selection (if required by controller type)
+                if self._controller_types[self._wizard_data["type"]][
+                    "requires_sensors"
+                ]:
+                    with ui.card().classes("w-full"):
+                        with ui.card_section():
+                            ui.label("Sensor Data Sources").classes(
+                                "font-semibold mb-2"
+                            )
 
                         # Available sensors
                         self._step2_elements["sensor_container"] = ui.column().classes(
@@ -387,15 +401,20 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
                         )
                         self._render_webcam_selection()
 
-    def _render_step3(self) -> None:
+    def _render_step3(self, container: ui.column | None = None) -> None:
         """Render step 3: Controller-specific settings."""
-        ui.label("Configure controller-specific parameters").classes("text-lg mb-4")
+        container = container or self._step3_container
+        if container is None:
+            return
 
-        with ui.column().classes("gap-4 w-full"):
-            # Controller parameters
-            with ui.card().classes("w-full"):
-                with ui.card_section():
-                    ui.label("Controller Parameters").classes("font-semibold mb-2")
+        with container:
+            ui.label("Configure controller-specific parameters").classes("text-lg mb-4")
+
+            with ui.column().classes("gap-4 w-full"):
+                # Controller parameters
+                with ui.card().classes("w-full"):
+                    with ui.card_section():
+                        ui.label("Controller Parameters").classes("font-semibold mb-2")
 
                     self._step3_elements["parameters_container"] = ui.column().classes(
                         "gap-4"
@@ -435,10 +454,10 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
         """Handle controller type change."""
         self._update_controller_defaults()
         self._update_type_description()
-        # Refresh step 2 and 3 if they exist
-        if hasattr(self, "_step2_elements"):
+        # Refresh step 2 and 3 if their containers are available
+        if self._step2_container is not None:
             self._refresh_step2()
-        if hasattr(self, "_step3_elements"):
+        if self._step3_container is not None:
             self._refresh_step3()
 
     def _update_type_description(self) -> None:
@@ -522,7 +541,6 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
                     ui.image().classes("w-64 h-48 border").props('alt="Webcam preview"')
                 )
 
-                
             # Webcam configuration
             if self._wizard_data["selected_webcam"]:
                 ui.separator().classes("my-4")
@@ -681,9 +699,11 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
         with container:
             for param_name, param_config in parameters.items():
                 with ui.row().classes("items-center gap-4"):
-                    ui.label(f"{param_config.get('label', param_name)}:").classes("w-48 font-semibold")
-                    
-                    if param_config['type'] == 'int':
+                    ui.label(f"{param_config.get('label', param_name)}:").classes(
+                        "w-48 font-semibold"
+                    )
+
+                    if param_config["type"] == "int":
                         ui.number(
                             value=self._wizard_data["parameters"].get(
                                 param_name, param_config["default"]
@@ -692,7 +712,11 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
                             max=param_config.get("max"),
                         ).bind_value_to(
                             self._wizard_data["parameters"], param_name
-                        ).props("outlined").classes("flex-1")
+                        ).props(
+                            "outlined"
+                        ).classes(
+                            "flex-1"
+                        )
                     elif param_config["type"] == "float":
                         ui.number(
                             value=self._wizard_data["parameters"].get(
@@ -716,7 +740,11 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
                             )
                         ).bind_value_to(
                             self._wizard_data["parameters"], param_name
-                        ).props("outlined").classes("flex-1")
+                        ).props(
+                            "outlined"
+                        ).classes(
+                            "flex-1"
+                        )
 
             if controller_type == "motion_detection":
                 ui.button("Select ROI", on_click=self._show_roi_selector).props(
@@ -996,13 +1024,21 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
 
     def _refresh_step2(self) -> None:
         """Refresh step 2 elements."""
-        if hasattr(self, "_step2_elements"):
-            self._render_step2()
+        if self._step2_container is None:
+            return
+
+        self._step2_container.clear()
+        self._step2_elements = {}
+        self._render_step2(self._step2_container)
 
     def _refresh_step3(self) -> None:
         """Refresh step 3 elements."""
-        if hasattr(self, "_step3_elements"):
-            self._render_step3()
+        if self._step3_container is None:
+            return
+
+        self._step3_container.clear()
+        self._step3_elements = {}
+        self._render_step3(self._step3_container)
 
 
 # Legacy compatibility class
