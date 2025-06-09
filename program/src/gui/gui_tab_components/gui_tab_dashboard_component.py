@@ -189,6 +189,7 @@ class DashboardComponent(BaseComponent):
         self._sensor_cards: Dict[str, SensorCardComponent] = {}
         self._controller_cards: Dict[str, ui.card] = {}
         self._camera_stream: Optional[CameraStreamComponent] = None
+        self._camera_streams: Dict[str, CameraStreamComponent] = {}
 
         # Filter state and timer
         self._sensor_filter: List[str] = []
