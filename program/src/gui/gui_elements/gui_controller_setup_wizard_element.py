@@ -961,13 +961,15 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
                 self._wizard_data["type"] == "motion_detection"
                 and self._wizard_data["selected_webcam"]
             ):
+                # Generate a unique webcam ID and use it for the controller
+                webcam_id = self.config_service.generate_next_webcam_id()
                 controller_config["parameters"] = {
-                    "cam_id": self._wizard_data["selected_webcam"],
+                    "cam_id": webcam_id,
                     **self._wizard_data["parameters"],
                 }
                 # Add webcam configuration
                 webcam_config = {
-                    "webcam_id": self._wizard_data["selected_webcam"],
+                    "webcam_id": webcam_id,
                     "name": self._wizard_data["selected_webcam"],
                     "device_index": self._wizard_data["webcam_config"]["device_index"],
                     "resolution": [
