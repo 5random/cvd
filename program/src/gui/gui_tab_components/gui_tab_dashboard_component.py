@@ -443,9 +443,13 @@ class DashboardComponent(BaseComponent):
                     ui.label(f"Camera {cid}").classes("text-sm font-semibold mb-2")
                     stream.render()
                     with ui.row().classes("gap-2 mt-2"):
+                        options = ["320x240", "640x480", "1280x720"]
+                        current_res = f"{width}x{height}"
+                        if current_res not in options:
+                            options.insert(0, current_res)
                         ui.select(
-                            ["320x240", "640x480", "1280x720"],
-                            value=f"{width}x{height}",
+                            options,
+                            value=current_res,
                             on_change=lambda e, s=stream: self._set_stream_resolution(
                                 s, e.value
                             ),
