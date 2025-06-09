@@ -12,9 +12,16 @@ import cv2
 from src.controllers.controller_manager import create_cvd_controller_manager
 from src.data_handler.sources.sensor_source_manager import SensorManager
 from src.gui.gui_elements.gui_live_plot_element import LivePlotComponent, PlotConfig
-from src.gui.gui_elements.gui_notification_center_element import create_notification_center
-from src.gui.gui_tab_components.gui_tab_base_component import ComponentRegistry, get_component_registry
-from src.gui.gui_tab_components.gui_tab_controllers_component import ControllersComponent
+from src.gui.gui_elements.gui_notification_center_element import (
+    create_notification_center,
+)
+from src.gui.gui_tab_components.gui_tab_base_component import (
+    ComponentRegistry,
+    get_component_registry,
+)
+from src.gui.gui_tab_components.gui_tab_controllers_component import (
+    ControllersComponent,
+)
 from src.gui.gui_tab_components.gui_tab_dashboard_component import DashboardComponent
 from src.gui.gui_tab_components.gui_tab_data_component import (
     create_data_component,
@@ -29,7 +36,10 @@ from src.gui.gui_tab_components.gui_tab_sensors_component import (
     SensorsComponent,
 )
 from src.gui.gui_tab_components.gui_setup_wizard_component import SetupWizardComponent
-from src.utils.config_utils.config_service import ConfigurationService, ConfigurationError
+from src.utils.config_utils.config_service import (
+    ConfigurationService,
+    ConfigurationError,
+)
 from src.utils.data_utils.data_manager import get_data_manager
 from src.utils.log_utils.log_service import debug, error, info, warning
 from src.gui.gui_elements.gui_webcam_stream_element import CameraStreamComponent
@@ -41,7 +51,9 @@ from fastapi import Request, HTTPException
 class WebApplication:
     """Main web application managing NiceGUI interface and routing"""
 
-    def __init__(self, config_service: ConfigurationService, sensor_manager: SensorManager):
+    def __init__(
+        self, config_service: ConfigurationService, sensor_manager: SensorManager
+    ):
         self.config_service = config_service
         self.sensor_manager = sensor_manager
         # Initialize controller manager for dashboard and other components
@@ -59,6 +71,8 @@ class WebApplication:
         self._log_component: Optional[LogComponent] = None
         self._experiment_component: Optional[ExperimentComponent] = None
         self._data_component: Optional[DataComponent] = None
+        self._dashboard_component: Optional[DashboardComponent] = None
+        self._live_plot: Optional[LivePlotComponent] = None
 
         # Initialize notification center with error handling
         try:
@@ -104,7 +118,9 @@ class WebApplication:
 
     async def _processing_loop(self) -> None:
         while True:
-            interval_ms = self.config_service.get("controller_manager.processing_interval_ms", int, 30)
+            interval_ms = self.config_service.get(
+                "controller_manager.processing_interval_ms", int, 30
+            )
             interval = max(0.001, interval_ms / 1000.0)
             await self.sensor_manager.wait_for_new_data(timeout=interval)
             sensor_data = self.sensor_manager.get_latest_readings()
@@ -151,15 +167,14 @@ class WebApplication:
 
         @ui.page("/video_feed")
         async def video_feed(request: Request):
-
             """Stream MJPEG frames from the dashboard camera"""
             # retrieve specific dashboard camera stream or fallback to first CameraStreamComponent
-            camera = self.component_registry.get_component('dashboard_camera_stream')
+            camera = self.component_registry.get_component("dashboard_camera_stream")
             if camera is None:
                 # fallback to first registered camera stream
                 for comp in self.component_registry.get_all_components():
                     cid = getattr(comp, "component_id", "")
-                    if str(cid).startswith('dashboard_camera_stream_'):
+                    if str(cid).startswith("dashboard_camera_stream_"):
 
                         camera = comp
                         break
@@ -171,10 +186,10 @@ class WebApplication:
                 while True:
                     try:
                         if await request.is_disconnected():
-                            info('Client disconnected from video feed')
+                            info("Client disconnected from video feed")
                             break
                     except asyncio.CancelledError:
-                        info('Video feed cancelled')
+                        info("Video feed cancelled")
                         break
                     if isinstance(camera, CameraStreamComponent):
                         frame = camera.get_latest_frame()
@@ -182,12 +197,20 @@ class WebApplication:
                             success, buf = cv2.imencode("jpg", frame)
                             if success:
                                 jpeg_bytes = buf.tobytes()
-                                yield (b"--frame\r\nContent-Type: image/jpeg\r\n\r\n" + jpeg_bytes + b"\r\n")
+                                yield (
+                                    b"--frame\r\nContent-Type: image/jpeg\r\n\r\n"
+                                    + jpeg_bytes
+                                    + b"\r\n"
+                                )
                     await asyncio.sleep(
-                        camera.update_interval if isinstance(camera, CameraStreamComponent) else 0.03
+                        camera.update_interval
+                        if isinstance(camera, CameraStreamComponent)
+                        else 0.03
                     )
 
-            return StreamingResponse(gen(), media_type="multipart/x-mixed-replace; boundary=frame")
+            return StreamingResponse(
+                gen(), media_type="multipart/x-mixed-replace; boundary=frame"
+            )
 
     def _setup_layout(self) -> None:
         """Setup common layout elements"""
@@ -206,7 +229,11 @@ class WebApplication:
         dm = get_data_manager()
         if dm and dm.downloads_dir.exists():
             try:
-                app.mount("/downloads", StaticFiles(directory=str(dm.downloads_dir)), name="downloads")
+                app.mount(
+                    "/downloads",
+                    StaticFiles(directory=str(dm.downloads_dir)),
+                    name="downloads",
+                )
                 debug(f"Mounted downloads directory at /downloads: {dm.downloads_dir}")
             except Exception as e:
                 error(f"Error mounting downloads directory {dm.downloads_dir}: {e}")
@@ -216,9 +243,9 @@ class WebApplication:
         # Header
         with ui.header().classes("cvd-header text-white"):
             with ui.row().classes("w-full items-center"):
-                self._title_label = ui.label(self.config_service.get("ui.title", str, "CVD Tracker Dashboard")).classes(
-                    "text-h4 flex-grow"
-                )
+                self._title_label = ui.label(
+                    self.config_service.get("ui.title", str, "CVD Tracker Dashboard")
+                ).classes("text-h4 flex-grow")
                 self._create_quick_settings()
 
         # Main content with tabs
@@ -238,13 +265,17 @@ class WebApplication:
 
             # Sensors tab
             with ui.tab_panel("sensors").classes("p-4"):
-                self._sensors_component = SensorsComponent(self.sensor_manager, self.config_service)
+                self._sensors_component = SensorsComponent(
+                    self.sensor_manager, self.config_service
+                )
                 self.component_registry.register(self._sensors_component)
                 self._sensors_component.render()
 
             # Controllers tab
             with ui.tab_panel("controllers").classes("p-4"):
-                self._controllers_component = ControllersComponent(self.config_service, self.controller_manager)
+                self._controllers_component = ControllersComponent(
+                    self.config_service, self.controller_manager
+                )
                 self.component_registry.register(self._controllers_component)
                 self._controllers_component.render()
 
@@ -263,7 +294,9 @@ class WebApplication:
             # Data tab
             with ui.tab_panel("data").classes("p-4"):
                 ui.label("Data Management").classes("text-xl mb-4")
-                self._data_component = create_data_component(component_id="data_component")
+                self._data_component = create_data_component(
+                    component_id="data_component"
+                )
                 self.component_registry.register(self._data_component)
                 self._data_component.render()
 
@@ -288,23 +321,31 @@ class WebApplication:
                 if cfg.get("show_on_dashboard")
             ]
 
+
             with ui.column().classes('w-1/2'):
-                dashboard = DashboardComponent(
+
+                self._dashboard_component = DashboardComponent(
                     self.config_service,
                     self.sensor_manager,
                     self.controller_manager,
                     self._notification_center,
                 )
-                dashboard.render()
+                self.component_registry.register(self._dashboard_component)
+                self._dashboard_component.render()
             # use dashboard's configured sensors for live plot
-            dashboard_sensors = getattr(dashboard, '_dashboard_sensors', [])
+
+            dashboard_sensors = getattr(self._dashboard_component, '_dashboard_sensors', [])
+
 
             # Right column - live plot
             if dashboard_sensors:
                 with ui.column().classes("w-1/2"):
+
                     plot_config = PlotConfig(max_points=2000, refresh_rate_ms=1000, history_seconds=3600)
-                    live_plot = LivePlotComponent(self.sensor_manager, plot_config, dashboard_sensors)
-                    live_plot.render()
+                    self._live_plot = LivePlotComponent(self.sensor_manager, plot_config, dashboard_sensors)
+
+                    self.component_registry.register(self._live_plot)
+                    self._live_plot.render()
 
     def _create_sensors_content(self) -> None:
         """Create sensors tab content"""
@@ -324,7 +365,11 @@ class WebApplication:
                     {"name": "connected", "label": "Connected", "field": "connected"},
                     {"name": "polling", "label": "Polling", "field": "polling"},
                     {"name": "status", "label": "Status", "field": "status"},
-                    {"name": "last_reading", "label": "Last Reading", "field": "last_reading"},
+                    {
+                        "name": "last_reading",
+                        "label": "Last Reading",
+                        "field": "last_reading",
+                    },
                 ]
 
                 rows = []
@@ -355,7 +400,8 @@ class WebApplication:
 
                 # Basic settings
                 self._title_input = ui.input(
-                    label="System Title", value=self.config_service.get("ui.title", str, "CVD Tracker")
+                    label="System Title",
+                    value=self.config_service.get("ui.title", str, "CVD Tracker"),
                 )
                 self._title_input.classes("w-full mb-2")
 
@@ -386,8 +432,13 @@ class WebApplication:
                 if hasattr(self, "_title_label") and self._title_label is not None:
                     self._title_label.text = str(self._title_input.value)
 
-            if hasattr(self, "_refresh_rate_input") and self._refresh_rate_input is not None:
-                self.config_service.set("ui.refresh_rate_ms", int(self._refresh_rate_input.value))
+            if (
+                hasattr(self, "_refresh_rate_input")
+                and self._refresh_rate_input is not None
+            ):
+                self.config_service.set(
+                    "ui.refresh_rate_ms", int(self._refresh_rate_input.value)
+                )
 
             ui.notify("Settings saved successfully!", type="positive")
         except Exception as e:
@@ -405,22 +456,33 @@ class WebApplication:
                 dark_mode.value = not dark_mode.value
                 self.config_service.set("ui.dark_mode", dark_mode.value)
 
-            ui.button(icon="dark_mode", color="#5898d4", on_click=toggle_dark_mode).props("flat round")
+            ui.button(
+                icon="dark_mode", color="#5898d4", on_click=toggle_dark_mode
+            ).props("flat round")
 
             # Refresh button
-            ui.button(icon="refresh", color="#5898d4", on_click=ui.navigate.reload).props("flat round")
+            ui.button(
+                icon="refresh", color="#5898d4", on_click=ui.navigate.reload
+            ).props("flat round")
 
             # Full screen button
-            ui.button(icon="fullscreen", color="#5898d4", on_click=lambda: ui.notify("Fullscreen mode")).props(
-                "flat round"
-            )
+            ui.button(
+                icon="fullscreen",
+                color="#5898d4",
+                on_click=lambda: ui.notify("Fullscreen mode"),
+            ).props("flat round")
 
             # Notification center button
             # Only create notification button if attribute exists and not None
-            if hasattr(self, "_notification_center") and self._notification_center is not None:
+            if (
+                hasattr(self, "_notification_center")
+                and self._notification_center is not None
+            ):
                 self._notification_center.create_notification_button()
             else:
-                debug("Notification center not initialized; skipping notification button")
+                debug(
+                    "Notification center not initialized; skipping notification button"
+                )
 
     def _save_configuration(self, config_json: str) -> None:
         """Save configuration from JSON text"""
@@ -459,11 +521,17 @@ class WebApplication:
         """Create standalone configuration page"""
         ui.label("Configuration").classes("text-h4 mb-4")
         # JSON editor for configuration
-        config_textarea = ui.textarea(value=self.config_service.get_raw_config_as_json())
+        config_textarea = ui.textarea(
+            value=self.config_service.get_raw_config_as_json()
+        )
         config_textarea.classes("w-full h-64")
         with ui.row().classes("gap-2 mt-2"):
-            ui.button("Save", on_click=lambda: self._save_configuration(config_textarea.value)).props("color=primary")
-            ui.button("Reset", on_click=lambda: self._reset_configuration(config_textarea)).props("outline")
+            ui.button(
+                "Save", on_click=lambda: self._save_configuration(config_textarea.value)
+            ).props("color=primary")
+            ui.button(
+                "Reset", on_click=lambda: self._reset_configuration(config_textarea)
+            ).props("outline")
 
     def _create_setup_wizard_page(self) -> None:
         """Create setup wizard page"""
