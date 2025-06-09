@@ -337,6 +337,14 @@ class DataFilterPanel(BaseComponent):
         if self._date_range_input:
             self._date_range_input.value = ""
 
+        # Reset any existing date pickers so the dialog opens blank next time
+        if self._date_from_picker:
+            self._date_from_picker.value = ""
+            self._date_from_picker = None
+        if self._date_to_picker:
+            self._date_to_picker.value = ""
+            self._date_to_picker = None
+
         self._emit_filter_change()
 
     def _emit_filter_change(self) -> None:

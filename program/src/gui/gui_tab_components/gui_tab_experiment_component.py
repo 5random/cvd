@@ -1308,6 +1308,14 @@ class ExperimentHistoryTable(BaseComponent):
             self._state_select.value = "All"
         if self._date_range_input:
             self._date_range_input.value = ""
+
+        # Reset any existing date pickers so the dialog opens blank next time
+        if self._date_from_picker:
+            self._date_from_picker.value = ""
+            self._date_from_picker = None
+        if self._date_to_picker:
+            self._date_to_picker.value = ""
+            self._date_to_picker = None
         self._load_experiments()
 
     def _on_view(self, e) -> None:
