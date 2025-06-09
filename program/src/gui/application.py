@@ -66,6 +66,9 @@ class WebApplication:
         self._title_label: Optional[ui.label] = None
         self._title_input: Optional[ui.input] = None
         self._refresh_rate_input: Optional[ui.number] = None
+        self._storage_base_input: Optional[ui.input] = None
+        self._flush_interval_input: Optional[ui.number] = None
+        self._max_notifications_input: Optional[ui.number] = None
         self._sensors_component: Optional[SensorsComponent] = None
         self._controllers_component: Optional[ControllersComponent] = None
         self._log_component: Optional[LogComponent] = None
@@ -438,6 +441,34 @@ class WebApplication:
                 )
                 self._refresh_rate_input.classes("w-full mb-2")
 
+                self._storage_base_input = ui.input(
+                    label="Data Storage Base Path",
+                    value=self.config_service.get(
+                        "data_storage.storage_paths.base", str, "data"
+                    ),
+                )
+                self._storage_base_input.classes("w-full mb-2")
+
+                self._flush_interval_input = ui.number(
+                    label="Data Flush Interval (s)",
+                    value=self.config_service.get(
+                        "data_storage.flush_interval", int, 10
+                    ),
+                    min=1,
+                    max=3600,
+                )
+                self._flush_interval_input.classes("w-full mb-2")
+
+                self._max_notifications_input = ui.number(
+                    label="Max Notifications",
+                    value=self.config_service.get(
+                        "ui.notification_center.max_notifications", int, 500
+                    ),
+                    min=1,
+                    max=10000,
+                )
+                self._max_notifications_input.classes("w-full mb-2")
+
                 with ui.row().classes("gap-2 mt-4"):
                     ui.button(
                         "Save Settings", on_click=self._save_settings
@@ -469,6 +500,33 @@ class WebApplication:
             ):
                 self.config_service.set(
                     "ui.refresh_rate_ms", int(self._refresh_rate_input.value)
+                )
+
+            if (
+                hasattr(self, "_storage_base_input")
+                and self._storage_base_input is not None
+            ):
+                self.config_service.set(
+                    "data_storage.storage_paths.base",
+                    str(self._storage_base_input.value),
+                )
+
+            if (
+                hasattr(self, "_flush_interval_input")
+                and self._flush_interval_input is not None
+            ):
+                self.config_service.set(
+                    "data_storage.flush_interval",
+                    int(self._flush_interval_input.value),
+                )
+
+            if (
+                hasattr(self, "_max_notifications_input")
+                and self._max_notifications_input is not None
+            ):
+                self.config_service.set(
+                    "ui.notification_center.max_notifications",
+                    int(self._max_notifications_input.value),
                 )
 
             ui.notify("Settings saved successfully!", type="positive")
@@ -543,6 +601,18 @@ class WebApplication:
             if hasattr(self, "_refresh_rate_input") and self._refresh_rate_input is not None:
                 self._refresh_rate_input.value = self.config_service.get(
                     "ui.refresh_rate_ms", int, 1000
+                )
+            if hasattr(self, "_storage_base_input") and self._storage_base_input is not None:
+                self._storage_base_input.value = self.config_service.get(
+                    "data_storage.storage_paths.base", str, "data"
+                )
+            if hasattr(self, "_flush_interval_input") and self._flush_interval_input is not None:
+                self._flush_interval_input.value = self.config_service.get(
+                    "data_storage.flush_interval", int, 10
+                )
+            if hasattr(self, "_max_notifications_input") and self._max_notifications_input is not None:
+                self._max_notifications_input.value = self.config_service.get(
+                    "ui.notification_center.max_notifications", int, 500
                 )
         except (OSError, ConfigurationError) as e:
             ui.notify(f"Error resetting configuration: {e}", type="negative")
