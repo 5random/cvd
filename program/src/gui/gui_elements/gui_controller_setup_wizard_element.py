@@ -736,17 +736,6 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
                     "outlined"
                 )
 
-            if controller_type == "motion_detection":
-                ui.button("Select ROI", on_click=self._show_roi_selector).props(
-                    "outlined"
-                )
-
-
-            if controller_type == "motion_detection":
-                ui.button("Select ROI", on_click=self._show_roi_selector).props(
-                    "outlined"
-                )
-
     def _update_state_message(self, index: int, value: str) -> None:
         """Update a specific state message."""
         if 0 <= index < len(self._wizard_data["state_output"]):
