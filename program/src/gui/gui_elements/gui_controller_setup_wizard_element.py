@@ -143,8 +143,8 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
         self._controller_types: Dict[str, Dict[str, Any]] = {
             t: {
                 "name": t.replace("_", " ").title(),
-                "description": "",  # könnt Ihr z.B. aus localization ziehen
-                "requires_sensors": False,  # nach Bedarf aus Schema oder Konvention ableiten
+                "description": "",
+                "requires_sensors": False,
                 "requires_webcam": False,
                 "algorithms": [],  # ggf. aus einem extra Algorithmus-Schema
                 "default_state_output": [],  # ebenso
@@ -246,13 +246,11 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
             self._wizard_data["algorithms"] = config["algorithms"].copy()
             self._wizard_data["state_output"] = config["default_state_output"].copy()
 
-
             # Set default parameters from template
             template = config.get("parameters", {})
             self._wizard_data["parameters"] = {
                 name: param_cfg["default"] for name, param_cfg in template.items()
             }
-
 
     def _render_stepper(self) -> None:
         """Render the 4-step wizard stepper."""
@@ -504,19 +502,24 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
                 ui.label("Webcam:").classes("w-32 font-semibold")
                 webcam_options = self._get_available_webcams()
 
-                self._step2_elements['webcam_select'] = ui.select(
-                    webcam_options,
-                    value=self._wizard_data['selected_webcam'],
-                    on_change=self._on_webcam_change
-                ).bind_value_to(self._wizard_data, 'selected_webcam').props("outlined").classes("flex-1")
-                ui.button("Test Webcam", on_click=self._test_webcam).props("color=secondary")
+                self._step2_elements["webcam_select"] = (
+                    ui.select(
+                        webcam_options,
+                        value=self._wizard_data["selected_webcam"],
+                        on_change=self._on_webcam_change,
+                    )
+                    .bind_value_to(self._wizard_data, "selected_webcam")
+                    .props("outlined")
+                    .classes("flex-1")
+                )
+                ui.button("Test Webcam", on_click=self._test_webcam).props(
+                    "color=secondary"
+                )
 
             # Preview image container
             with ui.row().classes("items-center"):
-                self._step2_elements['webcam_preview'] = (
-                    ui.image()
-                    .classes("w-64 h-48 border")
-                    .props('alt="Webcam preview"')
+                self._step2_elements["webcam_preview"] = (
+                    ui.image().classes("w-64 h-48 border").props('alt="Webcam preview"')
                 )
 
                 self._step2_elements["webcam_select"] = (
@@ -529,8 +532,11 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
                     .props("outlined")
                     .classes("flex-1")
                 )
+                ui.button("Test Webcam", on_click=self._test_webcam).props(
+                    "color=secondary"
+                )
 
-
+                
             # Webcam configuration
             if self._wizard_data["selected_webcam"]:
                 ui.separator().classes("my-4")
@@ -631,40 +637,49 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
 
     def _on_webcam_change(self, e: events.ValueChangeEventArguments) -> None:
         """Handle webcam selection change."""
+        selected = e.value if e is not None else None
+        if isinstance(selected, str):
+            try:
+                index = int(selected.split()[1])
+                self._wizard_data.setdefault("webcam_config", {})[
+                    "device_index"
+                ] = index
+            except (IndexError, ValueError):
+                pass
         self._render_webcam_selection()
 
     def _test_webcam(self) -> None:
         """Open the selected webcam and capture a preview frame."""
-        config = self._wizard_data.get('webcam_config', {})
-        device_index = config.get('device_index', 0)
+        config = self._wizard_data.get("webcam_config", {})
+        device_index = config.get("device_index", 0)
 
         capture = cv2.VideoCapture(device_index)
-        if config.get('width'):
-            capture.set(cv2.CAP_PROP_FRAME_WIDTH, int(config['width']))
-        if config.get('height'):
-            capture.set(cv2.CAP_PROP_FRAME_HEIGHT, int(config['height']))
-        if config.get('fps'):
-            capture.set(cv2.CAP_PROP_FPS, int(config['fps']))
+        if config.get("width"):
+            capture.set(cv2.CAP_PROP_FRAME_WIDTH, int(config["width"]))
+        if config.get("height"):
+            capture.set(cv2.CAP_PROP_FRAME_HEIGHT, int(config["height"]))
+        if config.get("fps"):
+            capture.set(cv2.CAP_PROP_FPS, int(config["fps"]))
 
         if not capture.isOpened():
-            ui.notify('Failed to open webcam', color='negative')
+            ui.notify("Failed to open webcam", color="negative")
             return
 
         ret, frame = capture.read()
         capture.release()
 
         if not ret or frame is None:
-            ui.notify('Failed to capture frame', color='negative')
+            ui.notify("Failed to capture frame", color="negative")
             return
 
         try:
             image = Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
-            preview = self._step2_elements.get('webcam_preview')
+            preview = self._step2_elements.get("webcam_preview")
             if preview:
                 preview.set_source(image)
-            ui.notify('Webcam capture successful', color='positive')
+            ui.notify("Webcam capture successful", color="positive")
         except Exception as exc:
-            ui.notify(f'Webcam preview failed: {exc}', color='negative')
+            ui.notify(f"Webcam preview failed: {exc}", color="negative")
 
     def _render_controller_parameters(self) -> None:
         """Render controller-specific parameters."""
@@ -676,7 +691,6 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
             return
 
         parameters = self._controller_types[controller_type]["parameters"]
-
         with container:
             for param_name, param_config in parameters.items():
                 with ui.row().classes("items-center gap-4"):
@@ -691,11 +705,7 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
                             max=param_config.get("max"),
                         ).bind_value_to(
                             self._wizard_data["parameters"], param_name
-                        ).props(
-                            "outlined"
-                        ).classes(
-                            "flex-1"
-                        )
+                        ).props("outlined").classes("flex-1")
                     elif param_config["type"] == "float":
                         ui.number(
                             value=self._wizard_data["parameters"].get(
@@ -711,6 +721,7 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
                         ).classes(
                             "flex-1"
                         )
+
                     elif param_config["type"] == "str":
                         ui.input(
                             value=self._wizard_data["parameters"].get(
@@ -718,17 +729,18 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
                             )
                         ).bind_value_to(
                             self._wizard_data["parameters"], param_name
-                        ).props(
-                            "outlined"
-                        ).classes(
-                            "flex-1"
-                        )
+                        ).props("outlined").classes("flex-1")
 
             if controller_type == "motion_detection":
                 ui.button("Select ROI", on_click=self._show_roi_selector).props(
                     "outlined"
                 )
 
+
+            if controller_type == "motion_detection":
+                ui.button("Select ROI", on_click=self._show_roi_selector).props(
+                    "outlined"
+                )
 
     def _update_state_message(self, index: int, value: str) -> None:
         """Update a specific state message."""
@@ -778,7 +790,6 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
                 ui.label("Drag on the image to select the ROI")
                 ui.button("Cancel", on_click=dialog.close)
         dialog.open()
-
 
     def _render_state_output_config(self) -> None:
         """Render state output message configuration."""
