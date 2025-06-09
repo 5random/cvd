@@ -151,6 +151,7 @@ class WebApplication:
 
         @ui.page("/video_feed")
         async def video_feed(request: Request):
+
             """Stream MJPEG frames from the dashboard camera"""
             # retrieve specific dashboard camera stream or fallback to first CameraStreamComponent
             camera = self.component_registry.get_component('dashboard_camera_stream')
@@ -277,7 +278,13 @@ class WebApplication:
         """Create dashboard tab content"""
         with ui.row().classes("w-full h-full gap-4"):
             # Left column - sensor dashboard
-            # render dashboard component and collect sensors for live plot
+
+            dashboard_sensors = [
+                sid
+                for sid, cfg in self.config_service.get_sensor_configs()
+                if cfg.get("show_on_dashboard")
+            ]
+
             with ui.column().classes('w-1/2'):
                 dashboard = DashboardComponent(
                     self.config_service,
