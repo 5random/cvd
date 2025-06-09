@@ -307,3 +307,34 @@ async def test_algorithm_unexpected_key_warns(tmp_path, caplog):
     caplog.set_level(logging.WARNING)
     service._validate_algorithm_config(cfg)
     assert any("Unknown field" in r.message for r in caplog.records)
+
+
+@pytest.mark.asyncio
+async def test_motion_detection_algorithm_enum(tmp_path):
+    config_path = tmp_path / "config.json"
+    default_path = tmp_path / "default.json"
+    config_path.write_text("{}")
+    default_path.write_text("{}")
+
+    service = ConfigurationService(config_path, default_path)
+
+    invalid_cfg = {
+        "controller_id": "con1",
+        "name": "c1",
+        "type": "motion_detection",
+        "enabled": True,
+        "parameters": {"algorithm": "INVALID"},
+    }
+
+    with pytest.raises(ValidationError):
+        service._validate_controller_config(invalid_cfg)
+
+    valid_cfg = {
+        "controller_id": "con1",
+        "name": "c1",
+        "type": "motion_detection",
+        "enabled": True,
+        "parameters": {"algorithm": "MOG2"},
+    }
+
+    service._validate_controller_config(valid_cfg)

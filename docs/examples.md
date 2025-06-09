@@ -91,3 +91,11 @@ On step 2 you can click **Test Connection** to verify the settings
 before creating the sensor. The wizard temporarily creates the device,
 reads once and then cleans up, displaying the result as a notification.
 
+## Controller Configuration Options
+
+Controller settings use predefined option lists for certain values. For example
+the motion detection controller only accepts ``"MOG2"`` or ``"KNN"`` as the
+background subtraction algorithm. The :class:`ConfigurationService` exposes
+helpers such as ``get_controller_type_options()`` and ``get_webcam_ids()`` which
+GUI components use to populate dropdown menus.
+

@@ -33,3 +33,14 @@ def test_update_controller_parameters_dict(tmp_path):
     params = svc.get_controller_parameters("con1")
     assert params == {"x": "y", "z": 1}
 
+
+def test_helper_option_lists(tmp_path):
+    cfg = {
+        "webcams": [{"cam1": {"name": "w1", "device_index": 0}}],
+        "controllers": [],
+    }
+    svc = create_service(tmp_path, cfg)
+
+    assert svc.get_webcam_ids() == ["cam1"]
+    assert "motion_detection" in svc.get_controller_type_options()
+
