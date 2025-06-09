@@ -165,20 +165,26 @@ class WebApplication:
             """System status page"""
             return self._create_status_page()
 
-        @ui.page("/video_feed")
-        async def video_feed(request: Request):
-            """Stream MJPEG frames from the dashboard camera"""
-            # retrieve specific dashboard camera stream or fallback to first CameraStreamComponent
-            camera = self.component_registry.get_component("dashboard_camera_stream")
-            if camera is None:
-                # fallback to first registered camera stream
-                for comp in self.component_registry.get_all_components():
-                    cid = getattr(comp, "component_id", "")
-                    if str(cid).startswith("dashboard_camera_stream_"):
+        async def _video_feed(request: Request, cid: Optional[str] = None):
+            """Stream MJPEG frames from the specified dashboard camera"""
+            camera = None
+            if cid:
+                camera = self.component_registry.get_component(
+                    f"dashboard_camera_stream_{cid}"
+                )
+                if camera is None:
+                    camera = self.component_registry.get_component(cid)
 
+            if camera is None:
+                camera = self.component_registry.get_component("dashboard_camera_stream")
+
+            if camera is None:
+                for comp in self.component_registry.get_all_components():
+                    comp_id = getattr(comp, "component_id", "")
+                    if str(comp_id).startswith("dashboard_camera_stream_"):
                         camera = comp
                         break
-            # if still no camera available, return error to client
+
             if camera is None:
                 raise HTTPException(status_code=503, detail="Camera stream unavailable")
 
@@ -211,6 +217,14 @@ class WebApplication:
             return StreamingResponse(
                 gen(), media_type="multipart/x-mixed-replace; boundary=frame"
             )
+
+        @ui.page("/video_feed")
+        async def video_feed(request: Request):
+            return await _video_feed(request=request, cid=None)
+
+        @ui.page("/video_feed/{cid}")
+        async def video_feed_param(request: Request, cid: str):
+            return await _video_feed(request=request, cid=cid)
 
     def _setup_layout(self) -> None:
         """Setup common layout elements"""

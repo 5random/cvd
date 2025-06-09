@@ -40,6 +40,13 @@ You may also set the ``CVD_CONFIG_DIR`` environment variable instead of passing
 
 Use the fullscreen button in the header to toggle between windowed and fullscreen mode.
 
+### Camera stream endpoints
+
+Each camera stream component exposes its frames via an HTTP endpoint.  The
+default stream remains available under ``/video_feed``.  Individual cameras can
+be accessed at ``/video_feed/{cid}`` where ``cid`` is the controller ID used on
+the dashboard.
+
 ### Dashboard visibility
 
 Sensors and controllers defined in the configuration will only appear on the
