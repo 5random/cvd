@@ -436,6 +436,7 @@ class DashboardComponent(BaseComponent):
                     component_id=f"dashboard_camera_stream_{cid}",
                     resolution=(width, height),
                     overlay_options=overlay,
+                    stream_path=f"/video_feed/{cid}",
                 )
 
                 with ui.card().classes("p-2 cvd-card mb-2"):
@@ -467,6 +468,7 @@ class DashboardComponent(BaseComponent):
                 max_width=480,
                 max_height=360,
                 component_id="dashboard_camera_stream",
+                stream_path="/video_feed",
             )
 
             # Render the camera stream
