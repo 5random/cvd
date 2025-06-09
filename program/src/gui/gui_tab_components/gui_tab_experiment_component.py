@@ -339,12 +339,12 @@ class ExperimentConfigDialog(CancelableDialogMixin):
         try:
             success = await self.experiment_manager.start_experiment(experiment_id)
             if success:
-                notify_later("Experiment started successfully", color="positive")
+                notify_later("Experiment started successfully", color="positive", slot=self._dialog)
             else:
-                notify_later("Failed to start experiment", color="negative")
+                notify_later("Failed to start experiment", color="negative", slot=self._dialog)
         except Exception as e:
             error(f"Error starting experiment: {e}")
-            notify_later(f"Error starting experiment: {str(e)}", color="negative")
+            notify_later(f"Error starting experiment: {str(e)}", color="negative", slot=self._dialog)
 
 
 class ExperimentCard(BaseComponent):
@@ -411,6 +411,7 @@ class ExperimentCard(BaseComponent):
             ):
                 with ui.card_section() as progress_section:
                     self._progress_section = progress_section
+
                     self._progress_bar = ui.linear_progress(
                         value=self.experiment_info.progress_percent / 100
                     ).classes("w-full mt-2")
@@ -533,6 +534,7 @@ class ExperimentCard(BaseComponent):
                 with self._container:
                     with ui.card_section() as progress_section:
                         self._progress_section = progress_section
+
                         self._progress_bar = ui.linear_progress(
                             value=self.experiment_info.progress_percent / 100
                         ).classes("w-full mt-2")

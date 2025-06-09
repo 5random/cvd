@@ -737,12 +737,12 @@ class SensorSetupWizardComponent(WizardMixin, BaseComponent):
             # Create sensor instance without registering
             sensor = self.sensor_manager.create_sensor(sensor_config)
             if not sensor:
-                notify_later("Failed to create sensor instance", color="negative")
+                notify_later("Failed to create sensor instance", color="negative", slot=self._dialog)
                 return
 
             if not await sensor.initialize():
                 await sensor.cleanup()
-                notify_later("Sensor initialization failed", color="negative")
+                notify_later("Sensor initialization failed", color="negative", slot=self._dialog)
                 return
 
             reading = await sensor.read()
@@ -750,14 +750,14 @@ class SensorSetupWizardComponent(WizardMixin, BaseComponent):
 
             if reading.status == SensorStatus.OK:
                 msg = f"Connection successful: {reading.value}"
-                notify_later(msg, color="positive")
+                notify_later(msg, color="positive", slot=self._dialog)
             else:
                 err = reading.error_message or reading.status.value
-                notify_later(f"Read failed: {err}", color="negative")
+                notify_later(f"Read failed: {err}", color="negative", slot=self._dialog)
 
         except Exception as e:
             error(f"Connection test error: {e}")
-            notify_later(f"Connection test failed: {e}", color="negative")
+            notify_later(f"Connection test failed: {e}", color="negative", slot=self._dialog)
 
     def _create_sensor(self) -> None:
         """Create the sensor with the configured settings."""
