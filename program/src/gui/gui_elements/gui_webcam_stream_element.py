@@ -81,7 +81,9 @@ class CameraStreamComponent(BaseComponent):
             self.show_motion_mask = bool(overlay_options.get("motion_mask", False))
             self.show_frame_diff = bool(overlay_options.get("frame_diff", False))
             try:
-                self.overlay_opacity = float(overlay_options.get("overlay_opacity", 0.3))
+                self.overlay_opacity = float(
+                    overlay_options.get("overlay_opacity", 0.3)
+                )
             except (TypeError, ValueError):
                 self.overlay_opacity = 0.3
 
@@ -428,7 +430,12 @@ class CameraStreamComponent(BaseComponent):
                     (int(w_m * scale), int(h_m * scale)),
                     interpolation=cv2.INTER_AREA,
                 )
-                if len(motion_mask_resized.shape) == 2:
+                channels = (
+                    1
+                    if len(motion_mask_resized.shape) == 2
+                    else motion_mask_resized.shape[2]
+                )
+                if channels == 1:
                     motion_mask_colored = cv2.applyColorMap(
                         motion_mask_resized, cv2.COLORMAP_HOT
                     )
@@ -436,6 +443,14 @@ class CameraStreamComponent(BaseComponent):
                         overlay_frame,
                         1 - self.overlay_opacity,
                         motion_mask_colored,
+                        self.overlay_opacity,
+                        0,
+                    )
+                else:
+                    overlay_frame = cv2.addWeighted(
+                        overlay_frame,
+                        1 - self.overlay_opacity,
+                        motion_mask_resized,
                         self.overlay_opacity,
                         0,
                     )
