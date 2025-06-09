@@ -21,15 +21,18 @@ Features:
 """
 
 import time
+import asyncio
 import json
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Any, Callable
-
+from dataclasses import dataclass, field
+from enum import Enum
 from pathlib import Path
 
 from nicegui import ui
 from src.gui.gui_tab_components.gui_tab_base_component import (
     TimedComponent,
+    BaseComponent,
     ComponentConfig,
 )
 from src.utils.log_utils.log_service import get_log_service, LogService
