@@ -16910,3 +16910,30 @@ src.utils.config_utils.config_service.ConfigurationError: Failed to load configu
 2025-06-09 14:07:37 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error rendering camera stream: Invalid value: 480x360
 2025-06-09 14:07:37 - cvd_tracker.error - WARNING - log_service.py:602 - warning - No experiment manager available - creating new instance
 2025-06-09 14:07:40 - cvd_tracker.error - ERROR - gui_notification_center_element.py:502 - add_notification - NOTIFICATION: System Error - ERROR - log_service.py:607 - error - Error rendering camera stream: Invalid value: 480x360
+2025-06-09 19:36:36 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Camera capture missing, attempting reinitialization
+2025-06-09 19:36:37 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error rendering camera stream: Invalid value: 480x360
+2025-06-09 19:36:37 - cvd_tracker.error - WARNING - log_service.py:602 - warning - No experiment manager available - creating new instance
+2025-06-09 19:36:41 - cvd_tracker.error - ERROR - gui_notification_center_element.py:502 - add_notification - NOTIFICATION: System Error - ERROR - log_service.py:607 - error - Error rendering camera stream: Invalid value: 480x360
+2025-06-09 19:38:53 - cvd_tracker.error - WARNING - log_service.py:602 - warning - signal
+2025-06-09 20:01:55 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Camera capture missing, attempting reinitialization
+2025-06-09 20:01:56 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error rendering camera stream: Invalid value: 480x360
+2025-06-09 20:01:56 - cvd_tracker.error - WARNING - log_service.py:602 - warning - No experiment manager available - creating new instance
+2025-06-09 20:02:00 - cvd_tracker.error - ERROR - gui_notification_center_element.py:502 - add_notification - NOTIFICATION: System Error - ERROR - log_service.py:607 - error - Error rendering camera stream: Invalid value: 480x360
+2025-06-09 20:03:36 - cvd_tracker.error - ERROR - log_service.py:607 - error - Connection test error: The current slot cannot be determined because the slot stack for this task is empty.
+This may happen if you try to create UI from a background task.
+To fix this, enter the target slot explicitly using `with container_element:`.
+2025-06-09 20:03:39 - cvd_tracker.error - ERROR - gui_notification_center_element.py:502 - add_notification - NOTIFICATION: System Error - ERROR - log_service.py:607 - error - Connection test error: The current slot cannot be determined because the slot stack for this task is empty.
+2025-06-09 20:03:41 - cvd_tracker.error - ERROR - log_service.py:607 - error - Connection test error: The current slot cannot be determined because the slot stack for this task is empty.
+This may happen if you try to create UI from a background task.
+To fix this, enter the target slot explicitly using `with container_element:`.
+2025-06-09 20:03:45 - cvd_tracker.error - ERROR - log_service.py:607 - error - Connection test error: The current slot cannot be determined because the slot stack for this task is empty.
+This may happen if you try to create UI from a background task.
+To fix this, enter the target slot explicitly using `with container_element:`.
+2025-06-09 20:03:45 - cvd_tracker.error - ERROR - log_service.py:607 - error - Connection test error: The current slot cannot be determined because the slot stack for this task is empty.
+This may happen if you try to create UI from a background task.
+To fix this, enter the target slot explicitly using `with container_element:`.
+2025-06-09 20:04:38 - cvd_tracker.error - ERROR - log_service.py:607 - error - Sensor not found: sen002
+2025-06-09 20:04:40 - cvd_tracker.error - ERROR - gui_notification_center_element.py:502 - add_notification - NOTIFICATION: System Error - ERROR - log_service.py:607 - error - Sensor not found: sen002
+2025-06-09 20:04:41 - cvd_tracker.error - ERROR - log_service.py:607 - error - Sensor not found: sen002
+2025-06-09 20:04:41 - cvd_tracker.error - ERROR - log_service.py:607 - error - Sensor not found: sen002
+2025-06-09 20:04:41 - cvd_tracker.error - ERROR - log_service.py:607 - error - Sensor not found: sen002

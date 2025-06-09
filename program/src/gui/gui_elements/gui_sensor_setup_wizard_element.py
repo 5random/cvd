@@ -29,7 +29,7 @@ class SensorSetupWizardComponent(WizardMixin, BaseComponent):
         sensor_manager: SensorManager,
         on_close: Optional[Callable[[], None]] = None,
     ):
-        config = ComponentConfig(component_id="sensor_setup_wizard")
+        config = ComponentConfig("sensor_setup_wizard")
         super().__init__(config)
         self.config_service = config_service
         self.sensor_manager = sensor_manager

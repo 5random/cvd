@@ -17,7 +17,7 @@ Fixed issues:
 - Download functionality with proper file selection
 """
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 
 # Constants
 TIME_FORMAT = "%H:%M:%S"
@@ -305,8 +305,9 @@ class DataFilterPanel(BaseComponent):
                 return
 
         self.current_filters["date_range"] = (from_date, to_date)
-        if self._date_range_input:
-            self._date_range_input.value = self._format_date_range(from_date, to_date)
+        date_input = self._date_range_input
+        if date_input is not None:
+            date_input.value = self._format_date_range(from_date, to_date)
         self._emit_filter_change()
 
     def _clear_filters(self) -> None:

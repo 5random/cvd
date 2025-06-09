@@ -20,6 +20,26 @@
         "baudrate": 9600,
         "timeout": 2.0
       }
+    },
+    {
+      "sen002": {
+        "name": "Sensor 101",
+        "type": "temperature",
+        "source": "mock_arduino_tc_board",
+        "interface": "serial",
+        "enabled": true,
+        "show_on_dashboard": true,
+        "port": "COM3",
+        "channel": 0.0,
+        "poll_interval_ms": 1000,
+        "baudrate": 9600,
+        "timeout": 2.0,
+        "algorithm": [
+          "sen002_filter_1",
+          "sen002_filter_2",
+          "sen002_filter_3"
+        ]
+      }
     }
   ],
   "webcams": [
@@ -129,6 +149,47 @@
           "parameters": {
             "threshold_std": 2.0,
             "min_samples": 10
+          }
+        }
+      }
+    },
+    {
+      "sen002_filter_1": {
+        "name": "Range Validation for Sensor 101",
+        "type": "filtering",
+        "enabled": true,
+        "settings": {
+          "class": "RangeValidationFilter",
+          "parameters": {
+            "min_value": 0.0,
+            "max_value": 100.0
+          }
+        }
+      }
+    },
+    {
+      "sen002_filter_2": {
+        "name": "Outlier Detection for Sensor 101",
+        "type": "filtering",
+        "enabled": true,
+        "settings": {
+          "class": "OutlierDetectionFilter",
+          "parameters": {
+            "threshold_std": 3.0,
+            "min_samples": 10
+          }
+        }
+      }
+    },
+    {
+      "sen002_filter_3": {
+        "name": "Moving Average for Sensor 101",
+        "type": "filtering",
+        "enabled": true,
+        "settings": {
+          "class": "MovingAverageFilter",
+          "parameters": {
+            "window_size": 50.0
           }
         }
       }

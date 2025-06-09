@@ -10,12 +10,14 @@ class WizardMixin:
 
     def _close_dialog(self) -> None:
         """Close the wizard dialog if open."""
-        if getattr(self, "_dialog", None):
-            self._dialog.close()
+        dialog = self._dialog  # type: Optional[Any]
+        if dialog is not None:
+            dialog.close()
             self._dialog = None
 
-        if getattr(self, "on_close", None):
-            self.on_close()
+        callback = self.on_close  # type: Optional[Callable[[], None]]
+        if callback:
+            callback()
 
     def _update_element(self, data: Any) -> None:
         """Update element with new data (required by BaseComponent)."""

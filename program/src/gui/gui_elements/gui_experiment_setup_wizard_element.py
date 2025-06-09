@@ -33,7 +33,7 @@ class ExperimentSetupWizardComponent(WizardMixin, BaseComponent):
         controller_manager: Optional[ControllerManager] = None,
         on_close: Optional[Callable[[], None]] = None,
     ):
-        config = ComponentConfig(component_id="experiment_setup_wizard")
+        config = ComponentConfig("experiment_setup_wizard")
         super().__init__(config)
         self.config_service = config_service
         self.experiment_manager = experiment_manager or get_experiment_manager()

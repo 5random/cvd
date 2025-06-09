@@ -249,7 +249,7 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
             # Set default parameters from template
             template = config.get("parameters", {})
             self._wizard_data["parameters"] = {
-                name: param_cfg["default"] for name, param_cfg in template.items()
+                name: param_cfg.get("default") for name, param_cfg in template.items()
             }
 
     def _render_stepper(self) -> None:
