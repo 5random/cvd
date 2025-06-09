@@ -99,3 +99,7 @@ background subtraction algorithm. The :class:`ConfigurationService` exposes
 helpers such as ``get_controller_type_options()`` and ``get_webcam_ids()`` which
 GUI components use to populate dropdown menus.
 
+The motion detection controller also supports defining a region of interest
+within the camera frame. Provide ``roi_x`` and ``roi_y`` for the top-left corner
+along with ``roi_width`` and ``roi_height`` to restrict detection to that area.
+

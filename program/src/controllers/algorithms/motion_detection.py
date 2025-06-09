@@ -173,6 +173,12 @@ class MotionDetectionController(ImageController):
         self.multi_frame_window = params.get("multi_frame_window", 30)
         self.multi_frame_threshold = params.get("multi_frame_threshold", 0.3)
 
+        # Optional region of interest for motion analysis
+        self.roi_x = params.get("roi_x", 0)
+        self.roi_y = params.get("roi_y", 0)
+        self.roi_width = params.get("roi_width")
+        self.roi_height = params.get("roi_height")
+
         # Background subtractor
         self._bg_subtractor: Optional[cv2.BackgroundSubtractor] = None
         self._frame_count = 0
@@ -180,16 +186,11 @@ class MotionDetectionController(ImageController):
         self._frame_size: Optional[Tuple[int, int]] = None
 
         # Statistics
-        self._motion_history = []
+        self._motion_history: list[dict[str, Any]] = []
         self._max_history = params.get("max_history", 100)
 
         # Lock to protect shared state in async processing
         self._state_lock = asyncio.Lock()
-
-        # Camera capture state
-        self._stop_event = asyncio.Event()
-        self._capture: Optional[cv2.VideoCapture] = None
-        self._capture_task: Optional[asyncio.Task] = None
 
     async def initialize(self) -> bool:
         """Initialize the motion detection controller"""
@@ -238,6 +239,14 @@ class MotionDetectionController(ImageController):
                 return ControllerResult.error_result(
                     "Failed to convert image data to OpenCV format"
                 )
+
+            # Crop to region of interest if configured
+            if self.roi_width is not None and self.roi_height is not None:
+                x1 = max(0, int(self.roi_x))
+                y1 = max(0, int(self.roi_y))
+                x2 = min(frame.shape[1], x1 + int(self.roi_width))
+                y2 = min(frame.shape[0], y1 + int(self.roi_height))
+                frame = frame[y1:y2, x1:x2]
 
             # Store frame size for calculations
             if self._frame_size is None:
