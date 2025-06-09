@@ -37,7 +37,9 @@ def test_detects_dummy_camera(monkeypatch, tmp_path):
         def release(self):
             pass
 
-    dummy_cv2 = types.SimpleNamespace(VideoCapture=lambda idx: DummyCapture(idx))
+    dummy_cv2 = types.SimpleNamespace(
+        VideoCapture=lambda idx, backend=None: DummyCapture(idx)
+    )
     monkeypatch.setitem(sys.modules, "cv2", dummy_cv2)
 
     monkeypatch.setattr(

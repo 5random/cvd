@@ -68,6 +68,13 @@ Webcam properties under ``uvc_settings`` follow OpenCV naming. The property
 ``"backlight_compensation"`` can also be provided as ``"backlight_comp"`` and
 will be interpreted the same way.
 
+### Video capture backend
+
+You may explicitly select the OpenCV backend used for capturing frames by
+providing ``"capture_backend"`` in a webcam or controller configuration. Common
+values include ``cv2.CAP_DSHOW`` and ``cv2.CAP_MSMF`` on Windows. If omitted,
+OpenCV will choose the default backend for the platform.
+
 
 ## Running tests
 

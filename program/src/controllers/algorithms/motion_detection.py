@@ -141,6 +141,7 @@ class MotionDetectionController(ImageController):
         self.width = params.get("width")
         self.height = params.get("height")
         self.fps = params.get("fps")
+        self.capture_backend = params.get("capture_backend")
         self.rotation = params.get("rotation", 0)
         self.uvc_settings = {}
         self.uvc_settings.update(params.get("uvc", {}))
@@ -157,6 +158,9 @@ class MotionDetectionController(ImageController):
                         self.width, self.height = res
                     self.fps = cam_cfg.get("fps", self.fps)
                     self.rotation = cam_cfg.get("rotation", self.rotation)
+                    self.capture_backend = cam_cfg.get(
+                        "capture_backend", self.capture_backend
+                    )
                     self.uvc_settings.update(cam_cfg.get("uvc", {}))
                     self.uvc_settings.update(cam_cfg.get("uvc_settings", {}))
         self.algorithm = params.get("algorithm", "MOG2")  # MOG2, KNN, or GMG
@@ -191,7 +195,6 @@ class MotionDetectionController(ImageController):
         self.roi_y = params.get("roi_y", 0)
         self.roi_width = params.get("roi_width")
         self.roi_height = params.get("roi_height")
-
 
         # Background subtractor
         self._bg_subtractor: Optional[cv2.BackgroundSubtractor] = None
@@ -326,7 +329,9 @@ class MotionDetectionController(ImageController):
                     elif self.multi_frame_method == "probability":
                         recent = self._motion_history[-self.multi_frame_window :]
                         if recent:
-                            probability = float(np.mean([h["confidence"] for h in recent]))
+                            probability = float(
+                                np.mean([h["confidence"] for h in recent])
+                            )
                         else:
                             probability = 0.0
 
@@ -565,9 +570,16 @@ class MotionDetectionController(ImageController):
                         device_index=self.device_index,
                     )
                     try:
-                        self._capture = await run_camera_io(
-                            cv2.VideoCapture, self.device_index
-                        )
+                        if self.capture_backend is not None:
+                            self._capture = await run_camera_io(
+                                cv2.VideoCapture,
+                                self.device_index,
+                                self.capture_backend,
+                            )
+                        else:
+                            self._capture = await run_camera_io(
+                                cv2.VideoCapture, self.device_index
+                            )
                         if self._capture and self._capture.isOpened():
                             if self.width:
                                 await run_camera_io(
