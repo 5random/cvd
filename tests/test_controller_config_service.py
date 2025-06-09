@@ -13,7 +13,14 @@ def create_service(tmp_path, cfg):
 def test_update_controller_parameters_list(tmp_path):
     cfg = {
         "controllers": [
-            {"con1": {"name": "c", "type": "motion_detection", "parameters": {"a": 1}, "enabled": True}}
+            {
+                "con1": {
+                    "name": "c",
+                    "type": "motion_detection",
+                    "parameters": {"a": 1},
+                    "enabled": True,
+                }
+            }
         ]
     }
     svc = create_service(tmp_path, cfg)
@@ -25,7 +32,12 @@ def test_update_controller_parameters_list(tmp_path):
 def test_update_controller_parameters_dict(tmp_path):
     cfg = {
         "controllers": {
-            "con1": {"name": "c", "type": "motion_detection", "parameters": {"x": "y"}, "enabled": True}
+            "con1": {
+                "name": "c",
+                "type": "motion_detection",
+                "parameters": {"x": "y"},
+                "enabled": True,
+            }
         }
     }
     svc = create_service(tmp_path, cfg)
@@ -44,3 +56,22 @@ def test_helper_option_lists(tmp_path):
     assert svc.get_webcam_ids() == ["cam1"]
     assert "motion_detection" in svc.get_controller_type_options()
 
+
+def test_wizard_parameter_defaults(tmp_path):
+    """Parameters are prefilled from templates for each controller type."""
+    from src.gui.gui_elements.gui_controller_setup_wizard_element import (
+        ControllerSetupWizardComponent,
+        _PARAM_TEMPLATES,
+    )
+
+    class Dummy:
+        pass
+
+    svc = create_service(tmp_path, {"controllers": []})
+    wizard = ControllerSetupWizardComponent(svc, Dummy(), Dummy())
+
+    for ctype, template in _PARAM_TEMPLATES.items():
+        wizard._wizard_data["type"] = ctype
+        wizard._update_controller_defaults()
+        expected = {k: v["default"] for k, v in template.items()}
+        assert wizard._wizard_data["parameters"] == expected
