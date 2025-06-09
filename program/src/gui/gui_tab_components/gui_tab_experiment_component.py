@@ -1538,7 +1538,7 @@ class ExperimentComponent(BaseComponent):
             experiment_manager=cast(ExperimentManager, self.experiment_manager),
             sensor_manager=self.sensor_manager,
             controller_manager=self.controller_manager,
-            on_close=None,
+            on_close=self._on_experiment_created,
         )
         experiment_wizard.show_dialog()
 
