@@ -1,24 +1,53 @@
 """UI helper mixin for the NotificationCenter."""
 from datetime import datetime, timedelta
-from typing import List
+from typing import List, Any
 
 from nicegui import ui
 
-from src.gui.notifications.models import Notification, NotificationSeverity, NotificationSource
+from src.gui.gui_elements.notifications.models import Notification, NotificationSeverity, NotificationSource
 
 class NotificationUIMixin:
     """Mixin providing UI rendering helpers for NotificationCenter."""
 
-    notifications: List[Notification]
-    _notification_list: None
-    _badge_counter: None
-    _dialog: None
-    _menu: None
-    _notification_list_container: None
+    # Stub methods implemented by NotificationCenter
+    def get_unread_count(self) -> int:
+        """Return count of unread notifications."""
+        return 0
+
+    def mark_all_as_read(self) -> None:
+        """Mark all notifications as read."""
+        pass
+
+    def mark_as_read(self, notification_id: str) -> None:
+        """Mark a single notification as read."""
+        pass
+
+    def delete_notification(self, notification_id: str) -> None:
+        """Delete a notification."""
+        pass
+
+    def clear_notifications(self) -> None:
+        """Clear all notifications."""
+        pass
+
+    # Ensure UI element attributes allow assignment (use Any to avoid override type conflicts)
+    notifications: Any
+    _notification_list: Any
+    _badge_counter: Any
+    _dialog: Any
+    _menu: Any
+    _notification_list_container: Any
     _severity_filter: str
     _source_filter: str
 
     def create_notification_button(self) -> ui.button:
+        # initialize filter and notification attributes if missing
+        if not hasattr(self, '_severity_filter'):
+            self._severity_filter = 'all'
+        if not hasattr(self, '_source_filter'):
+            self._source_filter = 'all'
+        if not hasattr(self, 'notifications'):
+            self.notifications = []
         with ui.row().classes('relative'):
             button = ui.button(icon='notifications', color='5898d4').props('flat round').classes('relative')
             unread_count = self.get_unread_count()

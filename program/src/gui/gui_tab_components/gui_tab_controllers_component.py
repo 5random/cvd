@@ -676,18 +676,10 @@ class ControllersComponent(BaseComponent):
                 ui.label("Controllers").classes("text-2xl font-bold")
 
                 with ui.row().classes("gap-2"):
-                    ui.button("Add Controller", icon="add", color="primary").on(
-                        "click", self._show_add_dialog
-                    )
-                    ui.button("Start All", icon="play_arrow", color="green").on(
-                        "click", self._start_all_controllers
-                    )
-                    ui.button("Stop All", icon="stop", color="red").on(
-                        "click", self._stop_all_controllers
-                    )
-                    ui.button("Refresh", icon="refresh", color="blue").on(
-                        "click", self._refresh_controllers
-                    )
+                    ui.button("Add Controller", icon="add", color="primary").on("click", self._show_add_dialog)
+                    ui.button("Start All", icon="play_arrow", color="green").on("click", self._start_all_controllers)
+                    ui.button("Stop All", icon="stop", color="red").on("click", self._stop_all_controllers)
+                    ui.button("Refresh", icon="refresh", color="blue").on("click", self._refresh_controllers)
 
             # System overview
             self._render_system_overview()

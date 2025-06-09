@@ -69,9 +69,9 @@
       "file_path": "data\\raw\\sen001.csv",
       "category": "raw",
       "status": "active",
-      "size_bytes": 463181,
+      "size_bytes": 473119,
       "created_at": "2025-06-08T11:25:17.246171",
-      "modified_at": "2025-06-08T18:06:39.609572",
+      "modified_at": "2025-06-09T10:27:26.559405",
       "sensor_id": "sen001",
       "experiment_id": null,
       "compressed_path": null,
@@ -95,9 +95,9 @@
       "file_path": "data\\processed\\sen001.csv",
       "category": "processed",
       "status": "active",
-      "size_bytes": 462153,
+      "size_bytes": 472086,
       "created_at": "2025-06-08T11:25:17.249018",
-      "modified_at": "2025-06-08T18:06:39.610573",
+      "modified_at": "2025-06-09T10:27:26.559405",
       "sensor_id": "sen001",
       "experiment_id": null,
       "compressed_path": null,
@@ -131,10 +131,10 @@
       "tags": null
     }
   },
-  "last_updated": "2025-06-08T18:06:40.520659",
+  "last_updated": "2025-06-09T10:27:28.431245",
   "dir_mtimes": {
-    "D:\\Willem\\KV_GitHub\\cvd\\data\\raw": 1749398799.651385,
-    "D:\\Willem\\KV_GitHub\\cvd\\data\\processed": 1749398799.651385,
+    "D:\\Willem\\KV_GitHub\\cvd\\data\\raw": 1749457645.6564229,
+    "D:\\Willem\\KV_GitHub\\cvd\\data\\processed": 1749457645.6564229,
     "D:\\Willem\\KV_GitHub\\cvd\\data\\experiments": 1749398763.1163392,
     "D:\\Willem\\KV_GitHub\\cvd\\data\\logs": 1749274513.3396335
   },

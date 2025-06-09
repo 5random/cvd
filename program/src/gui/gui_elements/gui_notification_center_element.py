@@ -21,17 +21,16 @@ Features:
 """
 
 import time
+import asyncio
 import json
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Any, Callable
-from enum import Enum
-from dataclasses import dataclass, field
-
+from src.gui.gui_elements.notifications.models import Notification, NotificationSeverity, NotificationSource
 from pathlib import Path
-
 from nicegui import ui
 from src.gui.gui_tab_components.gui_tab_base_component import (
     TimedComponent,
+    BaseComponent,
     ComponentConfig,
 )
 from src.utils.log_utils.log_service import get_log_service, LogService
@@ -41,52 +40,10 @@ from src.data_handler.sources.sensor_source_manager import SensorManager
 from src.controllers.controller_manager import ControllerManager
 from src.controllers.controller_base import ControllerStatus
 from src.utils.alert_system_utils.email_alert_service import get_email_alert_service
-
-class NotificationSeverity(Enum):
-    """Severity levels for notifications"""
-
-    INFO = "info"
-    WARNING = "warning"
-    ERROR = "error"
-    SUCCESS = "success"
-
-
-class NotificationSource(Enum):
-    """Sources of notifications"""
-
-    EXPERIMENT = "experiment"
-    SENSOR = "sensor"
-    CONTROLLER = "controller"
-    SYSTEM = "system"
-    CONFIG = "config"
-    DATA_PROCESSING = "data_processing"
-    AUDIT = "audit"
-
-
-@dataclass
-class Notification:
-    """Individual notification entry"""
-
-    id: str
-    title: str
-    message: str
-    severity: NotificationSeverity
-    source: NotificationSource
-    timestamp: datetime
-    read: bool = False
-    metadata: Dict[str, Any] = field(default_factory=dict)
-    action_label: Optional[str] = None
-    action_callback: Optional[Callable] = None
-
-
-from src.gui.notifications import (
-    Notification,
-    NotificationSeverity,
-    NotificationSource,
+from src.gui.gui_elements.notifications import (
     NotificationMonitoringMixin,
     NotificationUIMixin,
 )
-
 
 
 class NotificationCenter(NotificationMonitoringMixin, NotificationUIMixin, TimedComponent):
