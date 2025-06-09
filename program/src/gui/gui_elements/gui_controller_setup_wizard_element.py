@@ -231,6 +231,7 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
                 "width": 640,
                 "height": 480,
                 "fps": 30,
+                "rotation": 0,
                 "brightness": 128,
                 "contrast": 32,
                 "saturation": 64,
@@ -576,6 +577,19 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
                             max=60,
                         ).bind_value_to(
                             self._wizard_data["webcam_config"], "fps"
+                        ).classes(
+                            "w-24"
+                        )
+
+                    with ui.row().classes("items-center gap-4"):
+                        ui.label("Rotation:").classes("w-24")
+                        ui.number(
+                            value=self._wizard_data["webcam_config"].get("rotation", 0),
+                            min=0,
+                            max=270,
+                            step=90,
+                        ).bind_value_to(
+                            self._wizard_data["webcam_config"], "rotation"
                         ).classes(
                             "w-24"
                         )
@@ -975,7 +989,7 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
                         self._wizard_data["webcam_config"]["height"],
                     ],
                     "fps": self._wizard_data["webcam_config"]["fps"],
-                    "rotation": 0,
+                    "rotation": self._wizard_data["webcam_config"].get("rotation", 0),
                     "uvc_settings": {
                         "brightness": self._wizard_data["webcam_config"]["brightness"],
                         "contrast": self._wizard_data["webcam_config"]["contrast"],
