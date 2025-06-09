@@ -711,11 +711,6 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
                             "flex-1"
                         )
 
-            if controller_type == "motion_detection":
-                ui.button("Select ROI", on_click=self._show_roi_selector).props(
-                    "outlined"
-                )
-
                     elif param_config["type"] == "str":
                         ui.input(
                             value=self._wizard_data["parameters"].get(
@@ -728,6 +723,11 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
                         ).classes(
                             "flex-1"
                         )
+
+            if controller_type == "motion_detection":
+                ui.button("Select ROI", on_click=self._show_roi_selector).props(
+                    "outlined"
+                )
 
 
     def _update_state_message(self, index: int, value: str) -> None:
