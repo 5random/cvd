@@ -409,8 +409,9 @@ class ExperimentCard(BaseComponent):
                 self.experiment_info.state == ExperimentState.RUNNING
                 and self.experiment_info.progress_percent > 0
             ):
-                with ui.card_section() as section:
-                    self._progress_section = section
+                with ui.card_section() as progress_section:
+                    self._progress_section = progress_section
+
                     self._progress_bar = ui.linear_progress(
                         value=self.experiment_info.progress_percent / 100
                     ).classes("w-full mt-2")
@@ -447,6 +448,7 @@ class ExperimentCard(BaseComponent):
                                 "text-sm font-mono text-red-600"
                             )
 
+            with ui.card_section():
                 # Action buttons
                 with ui.row().classes("gap-2 justify-end w-full mt-4") as action_row:
                     self._action_row = action_row
@@ -530,8 +532,9 @@ class ExperimentCard(BaseComponent):
         if show_progress:
             if not self._progress_section:
                 with self._container:
-                    with ui.card_section() as section:
-                        self._progress_section = section
+                    with ui.card_section() as progress_section:
+                        self._progress_section = progress_section
+
                         self._progress_bar = ui.linear_progress(
                             value=self.experiment_info.progress_percent / 100
                         ).classes("w-full mt-2")
