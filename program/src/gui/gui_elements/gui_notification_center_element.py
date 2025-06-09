@@ -25,11 +25,8 @@ import asyncio
 import json
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Any, Callable
-from dataclasses import dataclass, field
-from enum import Enum
 from src.gui.gui_elements.notifications.models import Notification, NotificationSeverity, NotificationSource
 from pathlib import Path
-
 from nicegui import ui
 from src.gui.gui_tab_components.gui_tab_base_component import (
     TimedComponent,

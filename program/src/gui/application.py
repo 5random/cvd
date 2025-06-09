@@ -156,8 +156,11 @@ class WebApplication:
             # retrieve specific dashboard camera stream or fallback to first CameraStreamComponent
             camera = self.component_registry.get_component('dashboard_camera_stream')
             if camera is None:
+                # fallback to first registered camera stream
                 for comp in self.component_registry.get_all_components():
-                    if isinstance(comp, CameraStreamComponent):
+                    cid = getattr(comp, "component_id", "")
+                    if str(cid).startswith('dashboard_camera_stream_'):
+
                         camera = comp
                         break
             # if still no camera available, return error to client
