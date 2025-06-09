@@ -114,6 +114,7 @@ class ComponentRegistry:
         if component_id in self._components:
             component = self._components[component_id]
             component.cleanup()
+            del self._components[component_id]
             info(f"Unregistered component: {component_id}")
             return True
         return False
