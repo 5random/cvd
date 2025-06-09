@@ -665,9 +665,14 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
             except (IndexError, ValueError):
                 pass
         self._render_webcam_selection()
+        self._test_webcam()
 
     def _test_webcam(self) -> None:
         """Open the selected webcam and capture a preview frame."""
+        preview = self._step2_elements.get("webcam_preview")
+        if not preview:
+            return
+
         config = self._wizard_data.get("webcam_config", {})
         device_index = config.get("device_index", 0)
 
@@ -693,9 +698,7 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
 
         try:
             image = Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
-            preview = self._step2_elements.get("webcam_preview")
-            if preview:
-                preview.set_source(image)
+            preview.set_source(image)
             ui.notify("Webcam capture successful", color="positive")
         except Exception as exc:
             ui.notify(f"Webcam preview failed: {exc}", color="negative")

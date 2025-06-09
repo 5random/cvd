@@ -176,3 +176,29 @@ def test_test_webcam_uses_device_index(monkeypatch, tmp_path, dummy_ui):
     wizard._test_webcam()
 
     assert used_index["value"] == 3
+
+
+def test_on_webcam_change_triggers_preview(monkeypatch, tmp_path):
+    service = create_service(tmp_path)
+    monkeypatch.setattr(
+        ControllerSetupWizardComponent,
+        "_update_controller_defaults",
+        lambda self: None,
+    )
+    wizard = ControllerSetupWizardComponent(
+        service, DummyControllerManager(), DummySensorManager()
+    )
+
+    # stub render method to create preview element
+    monkeypatch.setattr(
+        wizard,
+        "_render_webcam_selection",
+        lambda: wizard._step2_elements.update({"webcam_preview": DummyImage()}),
+    )
+
+    called = {}
+    monkeypatch.setattr(wizard, "_test_webcam", lambda: called.setdefault("ok", True))
+
+    wizard._on_webcam_change(types.SimpleNamespace(value="Camera 1 (USB)"))
+
+    assert called.get("ok")
