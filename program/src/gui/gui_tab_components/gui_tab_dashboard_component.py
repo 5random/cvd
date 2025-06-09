@@ -530,6 +530,42 @@ class DashboardComponent(BaseComponent):
         self._sensor_row.clear()
         self._render_sensor_cards()
 
+    def refresh_controllers(self) -> None:
+        """Reload dashboard controllers and re-render cards."""
+        self._dashboard_controllers = [
+            cid
+            for cid, cfg in self.config_service.get_controller_configs()
+            if cfg.get("show_on_dashboard")
+        ]
+
+        layout = self.config_service.get_dashboard_layout()
+        if isinstance(layout, dict):
+            controller_layout = layout.get("controllers", [])
+            if controller_layout:
+                ordered = [
+                    cid
+                    for cid in controller_layout
+                    if cid in self._dashboard_controllers
+                ]
+                ordered += [
+                    cid
+                    for cid in self._dashboard_controllers
+                    if cid not in ordered
+                ]
+                self._dashboard_controllers = ordered
+
+        if not self._controller_row:
+            return
+
+        for card in self._controller_cards.values():
+            try:
+                card.delete()
+            except Exception:
+                pass
+        self._controller_cards.clear()
+        self._controller_row.clear()
+        self._render_controller_cards()
+
     def _set_stream_resolution(self, stream: CameraStreamComponent, value: str) -> None:
         """Update resolution of a camera stream from dropdown selection."""
         try:
