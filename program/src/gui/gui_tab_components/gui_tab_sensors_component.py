@@ -696,13 +696,18 @@ class SensorsComponent(TimedComponent):
         from src.gui.gui_elements.gui_sensor_setup_wizard_element import (
             SensorSetupWizardComponent,
         )
-        
-        wizard = SensorSetupWizardComponent(
+
+        def _on_close() -> None:
+            """Handle wizard close event."""
+            self._setup_wizard = None
+            self._refresh_sensors()
+
+        self._setup_wizard = SensorSetupWizardComponent(
             self.config_service,
             self.sensor_manager,
-            on_close=self._refresh_sensors
+            on_close=_on_close,
         )
-        wizard.show_dialog()
+        self._setup_wizard.show_dialog()
             
     def _edit_sensor(self, sensor_info: SensorInfo) -> None:
         """Edit sensor configuration"""
