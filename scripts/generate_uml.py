@@ -1,10 +1,11 @@
 import ast
 import io
 import tokenize
+import os
+
 from pathlib import Path
 
 SRC_DIR = Path(__file__).resolve().parents[1] / 'program' / 'src'
-
 
 def extract_comments(source: str) -> dict[int, str]:
     """Return a mapping of line numbers to inline comment text."""
@@ -102,6 +103,7 @@ class ClassCollector(ast.NodeVisitor):
         }
 
         # continue walking to support nested classes
+
         self.generic_visit(node)
 
 def collect_classes():
@@ -113,9 +115,9 @@ def collect_classes():
         except Exception:
             continue
         collector.current_comments = extract_comments(source)
+
         collector.visit(tree)
     return collector.classes
-
 
 def generate_mermaid(classes: dict[str, dict]) -> str:
     lines = ["```mermaid", "classDiagram"]
