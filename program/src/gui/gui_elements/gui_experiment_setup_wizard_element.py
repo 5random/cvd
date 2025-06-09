@@ -411,12 +411,11 @@ class ExperimentSetupWizardComponent(WizardMixin, BaseComponent):
                     ui.label("Select a phase template or edit phases below:").classes("mb-2")
                     self._step3_elements['phase_template'] = ui.select(
                         list(self._phase_templates.keys()),
-                        with_input=False,
-                        placeholder="Choose template"
+                        with_input=False
                     ).props("outlined dense").classes("w-full")
                     self._step3_elements['phase_template'].on(
                         'update:model-value',
-                        lambda e: self._apply_phase_template(e.value)
+                        lambda e: self._apply_phase_template(e.args[0])
                     )
 
                     phases_json = json.dumps(self._wizard_data['phases'], indent=2)
@@ -425,7 +424,7 @@ class ExperimentSetupWizardComponent(WizardMixin, BaseComponent):
                     ).props("outlined rows=6 class=mt-4")
                     self._step3_elements['phases'].on(
                         'blur',
-                        lambda e: self._update_phase_data(e.sender.value)
+                        lambda e: self._update_phase_data(self._step3_elements['phases'].value)
                     )
 
     def _render_step4(self) -> None:

@@ -16834,3 +16834,79 @@ src.utils.config_utils.config_service.ConfigurationError: Failed to load configu
 2025-06-09 10:23:42 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
 2025-06-09 10:23:42 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
 2025-06-09 10:27:55 - cvd_tracker.error - WARNING - log_service.py:602 - warning - signal
+2025-06-09 11:08:21 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Camera capture missing, attempting reinitialization
+2025-06-09 11:08:22 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error rendering camera stream: Invalid value: 480x360
+2025-06-09 11:08:22 - cvd_tracker.error - WARNING - log_service.py:602 - warning - No experiment manager available - creating new instance
+2025-06-09 11:08:23 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error rendering camera stream: Invalid value: 480x360
+2025-06-09 11:08:26 - cvd_tracker.error - ERROR - gui_notification_center_element.py:486 - add_notification - NOTIFICATION: System Error - ERROR - log_service.py:607 - error - Error rendering camera stream: Invalid value: 480x360
+2025-06-09 12:17:07 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Camera capture missing, attempting reinitialization
+2025-06-09 12:17:08 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error rendering camera stream: Invalid value: 480x360
+2025-06-09 12:17:08 - cvd_tracker.error - WARNING - log_service.py:602 - warning - No experiment manager available - creating new instance
+2025-06-09 12:17:12 - cvd_tracker.error - ERROR - gui_notification_center_element.py:502 - add_notification - NOTIFICATION: System Error - ERROR - log_service.py:607 - error - Error rendering camera stream: Invalid value: 480x360
+2025-06-09 12:17:16 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-09 12:17:16 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-09 12:17:16 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-09 12:17:16 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-09 12:17:16 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-09 12:17:16 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-09 12:17:16 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-09 12:17:16 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-09 12:17:16 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-09 12:17:17 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-09 12:17:17 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-09 12:17:17 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-09 12:17:17 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-09 12:17:17 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-09 12:17:17 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-09 12:17:17 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-09 12:17:17 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-09 12:17:17 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-09 12:17:17 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-09 12:17:17 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-09 12:17:17 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-09 12:17:17 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-09 12:17:18 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-09 12:17:18 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-09 12:17:18 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-09 12:17:18 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-09 12:17:18 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-09 12:29:47 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-09 12:29:48 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-09 12:29:48 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-09 12:29:48 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-09 12:29:48 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-09 12:29:48 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-09 12:29:48 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-09 12:29:48 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-09 12:29:48 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-09 12:29:48 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-09 12:29:48 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-09 12:29:48 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-09 12:29:48 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-09 12:29:48 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-09 13:46:55 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Camera capture missing, attempting reinitialization
+2025-06-09 13:46:56 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error rendering camera stream: Invalid value: 480x360
+2025-06-09 13:46:56 - cvd_tracker.error - WARNING - log_service.py:602 - warning - No experiment manager available - creating new instance
+2025-06-09 13:46:56 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error rendering camera stream: Invalid value: 480x360
+2025-06-09 13:47:00 - cvd_tracker.error - ERROR - gui_notification_center_element.py:502 - add_notification - NOTIFICATION: System Error - ERROR - log_service.py:607 - error - Error rendering camera stream: Invalid value: 480x360
+2025-06-09 13:49:45 - cvd_tracker.error - WARNING - log_service.py:602 - warning - signal
+2025-06-09 13:52:40 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Camera capture missing, attempting reinitialization
+2025-06-09 13:52:41 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error rendering camera stream: Invalid value: 480x360
+2025-06-09 13:52:41 - cvd_tracker.error - WARNING - log_service.py:602 - warning - No experiment manager available - creating new instance
+2025-06-09 13:52:45 - cvd_tracker.error - ERROR - gui_notification_center_element.py:502 - add_notification - NOTIFICATION: System Error - ERROR - log_service.py:607 - error - Error rendering camera stream: Invalid value: 480x360
+2025-06-09 13:53:25 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Camera capture missing, attempting reinitialization
+2025-06-09 13:53:26 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error rendering camera stream: Invalid value: 480x360
+2025-06-09 13:53:26 - cvd_tracker.error - WARNING - log_service.py:602 - warning - No experiment manager available - creating new instance
+2025-06-09 13:53:28 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error rendering camera stream: Invalid value: 480x360
+2025-06-09 13:53:31 - cvd_tracker.error - ERROR - gui_notification_center_element.py:502 - add_notification - NOTIFICATION: System Error - ERROR - log_service.py:607 - error - Error rendering camera stream: Invalid value: 480x360
+2025-06-09 13:54:59 - cvd_tracker.error - WARNING - log_service.py:602 - warning - signal
+2025-06-09 14:00:55 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Camera capture missing, attempting reinitialization
+2025-06-09 14:00:56 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error rendering camera stream: Invalid value: 480x360
+2025-06-09 14:00:56 - cvd_tracker.error - WARNING - log_service.py:602 - warning - No experiment manager available - creating new instance
+2025-06-09 14:00:57 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error rendering camera stream: Invalid value: 480x360
+2025-06-09 14:01:00 - cvd_tracker.error - ERROR - gui_notification_center_element.py:502 - add_notification - NOTIFICATION: System Error - ERROR - log_service.py:607 - error - Error rendering camera stream: Invalid value: 480x360
+2025-06-09 14:04:22 - cvd_tracker.error - WARNING - log_service.py:602 - warning - signal
+2025-06-09 14:07:35 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Camera capture missing, attempting reinitialization
+2025-06-09 14:07:37 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error rendering camera stream: Invalid value: 480x360
+2025-06-09 14:07:37 - cvd_tracker.error - WARNING - log_service.py:602 - warning - No experiment manager available - creating new instance
+2025-06-09 14:07:40 - cvd_tracker.error - ERROR - gui_notification_center_element.py:502 - add_notification - NOTIFICATION: System Error - ERROR - log_service.py:607 - error - Error rendering camera stream: Invalid value: 480x360

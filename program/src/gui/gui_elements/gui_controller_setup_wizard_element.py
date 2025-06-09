@@ -160,7 +160,8 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
             # Set default parameters
             self._wizard_data['parameters'] = {}
             for param_name, param_config in config['parameters'].items():
-                self._wizard_data['parameters'][param_name] = param_config['default']
+                # use None if no default in schema to avoid KeyError
+                self._wizard_data['parameters'][param_name] = param_config.get('default', None)
 
     def _render_stepper(self) -> None:
         """Render the 4-step wizard stepper."""
@@ -441,7 +442,7 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
         with container:
             for param_name, param_config in parameters.items():
                 with ui.row().classes("items-center gap-4"):
-                    ui.label(f"{param_config['label']}:").classes("w-48 font-semibold")
+                    ui.label(f"{param_config.get('label', param_name)}:").classes("w-48 font-semibold")
                     
                     if param_config['type'] == 'int':
                         ui.number(

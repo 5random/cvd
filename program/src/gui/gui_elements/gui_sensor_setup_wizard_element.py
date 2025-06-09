@@ -383,6 +383,10 @@ class SensorSetupWizardComponent(WizardMixin, BaseComponent):
                     port_names = [p.device for p in list_ports.comports()]
                 except Exception as e:  # pragma: no cover - extremely unlikely
                     warning(f"Failed to list serial ports: {e}")
+                # Include current port in options to avoid invalid default value
+                default_port = self._wizard_data.get("port")
+                if default_port and default_port not in port_names:
+                    port_names.insert(0, default_port)
 
                 with ui.row().classes("items-center gap-4"):
                     ui.label("Port:").classes("w-32 font-semibold")

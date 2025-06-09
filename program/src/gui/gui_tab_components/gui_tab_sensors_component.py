@@ -577,7 +577,8 @@ class SensorsComponent(TimedComponent):
         self._search_term: str = ""
         self._sensor_cards: Dict[str, SensorCardComponent] = {}
         self._config_dialog: Optional[SensorConfigDialog] = None
-        self._setup_wizard: Optional["SetupWizardComponent"] = None
+        # can hold any wizard component instance
+        self._setup_wizard: Any = None
         self._refresh_timer: Optional[ui.timer] = None
 
         # UI elements

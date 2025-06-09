@@ -207,9 +207,11 @@ class LogViewerComponent(TimedComponent):
 
                 with opener(self.log_file_info.path, "r", encoding="utf-8") as f:
                     f.seek(self._file_offset)
-                    new_lines = f.readlines()
+                    raw_lines = f.readlines()
                     self._file_offset = f.tell()
-
+                    # decode bytes to str if necessary to satisfy type expectations
+                    new_lines = [line if isinstance(line, str) else bytes(line).decode('utf-8') for line in raw_lines]
+    
                 self._log_lines.extend(new_lines)
                 if len(self._log_lines) > self._max_lines:
                     self._log_lines = self._log_lines[-self._max_lines :]
@@ -448,7 +450,6 @@ class LogComponent(BaseComponent):
                 log_files = self._get_log_files()
 
                 with ui.tabs(
-                    value=self._selected_recent_tab,
                     on_change=self._on_recent_tab_change,
                 ).classes("w-full") as recent_tabs:
                     for log_type in [
@@ -461,7 +462,7 @@ class LogComponent(BaseComponent):
                         ui.tab(log_type, label=log_type.capitalize())
 
                 with ui.tab_panels(
-                    recent_tabs, value=self._selected_recent_tab
+                    recent_tabs
                 ).classes("w-full"):
                     for log_type in [
                         "info",

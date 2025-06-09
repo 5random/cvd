@@ -1,5 +1,4 @@
 {
-
   "ui": {
     "title": "CVD Tracker",
     "refresh_rate_ms": 1000,
@@ -28,10 +27,17 @@
       "Built-in Camera": {
         "name": "Built-in Camera",
         "device_index": 0,
-        "resolution": [640, 480],
+        "resolution": [
+          640,
+          480
+        ],
         "fps": 30,
         "rotation": 0,
-        "uvc_settings": {"brightness": 255, "contrast": 100, "saturation": 64}
+        "uvc_settings": {
+          "brightness": 255,
+          "contrast": 100,
+          "saturation": 64
+        }
       }
     }
   ],
@@ -42,8 +48,13 @@
         "type": "motion_detection",
         "enabled": true,
         "show_on_dashboard": true,
-        "algorithm": ["bubble_detection"],
-        "state_output": ["Keine Bewegung erkannt", "Bewegung erkannt"],
+        "algorithm": [
+          "bubble_detection"
+        ],
+        "state_output": [
+          "Keine Bewegung erkannt",
+          "Bewegung erkannt"
+        ],
         "parameters": {
           "cam_id": "Built-in Camera",
           "sensitivity": 0.5,
@@ -51,6 +62,32 @@
           "background_learning_rate": 0.01,
           "noise_threshold": 25
         }
+      }
+    },
+    {
+      "con002": {
+        "name": "Reaktor Status",
+        "type": "reactor_state",
+        "enabled": true,
+        "show_on_dashboard": true,
+        "algorithms": [],
+        "state_output": [],
+        "parameters": {
+          "name": null,
+          "type": null,
+          "interface": null,
+          "enabled": null,
+          "device_index": null,
+          "ip_address": null,
+          "port": null,
+          "parameters": null,
+          "settings": null,
+          "algorithm": null,
+          "state_output": null,
+          "show_on_dashboard": null,
+          "cam_id": null
+        },
+        "input_sensors": []
       }
     }
   ],
@@ -62,7 +99,9 @@
         "enabled": true,
         "settings": {
           "class": "MovingAverageFilter",
-          "parameters": {"window_size": 7.0}
+          "parameters": {
+            "window_size": 7.0
+          }
         }
       }
     },
@@ -73,7 +112,10 @@
         "enabled": true,
         "settings": {
           "class": "RangeValidationFilter",
-          "parameters": {"min_value": 10.0, "max_value": 100.0}
+          "parameters": {
+            "min_value": 10.0,
+            "max_value": 100.0
+          }
         }
       }
     },
@@ -84,7 +126,10 @@
         "enabled": true,
         "settings": {
           "class": "OutlierDetectionFilter",
-          "parameters": {"threshold_std": 2.0, "min_samples": 10}
+          "parameters": {
+            "threshold_std": 2.0,
+            "min_samples": 10
+          }
         }
       }
     }

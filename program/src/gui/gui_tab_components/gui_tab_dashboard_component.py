@@ -246,7 +246,8 @@ class DashboardComponent(BaseComponent):
         """Render dashboard"""
         with ui.column().classes("w-full") as dashboard:
             # Dashboard header
-            ui.label("CVD Tracker Dashboard").classes("text-2xl font-bold mb-4")
+            with ui.row().classes("items-center justify-between w-full"):
+                ui.label("CVD Tracker Dashboard").classes("text-2xl font-bold mb-4")
 
             # System status overview
             self._render_system_status()
@@ -283,10 +284,11 @@ class DashboardComponent(BaseComponent):
                         ui.label("Controller States").classes(
                             "text-lg font-semibold mb-2"
                         )
+                        # allow drop targets by preventing default dragover behavior via event modifier
                         with (
                             ui.row()
                             .classes("w-full gap-4 flex-wrap")
-                            .on("dragover", lambda e: e.prevent_default()) as row
+                            .on("dragover.prevent", lambda _: None) as row
                         ):
                             self._controller_row = row
                             self._render_controller_cards()
@@ -309,12 +311,10 @@ class DashboardComponent(BaseComponent):
                 active_controllers = []
                 if self.controller_manager is not None:
                     try:
-                        active_controllers = [
-                            cid
-                            for cid in self.controller_manager.list_controllers()
-                            if self.controller_manager.get_controller(cid).status
-                            == ControllerStatus.RUNNING
-                        ]
+                        for cid in self.controller_manager.list_controllers():
+                            ctrl = self.controller_manager.get_controller(cid)
+                            if ctrl is not None and ctrl.status == ControllerStatus.RUNNING:
+                                active_controllers.append(cid)
                     except Exception as exc:  # pragma: no cover - log and continue
                         error(f"Failed to get active controllers: {exc}")
 
@@ -545,7 +545,8 @@ class DashboardComponent(BaseComponent):
                 "dragstart", lambda e, sid=sensor_id: self._start_sensor_drag(sid)
             )
             card_el.on("drop", lambda e, sid=sensor_id: self._drop_sensor_on(sid))
-            card_el.on("dragover", lambda e: e.prevent_default())
+            # prevent default dragover to allow drop
+            card_el.on("dragover.prevent", lambda _: None)
 
             self._sensor_cards[sensor_id] = sensor_card
 
@@ -570,7 +571,8 @@ class DashboardComponent(BaseComponent):
                 lambda e, cid=controller_id: self._start_controller_drag(cid),
             )
             card.on("drop", lambda e, cid=controller_id: self._drop_controller_on(cid))
-            card.on("dragover", lambda e: e.prevent_default())
+            # prevent default dragover to allow drop
+            card.on("dragover.prevent", lambda _: None)
             self._controller_cards[controller_id] = card
 
     def _start_sensor_drag(self, sensor_id: str) -> None:
