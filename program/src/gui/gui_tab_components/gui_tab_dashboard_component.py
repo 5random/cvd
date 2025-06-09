@@ -9,6 +9,7 @@ import psutil
 
 from src.utils.config_utils.config_service import ConfigurationService
 from src.utils.log_utils.log_service import info, warning, error, debug
+from src.utils.log_utils import log_service
 
 from src.data_handler.sources.sensor_source_manager import SensorManager
 from src.data_handler.interface.sensor_interface import SensorReading, SensorStatus
@@ -469,16 +470,9 @@ class DashboardComponent(BaseComponent):
             width, height = (int(v) for v in value.split('x'))
             stream.max_width = width
             stream.max_height = height
-        except Exception:
-            pass
-
-    
-
-            with ui.card().classes("p-4 cvd-card"):
-                with ui.column().classes("items-center"):
-                    ui.icon("videocam_off", size="lg").classes("text-gray-400 mb-2")
-                    ui.label("Camera Stream Unavailable").classes("text-gray-600")
-                    ui.label(f"Error: {str(e)}").classes("text-xs text-red-500")
+        except Exception as e:
+            log_service.error(f"Invalid value '{value}': {e}")
+            ui.notify(f"Invalid resolution: {value}", type='negative')
 
 
     def _render_sensor_cards(self) -> None:
