@@ -441,6 +441,37 @@ class WebApplication:
                 )
                 self._refresh_rate_input.classes("w-full mb-2")
 
+                # Logging settings
+                ui.label("Logging").classes("text-md font-semibold mt-4")
+                self._log_level_input = ui.select(
+                    ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
+                    label="Log Level",
+                    value=self.config_service.get("logging.level", str, "INFO"),
+                )
+                self._log_level_input.classes("w-full mb-2")
+
+                self._log_dir_input = ui.input(
+                    label="Log Directory",
+                    value=self.config_service.get("logging.log_dir", str, "data/logs"),
+                )
+                self._log_dir_input.classes("w-full mb-2")
+
+                self._log_rotation_input = ui.number(
+                    label="Log File Rotation (MB)",
+                    value=self.config_service.get(
+                        "logging.log_file_rotation_mb", int, 10
+                    ),
+                    min=1,
+                )
+                self._log_rotation_input.classes("w-full mb-2")
+
+                self._log_retention_input = ui.number(
+                    label="Retention Days",
+                    value=self.config_service.get("logging.retention_days", int, 30),
+                    min=0,
+                )
+                self._log_retention_input.classes("w-full mb-2")
+
                 self._network_host_input = ui.input(
                     label="Host",
                     value=self.config_service.get("network.host", str, "0.0.0.0"),
@@ -460,6 +491,7 @@ class WebApplication:
                     value=self.config_service.get("network.enable_https", bool, False),
                 )
                 self._network_https_checkbox.classes("mb-2")
+
 
                 with ui.row().classes("gap-2 mt-4"):
                     ui.button(
@@ -495,6 +527,36 @@ class WebApplication:
                 )
 
             if (
+                hasattr(self, "_log_level_input")
+                and self._log_level_input is not None
+            ):
+                self.config_service.set(
+                    "logging.level", str(self._log_level_input.value)
+                )
+
+            if (
+                hasattr(self, "_log_dir_input")
+                and self._log_dir_input is not None
+            ):
+                self.config_service.set(
+                    "logging.log_dir", str(self._log_dir_input.value)
+                )
+
+            if (
+                hasattr(self, "_log_rotation_input")
+                and self._log_rotation_input is not None
+            ):
+                self.config_service.set(
+                    "logging.log_file_rotation_mb", int(self._log_rotation_input.value)
+                )
+
+            if (
+                hasattr(self, "_log_retention_input")
+                and self._log_retention_input is not None
+            ):
+                self.config_service.set(
+                    "logging.retention_days", int(self._log_retention_input.value)
+
                 hasattr(self, "_network_host_input")
                 and self._network_host_input is not None
             ):
@@ -600,6 +662,23 @@ class WebApplication:
                 self._refresh_rate_input.value = self.config_service.get(
                     "ui.refresh_rate_ms", int, 1000
                 )
+
+            if hasattr(self, "_log_level_input") and self._log_level_input is not None:
+                self._log_level_input.value = self.config_service.get(
+                    "logging.level", str, "INFO"
+                )
+            if hasattr(self, "_log_dir_input") and self._log_dir_input is not None:
+                self._log_dir_input.value = self.config_service.get(
+                    "logging.log_dir", str, "data/logs"
+                )
+            if hasattr(self, "_log_rotation_input") and self._log_rotation_input is not None:
+                self._log_rotation_input.value = self.config_service.get(
+                    "logging.log_file_rotation_mb", int, 10
+                )
+            if hasattr(self, "_log_retention_input") and self._log_retention_input is not None:
+                self._log_retention_input.value = self.config_service.get(
+                    "logging.retention_days", int, 30
+
             if hasattr(self, "_network_host_input") and self._network_host_input is not None:
                 self._network_host_input.value = self.config_service.get(
                     "network.host", str, "0.0.0.0"
@@ -614,6 +693,7 @@ class WebApplication:
             ):
                 self._network_https_checkbox.value = self.config_service.get(
                     "network.enable_https", bool, False
+
                 )
         except (OSError, ConfigurationError) as e:
             ui.notify(f"Error resetting configuration: {e}", type="negative")
