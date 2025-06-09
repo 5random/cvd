@@ -45,7 +45,7 @@ from src.utils.log_utils.log_service import debug, error, info, warning
 from src.gui.gui_elements.gui_webcam_stream_element import CameraStreamComponent
 from starlette.staticfiles import StaticFiles
 from fastapi.responses import StreamingResponse
-from fastapi import Request, HTTPException
+from fastapi import Request
 
 
 class WebApplication:
@@ -197,7 +197,15 @@ class WebApplication:
                         break
 
             if camera is None:
-                raise HTTPException(status_code=503, detail="Camera stream unavailable")
+                if self._temp_camera_stream is None:
+                    self._temp_camera_stream = CameraStreamComponent(
+                        controller_manager=self.controller_manager,
+                        component_id="temp_camera_stream",
+                    )
+                    self.component_registry.register(self._temp_camera_stream)
+                    self._temp_camera_stream.start_streaming()
+
+                camera = self._temp_camera_stream
 
             async def gen():
                 while True:

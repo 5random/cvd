@@ -75,6 +75,9 @@ async def test_video_feed_creates_temp_camera(monkeypatch):
         def start_streaming(self):
             pass
 
+        def cleanup(self):
+            pass
+
     monkeypatch.setattr(
         "src.gui.application.CameraStreamComponent",
         DummyCam,
@@ -107,4 +110,12 @@ async def test_video_feed_creates_temp_camera(monkeypatch):
         await gen.__anext__()
 
     assert container.web_application._temp_camera_stream is not None
+
+    await container.web_application.shutdown()
+
+    assert container.web_application._temp_camera_stream is None
+    assert (
+        "temp_camera_stream" not in container.web_application.component_registry._components
+    )
+
     container.shutdown_sync()
