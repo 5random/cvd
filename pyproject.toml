@@ -21,6 +21,12 @@ dependencies = [
     "types-setuptools",
 ]
 
+[project.entry-points."cvd.sensors"]
+arduino_tc_board = "src.data_handler.sources.sensors.arduino_tc_sensor:ArduinoTCSensor"
+rs232 = "src.data_handler.sources.sensors.rs232_sensor:RS232Sensor"
+mock_arduino_tc_board = "src.data_handler.sources.mock_sensors:MockArduinoTCSensor"
+mock_rs232 = "src.data_handler.sources.mock_sensors:MockRS232Sensor"
+
 [tool.black]
 line-length = 88
 target-version = ['py39']
@@ -29,13 +35,3 @@ target-version = ['py39']
 python_version = "3.11"
 strict = false
 ignore_missing_imports = true
-
-[project]
-name = "cvd"
-version = "0.1.0"
-
-[project.entry-points."cvd.sensors"]
-arduino_tc_board = "src.data_handler.sources.sensors.arduino_tc_sensor:ArduinoTCSensor"
-rs232 = "src.data_handler.sources.sensors.rs232_sensor:RS232Sensor"
-mock_arduino_tc_board = "src.data_handler.sources.mock_sensors:MockArduinoTCSensor"
-mock_rs232 = "src.data_handler.sources.mock_sensors:MockRS232Sensor"
