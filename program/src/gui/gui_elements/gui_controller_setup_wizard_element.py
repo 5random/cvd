@@ -6,6 +6,8 @@ from typing import Any, Optional, Callable, Dict, List
 from nicegui import ui
 from nicegui.element import Element
 from nicegui import events
+import cv2
+from PIL import Image
 
 from src.gui.gui_tab_components.gui_tab_base_component import (
     BaseComponent,
@@ -20,6 +22,63 @@ from src.data_handler.sources.sensor_source_manager import SensorManager
 from src.controllers.controller_manager import ControllerManager
 from src.utils.config_utils.config_service import ConfigurationService
 from src.utils.log_utils.log_service import info, warning, error, debug
+
+# Parameter templates for supported controller types
+_PARAM_TEMPLATES: Dict[str, Dict[str, Dict[str, Any]]] = {
+    "motion_detection": {
+        "algorithm": {
+            "label": "Algorithm",
+            "type": "str",
+            "default": "MOG2",
+        },
+        "learning_rate": {
+            "label": "Learning Rate",
+            "type": "float",
+            "default": 0.01,
+            "min": 0.0,
+            "max": 1.0,
+        },
+        "threshold": {
+            "label": "Threshold",
+            "type": "int",
+            "default": 25,
+            "min": 0,
+            "max": 255,
+        },
+    },
+    "reactor_state": {
+        "idle_temp_max": {
+            "label": "Idle Temp Max (°C)",
+            "type": "float",
+            "default": 35.0,
+        },
+        "processing_temp_min": {
+            "label": "Processing Temp Min (°C)",
+            "type": "float",
+            "default": 80.0,
+        },
+        "processing_temp_max": {
+            "label": "Processing Temp Max (°C)",
+            "type": "float",
+            "default": 150.0,
+        },
+    },
+    "camera_capture": {
+        "device_index": {
+            "label": "Device Index",
+            "type": "int",
+            "default": 0,
+            "min": 0,
+        },
+        "fps": {
+            "label": "FPS",
+            "type": "int",
+            "default": 30,
+            "min": 1,
+            "max": 120,
+        },
+    },
+}
 
 
 class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
@@ -80,6 +139,7 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
         # enum-Werte für den "type"-Parameter
         types = controller_schema["properties"]["type"]["enum"]
         # eine Minimalstruktur für jeden Typ anlegen
+
         self._controller_types: Dict[str, Dict[str, Any]] = {
             t: {
                 "name": t.replace("_", " ").title(),
@@ -90,9 +150,8 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
                 "default_state_output": [],  # ebenso
                 # die Parameter-Definitionen aus dem Schema übernehmen
                 "parameters": controller_schema.get("properties", {}),
+
             }
-            for t in types
-        }
 
         # Additional parameters for motion detection
         motion_params = {
@@ -186,10 +245,13 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
             self._wizard_data["algorithms"] = config["algorithms"].copy()
             self._wizard_data["state_output"] = config["default_state_output"].copy()
 
-            # Set default parameters
-            self._wizard_data["parameters"] = {}
-            for param_name, param_config in config["parameters"].items():
-                self._wizard_data["parameters"][param_name] = param_config["default"]
+
+            # Set default parameters from template
+            template = config.get("parameters", {})
+            self._wizard_data["parameters"] = {
+                name: param_cfg["default"] for name, param_cfg in template.items()
+            }
+
 
     def _render_stepper(self) -> None:
         """Render the 4-step wizard stepper."""
@@ -440,6 +502,22 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
             with ui.row().classes("items-center gap-4"):
                 ui.label("Webcam:").classes("w-32 font-semibold")
                 webcam_options = self._get_available_webcams()
+
+                self._step2_elements['webcam_select'] = ui.select(
+                    webcam_options,
+                    value=self._wizard_data['selected_webcam'],
+                    on_change=self._on_webcam_change
+                ).bind_value_to(self._wizard_data, 'selected_webcam').props("outlined").classes("flex-1")
+                ui.button("Test Webcam", on_click=self._test_webcam).props("color=secondary")
+
+            # Preview image container
+            with ui.row().classes("items-center"):
+                self._step2_elements['webcam_preview'] = (
+                    ui.image()
+                    .classes("w-64 h-48 border")
+                    .props('alt="Webcam preview"')
+                )
+
                 self._step2_elements["webcam_select"] = (
                     ui.select(
                         webcam_options,
@@ -450,6 +528,7 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
                     .props("outlined")
                     .classes("flex-1")
                 )
+
 
             # Webcam configuration
             if self._wizard_data["selected_webcam"]:
@@ -516,14 +595,75 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
                         )
 
     def _get_available_webcams(self) -> List[str]:
-        """Get list of available webcams."""
-        # This could be enhanced to detect actual webcams
-        webcams = ["Built-in Camera", "USB Camera 1", "USB Camera 2", "Network Camera"]
-        return webcams
+        """Detect connected webcams using OpenCV.
+
+        This probes camera indices 0-5 and returns a descriptive name for each
+        detected device.  If OpenCV is not available or no cameras are found,
+        a static fallback list is returned.
+        """
+
+        fallback = [
+            "Built-in Camera",
+            "USB Camera 1",
+            "USB Camera 2",
+            "Network Camera",
+        ]
+
+        try:
+            import cv2  # type: ignore
+        except Exception:  # pragma: no cover - opencv not installed
+            warning("OpenCV not available, using fallback webcam list")
+            return fallback
+
+        webcams: List[str] = []
+        for index in range(6):
+            try:
+                cap = cv2.VideoCapture(index)
+                if cap is not None and cap.isOpened():
+                    webcams.append(f"Camera {index} (USB)")
+                if cap is not None:
+                    cap.release()
+            except Exception:  # pragma: no cover - unexpected opencv failure
+                continue
+
+        return webcams or fallback
 
     def _on_webcam_change(self, e: events.ValueChangeEventArguments) -> None:
         """Handle webcam selection change."""
         self._render_webcam_selection()
+
+    def _test_webcam(self) -> None:
+        """Open the selected webcam and capture a preview frame."""
+        config = self._wizard_data.get('webcam_config', {})
+        device_index = config.get('device_index', 0)
+
+        capture = cv2.VideoCapture(device_index)
+        if config.get('width'):
+            capture.set(cv2.CAP_PROP_FRAME_WIDTH, int(config['width']))
+        if config.get('height'):
+            capture.set(cv2.CAP_PROP_FRAME_HEIGHT, int(config['height']))
+        if config.get('fps'):
+            capture.set(cv2.CAP_PROP_FPS, int(config['fps']))
+
+        if not capture.isOpened():
+            ui.notify('Failed to open webcam', color='negative')
+            return
+
+        ret, frame = capture.read()
+        capture.release()
+
+        if not ret or frame is None:
+            ui.notify('Failed to capture frame', color='negative')
+            return
+
+        try:
+            image = Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
+            preview = self._step2_elements.get('webcam_preview')
+            if preview:
+                preview.set_source(image)
+            ui.notify('Webcam capture successful', color='positive')
+        except Exception as exc:
+            ui.notify(f'Webcam preview failed: {exc}', color='negative')
 
     def _render_controller_parameters(self) -> None:
         """Render controller-specific parameters."""
@@ -576,6 +716,20 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
                     "outlined"
                 )
 
+                    elif param_config["type"] == "str":
+                        ui.input(
+                            value=self._wizard_data["parameters"].get(
+                                param_name, param_config["default"]
+                            )
+                        ).bind_value_to(
+                            self._wizard_data["parameters"], param_name
+                        ).props(
+                            "outlined"
+                        ).classes(
+                            "flex-1"
+                        )
+
+
     def _update_state_message(self, index: int, value: str) -> None:
         """Update a specific state message."""
         if 0 <= index < len(self._wizard_data["state_output"]):
@@ -624,6 +778,7 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
                 ui.label("Drag on the image to select the ROI")
                 ui.button("Cancel", on_click=dialog.close)
         dialog.open()
+
 
     def _render_state_output_config(self) -> None:
         """Render state output message configuration."""
