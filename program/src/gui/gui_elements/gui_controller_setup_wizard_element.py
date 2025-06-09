@@ -126,6 +126,8 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
             "parameters": {},  # wird später aus _controller_types gefüllt
             "algorithm": [],
             "state_output": [],
+            "sensor_thresholds": {},
+            "controller_states": {},
         }
 
         # UI elements for each step (typed as Any to allow dynamic attribute access)
@@ -239,6 +241,8 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
             "parameters": {},
             "algorithm": [],
             "state_output": [],
+            "sensor_thresholds": {},
+            "controller_states": {},
         }
         self._update_controller_defaults()
 
@@ -421,6 +425,25 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
                         "gap-4"
                     )
                     self._render_controller_parameters()
+
+                if self._wizard_data["type"] == "reactor_state":
+                    with ui.card().classes("w-full"):
+                        with ui.card_section():
+                            ui.label("Sensor Thresholds").classes("font-semibold mb-2")
+
+                            self._step3_elements["threshold_container"] = ui.column().classes(
+                                "gap-2"
+                            )
+                            self._render_sensor_thresholds()
+
+                    with ui.card().classes("w-full"):
+                        with ui.card_section():
+                            ui.label("Controller States").classes("font-semibold mb-2")
+
+                            self._step3_elements["controller_state_container"] = ui.column().classes(
+                                "gap-2"
+                            )
+                            self._render_controller_state_selection()
 
             # State output configuration
             with ui.card().classes("w-full"):
@@ -814,6 +837,54 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
                 ui.button("Cancel", on_click=dialog.close)
         dialog.open()
 
+    def _render_sensor_thresholds(self) -> None:
+        """Render per-sensor threshold configuration."""
+        container = self._step3_elements.get("threshold_container")
+        if container is None:
+            return
+
+        container.clear()
+
+        for sensor_id in self._wizard_data.get("selected_sensors", []):
+            thresholds = self._wizard_data.setdefault("sensor_thresholds", {}).setdefault(
+                sensor_id, {"min": 0.0, "max": 100.0}
+            )
+            with ui.row().classes("items-center gap-2"):
+                ui.label(sensor_id).classes("w-32")
+                ui.number(value=thresholds["min"]).bind_value_to(
+                    thresholds, "min"
+                ).props("outlined").classes("w-24")
+                ui.number(value=thresholds["max"]).bind_value_to(
+                    thresholds, "max"
+                ).props("outlined").classes("w-24")
+
+    def _render_controller_state_selection(self) -> None:
+        """Render dropdowns to map controller states to positive/negative."""
+        container = self._step3_elements.get("controller_state_container")
+        if container is None:
+            return
+
+        container.clear()
+
+        configs = {cid: cfg for cid, cfg in self.config_service.get_controller_configs()}
+
+        for controller_id in self._wizard_data.get("controller_states", {}).keys():
+            config = configs.get(controller_id, {})
+            options = config.get("state_output", ["off", "on"])
+            if len(options) < 2:
+                options = ["off", "on"]
+
+            self._wizard_data["controller_states"].setdefault(controller_id, options[0])
+
+            with ui.row().classes("items-center gap-2"):
+                ui.label(controller_id).classes("w-32")
+                ui.select(
+                    options,
+                    value=self._wizard_data["controller_states"].get(controller_id),
+                ).bind_value_to(
+                    self._wizard_data["controller_states"], controller_id
+                ).props("outlined").classes("flex-1")
+
     def _render_state_output_config(self) -> None:
         """Render state output message configuration."""
         container = self._step3_elements["state_container"]
@@ -968,6 +1039,8 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
                 "show_on_dashboard": self._wizard_data["show_on_dashboard"],
                 "algorithm": self._wizard_data["algorithm"],
                 "state_output": self._wizard_data["state_output"],
+                "sensor_thresholds": self._wizard_data.get("sensor_thresholds", {}),
+                "controller_states": self._wizard_data.get("controller_states", {}),
             }
 
             # Add type-specific configuration
