@@ -97,6 +97,7 @@ class ConfigurationService:
             "type": {
                 "type": "string",
                 "enum": ["reactor_state", "motion_detection", "camera_capture", "camera"],
+
             },
             "interface": {
                 "type": "string",
