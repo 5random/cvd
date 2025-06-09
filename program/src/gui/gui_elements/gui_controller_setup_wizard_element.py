@@ -1028,6 +1028,31 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
             self.config_service._validate_controller_config(controller_config)
             self.config_service.add_controller_config(controller_config)
 
+            # Instantiate the controller immediately
+            if self.controller_manager:
+                try:
+                    new_controller = self.controller_manager.add_controller_from_config(
+                        controller_config
+                    )
+                except Exception as exc:
+                    warning(
+                        f"Failed to register controller {controller_config['controller_id']}: {exc}"
+                    )
+                    ui.notify(
+                        f"Failed to instantiate controller: {exc}",
+                        color="negative",
+                    )
+                    new_controller = None
+                else:
+                    if new_controller is None:
+                        warning(
+                            f"Failed to register controller {controller_config['controller_id']}"
+                        )
+                        ui.notify(
+                            f"Failed to instantiate controller '{controller_config['name']}'",
+                            color="negative",
+                        )
+
             info(
                 f"Created controller configuration: {self._wizard_data['controller_id']}"
             )
