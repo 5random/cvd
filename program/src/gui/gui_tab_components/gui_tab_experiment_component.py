@@ -595,7 +595,8 @@ class ExperimentCard(BaseComponent):
             return f"{minutes:.1f}m"
         else:
             hours = duration_seconds / 3600
-            return f"{hours:.1f}h"
+            minutes = (duration_seconds % 3600) / 60
+            return f"{hours:.0f}h {minutes:.0f}m"
 
     async def _start_experiment(self) -> None:
         """Start the experiment"""

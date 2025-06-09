@@ -16774,3 +16774,63 @@ To fix this, enter the target slot explicitly using `with container_element:`.
 This may happen if you try to create UI from a background task.
 To fix this, enter the target slot explicitly using `with container_element:`.
 2025-06-08 18:06:08 - cvd_tracker.error - ERROR - gui_notification_center_element.py:470 - add_notification - NOTIFICATION: System Error - ERROR - log_service.py:607 - error - Error starting experiment: The current slot cannot be determined because the slot stack for this task is empty.
+2025-06-09 10:19:28 - cvd_tracker.error - ERROR - log_service.py:607 - error - Failed to create application container: Failed to load configuration: Illegal trailing comma before end of object: line 25 column 4 (char 512)
+2025-06-09 10:19:28 - cvd_tracker.error - ERROR - log_service.py:607 - error - Application error: Failed to load configuration: Illegal trailing comma before end of object: line 25 column 4 (char 512)
+Traceback (most recent call last):
+  File "d:\Willem\KV_GitHub\cvd\program\src\utils\config_utils\config_service.py", line 205, in _load_config
+    user_config = json.load(f)
+  File "C:\Users\Willem\AppData\Local\Programs\Python\Python313\Lib\json\__init__.py", line 293, in load
+    return loads(fp.read(),
+        cls=cls, object_hook=object_hook,
+        parse_float=parse_float, parse_int=parse_int,
+        parse_constant=parse_constant, object_pairs_hook=object_pairs_hook, **kw)
+  File "C:\Users\Willem\AppData\Local\Programs\Python\Python313\Lib\json\__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^
+  File "C:\Users\Willem\AppData\Local\Programs\Python\Python313\Lib\json\decoder.py", line 345, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Willem\AppData\Local\Programs\Python\Python313\Lib\json\decoder.py", line 361, in raw_decode
+    obj, end = self.scan_once(s, idx)
+               ~~~~~~~~~~~~~~^^^^^^^^
+json.decoder.JSONDecodeError: Illegal trailing comma before end of object: line 25 column 4 (char 512)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "d:\Willem\KV_GitHub\cvd\program\main.py", line 48, in main
+    container = ApplicationContainer.create_sync(config_dir)
+  File "d:\Willem\KV_GitHub\cvd\program\src\utils\container.py", line 138, in create_sync
+    container = cls.create(config_dir)
+  File "d:\Willem\KV_GitHub\cvd\program\src\utils\container.py", line 63, in create
+    config_service = ConfigurationService(
+        config_path=config_dir / "config.json",
+        default_config_path=config_dir / "default_config.json"
+    )
+  File "d:\Willem\KV_GitHub\cvd\program\src\utils\config_utils\config_service.py", line 190, in __init__
+    self._load_config()
+    ~~~~~~~~~~~~~~~~~^^
+  File "d:\Willem\KV_GitHub\cvd\program\src\utils\config_utils\config_service.py", line 226, in _load_config
+    raise ConfigurationError(f"Failed to load configuration: {e}")
+src.utils.config_utils.config_service.ConfigurationError: Failed to load configuration: Illegal trailing comma before end of object: line 25 column 4 (char 512)
+2025-06-09 10:23:24 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Camera capture missing, attempting reinitialization
+2025-06-09 10:23:25 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error rendering camera stream: Invalid value: 480x360
+2025-06-09 10:23:25 - cvd_tracker.error - WARNING - log_service.py:602 - warning - No experiment manager available - creating new instance
+2025-06-09 10:23:29 - cvd_tracker.error - ERROR - gui_notification_center_element.py:486 - add_notification - NOTIFICATION: System Error - ERROR - log_service.py:607 - error - Error rendering camera stream: Invalid value: 480x360
+2025-06-09 10:23:41 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-09 10:23:41 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-09 10:23:41 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-09 10:23:41 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-09 10:23:41 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-09 10:23:41 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-09 10:23:41 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-09 10:23:41 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-09 10:23:41 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-09 10:23:41 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-09 10:23:41 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-09 10:23:42 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-09 10:23:42 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-09 10:23:42 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-09 10:23:42 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-09 10:23:42 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Motion detection controller not available
+2025-06-09 10:27:55 - cvd_tracker.error - WARNING - log_service.py:602 - warning - signal
