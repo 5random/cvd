@@ -497,10 +497,18 @@ class WebApplication:
             ).props("flat round")
 
             # Full screen button
+            def toggle_fullscreen() -> None:
+                """Toggle fullscreen mode using JavaScript"""
+                ui.run_javascript(
+                    "document.fullscreenElement"
+                    " ? document.exitFullscreen()"
+                    " : document.documentElement.requestFullscreen()"
+                )
+
             ui.button(
                 icon="fullscreen",
                 color="#5898d4",
-                on_click=lambda: ui.notify("Fullscreen mode"),
+                on_click=toggle_fullscreen,
             ).props("flat round")
 
             # Notification center button
