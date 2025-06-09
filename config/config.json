@@ -40,6 +40,21 @@
           "sen002_filter_3"
         ]
       }
+    },
+    {
+      "sen003": {
+        "name": "Test",
+        "type": "temperature",
+        "source": "mock_rs232",
+        "interface": "serial",
+        "enabled": true,
+        "show_on_dashboard": true,
+        "port": "COM3",
+        "channel": 0,
+        "poll_interval_ms": 1000,
+        "baudrate": 9600,
+        "timeout": 2.0
+      }
     }
   ],
   "webcams": [

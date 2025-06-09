@@ -1822,3 +1822,259 @@
 2025-06-09 20:38:22 - cvd_tracker.info - INFO - Registered component: experiment_component
 2025-06-09 20:38:22 - cvd_tracker.info - INFO - Registered component: data_component
 2025-06-09 20:38:22 - cvd_tracker.info - INFO - Registered component: logs
+2025-06-09 21:50:25 - cvd_tracker.info - INFO - Using real Arduino TC Board library
+2025-06-09 21:50:33 - cvd_tracker.info - INFO - Starting CVD Tracker...
+2025-06-09 21:50:33 - cvd_tracker.info - INFO - Compression service initialized with algorithm: gzip
+2025-06-09 21:50:33 - cvd_tracker.info - INFO - Compression service initialized
+2025-06-09 21:50:33 - cvd_tracker.info - INFO - Email alert service initialized
+2025-06-09 21:50:33 - cvd_tracker.info - INFO - Added processing stage range_validation to pipeline temperature_pipeline
+2025-06-09 21:50:33 - cvd_tracker.info - INFO - Added processing stage outlier_detection to pipeline temperature_pipeline
+2025-06-09 21:50:33 - cvd_tracker.info - INFO - Added processing stage moving_average to pipeline temperature_pipeline
+2025-06-09 21:50:33 - cvd_tracker.info - INFO - Controller registered
+2025-06-09 21:50:33 - cvd_tracker.info - INFO - Controller registered
+2025-06-09 21:50:33 - cvd_tracker.info - INFO - Registered component: notification_center
+2025-06-09 21:50:33 - cvd_tracker.info - INFO - Application container created successfully
+2025-06-09 21:50:33 - cvd_tracker.info - INFO - Background maintenance worker started
+2025-06-09 21:50:33 - cvd_tracker.info - INFO - DataManager initialized
+2025-06-09 21:50:33 - cvd_tracker.info - INFO - UI components and routes registered
+2025-06-09 21:50:33 - cvd_tracker.info - INFO - Starting web interface: CVD Tracker at localhost:8080
+2025-06-09 21:50:33 - cvd_tracker.info - INFO - Using real Arduino TC Board library
+2025-06-09 21:50:36 - cvd_tracker.info - INFO - Starting CVD Tracker...
+2025-06-09 21:50:36 - cvd_tracker.info - INFO - Compression service initialized with algorithm: gzip
+2025-06-09 21:50:36 - cvd_tracker.info - INFO - Compression service initialized
+2025-06-09 21:50:36 - cvd_tracker.info - INFO - Email alert service initialized
+2025-06-09 21:50:36 - cvd_tracker.info - INFO - Added processing stage range_validation to pipeline temperature_pipeline
+2025-06-09 21:50:36 - cvd_tracker.info - INFO - Added processing stage outlier_detection to pipeline temperature_pipeline
+2025-06-09 21:50:36 - cvd_tracker.info - INFO - Added processing stage moving_average to pipeline temperature_pipeline
+2025-06-09 21:50:36 - cvd_tracker.info - INFO - Controller registered
+2025-06-09 21:50:36 - cvd_tracker.info - INFO - Controller registered
+2025-06-09 21:50:36 - cvd_tracker.info - INFO - Registered component: notification_center
+2025-06-09 21:50:36 - cvd_tracker.info - INFO - Application container created successfully
+2025-06-09 21:50:36 - cvd_tracker.info - INFO - Background maintenance worker started
+2025-06-09 21:50:36 - cvd_tracker.info - INFO - DataManager initialized
+2025-06-09 21:50:36 - cvd_tracker.info - INFO - UI components and routes registered
+2025-06-09 21:50:36 - cvd_tracker.info - INFO - Starting web interface: CVD Tracker at localhost:8080
+2025-06-09 21:50:36 - cvd_tracker.info - INFO - CVD Tracker stopped
+2025-06-09 21:50:36 - cvd_tracker.info - INFO - Web application starting up...
+2025-06-09 21:50:36 - cvd_tracker.info - INFO - Initialized motion detection controller with MOG2 algorithm
+2025-06-09 21:50:36 - cvd_tracker.info - INFO - Motion detection controller initialized
+2025-06-09 21:50:36 - cvd_tracker.info - INFO - Controller started
+2025-06-09 21:50:36 - cvd_tracker.info - INFO - Controller started
+2025-06-09 21:50:36 - cvd_tracker.info - INFO - Controllers started
+2025-06-09 21:50:36 - cvd_tracker.info - INFO - Web application startup complete
+2025-06-09 21:50:36 - cvd_tracker.info - INFO - Created sensor: sen001 (temperature from mock_arduino_tc_board)
+2025-06-09 21:50:36 - cvd_tracker.info - INFO - Mock Arduino connected on COM3
+2025-06-09 21:50:36 - cvd_tracker.info - INFO - Mock Arduino TC sensor sen001 initialized on port COM3
+2025-06-09 21:50:36 - cvd_tracker.info - INFO - Registered sensor: sen001
+2025-06-09 21:50:36 - cvd_tracker.info - INFO - Started polling sensor sen001 every 1.0s
+2025-06-09 21:50:36 - cvd_tracker.info - INFO - Created sensor: sen002 (temperature from mock_arduino_tc_board)
+2025-06-09 21:50:36 - cvd_tracker.info - INFO - Mock Arduino connected on COM3
+2025-06-09 21:50:36 - cvd_tracker.info - INFO - Mock Arduino TC sensor sen002 initialized on port COM3
+2025-06-09 21:50:36 - cvd_tracker.info - INFO - Registered sensor: sen002
+2025-06-09 21:50:36 - cvd_tracker.info - INFO - Started polling sensor sen002 every 1.0s
+2025-06-09 21:50:36 - cvd_tracker.info - INFO - Started 2 sensors
+2025-06-09 21:50:37 - cvd_tracker.info - INFO - Registered component: dashboard
+2025-06-09 21:50:37 - cvd_tracker.info - INFO - Registered component: live_plot
+2025-06-09 21:50:37 - cvd_tracker.info - INFO - Registered component: sensors_component
+2025-06-09 21:50:37 - cvd_tracker.info - INFO - Registered component: controllers
+2025-06-09 21:50:37 - cvd_tracker.info - INFO - manager_created
+2025-06-09 21:50:37 - cvd_tracker.info - INFO - ExperimentManager initialized
+2025-06-09 21:50:37 - cvd_tracker.info - INFO - Registered component: experiment_component
+2025-06-09 21:50:37 - cvd_tracker.info - INFO - Registered component: data_component
+2025-06-09 21:50:37 - cvd_tracker.info - INFO - Registered component: logs
+2025-06-09 21:50:41 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:51:05 - cvd_tracker.info - INFO - Initialized motion detection controller with MOG2 algorithm
+2025-06-09 21:51:05 - cvd_tracker.info - INFO - Motion detection controller initialized
+2025-06-09 21:51:05 - cvd_tracker.info - INFO - Created sensor: sen003 (temperature from mock_rs232)
+2025-06-09 21:51:05 - cvd_tracker.info - INFO - Mock RS232 opened on COM3
+2025-06-09 21:51:05 - cvd_tracker.info - INFO - Mock RS232 sensor sen003 initialized on port COM3
+2025-06-09 21:51:05 - cvd_tracker.info - INFO - Mock RS232 closed on COM3
+2025-06-09 21:51:05 - cvd_tracker.info - INFO - RS232 sensor sen003 disconnected
+2025-06-09 21:51:06 - cvd_tracker.info - INFO - Using real Arduino TC Board library
+2025-06-09 21:51:08 - cvd_tracker.info - INFO - Starting CVD Tracker...
+2025-06-09 21:51:08 - cvd_tracker.info - INFO - Compression service initialized with algorithm: gzip
+2025-06-09 21:51:08 - cvd_tracker.info - INFO - Compression service initialized
+2025-06-09 21:51:08 - cvd_tracker.info - INFO - Email alert service initialized
+2025-06-09 21:51:08 - cvd_tracker.info - INFO - Added processing stage range_validation to pipeline temperature_pipeline
+2025-06-09 21:51:08 - cvd_tracker.info - INFO - Added processing stage outlier_detection to pipeline temperature_pipeline
+2025-06-09 21:51:08 - cvd_tracker.info - INFO - Added processing stage moving_average to pipeline temperature_pipeline
+2025-06-09 21:51:08 - cvd_tracker.info - INFO - Controller registered
+2025-06-09 21:51:08 - cvd_tracker.info - INFO - Controller registered
+2025-06-09 21:51:08 - cvd_tracker.info - INFO - Registered component: notification_center
+2025-06-09 21:51:08 - cvd_tracker.info - INFO - Application container created successfully
+2025-06-09 21:51:08 - cvd_tracker.info - INFO - Background maintenance worker started
+2025-06-09 21:51:08 - cvd_tracker.info - INFO - DataManager initialized
+2025-06-09 21:51:08 - cvd_tracker.info - INFO - UI components and routes registered
+2025-06-09 21:51:08 - cvd_tracker.info - INFO - Starting web interface: CVD Tracker at localhost:8080
+2025-06-09 21:51:08 - cvd_tracker.info - INFO - CVD Tracker stopped
+2025-06-09 21:51:16 - cvd_tracker.info - INFO - Created sensor configuration: sen003
+2025-06-09 21:51:45 - cvd_tracker.info - INFO - Registered component: dashboard
+2025-06-09 21:51:45 - cvd_tracker.info - INFO - Registered component: live_plot
+2025-06-09 21:51:45 - cvd_tracker.info - INFO - Registered component: sensors_component
+2025-06-09 21:51:45 - cvd_tracker.info - INFO - Registered component: controllers
+2025-06-09 21:51:45 - cvd_tracker.info - INFO - Registered component: experiment_component
+2025-06-09 21:51:45 - cvd_tracker.info - INFO - Registered component: data_component
+2025-06-09 21:51:45 - cvd_tracker.info - INFO - Registered component: logs
+2025-06-09 21:51:54 - cvd_tracker.info - INFO - Created sensor: sen001 (temperature from mock_arduino_tc_board)
+2025-06-09 21:51:54 - cvd_tracker.info - INFO - Mock Arduino connected on COM3
+2025-06-09 21:51:54 - cvd_tracker.info - INFO - Mock Arduino TC sensor sen001 initialized on port COM3
+2025-06-09 21:51:54 - cvd_tracker.info - INFO - Registered sensor: sen001
+2025-06-09 21:51:54 - cvd_tracker.info - INFO - Created sensor: sen002 (temperature from mock_arduino_tc_board)
+2025-06-09 21:51:54 - cvd_tracker.info - INFO - Mock Arduino connected on COM3
+2025-06-09 21:51:54 - cvd_tracker.info - INFO - Mock Arduino TC sensor sen002 initialized on port COM3
+2025-06-09 21:51:54 - cvd_tracker.info - INFO - Registered sensor: sen002
+2025-06-09 21:51:54 - cvd_tracker.info - INFO - Created sensor: sen003 (temperature from mock_rs232)
+2025-06-09 21:51:54 - cvd_tracker.info - INFO - Mock RS232 opened on COM3
+2025-06-09 21:51:54 - cvd_tracker.info - INFO - Mock RS232 sensor sen003 initialized on port COM3
+2025-06-09 21:51:54 - cvd_tracker.info - INFO - Registered sensor: sen003
+2025-06-09 21:51:54 - cvd_tracker.info - INFO - Started polling sensor sen003 every 1.0s
+2025-06-09 21:51:54 - cvd_tracker.info - INFO - Started 3 sensors
+2025-06-09 21:51:54 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:51:58 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:52:03 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:52:08 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:52:09 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:52:14 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:52:14 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:52:19 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:52:19 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:52:24 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:52:35 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:52:37 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:52:42 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:52:45 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:52:50 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:52:50 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:52:55 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:53:00 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:53:05 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:53:10 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:53:13 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:53:18 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:53:20 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:53:25 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:53:30 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:53:32 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:53:37 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:53:38 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:53:43 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:53:46 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:53:51 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:53:52 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:53:57 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:54:06 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:54:11 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:54:13 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:54:18 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:54:23 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:54:24 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:54:28 - cvd_tracker.info - INFO - Created experiment: Test_2025-06-09T21-54-28
+2025-06-09 21:54:28 - cvd_tracker.info - INFO - Created experiment configuration: Test_2025-06-09T21-54-28
+2025-06-09 21:54:28 - cvd_tracker.info - INFO - Experiment state changed: idle -> starting
+2025-06-09 21:54:29 - cvd_tracker.info - INFO - Created sensor: sen001 (temperature from mock_arduino_tc_board)
+2025-06-09 21:54:29 - cvd_tracker.info - INFO - Mock Arduino connected on COM3
+2025-06-09 21:54:29 - cvd_tracker.info - INFO - Mock Arduino TC sensor sen001 initialized on port COM3
+2025-06-09 21:54:29 - cvd_tracker.info - INFO - Registered sensor: sen001
+2025-06-09 21:54:29 - cvd_tracker.info - INFO - Created sensor: sen002 (temperature from mock_arduino_tc_board)
+2025-06-09 21:54:29 - cvd_tracker.info - INFO - Mock Arduino connected on COM3
+2025-06-09 21:54:29 - cvd_tracker.info - INFO - Mock Arduino TC sensor sen002 initialized on port COM3
+2025-06-09 21:54:29 - cvd_tracker.info - INFO - Registered sensor: sen002
+2025-06-09 21:54:29 - cvd_tracker.info - INFO - Created sensor: sen003 (temperature from mock_rs232)
+2025-06-09 21:54:29 - cvd_tracker.info - INFO - Mock RS232 opened on COM3
+2025-06-09 21:54:29 - cvd_tracker.info - INFO - Mock RS232 sensor sen003 initialized on port COM3
+2025-06-09 21:54:29 - cvd_tracker.info - INFO - Registered sensor: sen003
+2025-06-09 21:54:29 - cvd_tracker.info - INFO - Started 3 sensors
+2025-06-09 21:54:29 - cvd_tracker.info - INFO - Initialized motion detection controller with MOG2 algorithm
+2025-06-09 21:54:29 - cvd_tracker.info - INFO - Motion detection controller initialized
+2025-06-09 21:54:29 - cvd_tracker.info - INFO - Controller started
+2025-06-09 21:54:29 - cvd_tracker.info - INFO - Controller started
+2025-06-09 21:54:29 - cvd_tracker.info - INFO - task_registered
+2025-06-09 21:54:29 - cvd_tracker.info - INFO - Data collection loop started for experiment Test_2025-06-09T21-54-28
+2025-06-09 21:54:29 - cvd_tracker.info - INFO - Experiment state changed: starting -> running
+2025-06-09 21:54:29 - cvd_tracker.info - INFO - Started experiment: Test_2025-06-09T21-54-28
+2025-06-09 21:54:29 - cvd_tracker.info - INFO - task_registered
+2025-06-09 21:54:29 - cvd_tracker.info - INFO - task_started
+2025-06-09 21:54:29 - cvd_tracker.info - INFO - task_started
+2025-06-09 21:54:29 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:54:29 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:54:31 - cvd_tracker.info - INFO - Using real Arduino TC Board library
+2025-06-09 21:54:34 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:54:34 - cvd_tracker.info - INFO - Starting CVD Tracker...
+2025-06-09 21:54:34 - cvd_tracker.info - INFO - Compression service initialized with algorithm: gzip
+2025-06-09 21:54:34 - cvd_tracker.info - INFO - Compression service initialized
+2025-06-09 21:54:34 - cvd_tracker.info - INFO - Email alert service initialized
+2025-06-09 21:54:34 - cvd_tracker.info - INFO - Added processing stage range_validation to pipeline temperature_pipeline
+2025-06-09 21:54:34 - cvd_tracker.info - INFO - Added processing stage outlier_detection to pipeline temperature_pipeline
+2025-06-09 21:54:34 - cvd_tracker.info - INFO - Added processing stage moving_average to pipeline temperature_pipeline
+2025-06-09 21:54:34 - cvd_tracker.info - INFO - Controller registered
+2025-06-09 21:54:34 - cvd_tracker.info - INFO - Controller registered
+2025-06-09 21:54:34 - cvd_tracker.info - INFO - Registered component: notification_center
+2025-06-09 21:54:34 - cvd_tracker.info - INFO - Application container created successfully
+2025-06-09 21:54:34 - cvd_tracker.info - INFO - Background maintenance worker started
+2025-06-09 21:54:34 - cvd_tracker.info - INFO - DataManager initialized
+2025-06-09 21:54:34 - cvd_tracker.info - INFO - UI components and routes registered
+2025-06-09 21:54:34 - cvd_tracker.info - INFO - Starting web interface: CVD Tracker at localhost:8080
+2025-06-09 21:54:34 - cvd_tracker.info - INFO - CVD Tracker stopped
+2025-06-09 21:54:40 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:54:42 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:54:47 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:54:47 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:54:52 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:54:53 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:54:58 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:55:03 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:55:08 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:55:09 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:55:14 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:55:15 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:55:20 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:55:25 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:55:25 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:55:29 - cvd_tracker.info - INFO - Auto-stopping experiment after 1 minutes
+2025-06-09 21:55:29 - cvd_tracker.info - INFO - Experiment state changed: running -> stopping
+2025-06-09 21:55:29 - cvd_tracker.info - INFO - task_finished
+2025-06-09 21:55:29 - cvd_tracker.info - INFO - Compressed experiment file: data\experiments\Test_2025-06-09T21-54-28\metadata\experiment_metadata.json -> data\experiments\Test_2025-06-09T21-54-28\metadata\compressed\experiment_metadata.json.gz
+2025-06-09 21:55:29 - cvd_tracker.info - INFO - Compressed 1 experiment files in data\experiments\Test_2025-06-09T21-54-28\metadata
+2025-06-09 21:55:29 - cvd_tracker.info - INFO - Compressed experiment results: data\experiments\Test_2025-06-09T21-54-28\metadata\compressed\experiment_metadata.json.gz
+2025-06-09 21:55:29 - cvd_tracker.info - INFO - Experiment state changed: stopping -> completed
+2025-06-09 21:55:29 - cvd_tracker.info - INFO - Experiment state changed: completed -> idle
+2025-06-09 21:55:29 - cvd_tracker.info - INFO - Finalized experiment: Test_2025-06-09T21-54-28
+2025-06-09 21:55:29 - cvd_tracker.info - INFO - Stopped experiment: None
+2025-06-09 21:55:29 - cvd_tracker.info - INFO - task_finished
+2025-06-09 21:55:30 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:55:30 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:55:36 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:55:37 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:55:42 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:55:42 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:55:47 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:55:47 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:55:56 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:55:58 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:56:03 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:56:06 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:56:11 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:56:13 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:56:18 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:56:18 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:56:23 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:56:26 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:56:31 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:56:33 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:56:38 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:56:41 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:56:46 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:56:48 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:56:53 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:56:54 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:56:59 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:57:00 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:57:05 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:57:11 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:57:17 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:57:19 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:57:24 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:57:26 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:57:31 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:57:35 - cvd_tracker.info - INFO - Reactor state changed
+2025-06-09 21:57:40 - cvd_tracker.info - INFO - Reactor state changed

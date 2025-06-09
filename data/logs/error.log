@@ -16945,3 +16945,26 @@ To fix this, enter the target slot explicitly using `with container_element:`.
 2025-06-09 20:17:39 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen002 status: SensorStatus.OFFLINE
 2025-06-09 20:33:19 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error rendering camera stream: Invalid value: 480x360
 2025-06-09 20:38:22 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error rendering camera stream: Invalid value: 480x360
+2025-06-09 21:50:36 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Camera capture missing, attempting reinitialization
+2025-06-09 21:50:37 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error rendering camera stream: Invalid value: 480x360
+2025-06-09 21:50:37 - cvd_tracker.error - WARNING - log_service.py:602 - warning - No experiment manager available - creating new instance
+2025-06-09 21:50:41 - cvd_tracker.error - ERROR - gui_notification_center_element.py:502 - add_notification - NOTIFICATION: System Error - ERROR - log_service.py:607 - error - Error rendering camera stream: Invalid value: 480x360
+2025-06-09 21:51:05 - cvd_tracker.error - ERROR - log_service.py:607 - error - Connection test error: The current slot cannot be determined because the slot stack for this task is empty.
+This may happen if you try to create UI from a background task.
+To fix this, enter the target slot explicitly using `with container_element:`.
+2025-06-09 21:51:06 - cvd_tracker.error - ERROR - gui_notification_center_element.py:502 - add_notification - NOTIFICATION: System Error - ERROR - log_service.py:607 - error - Connection test error: The current slot cannot be determined because the slot stack for this task is empty.
+2025-06-09 21:51:19 - cvd_tracker.error - ERROR - log_service.py:607 - error - Sensor not found: sen003
+2025-06-09 21:51:21 - cvd_tracker.error - ERROR - gui_notification_center_element.py:502 - add_notification - NOTIFICATION: System Error - ERROR - log_service.py:607 - error - Sensor not found: sen003
+2025-06-09 21:51:23 - cvd_tracker.error - ERROR - log_service.py:607 - error - Sensor not found: sen003
+2025-06-09 21:51:25 - cvd_tracker.error - ERROR - log_service.py:607 - error - Sensor not found: sen003
+2025-06-09 21:51:25 - cvd_tracker.error - ERROR - log_service.py:607 - error - Sensor not found: sen003
+2025-06-09 21:51:45 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error rendering camera stream: Invalid value: 480x360
+2025-06-09 21:51:54 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 is already polling
+2025-06-09 21:51:54 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen002 is already polling
+2025-06-09 21:54:29 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen001 is already polling
+2025-06-09 21:54:29 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen002 is already polling
+2025-06-09 21:54:29 - cvd_tracker.error - WARNING - log_service.py:602 - warning - Sensor sen003 is already polling
+2025-06-09 21:54:29 - cvd_tracker.error - ERROR - log_service.py:607 - error - Error starting experiment: The current slot cannot be determined because the slot stack for this task is empty.
+This may happen if you try to create UI from a background task.
+To fix this, enter the target slot explicitly using `with container_element:`.
+2025-06-09 21:54:31 - cvd_tracker.error - ERROR - gui_notification_center_element.py:502 - add_notification - NOTIFICATION: System Error - ERROR - log_service.py:607 - error - Error starting experiment: The current slot cannot be determined because the slot stack for this task is empty.

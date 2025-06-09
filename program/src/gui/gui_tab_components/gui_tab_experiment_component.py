@@ -1557,7 +1557,7 @@ class ExperimentComponent(BaseComponent):
                         "Stop Current",
                         icon="stop",
                         on_click=self._stop_current_experiment,
-                    ).props("color=negative flat")
+                    ).props("color=negative")
 
             self.current_experiment_display = CurrentExperimentDisplay(
                 cast(ExperimentManager, self.experiment_manager)
