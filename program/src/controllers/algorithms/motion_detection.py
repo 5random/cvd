@@ -324,7 +324,6 @@ class MotionDetectionController(ImageController):
     def _convert_to_cv_frame(self, image_data: Any) -> Optional[np.ndarray]:
         """Convert various image data formats to OpenCV frame"""
         try:
-            rgb_source = False
             if isinstance(image_data, np.ndarray):
                 # Already an OpenCV frame (assumed BGR/BGRA)
                 frame = image_data
