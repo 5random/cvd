@@ -2,11 +2,9 @@
 Controllers component for displaying and managing all configured controllers.
 """
 
-from typing import Dict, Any, Optional, List, Callable
+from typing import Dict, Any, Optional, Callable
 from dataclasses import dataclass
 from nicegui import ui
-import time
-import asyncio
 
 from .dialog_utils import CancelableDialogMixin
 
@@ -17,7 +15,6 @@ from src.controllers.controller_manager import ControllerManager
 from src.controllers.controller_base import (
     ControllerStage,
     ControllerStatus,
-    ControllerType,
 )
 from src.gui.gui_tab_components.gui_tab_base_component import (
     TimedComponent,
