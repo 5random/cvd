@@ -1286,6 +1286,11 @@ class ExperimentHistoryTable(BaseComponent):
                 ui.notify("Invalid date", color="negative")
                 return
 
+        # Validate range
+        if from_date and to_date and to_date < from_date:
+            ui.notify("Invalid date range", color="negative")
+            return
+
         self._from_date = from_date
         self._to_date = to_date
         if self._date_range_input:

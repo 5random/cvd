@@ -1,4 +1,6 @@
 from datetime import datetime, date
+import types
+from nicegui import ui
 
 from src.experiment_handler.experiment_manager import (
     ExperimentConfig,
@@ -88,3 +90,17 @@ def test_sorting_applied():
     table._load_experiments()
     names = [r["name"] for r in table._table.rows]
     assert names == ["Charlie", "Beta", "Alpha"]
+
+
+def test_invalid_range_keeps_previous(monkeypatch):
+    messages = []
+    monkeypatch.setattr(ui, "notify", lambda msg, **kw: messages.append(msg))
+    table = _create_table()
+    table._from_date = date(2023, 1, 1)
+    table._to_date = date(2023, 2, 1)
+    table._date_from_picker = types.SimpleNamespace(value="2023-03-10")
+    table._date_to_picker = types.SimpleNamespace(value="2023-03-01")
+    table._apply_date_range()
+    assert table._from_date == date(2023, 1, 1)
+    assert table._to_date == date(2023, 2, 1)
+    assert "Invalid date range" in messages[0]
