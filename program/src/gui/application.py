@@ -73,6 +73,8 @@ class WebApplication:
         self._data_component: Optional[DataComponent] = None
         self._dashboard_component: Optional[DashboardComponent] = None
         self._live_plot: Optional[LivePlotComponent] = None
+        # Temporary camera stream used when dashboard stream is not yet available
+        self._temp_camera_stream: Optional[CameraStreamComponent] = None
 
         # Initialize notification center with error handling
         try:
@@ -113,6 +115,9 @@ class WebApplication:
         if self._live_plot:
             self.component_registry.unregister(self._live_plot.component_id)
             self._live_plot = None
+        if self._temp_camera_stream:
+            self.component_registry.unregister(self._temp_camera_stream.component_id)
+            self._temp_camera_stream = None
         self.component_registry.cleanup_all()
         info("Web application shutdown complete")
 
@@ -346,6 +351,12 @@ class WebApplication:
                 )
                 self.component_registry.register(self._dashboard_component)
                 self._dashboard_component.render()
+                # Remove temporary stream if a proper dashboard stream gets registered
+                if self._temp_camera_stream:
+                    self.component_registry.unregister(
+                        self._temp_camera_stream.component_id
+                    )
+                    self._temp_camera_stream = None
             # use dashboard's configured sensors for live plot
 
             dashboard_sensors = getattr(self._dashboard_component, '_dashboard_sensors', [])
