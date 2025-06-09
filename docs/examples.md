@@ -99,10 +99,16 @@ background subtraction algorithm. The :class:`ConfigurationService` exposes
 helpers such as ``get_controller_type_options()`` and ``get_webcam_ids()`` which
 GUI components use to populate dropdown menus.
 
+
 Motion detection also supports a multi-frame decision mode. Set
 ``multi_frame_enabled`` to ``true`` and choose a ``multi_frame_method`` of
 ``"threshold"`` or ``"probability"``. The ``threshold`` method counts detections
 over ``multi_frame_window`` frames while ``probability`` computes an exponential
 moving average of detection confidence using ``multi_frame_decay``. Motion is
 reported only when the resulting value exceeds ``multi_frame_threshold``.
+
+The motion detection controller also supports defining a region of interest
+within the camera frame. Provide ``roi_x`` and ``roi_y`` for the top-left corner
+along with ``roi_width`` and ``roi_height`` to restrict detection to that area.
+
 

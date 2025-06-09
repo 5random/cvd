@@ -96,8 +96,12 @@ class ConfigurationService:
             "name": {"type": "string"},
             "type": {
                 "type": "string",
-                "enum": ["reactor_state", "motion_detection", "camera_capture", "camera"],
-
+                "enum": [
+                    "reactor_state",
+                    "motion_detection",
+                    "camera_capture",
+                    "camera",
+                ],
             },
             "interface": {
                 "type": "string",
@@ -141,6 +145,10 @@ class ConfigurationService:
                                     "type": "string",
                                     "enum": ["MOG2", "KNN"],
                                 },
+                                "var_threshold": {"type": "number"},
+                                "dist2_threshold": {"type": "number"},
+                                "history": {"type": "integer"},
+                                "detect_shadows": {"type": "boolean"},
                             },
                             "additionalProperties": True,
                         }
@@ -469,17 +477,25 @@ class ConfigurationService:
 
     def get_controller_type_options(self) -> List[str]:
         """Return valid controller type strings from the schema."""
-        return list(self.CONTROLLER_SCHEMA["properties"]["type"]["enum"])
+        from typing import cast, List
+
+        props = cast(Dict[str, Any], self.CONTROLLER_SCHEMA.get("properties", {}))
+        type_schema = cast(Dict[str, Any], props.get("type", {}))
+        enum_vals = type_schema.get("enum", [])
+        return list(cast(List[str], enum_vals))
 
     def get_controller_enum_options(self, *path: str) -> Optional[List[Any]]:
         """Retrieve enum options for nested controller schema properties."""
-        schema = self.CONTROLLER_SCHEMA
+        from typing import cast, Dict, Any
+
+        schema = cast(Dict[str, Any], self.CONTROLLER_SCHEMA)
         for key in path:
-            props = schema.get("properties")
+            props = cast(Dict[str, Any], schema.get("properties"))
             if not props or key not in props:
                 return None
-            schema = props[key]
-        return schema.get("enum")
+            schema = cast(Dict[str, Any], props[key])
+        enum_vals = schema.get("enum")
+        return cast(Optional[List[Any]], enum_vals)
 
     def add_sensor_config(self, sensor_config: Dict[str, Any]) -> None:
         """Add a new sensor configuration with validation"""

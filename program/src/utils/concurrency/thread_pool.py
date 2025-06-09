@@ -7,6 +7,7 @@ Changelog
 * **Thread-sichere Executor-Initialisierung** mittels `self._lock`.
 * **Circuit-Breaker Hysterese**: +1 s `hysteresis_seconds`.
 """
+
 from __future__ import annotations
 
 import asyncio
@@ -27,6 +28,7 @@ from src.utils.log_utils.log_service import debug, error, info, warning
 # ───────────────────────────── optional dependencies ─────────────────────────
 try:
     from opentelemetry import trace  # type: ignore
+
     _tracer = trace.get_tracer("cvd_tracker.thread_pool")
 except Exception:  # pragma: no cover
     _tracer = None  # type: ignore
@@ -64,6 +66,7 @@ except Exception:  # pragma: no cover
     _metrics_registry = None  # type: ignore
     _M_SUBMITTED = _M_COMPLETED = _M_FAILED = _M_ACTIVE = None  # type: ignore
 
+
 # ────────────────────────────────── helpers ──────────────────────────────────
 class SecurityError(RuntimeError):
     """Raised when a callable violates sandbox rules."""
@@ -97,16 +100,16 @@ class ThreadPoolConfig:
     retry_backoff_max: float = 5.0
     circuit_breaker_failures: int | None = None
     circuit_breaker_reset_timeout: float | None = 60.0
-    hysteresis_seconds: float = 1.0          # NEU: Verzögerung für Circuit-Breaker Hysterese
+    hysteresis_seconds: float = 1.0  # NEU: Verzögerung für Circuit-Breaker Hysterese
 
     # Observability
     enable_tracing: bool = False
     enable_metrics: bool = False
 
     # Security
-    allowed_modules: Optional[Set[str]] = None          # {"src.sensors", ...}
-    allowed_callables: Optional[Set[str]] = None        # {"module.func", ...}
-    deny_cpu_bound: bool = False                        # simple heuristic
+    allowed_modules: Optional[Set[str]] = None  # {"src.sensors", ...}
+    allowed_callables: Optional[Set[str]] = None  # {"module.func", ...}
+    deny_cpu_bound: bool = False  # simple heuristic
 
     # Misc
     thread_name_prefix: str = "CVDTracker"
@@ -177,15 +180,23 @@ class ManagedThreadPool:
                     max_workers=self._workers,
                     thread_name_prefix=f"{self.config.thread_name_prefix}-{self.pool_type.value}",
                 )
-                debug("executor_created", pool=self.pool_type.value, workers=self._workers)
+                debug(
+                    "executor_created", pool=self.pool_type.value, workers=self._workers
+                )
         return self._executor
 
     # ── sandbox checks ──
     def _check_callable_security(self, fn: Callable[..., Any]) -> None:
         full_name = f"{fn.__module__}.{fn.__qualname__}"
-        if self.config.allowed_callables and full_name not in self.config.allowed_callables:
+        if (
+            self.config.allowed_callables
+            and full_name not in self.config.allowed_callables
+        ):
             raise SecurityError(f"Callable '{full_name}' not allowed")
-        if self.config.allowed_modules and fn.__module__ not in self.config.allowed_modules:
+        if (
+            self.config.allowed_modules
+            and fn.__module__ not in self.config.allowed_modules
+        ):
             raise SecurityError(f"Module '{fn.__module__}' not allowed")
         if self.config.deny_cpu_bound:
             sig = inspect.signature(fn)
@@ -317,6 +328,7 @@ class ManagedThreadPool:
             def _with_nice(*a: Any, **kw: Any):
                 try:
                     if hasattr(os, "nice"):
+                        assert self.config.nice is not None
                         os.nice(self.config.nice)  # type: ignore[attr-defined]
                 except Exception:  # pragma: no cover
                     pass
@@ -425,7 +437,12 @@ class ManagedThreadPool:
         self._ensure_executor()
         return self
 
-    def __exit__(self, exc_type: type[BaseException] | None, exc: BaseException | None, tb: TracebackType | None):
+    def __exit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc: BaseException | None,
+        tb: TracebackType | None,
+    ):
         self.shutdown()
 
 
@@ -434,18 +451,30 @@ class ThreadPoolManager:
     """Singleton-Orchestrator für mehrere ManagedThreadPools."""
 
     _defaults: Dict[ThreadPoolType, ThreadPoolConfig] = {
-        ThreadPoolType.SENSOR_IO: ThreadPoolConfig(pool_type=ThreadPoolType.SENSOR_IO, cpu_factor=2.0),
-        ThreadPoolType.CAMERA_IO: ThreadPoolConfig(pool_type=ThreadPoolType.CAMERA_IO, cpu_factor=2.0),
-        ThreadPoolType.FILE_IO: ThreadPoolConfig(pool_type=ThreadPoolType.FILE_IO, cpu_factor=3.0),
-        ThreadPoolType.NETWORK_IO: ThreadPoolConfig(pool_type=ThreadPoolType.NETWORK_IO, cpu_factor=4.0),
-        ThreadPoolType.GENERAL: ThreadPoolConfig(pool_type=ThreadPoolType.GENERAL, cpu_factor=4.0),
+        ThreadPoolType.SENSOR_IO: ThreadPoolConfig(
+            pool_type=ThreadPoolType.SENSOR_IO, cpu_factor=2.0
+        ),
+        ThreadPoolType.CAMERA_IO: ThreadPoolConfig(
+            pool_type=ThreadPoolType.CAMERA_IO, cpu_factor=2.0
+        ),
+        ThreadPoolType.FILE_IO: ThreadPoolConfig(
+            pool_type=ThreadPoolType.FILE_IO, cpu_factor=3.0
+        ),
+        ThreadPoolType.NETWORK_IO: ThreadPoolConfig(
+            pool_type=ThreadPoolType.NETWORK_IO, cpu_factor=4.0
+        ),
+        ThreadPoolType.GENERAL: ThreadPoolConfig(
+            pool_type=ThreadPoolType.GENERAL, cpu_factor=4.0
+        ),
     }
 
     def __init__(self) -> None:
         self._pools: Dict[ThreadPoolType, ManagedThreadPool] = {}
         self._lock = Lock()
 
-    def get_pool(self, pool_type: ThreadPoolType, *, config: ThreadPoolConfig | None = None) -> ManagedThreadPool:
+    def get_pool(
+        self, pool_type: ThreadPoolType, *, config: ThreadPoolConfig | None = None
+    ) -> ManagedThreadPool:
         with self._lock:
             if pool_type not in self._pools:
                 cfg = config or self._defaults[pool_type]
@@ -467,7 +496,9 @@ class ThreadPoolManager:
         return {pt.value: pool.get_stats() for pt, pool in self._pools.items()}
 
     async def shutdown_all(self) -> None:
-        await asyncio.gather(*(asyncio.to_thread(pool.shutdown) for pool in self._pools.values()))
+        await asyncio.gather(
+            *(asyncio.to_thread(pool.shutdown) for pool in self._pools.values())
+        )
         self._pools.clear()
 
 
@@ -486,24 +517,35 @@ def get_thread_pool_manager() -> ThreadPoolManager:
 
 
 async def run_sensor_io(fn: Callable[..., T], *args: Any, **kwargs: Any) -> T:
-    return await get_thread_pool_manager().submit_to_pool(ThreadPoolType.SENSOR_IO, fn, *args, **kwargs)
+    return await get_thread_pool_manager().submit_to_pool(
+        ThreadPoolType.SENSOR_IO, fn, *args, **kwargs
+    )
 
 
 async def run_camera_io(fn: Callable[..., T], *args: Any, **kwargs: Any) -> T:
-    return await get_thread_pool_manager().submit_to_pool(ThreadPoolType.CAMERA_IO, fn, *args, **kwargs)
+    return await get_thread_pool_manager().submit_to_pool(
+        ThreadPoolType.CAMERA_IO, fn, *args, **kwargs
+    )
 
 
 async def run_file_io(fn: Callable[..., T], *args: Any, **kwargs: Any) -> T:
-    return await get_thread_pool_manager().submit_to_pool(ThreadPoolType.FILE_IO, fn, *args, **kwargs)
+    return await get_thread_pool_manager().submit_to_pool(
+        ThreadPoolType.FILE_IO, fn, *args, **kwargs
+    )
 
 
 async def run_network_io(fn: Callable[..., T], *args: Any, **kwargs: Any) -> T:
-    return await get_thread_pool_manager().submit_to_pool(ThreadPoolType.NETWORK_IO, fn, *args, **kwargs)
+    return await get_thread_pool_manager().submit_to_pool(
+        ThreadPoolType.NETWORK_IO, fn, *args, **kwargs
+    )
 
 
 # context-manager shortcut
 
+
 @contextmanager
-def thread_pool_context(pool_type: ThreadPoolType, *, config: ThreadPoolConfig | None = None):
+def thread_pool_context(
+    pool_type: ThreadPoolType, *, config: ThreadPoolConfig | None = None
+):
     pool = get_thread_pool_manager().get_pool(pool_type, config=config)
     yield pool  # ownership remains with manager

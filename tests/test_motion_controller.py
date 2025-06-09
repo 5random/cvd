@@ -80,6 +80,7 @@ async def test_initialize_logs_algorithm(monkeypatch):
     await ctrl.cleanup()
 
     assert success
+
     assert any(
         m == "Initialized motion detection controller with MOG2 algorithm" for m in messages
     )
@@ -151,3 +152,76 @@ async def test_multi_frame_probability_mode(monkeypatch):
     res = await ctrl.process_image(frame, {})
     assert res.data.motion_detected is True
     await ctrl.stop()
+
+    assert any(m == "Motion detection controller initialized" for m in messages)
+
+
+@pytest.mark.asyncio
+async def test_bg_subtractor_mog2_params(monkeypatch):
+    params = {
+        "algorithm": "MOG2",
+        "var_threshold": 12,
+        "history": 321,
+        "detect_shadows": False,
+    }
+    config = ControllerConfig(controller_id="md", controller_type="motion_detection", parameters=params)
+    ctrl = MotionDetectionController("md", config)
+
+    called = {}
+
+    def fake_mog2(*, detectShadows=True, varThreshold=16, history=500):
+        called["detectShadows"] = detectShadows
+        called["varThreshold"] = varThreshold
+        called["history"] = history
+
+        class Dummy:
+            def apply(self, *a, **k):
+                return np.zeros((1, 1), dtype=np.uint8)
+
+        return Dummy()
+
+    monkeypatch.setattr(cv2, "createBackgroundSubtractorMOG2", fake_mog2)
+
+    success = await ctrl.initialize()
+    await ctrl.cleanup()
+
+    assert success
+    assert called == {"detectShadows": False, "varThreshold": 12, "history": 321}
+
+
+@pytest.mark.asyncio
+async def test_bg_subtractor_knn_params(monkeypatch):
+    params = {
+        "algorithm": "KNN",
+        "dist2_threshold": 42.0,
+        "history": 111,
+        "detect_shadows": False,
+    }
+    config = ControllerConfig(controller_id="md", controller_type="motion_detection", parameters=params)
+    ctrl = MotionDetectionController("md", config)
+
+    called = {}
+
+    def fake_knn(*, detectShadows=True, dist2Threshold=400.0, history=500):
+        called["detectShadows"] = detectShadows
+        called["dist2Threshold"] = dist2Threshold
+        called["history"] = history
+
+        class Dummy:
+            def apply(self, *a, **k):
+                return np.zeros((1, 1), dtype=np.uint8)
+
+        return Dummy()
+
+    monkeypatch.setattr(cv2, "createBackgroundSubtractorKNN", fake_knn)
+
+    success = await ctrl.initialize()
+    await ctrl.cleanup()
+
+    assert success
+    assert called == {
+        "detectShadows": False,
+        "dist2Threshold": 42.0,
+        "history": 111,
+    }
+

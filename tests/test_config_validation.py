@@ -338,3 +338,29 @@ async def test_motion_detection_algorithm_enum(tmp_path):
     }
 
     service._validate_controller_config(valid_cfg)
+
+
+@pytest.mark.asyncio
+async def test_motion_detection_additional_params(tmp_path):
+    config_path = tmp_path / "config.json"
+    default_path = tmp_path / "default.json"
+    config_path.write_text("{}")
+    default_path.write_text("{}")
+
+    service = ConfigurationService(config_path, default_path)
+
+    cfg = {
+        "controller_id": "con1",
+        "name": "c1",
+        "type": "motion_detection",
+        "enabled": True,
+        "parameters": {
+            "algorithm": "KNN",
+            "var_threshold": 10,
+            "dist2_threshold": 5.0,
+            "history": 50,
+            "detect_shadows": False,
+        },
+    }
+
+    service._validate_controller_config(cfg)
