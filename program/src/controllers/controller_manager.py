@@ -31,22 +31,7 @@ from src.utils.config_utils.config_service import (
     ConfigurationError,
 )
 
-from .controller_registry import CONTROLLER_CLASS_MAP
-
-
-# Registry mapping controller type names to classes
-CONTROLLER_REGISTRY: Dict[str, Type[ControllerStage]] = {}
-
-
-def register_controller_type(name: str, cls: Type[ControllerStage]) -> None:
-    """Register a controller class under a type name."""
-    CONTROLLER_REGISTRY[name] = cls
-
-
-# Register built-in controller types
-register_controller_type("camera_capture", CameraCaptureController)
-register_controller_type("motion_detection", MotionDetectionController)
-register_controller_type("reactor_state", ReactorStateController)
+from .controller_registry import CONTROLLER_CLASS_MAP, register_controller_type
 
 
 @dataclass
@@ -126,13 +111,6 @@ class ControllerManager:
                 output_name=config.get("output_name"),
             )
             
-            if controller_type == "motion_detection":
-                return MotionDetectionController(controller_id, cfg)
-            if controller_type == "reactor_state":
-                return ReactorStateController(controller_id, cfg)
-            if controller_type in ("camera_capture", "camera"):
-                return CameraCaptureController(controller_id, cfg)
-
             ctrl_cls = CONTROLLER_CLASS_MAP.get(controller_type)
             if ctrl_cls is None:
                 raise ValueError(f"Unknown controller type: {controller_type}")
