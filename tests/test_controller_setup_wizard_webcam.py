@@ -159,9 +159,14 @@ def test_on_webcam_change_updates_index(monkeypatch, tmp_path):
 
     monkeypatch.setattr(wizard, "_render_webcam_selection", lambda: None)
 
-    wizard._on_webcam_change(types.SimpleNamespace(value="Camera 2 (USB)"))
+    wizard._on_webcam_change(types.SimpleNamespace(value="USB Camera 5"))
 
-    assert wizard._wizard_data["webcam_config"]["device_index"] == 2
+    assert wizard._wizard_data["webcam_config"]["device_index"] == 5
+
+    # ensure names without numbers do not reset the index
+    wizard._on_webcam_change(types.SimpleNamespace(value="Network Camera"))
+
+    assert wizard._wizard_data["webcam_config"]["device_index"] == 5
 
 
 def test_test_webcam_uses_device_index(monkeypatch, tmp_path, dummy_ui):

@@ -3,6 +3,7 @@
 # mypy: ignore-errors
 
 from typing import Any, Optional, Callable, Dict, List
+import re
 import copy
 from nicegui import ui
 from nicegui.element import Element
@@ -496,18 +497,19 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
                         with ui.card_section():
                             ui.label("Sensor Thresholds").classes("font-semibold mb-2")
 
-                            self._step3_elements[
-                                "threshold_container"
-                            ] = ui.column().classes("gap-2")
+                            self._step3_elements["threshold_container"] = (
+                                ui.column().classes("gap-2")
+                            )
+
                             self._render_sensor_thresholds()
 
                     with ui.card().classes("w-full"):
                         with ui.card_section():
                             ui.label("Controller States").classes("font-semibold mb-2")
 
-                            self._step3_elements[
-                                "controller_state_container"
-                            ] = ui.column().classes("gap-2")
+                            self._step3_elements["controller_state_container"] = (
+                                ui.column().classes("gap-2")
+                            )
                             self._render_controller_state_selection()
 
             # State output configuration
@@ -783,13 +785,12 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
         """Handle webcam selection change."""
         selected = e.value if e is not None else None
         if isinstance(selected, str):
-            try:
-                index = int(selected.split()[1])
+            match = re.search(r"\d+", selected)
+            if match:
+                index = int(match.group())
                 self._wizard_data.setdefault("webcam_config", {})[
                     "device_index"
                 ] = index
-            except (IndexError, ValueError):
-                pass
         self._render_webcam_selection()
         self._test_webcam()
 
