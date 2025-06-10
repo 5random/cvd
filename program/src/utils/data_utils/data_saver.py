@@ -271,19 +271,18 @@ class DataSaver:
             sensor_map = self._writers[category]
             writer_data = sensor_map.get(sensor_id)
 
-        writer: Any
-        f: Optional[IO[Any]]
-        row_count: int
-        last_check_time: float
+            writer: Any
+            f: Optional[IO[Any]]
+            row_count: int
+            last_check_time: float
 
-        if writer_data is None or writer_data[0] is None:
-            file_path = output_dir / f"{sensor_id}.csv"
-            is_new = not file_path.exists() or file_path.stat().st_size == 0
-            temp_f = open(file_path, "a", newline="", encoding="utf-8")
-            temp_writer = csv.writer(temp_f)
-            row_count = 0
-            last_check_time = time.time()
-            with self._writer_lock:
+            if writer_data is None or writer_data[0] is None:
+                file_path = output_dir / f"{sensor_id}.csv"
+                is_new = not file_path.exists() or file_path.stat().st_size == 0
+                temp_f = open(file_path, "a", newline="", encoding="utf-8")
+                temp_writer = csv.writer(temp_f)
+                row_count = 0
+                last_check_time = time.time()
                 existing = sensor_map.get(sensor_id)
                 if existing is None or existing[0] is None:
                     if is_new:
@@ -306,24 +305,30 @@ class DataSaver:
                 else:
                     writer, f, row_count, last_check_time = existing
                     temp_f.close()
-        else:
-            writer, f, row_count, last_check_time = writer_data
+            else:
+                writer, f, row_count, last_check_time = writer_data
 
-        try:
-            writer.writerow([reading.timestamp, reading.value, reading.status.value])
-            row_count += 1
-            if f is not None and row_count % self.flush_interval == 0:
-                f.flush()
+            try:
+                writer.writerow(
+                    [
+                        reading.timestamp,
+                        reading.value,
+                        reading.status.value,
+                    ]
+                )
+                row_count += 1
+                if f is not None and row_count % self.flush_interval == 0:
+                    f.flush()
 
-            with self._writer_lock:
                 sensor_map[sensor_id] = (writer, f, row_count, last_check_time)
-            self._operation_counts[category] += 1
+            except Exception as e:
+                error(f"Failed to write {category} data for {sensor_id}: {e}")
+                return
 
-            self._check_compression_if_needed(f, sensor_id, category)
-            self._check_rotation_if_needed(category)
+        self._operation_counts[category] += 1
 
-        except Exception as e:
-            error(f"Failed to write {category} data for {sensor_id}: {e}")
+        self._check_compression_if_needed(f, sensor_id, category)
+        self._check_rotation_if_needed(category)
 
     def flush_all(self) -> None:
         """Flush all open buffers."""
