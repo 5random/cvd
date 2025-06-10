@@ -11,6 +11,9 @@ Example snippets demonstrating typical usage are available in
 
 ## Installation
 
+This project requires **Python 3.11** or newer. Ensure a compatible
+interpreter is available before installing any dependencies.
+
 To install dependencies and this package in editable mode, run:
 
 ```bash

@@ -13,6 +13,8 @@ from src.utils.log_utils.log_service import info, error, warning, debug
 
 def main():
     """Main application entry point"""
+    if sys.version_info < (3, 11):
+        raise RuntimeError("Python 3.11 or newer is required to run CVD Tracker")
     parser = argparse.ArgumentParser(description="CVD Tracker")
     parser.add_argument(
         "--controller-concurrency-limit",
