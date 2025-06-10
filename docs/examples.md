@@ -56,7 +56,7 @@ dashboard.
 ```python
 from src.utils.config_utils.config_service import ConfigurationService
 
-service = ConfigurationService(Path("program/config/config.json"), Path("program/config/default.json"))
+service = ConfigurationService(Path("program/config/config.json"), Path("program/config/default_config.json"))
 service.add_sensor_config({
     "sensor_id": "mock1",
     "name": "Example",
