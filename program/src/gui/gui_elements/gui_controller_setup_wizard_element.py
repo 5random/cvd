@@ -225,10 +225,15 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
 
     def _reset_wizard_data(self) -> None:
         """Reset wizard data to defaults."""
+        schema_props = self.config_service.CONTROLLER_SCHEMA["properties"]
+        ctrl_type_default = schema_props["type"].get(
+            "default", schema_props["type"]["enum"][0]
+        )
+
         self._wizard_data = {
             "controller_id": self.config_service.generate_next_controller_id(),
             "name": "",
-            "type": "reactor_state",
+            "type": ctrl_type_default,
             "enabled": True,
             "show_on_dashboard": True,
             "selected_sensors": [],
@@ -440,14 +445,46 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
                         ui.label("Controller Parameters").classes("font-semibold mb-2")
 
                         with ui.row().classes("items-start gap-4"):
-                            ui.image("/video_feed").classes("w-48 h-36 border").props('alt="Live preview"')
+                            ui.image("/video_feed").classes("w-48 h-36 border").props(
+                                'alt="Live preview"'
+                            )
                             with ui.column().classes("gap-2 flex-1"):
                                 ui.label("Brightness:").classes("w-24")
-                                ui.slider(min=0, max=255, value=self._wizard_data["webcam_config"].get("brightness", 128)).bind_value_to(self._wizard_data["webcam_config"], "brightness").classes("flex-1")
+                                ui.slider(
+                                    min=0,
+                                    max=255,
+                                    value=self._wizard_data["webcam_config"].get(
+                                        "brightness", 128
+                                    ),
+                                ).bind_value_to(
+                                    self._wizard_data["webcam_config"], "brightness"
+                                ).classes(
+                                    "flex-1"
+                                )
                                 ui.label("Contrast:").classes("w-24")
-                                ui.slider(min=0, max=100, value=self._wizard_data["webcam_config"].get("contrast", 32)).bind_value_to(self._wizard_data["webcam_config"], "contrast").classes("flex-1")
+                                ui.slider(
+                                    min=0,
+                                    max=100,
+                                    value=self._wizard_data["webcam_config"].get(
+                                        "contrast", 32
+                                    ),
+                                ).bind_value_to(
+                                    self._wizard_data["webcam_config"], "contrast"
+                                ).classes(
+                                    "flex-1"
+                                )
                                 ui.label("Saturation:").classes("w-24")
-                                ui.slider(min=0, max=100, value=self._wizard_data["webcam_config"].get("saturation", 64)).bind_value_to(self._wizard_data["webcam_config"], "saturation").classes("flex-1")
+                                ui.slider(
+                                    min=0,
+                                    max=100,
+                                    value=self._wizard_data["webcam_config"].get(
+                                        "saturation", 64
+                                    ),
+                                ).bind_value_to(
+                                    self._wizard_data["webcam_config"], "saturation"
+                                ).classes(
+                                    "flex-1"
+                                )
 
                     self._step3_elements["parameters_container"] = ui.column().classes(
                         "gap-4"
@@ -459,18 +496,18 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
                         with ui.card_section():
                             ui.label("Sensor Thresholds").classes("font-semibold mb-2")
 
-                            self._step3_elements["threshold_container"] = ui.column().classes(
-                                "gap-2"
-                            )
+                            self._step3_elements[
+                                "threshold_container"
+                            ] = ui.column().classes("gap-2")
                             self._render_sensor_thresholds()
 
                     with ui.card().classes("w-full"):
                         with ui.card_section():
                             ui.label("Controller States").classes("font-semibold mb-2")
 
-                            self._step3_elements["controller_state_container"] = ui.column().classes(
-                                "gap-2"
-                            )
+                            self._step3_elements[
+                                "controller_state_container"
+                            ] = ui.column().classes("gap-2")
                             self._render_controller_state_selection()
 
             # State output configuration
@@ -811,48 +848,50 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
 
                     element = None
                     if param_config["type"] == "int":
-                        element = ui.number(
-                            value=self._wizard_data["parameters"].get(
-                                param_name, param_config["default"]
-                            ),
-                            min=param_config.get("min"),
-                            max=param_config.get("max"),
-                        ).bind_value_to(
-                            self._wizard_data["parameters"], param_name
-                        ).props(
-                            "outlined"
-                        ).classes(
-                            "flex-1"
+                        element = (
+                            ui.number(
+                                value=self._wizard_data["parameters"].get(
+                                    param_name, param_config["default"]
+                                ),
+                                min=param_config.get("min"),
+                                max=param_config.get("max"),
+                            )
+                            .bind_value_to(self._wizard_data["parameters"], param_name)
+                            .props("outlined")
+                            .classes("flex-1")
                         )
                     elif param_config["type"] == "float":
-                        element = ui.number(
-                            value=self._wizard_data["parameters"].get(
-                                param_name, param_config["default"]
-                            ),
-                            min=param_config.get("min"),
-                            max=param_config.get("max"),
-                            step=param_config.get("step", 0.1),
-                        ).bind_value_to(
-                            self._wizard_data["parameters"], param_name
-                        ).props(
-                            "outlined"
-                        ).classes(
-                            "flex-1"
+                        element = (
+                            ui.number(
+                                value=self._wizard_data["parameters"].get(
+                                    param_name, param_config["default"]
+                                ),
+                                min=param_config.get("min"),
+                                max=param_config.get("max"),
+                                step=param_config.get("step", 0.1),
+                            )
+                            .bind_value_to(self._wizard_data["parameters"], param_name)
+                            .props("outlined")
+                            .classes("flex-1")
                         )
 
                     elif param_config["type"] == "str":
-                        element = ui.input(
-                            value=self._wizard_data["parameters"].get(
-                                param_name, param_config["default"]
+                        element = (
+                            ui.input(
+                                value=self._wizard_data["parameters"].get(
+                                    param_name, param_config["default"]
+                                )
                             )
-                        ).bind_value_to(
-                            self._wizard_data["parameters"], param_name
-                        ).props(
-                            "outlined"
-                        ).classes(
-                            "flex-1"
+                            .bind_value_to(self._wizard_data["parameters"], param_name)
+                            .props("outlined")
+                            .classes("flex-1")
                         )
-                    if element is not None and param_name in {"roi_x", "roi_y", "roi_width", "roi_height"}:
+                    if element is not None and param_name in {
+                        "roi_x",
+                        "roi_y",
+                        "roi_width",
+                        "roi_height",
+                    }:
                         self._step3_elements[param_name] = element
 
             if controller_type == "motion_detection":
@@ -930,9 +969,9 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
         container.clear()
 
         for sensor_id in self._wizard_data.get("selected_sensors", []):
-            thresholds = self._wizard_data.setdefault("sensor_thresholds", {}).setdefault(
-                sensor_id, {"min": 0.0, "max": 100.0}
-            )
+            thresholds = self._wizard_data.setdefault(
+                "sensor_thresholds", {}
+            ).setdefault(sensor_id, {"min": 0.0, "max": 100.0})
             with ui.row().classes("items-center gap-2"):
                 ui.label(sensor_id).classes("w-32")
                 ui.number(value=thresholds["min"]).bind_value_to(
@@ -950,7 +989,9 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
 
         container.clear()
 
-        configs = {cid: cfg for cid, cfg in self.config_service.get_controller_configs()}
+        configs = {
+            cid: cfg for cid, cfg in self.config_service.get_controller_configs()
+        }
 
         for controller_id in self._wizard_data.get("controller_states", {}).keys():
             config = configs.get(controller_id, {})
@@ -967,7 +1008,11 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
                     value=self._wizard_data["controller_states"].get(controller_id),
                 ).bind_value_to(
                     self._wizard_data["controller_states"], controller_id
-                ).props("outlined").classes("flex-1")
+                ).props(
+                    "outlined"
+                ).classes(
+                    "flex-1"
+                )
 
     def _render_state_output_config(self) -> None:
         """Render state output message configuration."""
