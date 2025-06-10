@@ -4,6 +4,8 @@ import pytest
 from src.controllers.controller_manager import ControllerManager
 from src.controllers.algorithms.motion_detection import MotionDetectionController
 from src.controllers.algorithms.reactor_state import ReactorStateController
+from src.utils.config_utils.config_service import ConfigurationError
+from src.utils.log_utils import log_service
 
 
 def test_create_known_controller_types():
@@ -14,17 +16,15 @@ def test_create_known_controller_types():
     assert isinstance(rs, ReactorStateController)
 
 
-def test_create_controller_missing_required_fields_returns_none(caplog):
+def test_create_controller_missing_required_fields_raises(caplog):
     manager = ControllerManager()
-    caplog.set_level(logging.WARNING)
-    result = manager.create_controller({'controller_id': 'missing_type'})
-    assert result is None
-    assert any('Unknown controller type' in r.message for r in caplog.records)
+    caplog.set_level(logging.ERROR, logger="cvd_tracker.error")
+    with pytest.raises(ConfigurationError):
+        manager.create_controller({'controller_id': 'missing_type'})
 
 
-def test_create_controller_unknown_type_warns(caplog):
+def test_create_controller_unknown_type_returns_none(caplog):
     manager = ControllerManager()
-    caplog.set_level(logging.WARNING)
+    caplog.set_level(logging.ERROR, logger="cvd_tracker.error")
     result = manager.create_controller({'controller_id': 'c1', 'type': 'unknown'})
     assert result is None
-    assert any('Unknown controller type' in r.message for r in caplog.records)

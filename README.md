@@ -27,12 +27,24 @@ configuration file as well as sample data under `data/`.  When installing with
 `pip install .`, these files are placed inside the package directory so the
 application can be started without additional setup.
 
+The repository also ships with example configurations located in
+`program/config`.  These files illustrate typical setups and can serve as a
+starting point for your own configuration.  The top-level `config/` directory is
+only used by the test suite and should not be modified for normal operation.
+
 ## Usage
 
 Launch the GUI application specifying the configuration directory:
 
 ```bash
 python program/main.py --config-dir program/config
+```
+
+To run the application with your own configuration directory simply point
+`--config-dir` to the folder containing your files:
+
+```bash
+python program/main.py --config-dir path/to/my_config
 ```
 
 You may also set the ``CVD_CONFIG_DIR`` environment variable instead of passing
@@ -118,3 +130,7 @@ pre-commit run --all-files
 ## Changelog
 
 - Fixed log viewer error caused by removed `last_args` attribute in NiceGUI ScrollArea.
+
+## License
+
+This project is released under the [MIT License](LICENSE).

@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 import time
+import threading
 
 import pytest
 
@@ -14,7 +15,7 @@ class DummyCompressionService:
 
     def compress_file(self, src: str, dst: str):
         # simply copy the input to the destination
-        with open(src, 'rb') as fsrc, open(dst, 'wb') as fdst:
+        with open(src, "rb") as fsrc, open(dst, "wb") as fdst:
             fdst.write(fsrc.read())
         self.calls.append((src, dst))
         return Path(dst)
@@ -112,4 +113,28 @@ def test_data_saver_background_tasks(tmp_path, monkeypatch):
     assert compressed_files, "expected compressed file"
     assert rotated_files, "expected rotated file"
     assert not saver._tasks, "background tasks should complete"
+    saver.close()
+
+
+def test_data_saver_thread_safety(tmp_path):
+    saver = ds_module.DataSaver(
+        base_output_dir=tmp_path,
+        enable_background_operations=False,
+        flush_interval=1,
+    )
+
+    def writer():
+        for _ in range(50):
+            saver.save(create_reading())
+
+    threads = [threading.Thread(target=writer) for _ in range(4)]
+    for t in threads:
+        t.start()
+    for t in threads:
+        t.join()
+
+    saver.flush_all()
+    file_path = tmp_path / "raw" / "s1.csv"
+    lines = file_path.read_text().splitlines()
+    assert len(lines) == 1 + 4 * 50
     saver.close()

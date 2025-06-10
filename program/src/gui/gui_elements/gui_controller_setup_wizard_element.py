@@ -226,10 +226,15 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
 
     def _reset_wizard_data(self) -> None:
         """Reset wizard data to defaults."""
+        schema_props = self.config_service.CONTROLLER_SCHEMA["properties"]
+        ctrl_type_default = schema_props["type"].get(
+            "default", schema_props["type"]["enum"][0]
+        )
+
         self._wizard_data = {
             "controller_id": self.config_service.generate_next_controller_id(),
             "name": "",
-            "type": "reactor_state",
+            "type": ctrl_type_default,
             "enabled": True,
             "show_on_dashboard": True,
             "selected_sensors": [],
@@ -495,6 +500,7 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
                             self._step3_elements["threshold_container"] = (
                                 ui.column().classes("gap-2")
                             )
+
                             self._render_sensor_thresholds()
 
                     with ui.card().classes("w-full"):
