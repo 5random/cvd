@@ -81,6 +81,8 @@ class WebApplication:
         self._live_plot: Optional[LivePlotComponent] = None
         # Temporary camera stream used when dashboard stream is not yet available
         self._temp_camera_stream: Optional[CameraStreamComponent] = None
+        # Container for sensor reading labels
+        self._sensor_readings_container: Optional[ui.row] = None
 
         # Initialize notification center with error handling
         try:
@@ -840,3 +842,19 @@ class WebApplication:
         ui.label("System Status").classes("text-h4 mb-4")
         # Reuse dashboard content for status overview
         self._create_dashboard_content()
+
+    def _update_sensor_readings(self) -> None:
+        """Update simple sensor reading display used by tests."""
+        if not self._sensor_readings_container:
+            return
+        self._sensor_readings_container.clear()
+
+        readings = self.sensor_manager.get_latest_readings()
+        sensor_configs = {sid: cfg for sid, cfg in self.config_service.get_sensor_configs()}
+
+        with self._sensor_readings_container:
+            for sensor_id, reading in readings.items():
+                cfg = sensor_configs.get(sensor_id, {})
+                unit = reading.metadata.get("unit") or cfg.get("unit", "°C")
+                ui.label(sensor_id)
+                ui.label(f"{reading.value:.2f}{unit}")
