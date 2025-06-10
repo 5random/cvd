@@ -289,16 +289,21 @@ class CameraStreamComponent(BaseComponent):
             if output is None:
                 return None
 
-            # Try to get camera/sensor data from controller manager
-            camera_frame = self._get_camera_frame()
-
-            if camera_frame is None:
-                warning("No camera frame available")
-                return None
-
             if isinstance(output, MotionDetectionResult):
                 result = output
-            elif isinstance(output, dict):
+                if result.frame is None:
+                    camera_frame = self._get_camera_frame()
+                    if camera_frame is None:
+                        warning("No camera frame available")
+                        return None
+                    result.frame = camera_frame
+                return result
+
+            if isinstance(output, dict):
+                camera_frame = self._get_camera_frame()
+                if camera_frame is None:
+                    warning("No camera frame available")
+                    return None
                 result = MotionDetectionResult(
                     motion_detected=output.get("motion_detected", False),
                     motion_area=output.get("motion_area", 0.0),
@@ -311,12 +316,9 @@ class CameraStreamComponent(BaseComponent):
                     motion_mask=output.get("motion_mask"),
                     frame=camera_frame,
                 )
-            else:
-                return None
+                return result
 
-            if result.frame is None:
-                result.frame = camera_frame
-            return result
+            return None
 
         except (AttributeError, KeyError, TypeError) as exc:
             warning(f"Error getting frame data: {exc}")
@@ -324,28 +326,40 @@ class CameraStreamComponent(BaseComponent):
 
     def _get_camera_frame(self) -> Optional[np.ndarray]:
         """Get current camera frame from available sources."""
-        # Try to get from controller outputs first
         outputs = self.controller_manager.get_controller_outputs()
-        # Look for camera or image data in controller outputs
-        for _, output in outputs.items():
-            if isinstance(output, MotionDetectionResult):
-                if output.frame is not None:
-                    return output.frame
-            elif isinstance(output, dict):
-                if "frame" in output:
-                    frame_data = output["frame"]
-                    if isinstance(frame_data, np.ndarray):
-                        return frame_data
 
-                if "image" in output:
-                    image_data = output["image"]
-                    if isinstance(image_data, np.ndarray):
-                        return image_data
+        # Try specific controller first if an ID is configured
+        if self.controller_id and self.controller_id in outputs:
+            output = outputs[self.controller_id]
+            frame = self._extract_frame(output)
+            if frame is not None:
+                return frame
 
-            elif isinstance(output, np.ndarray) and len(output.shape) == 3:
-                return output
+        # Fallback: search other controller outputs
+        for output in outputs.values():
+            frame = self._extract_frame(output)
+            if frame is not None:
+                return frame
 
         debug("No camera frame found in controller outputs")
+        return None
+
+    @staticmethod
+    def _extract_frame(output: Any) -> Optional[np.ndarray]:
+        """Extract a frame array from controller output."""
+        if isinstance(output, MotionDetectionResult):
+            if output.frame is not None:
+                return output.frame
+        elif isinstance(output, dict):
+            frame_data = output.get("frame")
+            if isinstance(frame_data, np.ndarray):
+                return frame_data
+
+            image_data = output.get("image")
+            if isinstance(image_data, np.ndarray):
+                return image_data
+        elif isinstance(output, np.ndarray) and len(output.shape) == 3:
+            return output
         return None
 
     def _prepare_display_frame(
