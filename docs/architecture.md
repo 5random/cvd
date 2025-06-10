@@ -44,6 +44,11 @@ relationships. Inline comments next to variable definitions are also
 captured so the diagram explains what each field represents. Private
 attributes and methods are omitted to keep the diagram concise.
 
+Run `python scripts/generate_uml.py > docs/full_class_diagram.mmd` to
+regenerate the diagram. The `full_class_diagram.mmd` file is already
+included in the repository and can be updated whenever the source code
+changes.
+
 ```{literalinclude} full_class_diagram.mmd
 :language: mermaid
 ```
