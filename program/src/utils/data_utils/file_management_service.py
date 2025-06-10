@@ -40,22 +40,37 @@ class FileMaintenanceService:
                         timestamp = int(file_path.stat().st_mtime)
                         new_name = f"{file_path.stem}_{timestamp}.csv"
                         target = compressed_dir / new_name
-                        # schedule rename and return the target path
                         futures.append(
-                            pool.submit_task(
-                                lambda p=file_path, t=target: (p, p.rename(t)),
-                                task_id=f"rotate_{file_path.name}"
+                            (
+                                file_path,
+                                pool.submit_task(
+                                    self._rotate_path,
+                                    file_path,
+                                    target,
+                                    task_id=f"rotate_{file_path.name}",
+                                ),
                             )
                         )
-            # wait for renames to complete
-            for fut in futures:
+            for src, fut in futures:
                 try:
-                    src, dst = fut.result()
-                    info(f"Rotated old file via pool: {src} -> {dst}")
+                    dst = fut.result()
+                    if dst is not None:
+                        info(f"Rotated old file via pool: {src} -> {dst}")
                 except Exception as ex:
                     error(f"Error rotating file in pool: {ex}")
         except Exception as e:
             error(f"Error rotating files: {e}")
+
+    def _rotate_path(self, src: Path, dst: Path) -> Optional[Path]:
+        """Helper to rename ``src`` to ``dst`` handling ``OSError``."""
+        try:
+            src.rename(dst)
+            return dst
+        except OSError as exc:
+            error(
+                f"Failed to rotate {src} to {dst}: [Errno {exc.errno}] {exc.strerror}"
+            )
+            return None
 
     def compress_inactive_files(self, directories: List[Path]) -> None:
         """Compress files exceeding threshold bytes into compressed subdirectory."""
