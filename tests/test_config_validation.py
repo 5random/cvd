@@ -192,7 +192,12 @@ async def test_controller_minimal_valid(tmp_path):
 
     service = ConfigurationService(config_path, default_path)
 
-    cfg = {"controller_id": "con1", "name": "c1", "type": "motion_detection", "enabled": True}
+    cfg = {
+        "controller_id": "con1",
+        "name": "c1",
+        "type": "motion_detection",
+        "enabled": True,
+    }
 
     service._validate_controller_config(cfg)
 
@@ -364,3 +369,32 @@ async def test_motion_detection_additional_params(tmp_path):
     }
 
     service._validate_controller_config(cfg)
+
+
+@pytest.mark.asyncio
+async def test_capture_backend_optional(tmp_path):
+    config_path = tmp_path / "config.json"
+    default_path = tmp_path / "default.json"
+    config_path.write_text("{}")
+    default_path.write_text("{}")
+
+    service = ConfigurationService(config_path, default_path)
+
+    controller_cfg = {
+        "controller_id": "con1",
+        "name": "c1",
+        "type": "motion_detection",
+        "enabled": True,
+        "capture_backend": None,
+    }
+
+    service._validate_controller_config(controller_cfg)
+
+    webcam_cfg = {
+        "webcam_id": "cam1",
+        "name": "cam1",
+        "device_index": 0,
+        "capture_backend": None,
+    }
+
+    service._validate_webcam_config(webcam_cfg)
