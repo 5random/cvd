@@ -107,7 +107,7 @@ class ConfigurationService:
             },
             "enabled": {"type": "boolean"},
             "device_index": {"type": "integer"},
-            "capture_backend": {"type": "integer"},
+            "capture_backend": {"type": ["integer", "null"]},
             "ip_address": {"type": "string"},
             "port": {"type": "integer"},
             "parameters": {"type": "object"},
@@ -162,7 +162,7 @@ class ConfigurationService:
         "properties": {
             "name": {"type": "string"},
             "device_index": {"type": "integer"},
-            "capture_backend": {"type": "integer"},
+            "capture_backend": {"type": ["integer", "null"]},
             "resolution": {"type": "array"},
             "fps": {"type": "integer"},
             "rotation": {"type": "integer", "enum": [0, 90, 180, 270]},
