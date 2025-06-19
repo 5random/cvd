@@ -6,9 +6,13 @@ Refactored to use the new core abstractions and application container.
 import sys
 import os
 from pathlib import Path
-import argparse
+
+sys.path.insert(0, str(Path(__file__).parent))  # include program folder for src.* imports
+sys.path.insert(0, str(Path(__file__).parent.parent))  # include project root for program.* imports
+
 from src.utils.container import ApplicationContainer
-from program.src.utils.log_service import info, error, warning, debug
+from src.utils.log_service import info, error, warning, debug
+import argparse
 
 
 def main():

@@ -28,7 +28,7 @@ import signal
 import sys
 import time
 import weakref
-from program.src.utils.log_service import info, warning, error, debug, performance, timer, context
+from src.utils.log_service import info, warning, error, debug, performance, timer, context
 from dataclasses import dataclass
 from typing import Any, Awaitable, Callable, Generic, Iterable, List, Optional, ParamSpec, Self, TypeVar, cast
 
