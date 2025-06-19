@@ -28,6 +28,7 @@ from .config_service import (
         set_config_service,
 )
 from .ui_helpers import *  # pylint: disable=wildcard-import
+from . import ui_helpers  # needed for __all__
 
 # ----------------------------------------------------------------------
 # public API
