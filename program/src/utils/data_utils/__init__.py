@@ -3,8 +3,6 @@ from .data_cleaner import clean_file
 from .data_saver import DataSaver
 from .file_management_service import FileMaintenanceService
 from .maintenance import MaintenanceManager
-
-# -*- coding: utf-8 -*-
 """
 data_utils
 ----------
