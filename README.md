@@ -23,6 +23,9 @@ pip install -e .
 pip install pre-commit black
 ```
 
+This installs all Python dependencies including `psutil`, which the dashboard
+uses to display CPU and memory usage.
+
 All dependencies are defined in `pyproject.toml`. Both `setup.py` and
 `requirements.txt` read from this file so there is a single authoritative list.
 
