@@ -4,7 +4,7 @@ import threading
 import time
 import os
 
-from src.utils.log_utils.log_service import info, warning, error
+from program.src.utils.log_service import info, warning, error
 from src.utils.concurrency.thread_pool import get_thread_pool_manager, ThreadPoolType
 from src.utils.data_utils.compression_service import CompressionService
 

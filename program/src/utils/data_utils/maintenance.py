@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Tuple, List
 
 from src.utils.data_utils.indexing import DataCategory, DirectoryEventHandler
-from src.utils.log_utils.log_service import info, warning, error, debug
+from program.src.utils.log_service import info, warning, error, debug
 from src.utils.concurrency.thread_pool import get_thread_pool_manager, ThreadPoolType, ManagedThreadPool
 
 

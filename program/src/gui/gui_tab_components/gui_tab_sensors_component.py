@@ -30,8 +30,8 @@ from src.data_handler.sources.sensor_source_manager import (
     SensorManager,
     SENSOR_REGISTRY,
 )
-from src.utils.config_utils.config_service import ConfigurationService
-from src.utils.log_utils.log_service import info, warning, error, debug
+from program.src.utils.config_service import ConfigurationService
+from program.src.utils.log_service import info, warning, error, debug
 
 if TYPE_CHECKING:
     from src.gui.gui_tab_components.gui_setup_wizard_component import (

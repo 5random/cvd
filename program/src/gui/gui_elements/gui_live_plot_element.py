@@ -17,7 +17,7 @@ from src.gui.gui_tab_components.gui_tab_base_component import (
     BaseComponent,
     ComponentConfig,
 )
-from src.utils.log_utils.log_service import info, warning, error, debug
+from program.src.utils.log_service import info, warning, error, debug
 
 @dataclass
 class PlotConfig:

@@ -36,12 +36,12 @@ from src.gui.gui_tab_components.gui_tab_sensors_component import (
     SensorsComponent,
 )
 from src.gui.gui_tab_components.gui_setup_wizard_component import SetupWizardComponent
-from src.utils.config_utils.config_service import (
+from program.src.utils.config_service import (
     ConfigurationService,
     ConfigurationError,
 )
 from src.utils.data_utils.data_manager import get_data_manager
-from src.utils.log_utils.log_service import debug, error, info, warning
+from program.src.utils.log_service import debug, error, info, warning
 from src.gui.gui_elements.gui_webcam_stream_element import CameraStreamComponent
 from starlette.staticfiles import StaticFiles
 from fastapi.responses import StreamingResponse

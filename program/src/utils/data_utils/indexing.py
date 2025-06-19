@@ -8,7 +8,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Dict, Any, List, Optional, Tuple, TYPE_CHECKING
 
-from src.utils.log_utils.log_service import error
+from program.src.utils.log_service import error
 
 if TYPE_CHECKING:
     from .data_manager import DataManager

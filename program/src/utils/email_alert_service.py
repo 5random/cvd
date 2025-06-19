@@ -3,8 +3,8 @@ import smtplib
 from email.message import EmailMessage
 from typing import Optional
 
-from src.utils.config_utils.config_service import get_config_service, ConfigurationService
-from src.utils.log_utils.log_service import info, warning, error
+from program.src.utils.config_service import get_config_service, ConfigurationService
+from program.src.utils.log_service import info, warning, error
 
 
 class EmailAlertService:
@@ -17,6 +17,7 @@ class EmailAlertService:
         self._load_configuration()
 
     def _load_configuration(self) -> None:
+        assert self._config_service is not None, "Configuration service not available"
         cfg = self._config_service.get('alerting', dict, {}) or {}
         self.recipient: Optional[str] = cfg.get('email_recipient')
         self.smtp_host: str = cfg.get('smtp_host', 'localhost')

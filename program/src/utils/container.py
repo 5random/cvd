@@ -9,13 +9,13 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import List, Tuple
 from concurrent.futures import Future
-from src.utils.log_utils.log_service import info, error
+from program.src.utils.log_service import info, error
 from src.utils.concurrency.thread_pool import (
     ManagedThreadPool,
     ThreadPoolType,
 )
 
-from src.utils.config_utils.config_service import (
+from program.src.utils.config_service import (
     ConfigurationService,
     set_config_service,
 )
@@ -29,7 +29,7 @@ from src.utils.data_utils.compression_service import (
     CompressionService,
     set_compression_service,
 )
-from src.utils.alert_system_utils.email_alert_service import (
+from program.src.utils.email_alert_service import (
     EmailAlertService,
     set_email_alert_service,
 )

@@ -16,8 +16,8 @@ from src.data_handler.sources.sensor_source_manager import (
 from src.data_handler.interface.sensor_interface import SensorStatus
 from src.utils.ui_helpers import notify_later
 from src.controllers.controller_manager import ControllerManager
-from src.utils.config_utils.config_service import ConfigurationService
-from src.utils.log_utils.log_service import info, warning, error, debug
+from program.src.utils.config_service import ConfigurationService
+from program.src.utils.log_service import info, warning, error, debug
 
 
 class SensorSetupWizardComponent(WizardMixin, BaseComponent):

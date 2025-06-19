@@ -1,6 +1,6 @@
 from __future__ import annotations
 import random
-from src.utils.log_utils.log_service import info
+from program.src.utils.log_service import info
 
 class MockRS232Serial:
     """Mock RS232 for testing when hardware is not available."""

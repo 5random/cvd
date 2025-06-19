@@ -5,7 +5,7 @@ from typing import Any, Dict, Optional
 
 from nicegui import ui
 
-from src.utils.alert_system_utils.email_alert_service import get_email_alert_service
+from program.src.utils.email_alert_service import get_email_alert_service
 from src.controllers.controller_base import ControllerStatus
 from src.gui.gui_elements.notifications.models import Notification, NotificationSeverity, NotificationSource
 

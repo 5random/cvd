@@ -1,7 +1,7 @@
 import cv2
 from typing import Dict, Any, Optional
 from src.utils.concurrency.thread_pool import run_camera_io
-from src.utils.log_utils.log_service import warning
+from program.src.utils.log_service import warning
 
 
 async def apply_uvc_settings(

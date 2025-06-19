@@ -21,8 +21,8 @@ from ...controllers.algorithms.motion_detection import (
     MotionDetectionController,
     MotionDetectionResult,
 )
-from src.utils.log_utils.log_service import warning, error, debug
-from src.utils.log_utils import log_service
+from program.src.utils.log_service import warning, error, debug
+from program.src.utils import log_service
 
 
 class CameraStreamComponent(BaseComponent):

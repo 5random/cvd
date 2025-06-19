@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from enum import Enum
 import time
 
-from src.utils.log_utils.log_service import error
+from program.src.utils.log_service import error
 
 T = TypeVar('T')
 

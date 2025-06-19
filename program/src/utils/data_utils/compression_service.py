@@ -14,8 +14,8 @@ from dataclasses import dataclass
 from threading import Lock
 import os
 
-from src.utils.config_utils.config_service import get_config_service, ConfigurationError
-from src.utils.log_utils.log_service import debug, info, warning, error
+from program.src.utils.config_service import get_config_service, ConfigurationError
+from program.src.utils.log_service import debug, info, warning, error
 from src.utils.concurrency.thread_pool import get_thread_pool_manager, ThreadPoolType
 
 @dataclass

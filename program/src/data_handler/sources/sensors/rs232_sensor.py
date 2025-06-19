@@ -7,7 +7,7 @@ from concurrent.futures import Executor
 import serial
 from src.data_handler.interface.sensor_interface import SensorReading, SensorStatus, SensorConfig
 from .base_sensor import BaseSensor
-from src.utils.log_utils.log_service import info, warning, error, debug
+from program.src.utils.log_service import info, warning, error, debug
 from src.data_handler.sources.mock_hardware import MockRS232Serial
 
 

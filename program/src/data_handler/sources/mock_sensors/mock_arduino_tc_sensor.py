@@ -5,7 +5,7 @@ from src.data_handler.sources.mock_hardware.arduino_tc_board import (
     MockArduinoTCBoardSerial,
     mock_find_arduino_port,
 )
-from src.utils.log_utils.log_service import info, error
+from program.src.utils.log_service import info, error
 
 
 class MockArduinoTCSensor(ArduinoTCSensor):

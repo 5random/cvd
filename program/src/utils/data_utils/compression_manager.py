@@ -3,7 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import List
 
-from src.utils.log_utils.log_service import debug, error
+from program.src.utils.log_service import debug, error
 from src.utils.data_utils.indexing import FileStatus
 
 

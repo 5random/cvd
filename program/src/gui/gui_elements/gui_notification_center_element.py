@@ -37,13 +37,13 @@ from src.gui.gui_tab_components.gui_tab_base_component import (
     BaseComponent,
     ComponentConfig,
 )
-from src.utils.log_utils.log_service import get_log_service, LogService
-from src.utils.config_utils.config_service import ConfigurationService
+from program.src.utils.log_service import get_log_service, LogService
+from program.src.utils.config_service import ConfigurationService
 from src.experiment_handler.experiment_manager import ExperimentManager, ExperimentState
 from src.data_handler.sources.sensor_source_manager import SensorManager
 from src.controllers.controller_manager import ControllerManager
 from src.controllers.controller_base import ControllerStatus
-from src.utils.alert_system_utils.email_alert_service import get_email_alert_service
+from program.src.utils.email_alert_service import get_email_alert_service
 from src.gui.gui_elements.notifications import (
     NotificationMonitoringMixin,
     NotificationUIMixin,

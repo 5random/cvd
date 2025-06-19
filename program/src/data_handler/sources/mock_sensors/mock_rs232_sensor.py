@@ -6,7 +6,7 @@ from concurrent.futures import Executor
 
 from src.data_handler.sources.sensors.rs232_sensor import RS232Sensor
 from src.data_handler.sources.mock_hardware.rs232 import MockRS232Serial
-from src.utils.log_utils.log_service import info, error
+from program.src.utils.log_service import info, error
 
 class MockRS232Sensor(RS232Sensor):
     """RS232 sensor that always uses the mock serial connection."""

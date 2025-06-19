@@ -1,7 +1,7 @@
 from __future__ import annotations
 import random
 from typing import Optional
-from src.utils.log_utils.log_service import info, debug
+from program.src.utils.log_service import info, debug
 
 
 class MockArduinoTCBoardSerial:

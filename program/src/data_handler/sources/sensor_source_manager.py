@@ -12,7 +12,7 @@ from src.data_handler.interface.sensor_interface import (
     SensorConfig,
     SensorStatus,
 )
-from src.utils.config_utils.config_service import ConfigurationService, ValidationError
+from program.src.utils.config_service import ConfigurationService, ValidationError
 from src.data_handler.sources.sensors.arduino_tc_sensor import ArduinoTCSensor
 from src.data_handler.sources.sensors.rs232_sensor import RS232Sensor
 from src.data_handler.sources.mock_sensors import (
@@ -21,7 +21,7 @@ from src.data_handler.sources.mock_sensors import (
 )
 from src.utils.data_utils.data_saver import DataSaver
 from src.data_handler.processing.pipeline.pipeline import DataPipeline
-from src.utils.log_utils.log_service import info, warning, error, debug
+from program.src.utils.log_service import info, warning, error, debug
 
 # Registry for sensor implementations
 SensorFactory = Callable[[SensorConfig, Optional[Executor]], SensorInterface]

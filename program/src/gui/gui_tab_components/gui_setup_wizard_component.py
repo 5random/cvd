@@ -13,7 +13,7 @@ from src.gui.gui_tab_components.gui_tab_controllers_component import (
 )
 from src.data_handler.sources.sensor_source_manager import SensorManager
 from src.controllers.controller_manager import ControllerManager
-from src.utils.config_utils.config_service import ConfigurationService
+from program.src.utils.config_service import ConfigurationService
 
 
 class SetupWizardComponent(BaseComponent):

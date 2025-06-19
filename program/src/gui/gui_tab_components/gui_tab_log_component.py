@@ -19,7 +19,7 @@ import bz2
 import lzma
 import tempfile
 
-from src.utils.log_utils.log_service import (
+from program.src.utils.log_service import (
     LogService,
     get_log_service,
     info,

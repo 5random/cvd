@@ -4,7 +4,7 @@ import csv
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Iterable, Optional, Any
-from src.utils.log_utils.log_service import warning
+from program.src.utils.log_service import warning
 
 def _read_rows(path: Path) -> List[Dict[str, str]]:
     """Read CSV rows skipping duplicated headers."""

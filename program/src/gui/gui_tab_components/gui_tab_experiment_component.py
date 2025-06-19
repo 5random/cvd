@@ -36,11 +36,11 @@ from src.experiment_handler.experiment_manager import (
 )
 from src.data_handler.sources.sensor_source_manager import SensorManager
 from src.controllers.controller_manager import ControllerManager
-from src.utils.config_utils.config_service import (
+from program.src.utils.config_service import (
     ConfigurationService,
     get_config_service,
 )
-from src.utils.log_utils.log_service import info, warning, error, debug
+from program.src.utils.log_service import info, warning, error, debug
 from src.gui.gui_elements.gui_experiment_setup_wizard_element import (
     ExperimentSetupWizardComponent,
 )
@@ -1648,7 +1648,7 @@ def create_experiment_component(
     """Create an experiment component with default configuration"""
     # Get services if not provided
     if not config_service:
-        from src.utils.config_utils.config_service import get_config_service
+        from program.src.utils.config_service import get_config_service
 
         config_service = get_config_service()
         if not config_service:

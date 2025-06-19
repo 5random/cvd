@@ -22,8 +22,8 @@ from src.gui.gui_elements.gui_sensor_setup_wizard_element import (
 )
 from src.data_handler.sources.sensor_source_manager import SensorManager
 from src.controllers.controller_manager import ControllerManager
-from src.utils.config_utils.config_service import ConfigurationService
-from src.utils.log_utils.log_service import info, warning, error, debug
+from program.src.utils.config_service import ConfigurationService
+from program.src.utils.log_service import info, warning, error, debug
 
 # Parameter templates for supported controller types
 _PARAM_TEMPLATES: Dict[str, Dict[str, Dict[str, Any]]] = {

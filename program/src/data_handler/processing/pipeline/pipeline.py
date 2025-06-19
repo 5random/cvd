@@ -12,7 +12,7 @@ from src.data_handler.processing.processing_base import ProcessingResult, Proces
 from src.data_handler.processing.filters.simple_moving_avg_filter import MovingAverageFilter
 from src.data_handler.processing.filters.range_validation_filter import RangeValidationFilter
 from src.data_handler.processing.filters.outlier_detection_filter import OutlierDetectionFilter
-from src.utils.log_utils.log_service import info, warning, error, debug
+from program.src.utils.log_service import info, warning, error, debug
 
 class DataPipeline:
     """Data processing pipeline managing multiple stages"""

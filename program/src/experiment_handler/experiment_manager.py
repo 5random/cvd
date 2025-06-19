@@ -22,7 +22,7 @@ from enum import Enum
 from contextlib import asynccontextmanager
 import threading
 
-from src.utils.config_utils.config_service import (
+from program.src.utils.config_service import (
     get_config_service,
     ConfigurationService,
 )
@@ -31,7 +31,7 @@ from src.utils.data_utils.data_saver import DataSaver
 from src.data_handler.interface.sensor_interface import SensorReading, SensorStatus
 from src.utils.data_utils.compression_service import get_compression_service
 from src.utils.data_utils.file_management_service import FileMaintenanceService
-from src.utils.log_utils.log_service import info, warning, error, debug
+from program.src.utils.log_service import info, warning, error, debug
 from src.controllers.controller_manager import ControllerManager
 from src.utils.concurrency.async_utils import (
     AsyncTaskManager,

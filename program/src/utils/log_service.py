@@ -30,7 +30,7 @@ from typing import Any, Dict, Optional, Union, List, Iterator
 from contextlib import contextmanager
 from enum import Enum
 
-from src.utils.config_utils.config_service import (
+from program.src.utils.config_service import (
     get_config_service,
     set_config_service,
     ConfigurationError,

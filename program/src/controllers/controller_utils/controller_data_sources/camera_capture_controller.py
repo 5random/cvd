@@ -6,7 +6,7 @@ import contextlib
 from typing import Optional
 
 from src.utils.concurrency.thread_pool import run_camera_io
-from src.utils.config_utils.config_service import get_config_service
+from program.src.utils.config_service import get_config_service
 from src.controllers.controller_base import (
     ControllerStage,
     ControllerConfig,
@@ -14,7 +14,7 @@ from src.controllers.controller_base import (
     ControllerInput,
     ControllerResult,
 )
-from src.utils.log_utils.log_service import info, warning, error
+from program.src.utils.log_service import info, warning, error
 from src.controllers.controller_utils.camera_utils import (
     apply_uvc_settings,
     rotate_frame,

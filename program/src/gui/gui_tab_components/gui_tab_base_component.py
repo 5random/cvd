@@ -6,7 +6,7 @@ from abc import ABC, abstractmethod
 from typing import Any, Dict, Optional, List, Callable
 from dataclasses import dataclass, field
 from nicegui import ui
-from src.utils.log_utils.log_service import info, warning, error, debug
+from program.src.utils.log_service import info, warning, error, debug
 
 
 @dataclass

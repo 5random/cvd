@@ -23,7 +23,7 @@ from threading import BoundedSemaphore, Lock
 from types import TracebackType
 from typing import Any, Callable, Dict, Optional, Set, TypeVar
 
-from src.utils.log_utils.log_service import debug, error, info, warning
+from program.src.utils.log_service import debug, error, info, warning
 
 # ───────────────────────────── optional dependencies ─────────────────────────
 try:

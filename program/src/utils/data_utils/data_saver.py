@@ -6,7 +6,7 @@ import contextlib
 from concurrent.futures import Future
 from src.utils.concurrency.thread_pool import get_thread_pool_manager, ThreadPoolType
 from src.data_handler.interface.sensor_interface import SensorReading
-from src.utils.log_utils.log_service import info, warning, error, debug
+from program.src.utils.log_service import info, warning, error, debug
 import threading
 import time
 from src.utils.data_utils.compression_service import get_compression_service

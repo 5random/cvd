@@ -22,7 +22,7 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Any, Callable, Dict, Optional
 
-from src.utils.log_utils.log_service import info, warning
+from program.src.utils.log_service import info, warning
 
 
 class ProcessPoolType(Enum):

@@ -18,7 +18,7 @@ from src.controllers.controller_base import (
     ControllerStatus,
 )
 from src.data_handler.interface.sensor_interface import SensorReading
-from src.utils.log_utils.log_service import info, warning, error, debug
+from program.src.utils.log_service import info, warning, error, debug
 
 
 from .algorithms.motion_detection import MotionDetectionController
@@ -26,7 +26,7 @@ from .algorithms.reactor_state import ReactorStateController
 from .controller_utils.controller_data_sources.camera_capture_controller import (
     CameraCaptureController,
 )
-from src.utils.config_utils.config_service import (
+from program.src.utils.config_service import (
     get_config_service,
     ConfigurationError,
 )
