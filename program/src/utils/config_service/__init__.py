@@ -13,6 +13,9 @@ from pathlib import Path
 from dataclasses import dataclass
 import sys
 
+from .loader import deep_merge, load_config, save_config
+from .validation import validate_config
+
 # Use standard logging for configuration service to avoid circular dependencies
 info = logging.info
 warning = logging.warning
@@ -230,20 +233,7 @@ class ConfigurationService:
     def _load_config(self) -> None:
         """Load configuration from files"""
         try:
-            # Load default config
-            default_config = {}
-            if self.default_config_path.exists():
-                with open(self.default_config_path, "r", encoding="utf-8") as f:
-                    default_config = json.load(f)
-
-            # Load user config
-            user_config = {}
-            if self.config_path.exists():
-                with open(self.config_path, "r", encoding="utf-8") as f:
-                    user_config = json.load(f)
-
-            # Merge configs
-            self._config_cache = self._deep_merge(default_config, user_config)
+            self._config_cache = load_config(self.config_path, self.default_config_path)
 
             # Normalize sensors to list-of-dicts format
             sensors = self._config_cache.get("sensors")
@@ -267,37 +257,12 @@ class ConfigurationService:
         self, default: Dict[str, Any], override: Dict[str, Any]
     ) -> Dict[str, Any]:
         """Deep merge two dictionaries"""
-        result = default.copy()
-
-        for key, value in override.items():
-            if (
-                key in result
-                and isinstance(result[key], dict)
-                and isinstance(value, dict)
-            ):
-                result[key] = self._deep_merge(result[key], value)
-            else:
-                result[key] = value
-
-        return result
+        return deep_merge(default, override)
 
     def _validate_config(
         self, config: Dict[str, Any], schema: Dict[str, Any], config_type: str
     ) -> List[str]:
-        """Validate configuration against schema and return list of errors"""
-        validator = Draft7Validator(schema)
-        errors: List[str] = []
-        for err in validator.iter_errors(config):
-            path = ".".join(str(p) for p in err.path)
-            message = f"{path}: {err.message}" if path else err.message
-            errors.append(message)
-
-        known_fields: Set[str] = set(schema.get("properties", {}).keys())
-        known_fields.update({"sensor_id", "controller_id", "algorithm_id", "webcam_id"})
-        for field in set(config.keys()) - known_fields:
-            warning(f"Unknown field in {config_type} config: {field}")
-
-        return errors
+        return validate_config(config, schema, config_type)
 
     def _validate_sensor_config(self, sensor_config: Dict[str, Any]) -> None:
         """Validate sensor configuration"""
@@ -400,21 +365,16 @@ class ConfigurationService:
     def _save_config(self) -> None:
         """Save configuration to file"""
         try:
-            # ensure the directory for the config file exists
-            self.config_path.parent.mkdir(parents=True, exist_ok=True)
-            # Prepare a reversible config dump: convert sensors list back to dict
             dump_config = copy.deepcopy(self._config_cache)
             sensors = dump_config.get("sensors")
             if isinstance(sensors, list):
-                # Merge list of single-key dicts into a single dict
                 sensor_map: Dict[str, Any] = {}
                 for entry in sensors:
                     if isinstance(entry, dict):
                         for sid, cfg in entry.items():
                             sensor_map[sid] = cfg
                 dump_config["sensors"] = sensor_map
-            with open(self.config_path, "w", encoding="utf-8") as f:
-                json.dump(dump_config, f, indent=2, ensure_ascii=False)
+            save_config(dump_config, self.config_path)
             debug(f"Configuration saved to {self.config_path}")
         except Exception as e:
             error(f"Failed to save configuration: {e}")
@@ -1054,14 +1014,15 @@ class ConfigurationService:
 
     def reload(self) -> None:
         """Reload configuration from files"""
-        self._load_config()
+        from .maintenance import reload_config
+
+        reload_config(self)
 
     def reset_to_defaults(self) -> None:
         """Reset configuration to defaults"""
-        if self.default_config_path.exists():
-            with open(self.default_config_path, "r", encoding="utf-8") as f:
-                self._config_cache = json.load(f)
-            self._save_config()
+        from .maintenance import reset_to_defaults
+
+        reset_to_defaults(self)
 
 
 # Global configuration service instance
@@ -1085,3 +1046,4 @@ def set_config_service(service: ConfigurationService) -> None:
 module = sys.modules[__name__]
 sys.modules.setdefault("src.utils.config_service", module)
 sys.modules.setdefault("program.src.utils.config_service", module)
+sys.modules.setdefault("src.utils.config_utils.config_service", module)
