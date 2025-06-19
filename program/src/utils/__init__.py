@@ -3,7 +3,6 @@ from .container import ApplicationContainer
 from .email_alert_service import EmailAlertService, set_email_alert_service
 from .log_service import info, warning, error, debug, performance, timer, context
 
-# filepath: .../utils/__init__.py
 """
 Utility subpackage providing helpers for configuration, logging and
 concurrency management.
@@ -28,6 +27,7 @@ from .config_service import (
         set_config_service,
 )
 from .ui_helpers import *  # pylint: disable=wildcard-import
+from . import ui_helpers  # needed for __all__
 
 # ----------------------------------------------------------------------
 # public API

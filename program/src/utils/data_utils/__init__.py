@@ -1,16 +1,26 @@
+"""
+data_utils
+
+Data utilities package.
+
+This package bundles helpers for data compression, cleanup, storage,
+indexing and background maintenance.
+
+
+It exposes:
+    - ``compression_service`` and ``compression_manager``
+    - ``data_cleaner``
+    - ``data_saver``
+    - ``file_management_service``
+    - ``indexing``
+    - ``data_manager``
+    - ``maintenance``
+"""
 from .compression_manager import CompressionManager
 from .data_cleaner import clean_file
 from .data_saver import DataSaver
 from .file_management_service import FileMaintenanceService
 from .maintenance import MaintenanceManager
-"""
-data_utils
-----------
-
-Paket mit Hilfsmodulen für Datenkompression, -bereinigung, -verwaltung,
-Indexierung und Hintergrundwartung.
-"""
-
 # Kompressions-Management
 
 # Kompressions-Service

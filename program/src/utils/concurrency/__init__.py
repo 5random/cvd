@@ -1,6 +1,5 @@
 from . import async_utils, process_pool, thread_pool
 
-# filepath: d:/Willem/KV_GitHub/cvd/program/src/utils/concurrency/__init__.py
 """
 Concurrency utilities package
 
