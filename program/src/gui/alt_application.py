@@ -17,12 +17,11 @@ class SimpleGUIApplication:
         self.motion_detected = False
         self.experiment_running = False
         self.alerts_enabled = False
-        
         # Placeholder settings
         self.settings = {
             'sensitivity': 50,
             'fps': 30,
-            'resolution': '640x480',
+            'resolution': '640x480 (30fps)',
             'roi_enabled': False,
             'email': '',
             'alert_delay': 5
@@ -50,79 +49,302 @@ class SimpleGUIApplication:
                     self.alert_status_icon = ui.icon('notifications').classes(
                         'text-yellow-300' if self.alerts_enabled else 'text-gray-400'
                     ).tooltip('Email Alerts Status')
-                    
-                    # Experiment status
+                      # Experiment status
                     self.experiment_status_icon = ui.icon('science').classes(
                         'text-green-300' if self.experiment_running else 'text-gray-400'
                     ).tooltip('Experiment Status')
                     
+                    # Separator
+                    ui.separator().props('vertical inset').classes('bg-white opacity-30 mx-2')
+                    
+                    # Control buttons
+                    ui.button(icon='fullscreen', on_click=lambda: ui.notify('function toggle_fullscreen not yet implemented', type='info')) \
+                        .props('flat round').classes('text-white') \
+                        .tooltip('Toggle Fullscreen')
+                    
+                    ui.button(icon='refresh', on_click=lambda: ui.notify('function reload_page not yet implemented', type='info')) \
+                        .props('flat round').classes('text-white') \
+                        .tooltip('Reload Page')
+                    
+                    # Dark/Light mode toggle
+                    self.dark_mode_btn = ui.button(icon='dark_mode', on_click=lambda: ui.notify('function toggle_dark_mode not yet implemented', type='info')) \
+                        .props('flat round').classes('text-white') \
+                        .tooltip('Toggle Dark/Light Mode')
+                    
+                    # Separator
+                    ui.separator().props('vertical inset').classes('bg-white opacity-30 mx-2')
+                    
                     # Current time
                     self.time_label = ui.label('')
-                    ui.timer(1.0, self.update_time)
+                    # schedule update_time every second
+                    ui.timer(1.0, lambda: self.update_time())
     
     def create_camera_section(self):
         """Create camera feed and controls section"""
         with ui.card().classes('cvd-card w-full'):
             ui.label('Live Camera Feed').classes('text-lg font-bold mb-2')
             
-            # Placeholder for camera stream with context menu
+            # Video placeholder for camera stream with context menu
             with ui.row().classes('justify-center mb-4'):
                 with ui.card().classes('border-2 border-dashed border-gray-300') \
                     .style('width: 640px; height: 480px; background-color: #f5f5f5; display: flex; align-items: center; justify-content: center;'):
-                    ui.label('Camera Feed Placeholder').classes('text-gray-500 text-center')
+                    
+                    # Video element as placeholder for camera feed
+                    self.video_element = ui.video(
+                        'https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/360/Big_Buck_Bunny_360_10s_1MB.mp4'
+                    ).style('width: 100%; height: 100%; object-fit: contain;')
                     
                     # Right-click context menu for camera
                     with ui.context_menu():
-                        ui.menu_item('Camera Settings', on_click=self.show_camera_settings_context)
+                        ui.menu_item('Camera Settings', on_click=lambda: ui.notify('function show_camera_settings_context not yet implemented', type='info'))
                         ui.separator()
-                        ui.menu_item('Start Recording', on_click=self.start_recording_context)
-                        ui.menu_item('Take Snapshot', on_click=self.take_snapshot_context)
+                        ui.menu_item('Take Snapshot', on_click=lambda: ui.notify('function take_snapshot_context not yet implemented', type='info'))
                         ui.separator()
-                        ui.menu_item('Adjust ROI', on_click=self.adjust_roi_context)
-                        ui.menu_item('Reset View', on_click=self.reset_view_context)
+                        ui.menu_item('Adjust ROI', on_click=lambda: ui.notify('function adjust_roi_context not yet implemented', type='info'))
+                        ui.menu_item('Reset View', on_click=lambda: ui.notify('function reset_view_context not yet implemented', type='info'))
             
             # Camera controls
             with ui.row().classes('gap-2 justify-center mb-4'):
-                self.start_camera_btn = ui.button('Start Camera', icon='play_arrow', 
-                                                 on_click=self.toggle_camera).props('color=positive')
-                self.stop_camera_btn = ui.button('Stop Camera', icon='stop', 
-                                                on_click=self.toggle_camera).props('color=negative')
-                self.stop_camera_btn.disable()
-            
-            # Collapsible Camera Settings
+                self.start_camera_btn = ui.button('Play Video', icon='play_arrow', on_click=self.toggle_video_play).props('color=positive')
+                self.stop_camera_btn = ui.button('Pause Video', icon='pause', on_click=self.toggle_video_pause).props('color=negative')
+              # Collapsible Camera Settings
             with ui.expansion('Camera Settings', icon='settings').classes('w-full mt-4'):
-                with ui.grid(columns=2).classes('gap-4 w-full mt-2'):
-                    # Left column - Basic settings
-                    with ui.column():
-                        ui.label('Motion Sensitivity').classes('text-sm font-medium')
+                with ui.column().classes('gap-4 w-full mt-2'):
+                    # Basic Camera Settings
+                    ui.label('Basic Settings').classes('text-base font-semibold text-blue-600')                    # Motion Sensitivity
+                    ui.label('Motion Sensitivity').classes('text-sm font-medium text-gray-700')
+                    with ui.row().classes('gap-3 items-center mb-3 w-full'):
+                        self.sensitivity_number = ui.number(
+                            value=self.settings['sensitivity'], min=0, max=100, step=1,
+                            on_change=lambda value: ui.notify('function update_sensitivity not yet implemented', type='info')
+                        ).classes('w-20').props('dense outlined')
                         self.sensitivity_slider = ui.slider(
                             min=0, max=100, value=self.settings['sensitivity'], step=1,
-                            on_change=self.update_sensitivity
-                        ).props('label-always')
+                            on_change=lambda value: ui.notify('function update_sensitivity not yet implemented', type='info')
+                        ).props('thumb-label').classes('flex-1').style('min-width: 200px; height: 40px;')
                         
-                        ui.label('Frame Rate').classes('text-sm font-medium')
-                        self.fps_select = ui.select(
-                            [15, 30, 60], label='FPS', value=self.settings['fps'],
-                            on_change=self.update_fps
-                        ).classes('w-full')
+                        # Bind slider and number input values together
+                        self.sensitivity_slider.bind_value(self.sensitivity_number, 'value')
+                        self.sensitivity_number.bind_value(self.sensitivity_slider, 'value')
+                        
+                    # Frame Rate & Resolution
+                    with ui.grid(columns=2).classes('gap-4 w-full mb-4'):
+                        with ui.column():
+                            ui.label('Frame Rate').classes('text-sm font-medium text-gray-700')
+                            self.fps_select = ui.select(
+                                [5, 10, 15, 20, 24, 30], label='FPS', value=self.settings['fps'],
+                                on_change=lambda value: ui.notify('function update_fps not yet implemented', type='info')
+                            ).classes('w-full').props('dense outlined')
+                        
+                        with ui.column():
+                            ui.label('Resolution').classes('text-sm font-medium text-gray-700')
+                            self.resolution_select = ui.select(
+                                [
+                                    '320x240 (30fps)', '352x288 (30fps)', '640x480 (30fps)', 
+                                    '800x600 (30fps)', '1024x768 (30fps)', '1280x720 (30fps)', 
+                                    '1280x960 (30fps)', '1280x1024 (30fps)', '1920x1080 (30fps)'
+                                ], 
+                                label='Resolution', value='640x480 (30fps)',
+                                on_change=lambda value: ui.notify('function update_resolution not yet implemented', type='info')
+                            ).classes('w-full').props('dense outlined')
                     
-                    # Right column - Advanced settings
-                    with ui.column():
-                        ui.label('Resolution').classes('text-sm font-medium')
-                        self.resolution_select = ui.select(
-                            ['640x480', '1280x720', '1920x1080'], 
-                            label='Resolution', value=self.settings['resolution'],
-                            on_change=self.update_resolution
-                        ).classes('w-full')
-                        
-                        ui.label('Region of Interest').classes('text-sm font-medium')
-                        with ui.row().classes('gap-2'):
-                            self.roi_checkbox = ui.checkbox('Enable ROI', value=self.settings['roi_enabled'])
-                            ui.button('Set ROI', icon='crop_free', on_click=self.set_roi).props('size=sm')
+                    # Region of Interest
+                    ui.label('Region of Interest').classes('text-sm font-medium text-gray-700')
+                    with ui.row().classes('gap-2 mb-4'):
+                        self.roi_checkbox = ui.checkbox('Enable ROI', value=self.settings['roi_enabled'])
+                        ui.button('Set ROI', icon='crop_free', on_click=lambda: ui.notify('function set_roi not yet implemented', type='info')).props('size=sm')
                 
-                # Apply settings button
-                ui.button('Apply Settings', icon='check', on_click=self.apply_camera_settings) \
-                    .props('color=primary').classes('w-full mt-4')
+                    # UVC Camera Controls Section
+                    ui.separator().classes('my-4')
+                    ui.label('UVC Camera Controls').classes('text-base font-semibold text-blue-600')
+                    ui.label('Hardware-level camera adjustments').classes('text-xs text-gray-600 mb-3')
+                    
+                    # Image Quality Controls
+                    ui.label('Image Quality').classes('text-sm font-medium text-gray-700 mb-2')                    # Brightness Control
+                    ui.label('Brightness').classes('text-xs text-gray-600')
+                    with ui.row().classes('gap-3 items-center mb-3 w-full'):
+                        self.brightness_number = ui.number(
+                            value=0, min=-100, max=100, step=1,
+                            on_change=lambda value: ui.notify('function update_brightness not yet implemented', type='info')
+                        ).classes('w-20').props('dense outlined')
+                        self.brightness_slider = ui.slider(
+                            min=-100, max=100, value=0, step=1,
+                            on_change=lambda value: ui.notify('function update_brightness not yet implemented', type='info')
+                        ).props('thumb-label').classes('flex-1').style('min-width: 200px; height: 40px;')
+                        
+                        # Bind values
+                        self.brightness_slider.bind_value(self.brightness_number, 'value')
+                        self.brightness_number.bind_value(self.brightness_slider, 'value')
+                    
+                    # Contrast Control
+                    ui.label('Contrast').classes('text-xs text-gray-600')
+                    with ui.row().classes('gap-3 items-center mb-3 w-full'):
+                        self.contrast_number = ui.number(
+                            value=100, min=0, max=200, step=1,
+                            on_change=lambda value: ui.notify('function update_contrast not yet implemented', type='info')
+                        ).classes('w-20').props('dense outlined')
+                        self.contrast_slider = ui.slider(
+                            min=0, max=200, value=100, step=1,
+                            on_change=lambda value: ui.notify('function update_contrast not yet implemented', type='info')
+                        ).props('thumb-label').classes('flex-1').style('min-width: 200px; height: 40px;')
+                        
+                        # Bind values
+                        self.contrast_slider.bind_value(self.contrast_number, 'value')
+                        self.contrast_number.bind_value(self.contrast_slider, 'value')
+                    
+                    # Saturation Control
+                    ui.label('Saturation').classes('text-xs text-gray-600')
+                    with ui.row().classes('gap-3 items-center mb-3 w-full'):
+                        self.saturation_number = ui.number(
+                            value=100, min=0, max=200, step=1,
+                            on_change=lambda value: ui.notify('function update_saturation not yet implemented', type='info')
+                        ).classes('w-20').props('dense outlined')
+                        self.saturation_slider = ui.slider(
+                            min=0, max=200, value=100, step=1,
+                            on_change=lambda value: ui.notify('function update_saturation not yet implemented', type='info')
+                        ).props('thumb-label').classes('flex-1').style('min-width: 200px; height: 40px;')
+                        
+                        # Bind values
+                        self.saturation_slider.bind_value(self.saturation_number, 'value')
+                        self.saturation_number.bind_value(self.saturation_slider, 'value')
+                    
+                    # Hue Control
+                    ui.label('Hue').classes('text-xs text-gray-600')
+                    with ui.row().classes('gap-3 items-center mb-3 w-full'):
+                        self.hue_number = ui.number(
+                            value=0, min=-180, max=180, step=1,
+                            on_change=lambda value: ui.notify('function update_hue not yet implemented', type='info')
+                        ).classes('w-20').props('dense outlined')
+                        self.hue_slider = ui.slider(
+                            min=-180, max=180, value=0, step=1,
+                            on_change=lambda value: ui.notify('function update_hue not yet implemented', type='info')
+                        ).props('thumb-label').classes('flex-1').style('min-width: 200px; height: 40px;')
+                        
+                        # Bind values
+                        self.hue_slider.bind_value(self.hue_number, 'value')
+                        self.hue_number.bind_value(self.hue_slider, 'value')
+                    
+                    # Sharpness Control
+                    ui.label('Sharpness').classes('text-xs text-gray-600')
+                    with ui.row().classes('gap-3 items-center mb-4 w-full'):
+                        self.sharpness_number = ui.number(
+                            value=50, min=0, max=100, step=1,
+                            on_change=lambda value: ui.notify('function update_sharpness not yet implemented', type='info')
+                        ).classes('w-20').props('dense outlined')
+                        self.sharpness_slider = ui.slider(
+                            min=0, max=100, value=50, step=1,
+                            on_change=lambda value: ui.notify('function update_sharpness not yet implemented', type='info')
+                        ).props('thumb-label').classes('flex-1').style('min-width: 200px; height: 40px;')
+                        
+                        # Bind values
+                        self.sharpness_slider.bind_value(self.sharpness_number, 'value')
+                        self.sharpness_number.bind_value(self.sharpness_slider, 'value')                    
+                    # Exposure & Advanced Controls
+                    ui.label('Exposure & Advanced').classes('text-sm font-medium text-gray-700 mb-2')
+                    
+                    # White Balance Control
+                    ui.label('White Balance').classes('text-xs text-gray-600')
+                    with ui.row().classes('gap-3 mb-3 items-center w-full'):
+                        # Auto/manual toggle for white balance
+                        self.wb_auto_checkbox = ui.checkbox(
+                            'Auto', value=True,
+                            on_change=self.toggle_white_balance_auto
+                        ).classes('text-xs')
+                        self.wb_manual_number = ui.number(
+                            value=5000, min=2800, max=6500, step=100,
+                            on_change=lambda value: ui.notify('function update_white_balance_manual not yet implemented', type='info')
+                        ).classes('w-24').props('dense outlined')
+                        self.wb_manual_slider = ui.slider(
+                            min=2800, max=6500, value=5000, step=100,
+                            on_change=lambda value: ui.notify('function update_white_balance_manual not yet implemented', type='info')
+                        ).props('thumb-label').classes('flex-1').style('min-width: 200px; height: 40px;')
+                        
+                        # Initially disable manual controls since auto is enabled by default
+                        self.wb_manual_number.disable()
+                        self.wb_manual_slider.disable()
+                        
+                        # Bind values
+                        self.wb_manual_slider.bind_value(self.wb_manual_number, 'value')
+                        self.wb_manual_number.bind_value(self.wb_manual_slider, 'value')
+                    
+                    # Exposure Control
+                    ui.label('Exposure').classes('text-xs text-gray-600')
+                    with ui.row().classes('gap-3 mb-3 items-center w-full'):
+                        # Auto/manual toggle for exposure
+                        self.exposure_auto_checkbox = ui.checkbox(
+                            'Auto', value=True,
+                            on_change=self.toggle_exposure_auto
+                        ).classes('text-xs')
+                        self.exposure_manual_number = ui.number(
+                            value=100, min=1, max=1000, step=1,
+                            on_change=lambda value: ui.notify('function update_exposure_manual not yet implemented', type='info')
+                        ).classes('w-24').props('dense outlined')
+                        self.exposure_manual_slider = ui.slider(
+                            min=1, max=1000, value=100, step=1,
+                            on_change=lambda value: ui.notify('function update_exposure_manual not yet implemented', type='info')
+                        ).props('thumb-label').classes('flex-1').style('min-width: 200px; height: 40px;')
+                        
+                        # note: on_change passed above in constructor
+
+                        # Initially disable manual controls since auto is enabled by default
+                        self.exposure_manual_number.disable()
+                        self.exposure_manual_slider.disable()
+                        # Bind values
+                        self.exposure_manual_slider.bind_value(self.exposure_manual_number, 'value')
+                        self.exposure_manual_number.bind_value(self.exposure_manual_slider, 'value')
+                    
+                    # Gain Control
+                    ui.label('Gain').classes('text-xs text-gray-600')
+                    with ui.row().classes('gap-3 items-center mb-3 w-full'):
+                        self.gain_number = ui.number(
+                            value=50, min=0, max=100, step=1,
+                            on_change=lambda value: ui.notify('function update_gain not yet implemented', type='info')
+                        ).classes('w-20').props('dense outlined')
+                        self.gain_slider = ui.slider(
+                            min=0, max=100, value=50, step=1,
+                            on_change=lambda value: ui.notify('function update_gain not yet implemented', type='info')
+                        ).props('thumb-label').classes('flex-1').style('min-width: 200px; height: 40px;')
+                        
+                        # Bind values
+                        self.gain_slider.bind_value(self.gain_number, 'value')
+                        self.gain_number.bind_value(self.gain_slider, 'value')
+                    
+                    # Gamma Control
+                    ui.label('Gamma').classes('text-xs text-gray-600')
+                    with ui.row().classes('gap-3 items-center mb-3 w-full'):
+                        self.gamma_number = ui.number(
+                            value=100, min=50, max=300, step=1,
+                            on_change=lambda value: ui.notify('function update_gamma not yet implemented', type='info')
+                        ).classes('w-20').props('dense outlined')
+                        self.gamma_slider = ui.slider(
+                            min=50, max=300, value=100, step=1,
+                            on_change=lambda value: ui.notify('function update_gamma not yet implemented', type='info')
+                        ).props('thumb-label').classes('flex-1').style('min-width: 200px; height: 40px;')
+                        
+                        # Bind values
+                        self.gamma_slider.bind_value(self.gamma_number, 'value')
+                        self.gamma_number.bind_value(self.gamma_slider, 'value')
+                    
+                    # Backlight Compensation Control
+                    ui.label('Backlight Compensation').classes('text-xs text-gray-600')
+                    with ui.row().classes('gap-3 items-center mb-4 w-full'):
+                        self.backlight_comp_number = ui.number(
+                            value=0, min=0, max=100, step=1,
+                            on_change=lambda value: ui.notify('function update_backlight_comp not yet implemented', type='info')
+                        ).classes('w-20').props('dense outlined')
+                        self.backlight_comp_slider = ui.slider(
+                            min=0, max=100, value=0, step=1,
+                            on_change=lambda value: ui.notify('function update_backlight_comp not yet implemented', type='info')
+                        ).props('thumb-label').classes('flex-1').style('min-width: 200px; height: 40px;')
+                        
+                        # Bind values
+                        self.backlight_comp_slider.bind_value(self.backlight_comp_number, 'value')
+                        self.backlight_comp_number.bind_value(self.backlight_comp_slider, 'value')
+                
+                    # UVC Control Buttons
+                    with ui.row().classes('gap-2 mt-4 justify-end'):
+                        ui.button('Reset to Defaults', icon='restore', on_click=lambda: ui.notify('function reset_uvc_defaults not yet implemented', type='info')).props('size=sm color=orange')
+                        ui.button('Apply UVC Settings', icon='check', on_click=lambda: ui.notify('function apply_uvc_settings not yet implemented', type='info')).props('size=sm')
     
     def create_motion_status_section(self):
         """Create motion detection status section"""
@@ -167,7 +389,7 @@ class SimpleGUIApplication:
             # Enable/disable alerts
             self.alerts_enabled_checkbox = ui.checkbox(
                 'Enable Email Alerts', value=self.alerts_enabled,
-                on_change=self.toggle_alerts
+                on_change=lambda value: ui.notify('function toggle_alerts not yet implemented', type='info')
             ).classes('mb-3')
             
             # Email settings
@@ -199,9 +421,9 @@ class SimpleGUIApplication:
             # Test and status
             ui.separator().classes('my-3')
             with ui.row().classes('gap-2 w-full'):
-                ui.button('Send Test Alert', icon='send', on_click=self.send_test_alert) \
+                ui.button('Send Test Alert', icon='send', on_click=lambda: ui.notify('function send_test_alert not yet implemented', type='info')) \
                     .props('color=warning').classes('flex-1')
-                ui.button('Alert History', icon='history', on_click=self.show_alert_history) \
+                ui.button('Alert History', icon='history', on_click=lambda: ui.notify('function show_alert_history not yet implemented', type='info')) \
                     .props('color=secondary outline').classes('flex-1')
             
             # Last alert status
@@ -238,7 +460,7 @@ class SimpleGUIApplication:
                 
                 self.experiment_duration_input = ui.number(
                     'Duration (minutes)', 
-                    value=30, min=1, max=1440
+                    value=60, min=1, max=100000
                 ).classes('w-full')
                 
                 # Experiment options
@@ -252,11 +474,11 @@ class SimpleGUIApplication:
             # Control buttons
             with ui.row().classes('gap-2 w-full mt-4'):
                 self.start_experiment_btn = ui.button(
-                    'Start Experiment', icon='play_arrow', on_click=self.toggle_experiment
+                    'Start Experiment', icon='play_arrow', on_click=lambda: ui.notify('function toggle_experiment not yet implemented', type='info')
                 ).props('color=positive').classes('flex-1')
                 
                 self.stop_experiment_btn = ui.button(
-                    'Stop Experiment', icon='stop', on_click=self.toggle_experiment
+                    'Stop Experiment', icon='stop', on_click=lambda: ui.notify('function toggle_experiment not yet implemented', type='info')
                 ).props('color=negative').classes('flex-1')
                 self.stop_experiment_btn.disable()
             
@@ -304,7 +526,8 @@ class SimpleGUIApplication:
                 .cvd-card .q-expansion-item {
                     border: none;
                     box-shadow: none;
-                }                .cvd-card .q-expansion-item__container {
+                }
+                .cvd-card .q-expansion-item__container {
                     padding: 0;
                 }
                 /* Masonry layout improvements */
@@ -340,7 +563,7 @@ class SimpleGUIApplication:
         
         # Header
         self.create_header()
-          # Main content area - Masonry-style layout with CSS Grid
+        # Main content area - Masonry-style layout with CSS Grid
         with ui.element('div').classes('w-full p-4 masonry-grid'):
             # Camera section (top-left, spans full height if needed)
             with ui.element('div').style('grid-area: camera;'):
@@ -357,11 +580,41 @@ class SimpleGUIApplication:
             # Email Alerts (bottom-right)
             with ui.element('div').style('grid-area: alerts;'):
                 self.create_email_alerts_section()
-
-    # Event handlers - placeholder implementations
+            # Event handlers - placeholder implementations
     def update_time(self):
         """Update the time display in header"""
         self.time_label.text = datetime.now().strftime('%H:%M:%S')
+    
+    def toggle_video_play(self):
+        """Play the video placeholder"""
+        if hasattr(self, 'video_element'):
+            self.video_element.play()
+            # Update button states
+            self.start_camera_btn.props('disable')
+            self.stop_camera_btn.props(remove='disable')
+        ui.notify('Video started', type='positive')
+    
+    def toggle_video_pause(self):
+        """Pause the video placeholder"""
+        if hasattr(self, 'video_element'):
+            self.video_element.pause()
+            # Update button states
+            self.stop_camera_btn.props('disable')
+            self.start_camera_btn.props(remove='disable')
+        ui.notify('Video paused', type='info')
+    
+    # Header button handlers - placeholder implementations
+    def toggle_fullscreen(self):
+        """Toggle fullscreen mode"""
+        ui.notify('Toggle Fullscreen noch nicht implementiert', type='info')
+    
+    def reload_page(self):
+        """Reload the current page"""
+        ui.notify('Reload Page noch nicht implementiert', type='info')
+    
+    def toggle_dark_mode(self):
+        """Toggle between dark and light mode"""
+        ui.notify('Toggle Dark/Light Mode noch nicht implementiert', type='info')
     
     # Context menu handlers - all placeholder implementations
     def show_camera_settings_context(self):
@@ -425,6 +678,30 @@ class SimpleGUIApplication:
         """Toggle experiment running state"""
         ui.notify('toggle_experiment noch nicht implementiert', type='info')
     
+    def toggle_white_balance_auto(self, value):
+        """Toggle white balance between auto and manual mode"""
+        if value:
+            # Auto mode - disable manual controls
+            self.wb_manual_number.disable()
+            self.wb_manual_slider.disable()
+        else:
+            # Manual mode - enable manual controls
+            self.wb_manual_number.enable()
+            self.wb_manual_slider.enable()
+        ui.notify(f'White Balance set to {"Auto" if value else "Manual"}', type='info')
+    
+    def toggle_exposure_auto(self, value):
+        """Toggle exposure between auto and manual mode"""
+        if value:
+            # Auto mode - disable manual controls
+            self.exposure_manual_number.disable()
+            self.exposure_manual_slider.disable()
+        else:
+            # Manual mode - enable manual controls
+            self.exposure_manual_number.enable()
+            self.exposure_manual_slider.enable()
+        ui.notify(f'Exposure set to {"Auto" if value else "Manual"}', type='info')
+    
     def run(self, host: str = 'localhost', port: int = 8081):
         """Run the simple GUI application"""
         @ui.page('/')
@@ -436,7 +713,7 @@ class SimpleGUIApplication:
             host=host,
             port=port,
             title='CVD Tracker - Simple',
-            favicon='🔬',
+            favicon="https://www.tuhh.de/favicon.ico",
             dark=False,
             show=True
         )
