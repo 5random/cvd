@@ -5,12 +5,19 @@ from .file_management_service import FileMaintenanceService
 from .maintenance import MaintenanceManager
 
 # -*- coding: utf-8 -*-
-"""
-data_utils
-----------
+"""Data utilities package.
 
-Paket mit Hilfsmodulen für Datenkompression, -bereinigung, -verwaltung,
-Indexierung und Hintergrundwartung.
+This package bundles helpers for data compression, cleanup, storage,
+indexing and background maintenance.
+
+It exposes:
+    - ``compression_service`` and ``compression_manager``
+    - ``data_cleaner``
+    - ``data_saver``
+    - ``file_management_service``
+    - ``indexing``
+    - ``data_manager``
+    - ``maintenance``
 """
 
 # Kompressions-Management
