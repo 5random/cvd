@@ -1,16 +1,47 @@
-from . import concurrency, data_utils
-from .container import ApplicationContainer
-from .email_alert_service import EmailAlertService, set_email_alert_service
-from .log_service import info, warning, error, debug, performance, timer, context
-
-"""
-Utility subpackage providing helpers for configuration, logging and
+"""Utility subpackage providing helpers for configuration, logging and
 concurrency management.
 
-This package collects:
-    - config_service, container, email_alert_service, log_service, ui_helpers
-    - the two subpackages: concurrency, data_utils
+This package exposes a number of submodules and convenience functions.  In
+order to avoid circular import issues these objects are imported lazily via
+``__getattr__`` rather than at module import time.
 """
+
+from __future__ import annotations
+
+import importlib
+
+_BASE_PACKAGE = __name__
+
+# ----------------------------------------------------------------------
+# Lazy module attributes
+# ----------------------------------------------------------------------
+
+_lazy_modules = {
+    "concurrency": ".concurrency",
+    "data_utils": ".data_utils",
+    "ApplicationContainer": ".container",
+    "EmailAlertService": ".email_alert_service",
+    "set_email_alert_service": ".email_alert_service",
+    "info": ".log_service",
+    "warning": ".log_service",
+    "error": ".log_service",
+    "debug": ".log_service",
+    "performance": ".log_service",
+    "timer": ".log_service",
+    "context": ".log_service",
+}
+
+def __getattr__(name: str):  # pragma: no cover - thin wrapper
+    """Dynamically import attributes on first access."""
+
+    module_name = _lazy_modules.get(name)
+    if module_name is None:
+        raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+
+    module = importlib.import_module(module_name, __name__)
+    attr = getattr(module, name)
+    globals()[name] = attr
+    return attr
 
 # ----------------------------------------------------------------------
 # subpackages
