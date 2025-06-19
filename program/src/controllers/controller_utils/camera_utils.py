@@ -1,6 +1,6 @@
 import cv2
 from typing import Dict, Any, Optional
-from src.utils.concurrency.thread_pool import run_camera_io
+from program.src.utils.concurrency.thread_pool import run_camera_io
 from program.src.utils.log_service import warning
 
 

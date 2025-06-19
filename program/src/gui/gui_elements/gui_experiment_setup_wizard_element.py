@@ -5,19 +5,19 @@ from datetime import datetime
 from pathlib import Path
 from nicegui import ui
 import json
-from src.utils.ui_helpers import notify_later
+from program.src.utils.ui_helpers import notify_later
 
-from src.gui.gui_tab_components.gui_tab_base_component import (
+from program.src.gui.gui_tab_components.gui_tab_base_component import (
     BaseComponent,
     ComponentConfig,
 )
 from .gui_wizard_mixin import WizardMixin
-from src.experiment_handler.experiment_manager import (
+from program.src.experiment_handler.experiment_manager import (
     ExperimentManager, ExperimentConfig, ExperimentState, ExperimentPhase,
     get_experiment_manager
 )
-from src.data_handler.sources.sensor_source_manager import SensorManager
-from src.controllers.controller_manager import ControllerManager
+from program.src.data_handler.sources.sensor_source_manager import SensorManager
+from program.src.controllers.controller_manager import ControllerManager
 from program.src.utils.config_service import ConfigurationService
 from program.src.utils.log_service import info, warning, error, debug
 

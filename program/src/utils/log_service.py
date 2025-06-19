@@ -147,7 +147,7 @@ class LogService:
                 set_config_service(service)
             except Exception as exc:
                 raise ConfigurationError(
-                    "LogService requires an initialised ConfigurationService"
+                    f"LogService failed to initialise ConfigurationService: {exc}"
                 ) from exc
 
         self.config_service = service

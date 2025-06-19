@@ -78,14 +78,26 @@ class ConfigurationService:
                     "properties": {"interface": {"const": "serial"}},
                     "required": ["interface"],
                 },
-                "then": {"required": ["port", "channel"]},
+                "then": {
+                    "properties": {
+                        "port": {"type": "string"},
+                        "channel": {"type": "integer"},
+                    },
+                    "required": ["port", "channel"],
+                },
             },
             {
                 "if": {
                     "properties": {"interface": {"const": "modbus"}},
                     "required": ["interface"],
                 },
-                "then": {"required": ["port", "address"]},
+                "then": {
+                    "properties": {
+                        "port": {"type": "string"},
+                        "address": {"type": "string"},
+                    },
+                    "required": ["port", "address"],
+                },
             },
         ],
     }
@@ -390,8 +402,19 @@ class ConfigurationService:
         try:
             # ensure the directory for the config file exists
             self.config_path.parent.mkdir(parents=True, exist_ok=True)
+            # Prepare a reversible config dump: convert sensors list back to dict
+            dump_config = copy.deepcopy(self._config_cache)
+            sensors = dump_config.get("sensors")
+            if isinstance(sensors, list):
+                # Merge list of single-key dicts into a single dict
+                sensor_map: Dict[str, Any] = {}
+                for entry in sensors:
+                    if isinstance(entry, dict):
+                        for sid, cfg in entry.items():
+                            sensor_map[sid] = cfg
+                dump_config["sensors"] = sensor_map
             with open(self.config_path, "w", encoding="utf-8") as f:
-                json.dump(self._config_cache, f, indent=2, ensure_ascii=False)
+                json.dump(dump_config, f, indent=2, ensure_ascii=False)
             debug(f"Configuration saved to {self.config_path}")
         except Exception as e:
             error(f"Failed to save configuration: {e}")

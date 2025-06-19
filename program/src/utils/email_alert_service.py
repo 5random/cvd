@@ -3,7 +3,7 @@ import smtplib
 from email.message import EmailMessage
 from typing import Optional
 
-from program.src.utils.config_service import get_config_service, ConfigurationService
+from program.src.utils.config_service import get_config_service, ConfigurationService, ConfigurationError
 from program.src.utils.log_service import info, warning, error
 
 
@@ -24,7 +24,16 @@ class EmailAlertService:
         self.smtp_port: int = cfg.get('smtp_port', 25)
         self.smtp_user: Optional[str] = cfg.get('smtp_user')
         self.smtp_password: Optional[str] = cfg.get('smtp_password')
+        # Use SSL connection if True, else use STARTTLS on standard SMTP
+        self.smtp_use_ssl: bool = cfg.get('smtp_use_ssl', False)
         self.critical_timeout: int = cfg.get('critical_state_timeout_s', 60)
+        # Validate required alerting config fields
+        if not self.recipient or not isinstance(self.recipient, str) or not self.recipient.strip():
+            raise ConfigurationError("alerting.email_recipient is required and must be a non-empty string")
+        if not isinstance(self.smtp_host, str) or not self.smtp_host.strip():
+            raise ConfigurationError("alerting.smtp_host is required and must be a non-empty string")
+        if not isinstance(self.smtp_port, int) or not (1 <= self.smtp_port <= 65535):
+            raise ConfigurationError("alerting.smtp_port must be an integer between 1 and 65535")
 
     def send_alert(self, subject: str, body: str) -> bool:
         """Send an alert e-mail. Returns True on success."""
@@ -37,10 +46,19 @@ class EmailAlertService:
             msg['From'] = self.smtp_user or 'cvd-tracker'
             msg['To'] = self.recipient
             msg.set_content(body)
-            with smtplib.SMTP(self.smtp_host, self.smtp_port) as smtp:
-                if self.smtp_user:
+            # Establish connection: SSL or plain
+            if self.smtp_use_ssl:
+                smtp_conn = smtplib.SMTP_SSL(self.smtp_host, self.smtp_port)
+            else:
+                smtp_conn = smtplib.SMTP(self.smtp_host, self.smtp_port)
+            with smtp_conn as smtp:
+                smtp.ehlo()
+                if not self.smtp_use_ssl:
                     smtp.starttls()
-                    smtp.login(self.smtp_user, self.smtp_password or '')
+                    smtp.ehlo()
+                # Authenticate only if both user and password provided
+                if self.smtp_user and self.smtp_password:
+                    smtp.login(self.smtp_user, self.smtp_password)
                 smtp.send_message(msg)
             info(f"Sent alert email to {self.recipient}")
             return True

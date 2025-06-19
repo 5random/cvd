@@ -17,7 +17,7 @@ from src.controllers.controller_base import (
     ControllerConfig,
     ControllerStatus,
 )
-from src.data_handler.interface.sensor_interface import SensorReading
+from program.src.data_handler.interface.sensor_interface import SensorReading
 from program.src.utils.log_service import info, warning, error, debug
 
 
