@@ -27,13 +27,17 @@ class EmailAlertService:
         # Use SSL connection if True, else use STARTTLS on standard SMTP
         self.smtp_use_ssl: bool = cfg.get('smtp_use_ssl', False)
         self.critical_timeout: int = cfg.get('critical_state_timeout_s', 60)
-        # Validate required alerting config fields
+
+        # Validate configuration and fall back to safe defaults rather than raising
         if not self.recipient or not isinstance(self.recipient, str) or not self.recipient.strip():
-            raise ConfigurationError("alerting.email_recipient is required and must be a non-empty string")
+            warning("EmailAlertService: email recipient not configured; alert emails disabled")
+            self.recipient = None
         if not isinstance(self.smtp_host, str) or not self.smtp_host.strip():
-            raise ConfigurationError("alerting.smtp_host is required and must be a non-empty string")
+            warning("EmailAlertService: invalid smtp_host; using 'localhost'")
+            self.smtp_host = 'localhost'
         if not isinstance(self.smtp_port, int) or not (1 <= self.smtp_port <= 65535):
-            raise ConfigurationError("alerting.smtp_port must be an integer between 1 and 65535")
+            warning("EmailAlertService: invalid smtp_port; using 25")
+            self.smtp_port = 25
 
     def send_alert(self, subject: str, body: str) -> bool:
         """Send an alert e-mail. Returns True on success."""
