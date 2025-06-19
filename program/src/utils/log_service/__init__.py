@@ -22,8 +22,7 @@ import os
 import json
 import time
 import threading
-import gzip
-import shutil
+import sys
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Dict, Optional, Union, List, Iterator
@@ -36,6 +35,8 @@ from program.src.utils.config_service import (
     ConfigurationError,
     ConfigurationService,
 )  # type: ignore
+
+from .maintenance import rotate_logs, cleanup_old_logs, compress_old_logs
 
 
 class LogLevel(Enum):
@@ -518,37 +519,15 @@ class LogService:
     # Maintenance functions
     def rotate_logs(self) -> None:
         """Manually rotate all logs"""
-        for handler in self._handlers.values():
-            if hasattr(handler, "doRollover"):
-                handler.doRollover()
+        rotate_logs(self)
 
     def cleanup_old_logs(self) -> None:
         """Clean up old log files beyond retention period"""
-        cutoff_date = datetime.now() - timedelta(days=self.retention_days)
-
-        for log_file in self.log_dir.glob("*.log*"):
-            if log_file.stat().st_mtime < cutoff_date.timestamp():
-                try:
-                    log_file.unlink()
-                    self.info(f"Cleaned up old log file: {log_file}")
-                except Exception as e:
-                    self.error(f"Failed to cleanup log file {log_file}: {e}")
+        cleanup_old_logs(self)
 
     def compress_old_logs(self) -> None:
         """Compress old log files to save space"""
-        compressed_exts = {".gz", ".bz2", ".xz", ".zip"}
-        for log_file in self.log_dir.glob("*.log.*"):
-            if any(log_file.name.endswith(ext) for ext in compressed_exts):
-                continue
-            try:
-                compressed_file = f"{log_file}.gz"
-                with open(log_file, "rb") as f_in:
-                    with gzip.open(compressed_file, "wb") as f_out:
-                        shutil.copyfileobj(f_in, f_out)
-                log_file.unlink()
-                self.info(f"Compressed log file: {log_file} -> {compressed_file}")
-            except Exception as e:
-                self.error(f"Failed to compress log file {log_file}: {e}")
+        compress_old_logs(self)
 
     def get_log_stats(self) -> Dict[str, Any]:
         """Get logging statistics"""
@@ -696,3 +675,9 @@ def log_audit(action: str, data: Dict[str, Any]):
 def log_structured(event_type: str, data: Dict[str, Any]):
     """Log structured data using global instance"""
     get_log_service().structured(event_type, data)
+
+
+# Ensure module is importable via legacy ``log_utils.log_service`` path
+module = sys.modules[__name__]
+sys.modules.setdefault("src.utils.log_utils.log_service", module)
+sys.modules.setdefault("program.src.utils.log_service", module)
