@@ -19,6 +19,7 @@ dependencies = [
     "setuptools",
     "types-jsonschema",
     "types-setuptools",
+    "psutil",
 ]
 
 [project.entry-points."cvd.sensors"]
