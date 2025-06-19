@@ -8,6 +8,8 @@ through a NiceGUI based interface.  A short description of the architecture
 and main modules can be found in [docs/architecture.md](docs/architecture.md).
 Example snippets demonstrating typical usage are available in
 [docs/examples.md](docs/examples.md).
+An overview of the configuration and logging utilities lives in
+[docs/utils_services.md](docs/utils_services.md).
 
 ## Installation
 
