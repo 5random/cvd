@@ -60,7 +60,6 @@ class SimpleGUIApplication:
         controller_manager: Optional[ControllerManager] = None,
         config_dir: Optional[Path] = None,
     ):
-
         self.camera_active = False
         self.motion_detected = False
         self.experiment_running = False
@@ -118,8 +117,6 @@ class SimpleGUIApplication:
         self.camera_controller = self.controller_manager._controllers.get(
             "camera_capture"
         )
-
-        self.sensor_manager = SensorManager(self.config_service)
 
         self.motion_controller = self.controller_manager._controllers.get(
             "motion_detection"
