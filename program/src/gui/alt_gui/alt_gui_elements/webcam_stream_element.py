@@ -1,8 +1,8 @@
 from nicegui import ui
 
 class WebcamStreamElement:
-    def __init__(self, settings):
-        """Initialize webcam stream element with settings"""
+    def __init__(self, settings, callbacks=None):
+        """Initialize webcam stream element with settings and optional callbacks"""
         self.camera_active = False
         settings = settings or {
             'sensitivity': 50,
@@ -10,6 +10,7 @@ class WebcamStreamElement:
             'roi_enabled': False
         }
         self.settings = settings
+        self.callbacks = callbacks or {}
         
         @ui.page('/webcam_stream')
         def webcam_stream_page():
@@ -54,11 +55,11 @@ class WebcamStreamElement:
                         with ui.row().classes('gap-3 items-center mb-3 w-full'):
                             self.sensitivity_number = ui.number(
                                 value=self.settings['sensitivity'], min=0, max=100, step=1,
-                                on_change=lambda value: ui.notify('function update_sensitivity not yet implemented', type='info')
+                                on_change=self.callbacks.get('update_sensitivity', lambda v: ui.notify('function update_sensitivity not yet implemented', type='info'))
                             ).classes('w-20').props('dense outlined')
                             self.sensitivity_slider = ui.slider(
                                 min=0, max=100, value=self.settings['sensitivity'], step=1,
-                                on_change=lambda value: ui.notify('function update_sensitivity not yet implemented', type='info')
+                                on_change=self.callbacks.get('update_sensitivity', lambda v: ui.notify('function update_sensitivity not yet implemented', type='info'))
                             ).props('thumb-label').classes('flex-1').style('min-width: 200px; height: 40px;')
                             
                             # Bind slider and number input values together
@@ -71,26 +72,26 @@ class WebcamStreamElement:
                                 ui.label('Frame Rate').classes('text-sm font-medium text-gray-700')
                                 self.fps_select = ui.select(
                                     [5, 10, 15, 20, 24, 30], label='FPS', value=self.settings['fps'],
-                                    on_change=lambda value: ui.notify('function update_fps not yet implemented', type='info')
+                                    on_change=self.callbacks.get('update_fps', lambda v: ui.notify('function update_fps not yet implemented', type='info'))
                                 ).classes('w-full').props('dense outlined')
                             
                             with ui.column():
                                 ui.label('Resolution').classes('text-sm font-medium text-gray-700')
                                 self.resolution_select = ui.select(
                                     [
-                                        '320x240 (30fps)', '352x288 (30fps)', '640x480 (30fps)', 
-                                        '800x600 (30fps)', '1024x768 (30fps)', '1280x720 (30fps)', 
+                                        '320x240 (30fps)', '352x288 (30fps)', '640x480 (30fps)',
+                                        '800x600 (30fps)', '1024x768 (30fps)', '1280x720 (30fps)',
                                         '1280x960 (30fps)', '1280x1024 (30fps)', '1920x1080 (30fps)'
-                                    ], 
+                                    ],
                                     label='Resolution', value='640x480 (30fps)',
-                                    on_change=lambda value: ui.notify('function update_resolution not yet implemented', type='info')
+                                    on_change=self.callbacks.get('update_resolution', lambda v: ui.notify('function update_resolution not yet implemented', type='info'))
                                 ).classes('w-full').props('dense outlined')
                         
                         # Region of Interest
                         ui.label('Region of Interest').classes('text-sm font-medium text-gray-700')
                         with ui.row().classes('gap-2 mb-4'):
                             self.roi_checkbox = ui.checkbox('Enable ROI', value=self.settings['roi_enabled'])
-                            ui.button('Set ROI', icon='crop_free', on_click=lambda: ui.notify('function set_roi not yet implemented', type='info')).props('size=sm')
+                            ui.button('Set ROI', icon='crop_free', on_click=self.callbacks.get('set_roi', lambda: ui.notify('function set_roi not yet implemented', type='info'))).props('size=sm')
                     
                         # UVC Camera Controls Section
                         ui.separator().classes('my-4')
@@ -282,7 +283,7 @@ class WebcamStreamElement:
                         # UVC Control Buttons
                         with ui.row().classes('gap-2 mt-4 justify-end'):
                             ui.button('Reset to Defaults', icon='restore', on_click=lambda: ui.notify('function reset_uvc_defaults not yet implemented', type='info')).props('size=sm color=orange')
-                            ui.button('Apply UVC Settings', icon='check', on_click=lambda: ui.notify('function apply_uvc_settings not yet implemented', type='info')).props('size=sm')
+                            ui.button('Apply UVC Settings', icon='check', on_click=self.callbacks.get('apply_uvc_settings', lambda: ui.notify('function apply_uvc_settings not yet implemented', type='info'))).props('size=sm')
     
     def toggle_video_play(self):
         """Toggle video play state"""
