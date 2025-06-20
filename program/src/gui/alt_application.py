@@ -7,6 +7,15 @@
 from nicegui import ui
 from datetime import datetime
 from typing import Optional, Dict, Any
+import asyncio
+import cv2
+from fastapi.responses import StreamingResponse
+from fastapi import Request
+
+from src.controllers.controller_base import ControllerConfig
+from src.controllers.controller_utils.controller_data_sources.camera_capture_controller import (
+    CameraCaptureController,
+)
 
 from alt_gui import (
     setup_global_styles,
@@ -28,6 +37,7 @@ class SimpleGUIApplication:
         self.motion_detected = False
         self.experiment_running = False
         self.alerts_enabled = False
+        self.camera_controller: Optional[CameraCaptureController] = None
         
         # Placeholder settings
         self.settings = {
@@ -166,8 +176,42 @@ class SimpleGUIApplication:
         ui.notify('Reset View (Rechtsklick) noch nicht implementiert', type='info')
       # Main event handlers - placeholder implementations  
     def toggle_camera(self):
-        """Toggle camera on/off"""
-        ui.notify('toggle_camera noch nicht implementiert', type='info')
+        """Start or stop the camera capture controller."""
+
+        async def _start():
+            if self.camera_controller is None:
+                cfg = ControllerConfig(
+                    controller_id="camera_capture",
+                    controller_type="camera_capture",
+                    parameters={"device_index": 0},
+                )
+                self.camera_controller = CameraCaptureController(
+                    "camera_capture", cfg
+                )
+            await self.camera_controller.start()
+
+        async def _stop():
+            if self.camera_controller is not None:
+                await self.camera_controller.stop()
+                await self.camera_controller.cleanup()
+                self.camera_controller = None
+
+        if not self.camera_active:
+            asyncio.create_task(_start())
+            self.camera_active = True
+            if hasattr(self, "camera_status_icon"):
+                self.camera_status_icon.classes(replace="text-green-300")
+            if getattr(self.webcam_stream, "start_camera_btn", None):
+                self.webcam_stream.start_camera_btn.set_icon("pause")
+                self.webcam_stream.start_camera_btn.set_text("Pause Video")
+        else:
+            asyncio.create_task(_stop())
+            self.camera_active = False
+            if hasattr(self, "camera_status_icon"):
+                self.camera_status_icon.classes(replace="text-gray-400")
+            if getattr(self.webcam_stream, "start_camera_btn", None):
+                self.webcam_stream.start_camera_btn.set_icon("play_arrow")
+                self.webcam_stream.start_camera_btn.set_text("Play Video")
     
     def update_sensitivity(self, e):
         """Update motion detection sensitivity"""
@@ -348,6 +392,35 @@ class SimpleGUIApplication:
         @ui.page('/')
         def index():
             self.create_main_layout()
+
+        @ui.page('/video_feed')
+        async def video_feed(request: Request):
+            async def gen():
+                while True:
+                    try:
+                        if await request.is_disconnected():
+                            break
+                    except asyncio.CancelledError:
+                        break
+
+                    frame = None
+                    if self.camera_controller is not None:
+                        output = self.camera_controller.get_output()
+                        if isinstance(output, dict):
+                            frame = output.get('frame') or output.get('image')
+                        elif output is not None:
+                            frame = output
+
+                    if frame is not None:
+                        success, buf = cv2.imencode('.jpg', frame)
+                        if success:
+                            jpeg = buf.tobytes()
+                            yield (
+                                b'--frame\r\nContent-Type: image/jpeg\r\n\r\n' + jpeg + b'\r\n'
+                            )
+                    await asyncio.sleep(0.03)
+
+            return StreamingResponse(gen(), media_type='multipart/x-mixed-replace; boundary=frame')
         
         print(f'Starting Simple CVD GUI on http://{host}:{port}')
         ui.run(
