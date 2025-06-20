@@ -20,7 +20,5 @@ def register_controller_type(name: str, cls: Type[ControllerStage]) -> None:
 
 # Register built-in controller types
 register_controller_type("motion_detection", MotionDetectionController)
-register_controller_type("reactor_state", ReactorStateController)
-register_controller_type("camera_capture", CameraCaptureController)
 register_controller_type("camera", CameraCaptureController)
-
+#register_controller_type("reactor_state", ReactorStateController)

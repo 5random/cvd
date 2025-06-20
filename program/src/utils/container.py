@@ -24,7 +24,7 @@ from src.utils.data_utils.data_saver import DataSaver
 from src.data_handler.processing.pipeline.pipeline import (
     create_temperature_pipeline,
 )
-from src.gui.application import WebApplication
+from program.src.gui.gui_native.application import WebApplication
 from src.utils.data_utils.compression_service import (
     CompressionService,
     set_compression_service,
@@ -102,7 +102,7 @@ class ApplicationContainer:
                 data_pipeline=pipeline
             )
             # Initialize web application
-            from src.gui.application import WebApplication
+            from program.src.gui.gui_native.application import WebApplication
 
             web_application = WebApplication(
                 config_service=config_service,

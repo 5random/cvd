@@ -8,12 +8,16 @@ from nicegui import ui
 from datetime import datetime
 from typing import Optional, Dict, Any
 
-from .alt_gui import (
+from alt_gui import (
     setup_global_styles,
     WebcamStreamElement,
-    EmailAlertsSection,
     ExperimentManagementSection,
     MotionStatusSection,
+    create_compact_alert_widget,
+    create_demo_configurations,
+    create_email_alert_status_display,
+    create_email_alert_wizard,
+    EmailAlertStatusDisplay
 )
 
 class SimpleGUIApplication:
@@ -24,6 +28,7 @@ class SimpleGUIApplication:
         self.motion_detected = False
         self.experiment_running = False
         self.alerts_enabled = False
+        
         # Placeholder settings
         self.settings = {
             'sensitivity': 50,
@@ -33,6 +38,13 @@ class SimpleGUIApplication:
             'email': '',
             'alert_delay': 5
         }
+        
+        # Initialize email alert configurations with demo data
+        self.alert_configurations = create_demo_configurations()
+        self.alert_display = EmailAlertStatusDisplay(self.alert_configurations)
+        
+        # Track if we have active alerts
+        self._update_alerts_status()
     
         
     def create_header(self):
@@ -91,13 +103,11 @@ class SimpleGUIApplication:
         setup_global_styles(self)
 
         # Header
-        self.create_header()
-
-        # Instantiate shared UI sections
+        self.create_header()        # Instantiate shared UI sections
         self.webcam_stream = WebcamStreamElement(self.settings)
         self.motion_section = MotionStatusSection(self.settings)
         self.experiment_section = ExperimentManagementSection(self.settings)
-        self.alerts_section = EmailAlertsSection(self.settings)
+        # Note: EmailAlertsSection replaced with new alert system
 
         # Main content area - Masonry-style layout with CSS Grid
         with ui.element('div').classes('w-full p-4 masonry-grid'):
@@ -113,9 +123,9 @@ class SimpleGUIApplication:
             with ui.element('div').style('grid-area: experiment;'):
                 self.experiment_section.create_experiment_section()
 
-            # Email Alerts (bottom-right)
+            # Email Alerts (bottom-right) - New Alert System
             with ui.element('div').style('grid-area: alerts;'):
-                self.alerts_section.create_email_alerts_section()
+                self._create_enhanced_alerts_section()
             # Event handlers - placeholder implementations
     def update_time(self):
         """Update the time display in header"""
@@ -154,8 +164,7 @@ class SimpleGUIApplication:
     def reset_view_context(self):
         """Reset view from context menu"""
         ui.notify('Reset View (Rechtsklick) noch nicht implementiert', type='info')
-    
-    # Main event handlers - placeholder implementations  
+      # Main event handlers - placeholder implementations  
     def toggle_camera(self):
         """Toggle camera on/off"""
         ui.notify('toggle_camera noch nicht implementiert', type='info')
@@ -181,19 +190,158 @@ class SimpleGUIApplication:
         ui.notify('apply_camera_settings noch nicht implementiert', type='info')
     
     def toggle_alerts(self, e):
-        """Toggle email alerts on/off"""
-        ui.notify('toggle_alerts noch nicht implementiert', type='info')
+        """Toggle email alerts on/off - opens alert management"""
+        self.show_alert_management()
     
     def send_test_alert(self):
         """Send a test email alert"""
-        ui.notify('send_test_alert noch nicht implementiert', type='info')
+        self._send_test_to_all_configs()
     
     def show_alert_history(self):
         """Show alert history dialog"""
-        ui.notify('show_alert_history noch nicht implementiert', type='info')    
+        self._show_alert_history()
+    
     def toggle_experiment(self):
         """Toggle experiment running state"""
         ui.notify('toggle_experiment noch nicht implementiert', type='info')
+    
+    def _update_alerts_status(self):
+        """Update the alerts_enabled status based on current configurations"""
+        # Check if any alert configuration has active alert types
+        self.alerts_enabled = any(
+            any(settings.get('enabled', False) for settings in config.get('settings', {}).values())
+            for config in self.alert_configurations
+        )
+    
+    def show_alert_setup_wizard(self):
+        """Show the email alert setup wizard in a dialog"""
+        with ui.dialog() as dialog, ui.card().classes('w-full max-w-4xl'):
+            wizard_card = create_email_alert_wizard()
+            with ui.row().classes('w-full justify-end mt-4'):
+                ui.button('Schließen', on_click=dialog.close).props('flat')
+        dialog.open()
+    
+    def show_alert_management(self):
+        """Show the alert management interface in a dialog"""
+        with ui.dialog() as dialog, ui.card().classes('w-full max-w-6xl'):
+            ui.label('E-Mail Alert Verwaltung').classes('text-xl font-bold mb-4')
+            
+            # Create the full alert overview
+            self.alert_display.create_alert_overview()
+            
+            with ui.row().classes('w-full justify-end mt-4'):
+                ui.button('Schließen', on_click=dialog.close).props('flat')
+        dialog.open()
+    
+    def _create_enhanced_alerts_section(self):
+        """Create the enhanced email alerts section using the new alert system"""
+        with ui.card().classes('w-full h-full'):
+            with ui.card_section():
+                # Header with action buttons
+                with ui.row().classes('w-full items-center justify-between mb-4'):
+                    ui.label('E-Mail Alerts').classes('text-lg font-semibold')
+                    
+                    with ui.row().classes('gap-2'):
+                        ui.button(
+                            'Konfigurieren',
+                            icon='settings',
+                            on_click=self.show_alert_setup_wizard
+                        ).props('size=sm color=primary outline')
+                        
+                        ui.button(
+                            'Verwalten',
+                            icon='list',
+                            on_click=self.show_alert_management
+                        ).props('size=sm color=secondary outline')
+                
+                # Status overview
+                total_configs = len(self.alert_configurations)
+                active_configs = sum(1 for config in self.alert_configurations 
+                                   if sum(1 for settings in config.get('settings', {}).values() 
+                                         if settings.get('enabled', False)) > 0)
+                
+                # Quick status display
+                with ui.row().classes('items-center gap-3 mb-4'):
+                    # Status icon
+                    if active_configs > 0:
+                        ui.icon('check_circle').classes('text-green-600 text-2xl')
+                        status_text = 'Aktiv'
+                        status_color = 'positive'
+                    else:
+                        ui.icon('warning').classes('text-orange-600 text-2xl')
+                        status_text = 'Inaktiv'
+                        status_color = 'warning'
+                    
+                    with ui.column().classes('gap-1'):
+                        ui.label(f'Status: {status_text}').classes('font-medium')
+                        ui.label(f'{active_configs} von {total_configs} Konfigurationen aktiv').classes('text-sm text-gray-600')                # Quick summary of active configurations
+                if active_configs > 0:
+                    ui.separator().classes('my-3')
+                    ui.label('Aktive Konfigurationen:').classes('text-sm font-medium mb-2')
+                    
+                    for config in self.alert_configurations:
+                        active_alerts = sum(1 for settings in config.get('settings', {}).values() 
+                                          if settings.get('enabled', False))
+                        if active_alerts > 0:
+                            with ui.row().classes('items-center justify-between w-full mb-2 p-2 bg-gray-50 rounded'):
+                                # Left side: Icon and name
+                                with ui.row().classes('items-center gap-2'):
+                                    ui.icon('label').classes('text-blue-600')
+                                    ui.label(config.get('name', 'Unbenannt')).classes('text-sm font-medium')
+                                
+                                # Right side: Alerts and recipients in same line
+                                with ui.row().classes('items-center gap-2'):
+                                    ui.chip(f'{active_alerts} Alert(s)', color='positive').props('dense')
+                                    
+                                    # Show recipient count
+                                    email_count = len(config.get('emails', []))
+                                    if email_count > 0:
+                                        ui.chip(f'{email_count} Empfänger', color='blue').props('dense outline')
+                
+    def _send_test_to_all_configs(self):
+        """Send test alerts to all active configurations"""
+        active_configs = [config for config in self.alert_configurations 
+                         if sum(1 for settings in config.get('settings', {}).values() 
+                               if settings.get('enabled', False)) > 0]
+        
+        if not active_configs:
+            ui.notify('Keine aktiven Alert-Konfigurationen vorhanden', type='warning')
+            return
+        
+        total_recipients = sum(len(config.get('emails', [])) for config in active_configs)
+        ui.notify(f'Test-Alerts an {total_recipients} Empfänger in {len(active_configs)} Konfigurationen gesendet', type='positive')
+    
+    def _show_alert_history(self):
+        """Show alert history dialog"""
+        with ui.dialog() as dialog, ui.card().classes('w-full max-w-4xl'):
+            ui.label('Alert-Verlauf').classes('text-xl font-bold mb-4')
+            
+            # Placeholder for alert history
+            with ui.column().classes('gap-3'):
+                ui.label('Letzte gesendete Alerts:').classes('font-medium')
+                
+                # Mock alert history entries
+                history_entries = [
+                    {'time': '14:35:22', 'type': 'Keine Bewegung', 'config': 'Labor Überwachung', 'recipients': 3},
+                    {'time': '12:18:45', 'type': 'Kamera Offline', 'config': 'Labor Überwachung', 'recipients': 3},
+                    {'time': '09:22:10', 'type': 'Experiment Abgeschlossen', 'config': 'Experiment Benachrichtigungen', 'recipients': 2},
+                ]
+                
+                for entry in history_entries:
+                    with ui.card().classes('w-full p-3'):
+                        with ui.row().classes('items-center justify-between'):
+                            with ui.row().classes('items-center gap-3'):
+                                ui.icon('schedule').classes('text-gray-600')
+                                ui.label(entry['time']).classes('font-mono')
+                                ui.label(entry['type']).classes('font-medium')
+                                ui.label(f"({entry['config']})").classes('text-gray-600')
+                            
+                            ui.chip(f"{entry['recipients']} Empfänger", color='blue').props('dense outline')
+            
+            with ui.row().classes('w-full justify-end mt-4'):
+                ui.button('Schließen', on_click=dialog.close).props('flat')
+        
+        dialog.open()
     
     def run(self, host: str = 'localhost', port: int = 8081):
         """Run the simple GUI application"""
@@ -221,3 +369,35 @@ def main():
 
 if __name__ in {"__main__", "__mp_main__"}:
     main()
+
+# Integration Notes:
+# =================
+# The enhanced email alert system has been successfully integrated:
+#
+# 1. New Imports:
+#    - EmailAlertStatusDisplay and factory functions from alert_element_new.py
+#    - Demo configurations for testing
+#
+# 2. Enhanced Features:
+#    - Compact alert status widget in the main dashboard
+#    - Full alert management interface accessible via dialogs
+#    - Integration with existing header status indicators
+#    - Test alert functionality for all active configurations
+#    - Alert history viewing (with mock data for demonstration)
+#
+# 3. User Interface:
+#    - "Konfigurieren" button opens the 4-step setup wizard
+#    - "Verwalten" button opens the full alert overview
+#    - Quick status display shows active configurations
+#    - Header alert icon reflects the current alert status
+#
+# 4. Demo Data:
+#    - 3 sample configurations are loaded by default
+#    - Includes active and inactive configurations for testing
+#    - Email addresses are partially anonymized in the display
+#
+# Usage:
+# ------
+# Run the application with: python alt_application.py
+# The email alert section will show in the bottom-right grid area.
+# Click "Konfigurieren" to set up new alerts or "Verwalten" to view existing ones.

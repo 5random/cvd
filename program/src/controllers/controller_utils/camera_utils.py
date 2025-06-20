@@ -21,9 +21,11 @@ async def apply_uvc_settings(
         "sharpness": cv2.CAP_PROP_SHARPNESS,
         "gamma": cv2.CAP_PROP_GAMMA,
         "gain": cv2.CAP_PROP_GAIN,
-        "backlight_comp": cv2.CAP_PROP_BACKLIGHT,
         "backlight_compensation": cv2.CAP_PROP_BACKLIGHT,
+        "exposure_auto": cv2.CAP_PROP_AUTO_EXPOSURE,
         "exposure": cv2.CAP_PROP_EXPOSURE,
+        "white_balance_auto": cv2.CAP_PROP_AUTO_WB,
+        "white_balance": cv2.CAP_PROP_WB_TEMPERATURE,
     }
     for name, value in settings.items():
         try:
@@ -45,7 +47,7 @@ async def apply_uvc_settings(
                     await run_camera_io(capture.set, prop, float(value))
         except Exception as exc:
             warning(
-                "Failed to set UVC property",
+                "Failed to apply settings property",
                 controller_id=controller_id,
                 property=name,
                 error=str(exc),
