@@ -260,6 +260,23 @@ class ApplicationContainer:
                 continue
             pool.shutdown()
 
+        # Shutdown async services synchronously
+        try:
+            asyncio.run(self.sensor_manager.shutdown())
+        except Exception as e:
+            error(f"Error shutting down sensor manager: {e}")
+
+        try:
+            asyncio.run(self.web_application.shutdown())
+        except Exception as e:
+            error(f"Error shutting down web application: {e}")
+
+        # Close data saver
+        try:
+            self.data_saver.close()
+        except Exception as e:
+            error(f"Error closing data saver: {e}")
+
         # Clean up UI components to stop timers and other background tasks
         try:
             self.web_application.component_registry.cleanup_all()
