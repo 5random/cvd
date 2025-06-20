@@ -8,11 +8,13 @@ from nicegui import ui
 from datetime import datetime
 from typing import Optional, Dict, Any
 
-from alt_gui import setup_global_styles
-from alt_gui.alt_gui_elements.webcam_stream_element import WebcamStreamElement
-from alt_gui.alt_gui_elements.alert_element import EmailAlertsSection
-from alt_gui.alt_gui_elements.experiment_element import ExperimentManagementSection
-from alt_gui.alt_gui_elements.motion_detection_element import MotionStatusSection
+from .alt_gui import (
+    setup_global_styles,
+    WebcamStreamElement,
+    EmailAlertsSection,
+    ExperimentManagementSection,
+    MotionStatusSection,
+)
 
 class SimpleGUIApplication:
     """Simple GUI application skeleton with basic CVD functionality"""
@@ -32,173 +34,6 @@ class SimpleGUIApplication:
             'alert_delay': 5
         }
     
-    def setup_global_styles(self):
-        """Setup CSS styles matching the main application"""
-        ui.add_head_html("""
-            <style>
-                .cvd-header { 
-                    background: linear-gradient(90deg, #1976d2, #1565c0); 
-                }
-                .cvd-card { 
-                    border-radius: 8px; 
-                    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-                    padding: 16px;
-                }
-                .cvd-sensor-value { 
-                    font-size: 1.5rem; 
-                    font-weight: bold; 
-                }
-                .placeholder-content {
-                    background: #f5f5f5;
-                    border: 2px dashed #ccc;
-                    border-radius: 8px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    color: #666;
-                    min-height: 200px;
-                }
-                /* Motion status indicators */
-                .motion-detected {
-                    color: #ff9800;
-                    animation: pulse 2s infinite;
-                }
-                @keyframes pulse {
-                    0%, 100% { opacity: 1; }
-                    50% { opacity: 0.5; }
-                }
-                /* Card improvements */
-                .cvd-card .q-expansion-item {
-                    border: none;
-                    box-shadow: none;
-                }
-                .cvd-card .q-expansion-item__container {
-                    padding: 0;
-                }
-                /* Masonry layout improvements */
-                .masonry-grid {
-                    display: grid !important;
-                    grid-template-columns: 2fr 1fr;
-                    grid-template-rows: auto auto;
-                    gap: 1rem;
-                    grid-template-areas: 
-                        "camera motion"
-                        "experiment alerts";
-                }
-                /* Responsive adjustments */
-                @media (max-width: 1024px) {
-                    .masonry-grid {
-                        grid-template-columns: 1fr !important;
-                        grid-template-areas: 
-                            "camera"
-                            "motion"
-                            "experiment" 
-                            "alerts" !important;
-                    }
-                }
-            </style>
-        """)
-        
-    def create_camera_section(self):
-        """Create camera control section"""
-        with ui.card().classes('cvd-card w-full'):
-            ui.label('Camera Control').classes('text-h6 mb-4')
-            
-            # Camera preview placeholder
-            with ui.element('div').classes('placeholder-content mb-4'):
-                ui.label('Camera Feed Preview')
-            
-            # Camera controls
-            with ui.row().classes('w-full gap-4'):
-                ui.button('Start Camera', on_click=self.toggle_camera).classes('flex-1')
-                ui.button('Take Snapshot', on_click=lambda: ui.notify('Snapshot taken', type='info')).classes('flex-1')
-            
-            # Camera settings
-            with ui.expansion('Camera Settings').classes('w-full mt-4'):
-                with ui.column().classes('gap-4 p-4'):
-                    # Sensitivity
-                    ui.label('Motion Sensitivity')
-                    ui.slider(min=0, max=100, value=self.settings['sensitivity'], 
-                             on_change=self.update_sensitivity).classes('w-full')
-                    
-                    # FPS
-                    ui.label('Frame Rate (FPS)')
-                    ui.number(value=self.settings['fps'], on_change=self.update_fps).classes('w-full')
-                    
-                    # Resolution
-                    ui.label('Resolution')
-                    ui.select(['640x480 (30fps)', '1280x720 (30fps)', '1920x1080 (15fps)'], 
-                             value=self.settings['resolution'], on_change=self.update_resolution).classes('w-full')
-                    
-                    # ROI
-                    with ui.row().classes('w-full items-center'):
-                        ui.switch('Enable ROI', on_change=lambda e: ui.notify('ROI toggled', type='info'))
-                        ui.button('Set ROI', on_click=self.set_roi).props('outline')
-    
-    def create_motion_status_section(self):
-        """Create motion detection status section"""
-        with ui.card().classes('cvd-card w-full'):
-            ui.label('Motion Detection').classes('text-h6 mb-4')
-            
-            # Motion status indicator
-            with ui.row().classes('items-center gap-4 mb-4'):
-                self.motion_indicator = ui.icon('motion_photos_on').classes(
-                    'text-4xl motion-detected' if self.motion_detected else 'text-4xl text-gray-400')
-                with ui.column():
-                    ui.label('Motion Status').classes('text-caption')
-                    self.motion_status_label = ui.label(
-                        'Motion Detected' if self.motion_detected else 'No Motion').classes('cvd-sensor-value')
-            
-            # Motion statistics
-            with ui.column().classes('gap-2 mt-4'):
-                ui.label('Last Motion: Never').classes('text-body2')
-                ui.label('Motion Events: 0').classes('text-body2')
-                ui.label('Sensitivity: 50%').classes('text-body2')
-    
-    def create_experiment_section(self):
-        """Create experiment management section"""
-        with ui.card().classes('cvd-card w-full'):
-            ui.label('Experiment Control').classes('text-h6 mb-4')
-            
-            # Experiment status
-            with ui.row().classes('items-center gap-4 mb-4'):
-                self.experiment_indicator = ui.icon('science').classes(
-                    'text-4xl text-green-500' if self.experiment_running else 'text-4xl text-gray-400')
-                with ui.column():
-                    ui.label('Experiment Status').classes('text-caption')
-                    self.experiment_status_label = ui.label(
-                        'Running' if self.experiment_running else 'Stopped').classes('cvd-sensor-value')
-            
-            # Experiment controls
-            with ui.row().classes('w-full gap-4 mt-4'):
-                ui.button('Start Experiment', on_click=self.toggle_experiment).classes('flex-1')
-                ui.button('View Results', on_click=lambda: ui.notify('Results viewed', type='info')).classes('flex-1')
-    
-    def create_email_alerts_section(self):
-        """Create email alerts section"""
-        with ui.card().classes('cvd-card w-full'):
-            ui.label('Email Alerts').classes('text-h6 mb-4')
-            
-            # Alert status
-            with ui.row().classes('items-center gap-4 mb-4'):
-                self.alert_indicator = ui.icon('notifications').classes(
-                    'text-4xl text-yellow-500' if self.alerts_enabled else 'text-4xl text-gray-400')
-                with ui.column():
-                    ui.label('Alert Status').classes('text-caption')
-                    self.alert_status_label = ui.label(
-                        'Enabled' if self.alerts_enabled else 'Disabled').classes('cvd-sensor-value')
-            
-            # Email settings
-            with ui.expansion('Email Settings').classes('w-full mt-4'):
-                with ui.column().classes('gap-4 p-4'):
-                    ui.input('Email Address', value=self.settings['email']).classes('w-full')
-                    ui.number('Alert Delay (minutes)', value=self.settings['alert_delay']).classes('w-full')
-                    ui.switch('Enable Alerts', on_change=self.toggle_alerts)
-            
-            # Alert controls
-            with ui.row().classes('w-full gap-4 mt-4'):
-                ui.button('Send Test Alert', on_click=self.send_test_alert).classes('flex-1')
-                ui.button('Alert History', on_click=self.show_alert_history).classes('flex-1')
         
     def create_header(self):
         """Create application header with status indicators"""
@@ -252,28 +87,35 @@ class SimpleGUIApplication:
         """Create the main application layout"""
         ui.page_title('CVD Tracker - Simple Monitor')
         
-        # Setup global styles
-        self.setup_global_styles()
-        
+        # Setup global styles using shared theme
+        setup_global_styles(self)
+
         # Header
         self.create_header()
+
+        # Instantiate shared UI sections
+        self.webcam_stream = WebcamStreamElement(self.settings)
+        self.motion_section = MotionStatusSection(self.settings)
+        self.experiment_section = ExperimentManagementSection(self.settings)
+        self.alerts_section = EmailAlertsSection(self.settings)
+
         # Main content area - Masonry-style layout with CSS Grid
         with ui.element('div').classes('w-full p-4 masonry-grid'):
             # Camera section (top-left, spans full height if needed)
             with ui.element('div').style('grid-area: camera;'):
-                self.create_camera_section()
-            
+                self.webcam_stream.create_camera_section()
+
             # Motion Detection Status (top-right)
             with ui.element('div').style('grid-area: motion;'):
-                self.create_motion_status_section()
-            
+                self.motion_section.create_motion_status_section()
+
             # Experiment Management (bottom-left)
             with ui.element('div').style('grid-area: experiment;'):
-                self.create_experiment_section()
-            
+                self.experiment_section.create_experiment_section()
+
             # Email Alerts (bottom-right)
             with ui.element('div').style('grid-area: alerts;'):
-                self.create_email_alerts_section()
+                self.alerts_section.create_email_alerts_section()
             # Event handlers - placeholder implementations
     def update_time(self):
         """Update the time display in header"""
