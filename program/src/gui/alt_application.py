@@ -246,13 +246,13 @@ class SimpleGUIApplication:
                             'Konfigurieren',
                             icon='settings',
                             on_click=self.show_alert_setup_wizard
-                        ).props('size=sm color=primary outline')
+                        ).props('size=sm color=primary')
                         
                         ui.button(
                             'Verwalten',
                             icon='list',
                             on_click=self.show_alert_management
-                        ).props('size=sm color=secondary outline')
+                        ).props('size=sm color=secondary')
                 
                 # Status overview
                 total_configs = len(self.alert_configurations)
@@ -296,7 +296,7 @@ class SimpleGUIApplication:
                                     # Show recipient count
                                     email_count = len(config.get('emails', []))
                                     if email_count > 0:
-                                        ui.chip(f'{email_count} Empfänger', color='blue').props('dense outline')
+                                        ui.chip(f'{email_count} Empfänger', color='blue').props('dense')
                 
     def _send_test_to_all_configs(self):
         """Send test alerts to all active configurations"""
@@ -336,7 +336,7 @@ class SimpleGUIApplication:
                                 ui.label(entry['type']).classes('font-medium')
                                 ui.label(f"({entry['config']})").classes('text-gray-600')
                             
-                            ui.chip(f"{entry['recipients']} Empfänger", color='blue').props('dense outline')
+                            ui.chip(f"{entry['recipients']} Empfänger", color='blue').props('dense')
             
             with ui.row().classes('w-full justify-end mt-4'):
                 ui.button('Schließen', on_click=dialog.close).props('flat')

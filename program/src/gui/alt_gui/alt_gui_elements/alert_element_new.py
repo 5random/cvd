@@ -286,7 +286,7 @@ class EmailAlertWizard:
             with ui.stepper_navigation():
                 ui.button('Back', on_click=self.stepper.previous, icon='arrow_back').props('flat')
                 ui.button('Save Configuration', on_click=self._save_configuration, icon='save').props('color=positive')
-                ui.button('Test Alerts', on_click=self._test_alerts, icon='send').props('color=warning outline')
+                ui.button('Test Alerts', on_click=self._test_alerts, icon='send').props('color=warning ')
 
     def _validate_step1(self, name_input, step1_feedback, step1_next_btn):
         """Validate Step 1: Alert Name"""
@@ -592,7 +592,7 @@ class EmailAlertStatusDisplay:
                     'Neue Konfiguration',
                     icon='add',
                     on_click=self._show_setup_wizard
-                ).props('color=primary outline')
+                ).props('color=primary')
             
             if not self.alert_configurations:
                 # No configurations available
@@ -691,19 +691,19 @@ class EmailAlertStatusDisplay:
                         'Bearbeiten',
                         icon='edit',
                         on_click=lambda e, c=config: self._edit_configuration(c)
-                    ).props('size=sm color=primary outline')
+                    ).props('size=sm color=primary')
                     
                     ui.button(
                         'Test senden',
                         icon='send',
                         on_click=lambda e, c=config: self._send_test_alert(c)
-                    ).props('size=sm color=warning outline')
+                    ).props('size=sm color=warning')
                     
                     ui.button(
                         'Löschen',
                         icon='delete',
                         on_click=lambda e, c=config: self._delete_configuration(c)
-                    ).props('size=sm color=negative outline')
+                    ).props('size=sm color=negative')
     
     def create_compact_status_widget(self) -> ui.card:
         """Create a compact status widget for dashboard integration"""

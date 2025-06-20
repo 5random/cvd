@@ -61,9 +61,7 @@ class ExperimentManagementSection:
                 # Experiment options
                 ui.label("Recording Options").classes("text-sm font-semibold")
                 with ui.column().classes("ml-4 gap-1"):
-                    self.record_video_checkbox = ui.checkbox(
-                        "Record video feed", value=True
-                    )
+
                     self.record_motion_data_checkbox = ui.checkbox(
                         "Record motion detection data", value=True
                     )
