@@ -4,7 +4,7 @@ from nicegui import ui
 class WebcamStreamElement:
     """Initialize webcam stream element with settings and optional callbacks"""
 
-    def __init__(self, settings, on_camera_status_change=None):
+    def __init__(self, settings, callbacks=None, on_camera_status_change=None):
         self.camera_active = False
         self.recording = False
         self._on_camera_status_change = on_camera_status_change
