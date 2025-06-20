@@ -17,38 +17,25 @@ from src.controllers.controller_base import ControllerConfig
 from src.controllers.controller_utils.controller_data_sources.camera_capture_controller import (
     CameraCaptureController,
 )
-
-
-from src.controllers.controller_manager import create_cvd_controller_manager
 from src.controllers.controller_utils.camera_utils import apply_uvc_settings
-
-from pathlib import Path
-
+from src.controllers.controller_manager import (
+    ControllerManager,
+    create_cvd_controller_manager,
+)
 from src.experiment_handler.experiment_manager import (
     ExperimentManager,
     ExperimentConfig,
 )
 from src.utils.config_service import ConfigurationService
 from src.utils.email_alert_service import get_email_alert_service
-from src.utils.config_service import ConfigurationService
 from src.data_handler.sources.sensor_source_manager import SensorManager
-from src.controllers.controller_manager import create_cvd_controller_manager, ControllerManager
-from src.experiment_handler.experiment_manager import ExperimentManager
-
-
-from src.controllers.controller_manager import (
-    ControllerManager,
-    create_cvd_controller_manager,
-)
 
 from alt_gui import (
     setup_global_styles,
     WebcamStreamElement,
     ExperimentManagementSection,
     MotionStatusSection,
-    create_compact_alert_widget,
     create_demo_configurations,
-    create_email_alert_status_display,
     create_email_alert_wizard,
     EmailAlertStatusDisplay,
 )
@@ -555,7 +542,7 @@ class SimpleGUIApplication:
                 service.recipient = config['emails'][0]
 
         with ui.dialog() as dialog, ui.card().classes('w-full max-w-4xl'):
-            wizard_card = create_email_alert_wizard(on_save=_on_save)
+            create_email_alert_wizard(on_save=_on_save)
             with ui.row().classes('w-full justify-end mt-4'):
                 ui.button('Schließen', on_click=dialog.close).props('flat')
 
@@ -613,11 +600,9 @@ class SimpleGUIApplication:
                     if active_configs > 0:
                         ui.icon("check_circle").classes("text-green-600 text-2xl")
                         status_text = "Aktiv"
-                        status_color = "positive"
                     else:
                         ui.icon("warning").classes("text-orange-600 text-2xl")
                         status_text = "Inaktiv"
-                        status_color = "warning"
 
                     with ui.column().classes("gap-1"):
                         ui.label(f"Status: {status_text}").classes("font-medium")
