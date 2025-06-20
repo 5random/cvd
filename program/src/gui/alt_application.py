@@ -107,8 +107,6 @@ class SimpleGUIApplication:
             "camera_capture"
         )
 
-        self.sensor_manager = SensorManager(self.config_service)
-
         self.motion_controller = self.controller_manager._controllers.get(
             "motion_detection"
         )
