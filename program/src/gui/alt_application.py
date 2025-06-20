@@ -29,17 +29,6 @@ from src.experiment_handler.experiment_manager import (
 from src.utils.config_service import ConfigurationService
 from src.utils.email_alert_service import get_email_alert_service
 from src.data_handler.sources.sensor_source_manager import SensorManager
-from src.controllers.controller_manager import (
-    create_cvd_controller_manager,
-    ControllerManager,
-)
-from src.experiment_handler.experiment_manager import ExperimentManager
-
-
-from src.controllers.controller_manager import (
-    ControllerManager,
-    create_cvd_controller_manager,
-)
 
 from alt_gui import (
     setup_global_styles,
@@ -60,7 +49,6 @@ class SimpleGUIApplication:
         controller_manager: Optional[ControllerManager] = None,
         config_dir: Optional[Path] = None,
     ):
-
         self.camera_active = False
         self.motion_detected = False
         self.experiment_running = False
