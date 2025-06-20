@@ -1,18 +1,19 @@
 from nicegui import ui
 
+
 class WebcamStreamElement:
-    def __init__(self, settings, callbacks=None):
         """Initialize webcam stream element with settings and optional callbacks"""
+    def __init__(self, settings, on_camera_status_change=None):
+
         self.camera_active = False
-        settings = settings or {
-            'sensitivity': 50,
-            'fps': 30,
-            'roi_enabled': False
-        }
+        self.recording = False
+        self._on_camera_status_change = on_camera_status_change
+        settings = settings or {"sensitivity": 50, "fps": 30, "roi_enabled": False}
         self.settings = settings
         self.callbacks = callbacks or {}
         
         @ui.page('/webcam_stream')
+
         def webcam_stream_page():
             # Create the camera section
             self.create_camera_section()
@@ -285,32 +286,37 @@ class WebcamStreamElement:
                             ui.button('Reset to Defaults', icon='restore', on_click=lambda: ui.notify('function reset_uvc_defaults not yet implemented', type='info')).props('size=sm color=orange')
                             ui.button('Apply UVC Settings', icon='check', on_click=self.callbacks.get('apply_uvc_settings', lambda: ui.notify('function apply_uvc_settings not yet implemented', type='info'))).props('size=sm')
     
+
     def toggle_video_play(self):
         """Toggle video play state"""
         if not self.camera_active:
             self.video_element.play()
-            self.start_camera_btn.set_text('Pause Video')
-            self.start_camera_btn.set_icon('pause')
+            self.start_camera_btn.set_text("Pause Video")
+            self.start_camera_btn.set_icon("pause")
             self.camera_active = True
+            self._update_status()
         else:
             self.video_element.pause()
-            self.start_camera_btn.set_text('Play Video')
-            self.start_camera_btn.set_icon('play_arrow')
+            self.start_camera_btn.set_text("Play Video")
+            self.start_camera_btn.set_icon("play_arrow")
             self.camera_active = False
-    
+            self._update_status()
+
     def toggle_video_pause(self):
         """Toggle video pause state"""
         if self.camera_active:
             self.video_element.pause()
-            self.start_camera_btn.set_text('Play Video')
-            self.start_camera_btn.set_icon('play_arrow')
+            self.start_camera_btn.set_text("Play Video")
+            self.start_camera_btn.set_icon("play_arrow")
             self.camera_active = False
+            self._update_status()
         else:
             self.video_element.play()
-            self.start_camera_btn.set_text('Pause Video')
-            self.start_camera_btn.set_icon('pause')
+            self.start_camera_btn.set_text("Pause Video")
+            self.start_camera_btn.set_icon("pause")
             self.camera_active = True
-    
+            self._update_status()
+
     def toggle_white_balance_auto(self, value):
         """Toggle auto/manual white balance"""
         if value:
@@ -319,7 +325,7 @@ class WebcamStreamElement:
         else:
             self.wb_manual_number.enable()
             self.wb_manual_slider.enable()
-    
+
     def toggle_exposure_auto(self, value):
         """Toggle auto/manual exposure"""
         if value:
@@ -328,4 +334,42 @@ class WebcamStreamElement:
         else:
             self.exposure_manual_number.enable()
             self.exposure_manual_slider.enable()
-    
+
+    def _update_status(self):
+        """Notify parent about camera state changes."""
+        if self._on_camera_status_change:
+            self._on_camera_status_change(self.camera_active)
+
+    def toggle_recording(self):
+        """Start or stop dummy recording."""
+        self.recording = not self.recording
+        if self.recording:
+            self.record_menu_item.set_text("Stop Recording")
+            ui.notify("Recording started", type="positive")
+        else:
+            self.record_menu_item.set_text("Start Recording")
+            ui.notify("Recording stopped", type="warning")
+
+    def take_snapshot(self):
+        """Capture a snapshot of the current video frame."""
+        js = f"""
+        const v = document.getElementById('{self.video_element.id}');
+        const c = Object.assign(document.createElement('canvas'), {{width: v.videoWidth, height: v.videoHeight}});
+        c.getContext('2d').drawImage(v, 0, 0);
+        c.toBlob(b => {{
+            const url = URL.createObjectURL(b);
+            const a = Object.assign(document.createElement('a'), {{href: url, download: 'snapshot.png'}});
+            document.body.appendChild(a); a.click(); document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }}, 'image/png');
+        """
+        ui.run_javascript(js)
+
+    def adjust_roi(self):
+        """Open a simple ROI adjustment dialog."""
+        with ui.dialog() as dialog, ui.card():
+            ui.label("Adjust ROI - Demo")
+            ui.slider(min=0, max=100, value=0, label="X start").props("dense")
+            ui.slider(min=0, max=100, value=100, label="Width").props("dense")
+            ui.button("Apply", on_click=dialog.close)
+        dialog.open()
