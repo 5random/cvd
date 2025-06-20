@@ -17,20 +17,17 @@ from src.controllers.controller_base import ControllerConfig
 from src.controllers.controller_utils.controller_data_sources.camera_capture_controller import (
     CameraCaptureController,
 )
-
-
-from src.controllers.controller_manager import create_cvd_controller_manager
 from src.controllers.controller_utils.camera_utils import apply_uvc_settings
-
-from pathlib import Path
-
+from src.controllers.controller_manager import (
+    ControllerManager,
+    create_cvd_controller_manager,
+)
 from src.experiment_handler.experiment_manager import (
     ExperimentManager,
     ExperimentConfig,
 )
 from src.utils.config_service import ConfigurationService
 from src.utils.email_alert_service import get_email_alert_service
-from src.utils.config_service import ConfigurationService
 from src.data_handler.sources.sensor_source_manager import SensorManager
 from src.controllers.controller_manager import (
     create_cvd_controller_manager,
@@ -49,9 +46,7 @@ from alt_gui import (
     WebcamStreamElement,
     ExperimentManagementSection,
     MotionStatusSection,
-    create_compact_alert_widget,
     create_demo_configurations,
-    create_email_alert_status_display,
     create_email_alert_wizard,
     EmailAlertStatusDisplay,
 )
@@ -89,6 +84,8 @@ class SimpleGUIApplication:
         )
 
         # Additional runtime attributes
+        # Global dark mode controller from NiceGUI
+        self.dark_mode = ui.dark_mode()
         self._current_experiment_id: Optional[str] = None
         self._experiment_start: Optional[datetime] = None
         self._experiment_duration: Optional[int] = None
@@ -194,11 +191,8 @@ class SimpleGUIApplication:
                     # Dark/Light mode toggle
                     self.dark_mode_btn = (
                         ui.button(
-                            icon="dark_mode",
-                            on_click=lambda: ui.notify(
-                                "function toggle_dark_mode not yet implemented",
-                                type="info",
-                            ),
+                            icon="light_mode" if self.dark_mode.value else "dark_mode",
+                            on_click=self.toggle_dark_mode,
                         )
                         .props("flat round")
                         .classes("text-white")
@@ -622,11 +616,9 @@ class SimpleGUIApplication:
                     if active_configs > 0:
                         ui.icon("check_circle").classes("text-green-600 text-2xl")
                         status_text = "Aktiv"
-                        status_color = "positive"
                     else:
                         ui.icon("warning").classes("text-orange-600 text-2xl")
                         status_text = "Inaktiv"
-                        status_color = "warning"
 
                     with ui.column().classes("gap-1"):
                         ui.label(f"Status: {status_text}").classes("font-medium")
