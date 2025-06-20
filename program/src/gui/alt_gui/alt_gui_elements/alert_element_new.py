@@ -5,7 +5,7 @@ Implementiert einen 4-stufigen Wizard für die Konfiguration des Email-Alert-Ser
 
 from nicegui import ui
 from typing import Dict, List, Optional, Any, Callable
-from program.src.utils.email_alert_service import get_email_alert_service
+from src.utils.email_alert_service import get_email_alert_service
 from datetime import datetime
 import re
 
