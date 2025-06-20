@@ -8,6 +8,11 @@ from nicegui import ui
 from datetime import datetime
 from typing import Optional, Dict, Any
 
+from alt_gui import setup_global_styles
+from alt_gui.alt_gui_elements.webcam_stream_element import WebcamStreamElement
+from alt_gui.alt_gui_elements.alert_element import EmailAlertsSection
+from alt_gui.alt_gui_elements.experiment_element import ExperimentManagementSection
+from alt_gui.alt_gui_elements.motion_detection_element import MotionStatusSection
 
 class SimpleGUIApplication:
     """Simple GUI application skeleton with basic CVD functionality"""
