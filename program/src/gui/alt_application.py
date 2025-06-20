@@ -65,6 +65,12 @@ class SimpleGUIApplication:
         self.motion_detected = False
         self.experiment_running = False
         self.alerts_enabled = False
+        self.controller_manager = (
+            controller_manager
+            if controller_manager is not None
+            else create_cvd_controller_manager()
+        )
+
         self.camera_controller: Optional[CameraCaptureController] = None
 
         # Determine configuration directory and initialise core services
@@ -112,6 +118,9 @@ class SimpleGUIApplication:
         self.camera_controller = self.controller_manager._controllers.get(
             "camera_capture"
         )
+
+        self.sensor_manager = SensorManager(self.config_service)
+
         self.motion_controller = self.controller_manager._controllers.get(
             "motion_detection"
         )
