@@ -63,7 +63,11 @@ class SimpleGUIApplication:
         self.motion_detected = False
         self.experiment_running = False
         self.alerts_enabled = False
-        self.controller_manager = controller_manager
+        self.controller_manager = (
+            controller_manager
+            if controller_manager is not None
+            else create_cvd_controller_manager()
+        )
         self.camera_controller: Optional[CameraCaptureController] = None
 
         root = Path(__file__).resolve().parents[3]
@@ -106,12 +110,6 @@ class SimpleGUIApplication:
             config_dir / "default_config.json",
         )
         self.sensor_manager = SensorManager(self.config_service)
-        self.controller_manager: ControllerManager = create_cvd_controller_manager()
-        self.experiment_manager = ExperimentManager(
-            config_service=self.config_service,
-            sensor_manager=self.sensor_manager,
-            controller_manager=self.controller_manager,
-        )
 
     def create_header(self):
         """Create application header with status indicators"""
