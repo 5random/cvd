@@ -12,9 +12,11 @@ async def immediate(fn, *args, **kwargs):
 async def test_process_from_controller_data(monkeypatch):
     cfg = ControllerConfig(controller_id="md", controller_type="motion_detection")
     controller = MotionDetectionController("md", cfg)
+    controller.config.input_controllers = ["cam"]
     monkeypatch.setattr(controller._motion_pool, "submit_async", immediate)
     started = await controller.start()
     assert started
+    assert controller._capture_task is None
 
     frame = np.zeros((20, 20, 3), dtype=np.uint8)
     result = await controller.process(ControllerInput(controller_data={"cam": {"image": frame}}))

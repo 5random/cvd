@@ -542,7 +542,14 @@ class MotionDetectionController(ImageController):
             return False
         self._stop_event.clear()
         self._warmup_counter = self.warmup_frames
-        self._capture_task = asyncio.create_task(self._capture_loop())
+        if not self.config.input_controllers:
+            self._capture_task = asyncio.create_task(self._capture_loop())
+        else:
+            info(
+                "Using external capture controller, skipping internal loop",
+                controller_id=self.controller_id,
+            )
+            self._capture_task = None
         return True
 
     async def stop(self) -> None:

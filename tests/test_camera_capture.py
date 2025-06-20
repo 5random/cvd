@@ -94,8 +94,10 @@ async def test_camera_capture_recovery(monkeypatch):
 
     md_cfg = ControllerConfig(controller_id="md", controller_type="motion_detection")
     md = MotionDetectionController("md", md_cfg)
+    md.config.input_controllers = ["cam"]
     monkeypatch.setattr(md._motion_pool, "submit_async", immediate)
     await md.start()
+    assert md._capture_task is None
     result = await md.process(
         ControllerInput(controller_data={"cam": {"image": frame}})
     )
@@ -146,8 +148,10 @@ async def test_reinitialize_on_none(monkeypatch):
     frame = np.zeros((10, 10, 3), dtype=np.uint8)
     md_cfg = ControllerConfig(controller_id="md", controller_type="motion_detection")
     md = MotionDetectionController("md", md_cfg)
+    md.config.input_controllers = ["cam"]
     monkeypatch.setattr(md._motion_pool, "submit_async", immediate)
     await md.start()
+    assert md._capture_task is None
     result = await md.process(
         ControllerInput(controller_data={"cam": {"image": frame}})
     )
@@ -205,8 +209,10 @@ async def test_reopen_after_failures(monkeypatch):
     frame = np.zeros((10, 10, 3), dtype=np.uint8)
     md_cfg = ControllerConfig(controller_id="md", controller_type="motion_detection")
     md = MotionDetectionController("md", md_cfg)
+    md.config.input_controllers = ["cam"]
     monkeypatch.setattr(md._motion_pool, "submit_async", immediate)
     await md.start()
+    assert md._capture_task is None
     result = await md.process(
         ControllerInput(controller_data={"cam": {"image": frame}})
     )
