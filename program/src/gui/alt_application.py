@@ -8,6 +8,10 @@ from nicegui import ui, app
 from datetime import datetime
 from pathlib import Path
 from typing import Optional, Dict, Any
+import asyncio
+
+from src.controllers.controller_manager import create_cvd_controller_manager
+from src.controllers.controller_utils.camera_utils import apply_uvc_settings
 
 from pathlib import Path
 
@@ -73,6 +77,10 @@ class SimpleGUIApplication:
         # Track if we have active alerts
         self._update_alerts_status()
 
+        # Initialize controllers
+        self.camera_controller = self.controller_manager._controllers.get("camera_capture")
+        self.motion_controller = self.controller_manager._controllers.get("motion_detection")
+
         # --- Backend services -------------------------------------------------
         if config_dir is None:
             config_dir = Path(__file__).resolve().parents[3] / "config"
@@ -88,7 +96,7 @@ class SimpleGUIApplication:
             sensor_manager=self.sensor_manager,
             controller_manager=self.controller_manager,
         )
-    
+
 
     def create_header(self):
         """Create application header with status indicators"""
@@ -180,9 +188,16 @@ class SimpleGUIApplication:
         setup_global_styles(self)
 
         # Header
-        self.create_header()  # Instantiate shared UI sections
+        self.create_header()        # Instantiate shared UI sections
         self.webcam_stream = WebcamStreamElement(
-            self.settings, self.update_camera_status
+            self.settings,
+            callbacks={
+                'update_sensitivity': self.update_sensitivity,
+                'update_fps': self.update_fps,
+                'update_resolution': self.update_resolution,
+                'set_roi': self.set_roi,
+                'apply_uvc_settings': self.apply_uvc_settings,
+            },
         )
         self.motion_section = MotionStatusSection(self.settings)
         self.experiment_section = ExperimentManagementSection(self.settings)
@@ -274,24 +289,90 @@ class SimpleGUIApplication:
 
     def update_sensitivity(self, e):
         """Update motion detection sensitivity"""
-        ui.notify("update_sensitivity noch nicht implementiert", type="info")
-
+        value = int(getattr(e, 'value', e))
+        self.settings['sensitivity'] = value
+        if self.motion_controller:
+            self.motion_controller.motion_threshold_percentage = value / 100.0
+        self.webcam_stream.sensitivity_number.value = value
+        self.webcam_stream.sensitivity_slider.value = value
+        ui.notify(f'Sensitivity set to {value}%', type='positive')
+    
     def update_fps(self, e):
         """Update camera FPS setting"""
-        ui.notify("update_fps noch nicht implementiert", type="info")
-
+        value = int(getattr(e, 'value', e))
+        self.settings['fps'] = value
+        if self.camera_controller:
+            self.camera_controller.fps = value
+        if self.motion_controller:
+            self.motion_controller.fps = value
+        self.webcam_stream.fps_select.value = value
+        ui.notify(f'FPS set to {value}', type='positive')
+    
     def update_resolution(self, e):
         """Update camera resolution setting"""
-        ui.notify("update_resolution noch nicht implementiert", type="info")
-
+        res = getattr(e, 'value', e)
+        self.settings['resolution'] = res
+        try:
+            dims = res.split()[0]
+            width, height = map(int, dims.split('x'))
+        except Exception:
+            width = height = None
+        if width and height:
+            if self.camera_controller:
+                self.camera_controller.width = width
+                self.camera_controller.height = height
+            if self.motion_controller:
+                self.motion_controller.width = width
+                self.motion_controller.height = height
+        self.webcam_stream.resolution_select.value = res
+        ui.notify(f'Resolution set to {res}', type='positive')
+    
     def set_roi(self):
         """Set region of interest"""
-        ui.notify("set_roi noch nicht implementiert", type="info")
+        enabled = self.webcam_stream.roi_checkbox.value
+        self.settings['roi_enabled'] = enabled
+        if self.motion_controller:
+            if not enabled:
+                self.motion_controller.roi_x = 0
+                self.motion_controller.roi_y = 0
+                self.motion_controller.roi_width = None
+                self.motion_controller.roi_height = None
+            else:
+                width = self.motion_controller.width or 640
+                height = self.motion_controller.height or 480
+                self.motion_controller.roi_x = width // 4
+                self.motion_controller.roi_y = height // 4
+                self.motion_controller.roi_width = width // 2
+                self.motion_controller.roi_height = height // 2
+        ui.notify('ROI updated', type='positive')
 
-    def apply_camera_settings(self):
-        """Apply all camera settings"""
-        ui.notify("apply_camera_settings noch nicht implementiert", type="info")
-
+    def apply_uvc_settings(self):
+        """Apply UVC camera settings"""
+        settings = {
+            'brightness': self.webcam_stream.brightness_number.value,
+            'contrast': self.webcam_stream.contrast_number.value,
+            'saturation': self.webcam_stream.saturation_number.value,
+            'hue': self.webcam_stream.hue_number.value,
+            'sharpness': self.webcam_stream.sharpness_number.value,
+            'gain': self.webcam_stream.gain_number.value,
+            'gamma': self.webcam_stream.gamma_number.value,
+            'backlight_compensation': self.webcam_stream.backlight_comp_number.value,
+            'white_balance_auto': self.webcam_stream.wb_auto_checkbox.value,
+            'white_balance': self.webcam_stream.wb_manual_number.value,
+            'exposure_auto': self.webcam_stream.exposure_auto_checkbox.value,
+            'exposure': self.webcam_stream.exposure_manual_number.value,
+        }
+        self.settings.update(settings)
+        if self.camera_controller and getattr(self.camera_controller, '_capture', None):
+            asyncio.create_task(apply_uvc_settings(self.camera_controller._capture, settings))
+        if self.motion_controller and getattr(self.motion_controller, '_capture', None):
+            asyncio.create_task(apply_uvc_settings(self.motion_controller._capture, settings))
+        if self.camera_controller:
+            self.camera_controller.uvc_settings.update(settings)
+        if self.motion_controller:
+            self.motion_controller.uvc_settings.update(settings)
+        ui.notify('UVC settings applied', type='positive')
+    
     def toggle_alerts(self, e):
         """Toggle email alerts on/off - opens alert management"""
         self.show_alert_management()
