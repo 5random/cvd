@@ -7,6 +7,13 @@
 from nicegui import ui
 from datetime import datetime
 from typing import Optional, Dict, Any
+from pathlib import Path
+
+from src.experiment_handler.experiment_manager import (
+    ExperimentManager,
+    ExperimentConfig,
+)
+from src.utils.config_service import ConfigurationService
 
 from alt_gui import (
     setup_global_styles,
@@ -28,6 +35,16 @@ class SimpleGUIApplication:
         self.motion_detected = False
         self.experiment_running = False
         self.alerts_enabled = False
+
+        root = Path(__file__).resolve().parents[3]
+        config_path = root / "config" / "config.json"
+        default_config = root / "program" / "config" / "default_config.json"
+        self.config_service = ConfigurationService(config_path, default_config)
+        self.experiment_manager = ExperimentManager(self.config_service)
+        self._current_experiment_id: Optional[str] = None
+        self._experiment_start: Optional[datetime] = None
+        self._experiment_duration: Optional[int] = None
+        self._experiment_timer: Optional[ui.timer] = None
         
         # Placeholder settings
         self.settings = {
@@ -122,6 +139,12 @@ class SimpleGUIApplication:
             # Experiment Management (bottom-left)
             with ui.element('div').style('grid-area: experiment;'):
                 self.experiment_section.create_experiment_section()
+                self.experiment_section.start_experiment_btn.on(
+                    'click', self.toggle_experiment
+                )
+                self.experiment_section.stop_experiment_btn.on(
+                    'click', self.toggle_experiment
+                )
 
             # Email Alerts (bottom-right) - New Alert System
             with ui.element('div').style('grid-area: alerts;'):
@@ -203,7 +226,79 @@ class SimpleGUIApplication:
     
     def toggle_experiment(self):
         """Toggle experiment running state"""
-        ui.notify('toggle_experiment noch nicht implementiert', type='info')
+        import asyncio
+
+        async def _toggle() -> None:
+            if not self.experiment_running:
+                name = self.experiment_section.experiment_name_input.value
+                duration = self.experiment_section.experiment_duration_input.value
+                self._experiment_duration = int(duration) if duration else None
+
+                config = ExperimentConfig(
+                    name=name,
+                    duration_minutes=self._experiment_duration,
+                )
+                exp_id = self.experiment_manager.create_experiment(config)
+                success = await self.experiment_manager.start_experiment(exp_id)
+                if not success:
+                    ui.notify('Failed to start experiment', type='negative')
+                    return
+
+                self._current_experiment_id = exp_id
+                self.experiment_running = True
+                self._experiment_start = datetime.now()
+                self.experiment_section.start_experiment_btn.disable()
+                self.experiment_section.stop_experiment_btn.enable()
+                self.experiment_section.experiment_icon.classes('text-green-600')
+                self.experiment_section.experiment_status_label.text = 'Experiment running'
+                self.experiment_section.experiment_name_label.text = f'Name: {name}'
+                dur_text = (
+                    f'Duration: {self._experiment_duration} min'
+                    if self._experiment_duration
+                    else 'Duration: unlimited'
+                )
+                self.experiment_section.experiment_duration_label.text = dur_text
+                self.experiment_section.experiment_elapsed_label.text = 'Elapsed: 0s'
+                self.experiment_section.experiment_progress.value = 0.0
+                self.experiment_section.experiment_details.set_visibility(True)
+                if self._experiment_timer:
+                    self._experiment_timer.cancel()
+                self._experiment_timer = ui.timer(1.0, self._update_experiment_status)
+                ui.notify(f'Started experiment "{name}"', type='positive')
+            else:
+                success = await self.experiment_manager.stop_experiment()
+                if not success:
+                    ui.notify('Failed to stop experiment', type='negative')
+                    return
+
+                self.experiment_running = False
+                self._current_experiment_id = None
+                self.experiment_section.start_experiment_btn.enable()
+                self.experiment_section.stop_experiment_btn.disable()
+                self.experiment_section.experiment_icon.classes('text-gray-500')
+                self.experiment_section.experiment_status_label.text = 'No experiment running'
+                self.experiment_section.experiment_details.set_visibility(False)
+                if self._experiment_timer:
+                    self._experiment_timer.cancel()
+                    self._experiment_timer = None
+                ui.notify('Experiment stopped', type='info')
+
+        asyncio.create_task(_toggle())
+
+    def _update_experiment_status(self) -> None:
+        """Update elapsed time and progress display while running"""
+        if not self.experiment_running or not self._experiment_start:
+            return
+
+        elapsed = (datetime.now() - self._experiment_start).total_seconds()
+        self.experiment_section.experiment_elapsed_label.text = (
+            f"Elapsed: {int(elapsed)}s"
+        )
+
+        if self._experiment_duration:
+            total = self._experiment_duration * 60
+            progress = min(elapsed / total, 1.0)
+            self.experiment_section.experiment_progress.value = progress
     
     def _update_alerts_status(self):
         """Update the alerts_enabled status based on current configurations"""
