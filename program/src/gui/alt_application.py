@@ -66,6 +66,9 @@ class SimpleGUIApplication:
         self.controller_manager = controller_manager
         self.camera_controller: Optional[CameraCaptureController] = None
 
+        # Global dark mode controller from NiceGUI
+        self.dark_mode = ui.dark_mode()
+
         root = Path(__file__).resolve().parents[3]
         config_path = root / "config" / "config.json"
         default_config = root / "program" / "config" / "default_config.json"
@@ -188,11 +191,8 @@ class SimpleGUIApplication:
                     # Dark/Light mode toggle
                     self.dark_mode_btn = (
                         ui.button(
-                            icon="dark_mode",
-                            on_click=lambda: ui.notify(
-                                "function toggle_dark_mode not yet implemented",
-                                type="info",
-                            ),
+                            icon="light_mode" if self.dark_mode.value else "dark_mode",
+                            on_click=self.toggle_dark_mode,
                         )
 
                         .props("flat round")
