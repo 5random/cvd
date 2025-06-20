@@ -163,7 +163,7 @@ class MotionDetectionController(ImageController):
                     )
                     self.uvc_settings.update(cam_cfg.get("uvc", {}))
                     self.uvc_settings.update(cam_cfg.get("uvc_settings", {}))
-        self.algorithm = params.get("algorithm", "MOG2")  # MOG2, KNN, or GMG
+        self.algorithm = params.get("algorithm", "MOG2")  # MOG2 or KNN
         self.var_threshold = params.get("var_threshold", 16)
         self.dist2_threshold = params.get("dist2_threshold", 400.0)
         self.history = params.get("history", 500)
