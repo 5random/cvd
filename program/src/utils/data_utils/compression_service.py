@@ -295,8 +295,10 @@ class CompressionService:
     
     def _is_already_compressed(self, file_path: Path) -> bool:
         """Check if file is already compressed"""
-        compressed_extensions = {info['extension'] for info in self.COMPRESSION_ALGORITHMS.values()}
-        return file_path.suffix in compressed_extensions or 'compressed' in str(file_path)
+        compressed_extensions = {
+            info["extension"] for info in self.COMPRESSION_ALGORITHMS.values()
+        }
+        return file_path.suffix in compressed_extensions or "compressed" in file_path.parts
     
     def rotate_logs(self) -> None:
         """Rotate log files based on configuration"""
