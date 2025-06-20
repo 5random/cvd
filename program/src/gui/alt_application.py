@@ -36,6 +36,11 @@ from src.controllers.controller_manager import create_cvd_controller_manager, Co
 from src.experiment_handler.experiment_manager import ExperimentManager
 
 
+from src.controllers.controller_manager import (
+    ControllerManager,
+    create_cvd_controller_manager,
+)
+
 from alt_gui import (
     setup_global_styles,
     WebcamStreamElement,
@@ -52,13 +57,13 @@ from alt_gui import (
 class SimpleGUIApplication:
     """Simple GUI application skeleton with basic CVD functionality"""
 
-    
-    def __init__(self, config_dir: Optional[Path] = None):
+    def __init__(self, controller_manager: Optional[ControllerManager] = None, config_dir: Optional[Path] = None):
+
         self.camera_active = False
         self.motion_detected = False
         self.experiment_running = False
         self.alerts_enabled = False
-
+        self.controller_manager = controller_manager
         self.camera_controller: Optional[CameraCaptureController] = None
 
         root = Path(__file__).resolve().parents[3]
@@ -107,7 +112,6 @@ class SimpleGUIApplication:
             sensor_manager=self.sensor_manager,
             controller_manager=self.controller_manager,
         )
-
 
     def create_header(self):
         """Create application header with status indicators"""
@@ -164,18 +168,33 @@ class SimpleGUIApplication:
                     )
 
                     # Control buttons
-                    ui.button(icon="fullscreen", on_click=self.toggle_fullscreen).props(
-                        "flat round"
-                    ).classes("text-white").tooltip("Toggle Fullscreen")
+                    ui.button(
+                        icon="fullscreen",
+                        on_click=lambda: ui.notify(
+                            "function toggle_fullscreen not yet implemented",
+                            type="info",
+                        ),
+                    ).props("flat round").classes("text-white").tooltip(
+                        "Toggle Fullscreen"
+                    )
 
-                    ui.button(icon="refresh", on_click=self.reload_page).props(
-                        "flat round"
-                    ).classes("text-white").tooltip("Reload Page")
+                    ui.button(
+                        icon="refresh",
+                        on_click=lambda: ui.notify(
+                            "function reload_page not yet implemented", type="info"
+                        ),
+                    ).props("flat round").classes("text-white").tooltip("Reload Page")
 
                     # Dark/Light mode toggle
-                    self.dark_mode = ui.dark_mode()
                     self.dark_mode_btn = (
-                        ui.button(icon="dark_mode", on_click=self.toggle_dark_mode)
+                        ui.button(
+                            icon="dark_mode",
+                            on_click=lambda: ui.notify(
+                                "function toggle_dark_mode not yet implemented",
+                                type="info",
+                            ),
+                        )
+
                         .props("flat round")
                         .classes("text-white")
                         .tooltip("Toggle Dark/Light Mode")
@@ -243,6 +262,7 @@ class SimpleGUIApplication:
         """Update the time display in header"""
         self.time_label.text = datetime.now().strftime("%H:%M:%S")
 
+
     def update_camera_status(self, active: bool):
         """Update camera icon color based on active state."""
         self.camera_active = active
@@ -271,6 +291,7 @@ class SimpleGUIApplication:
         self.dark_mode.value = not self.dark_mode.value
         icon = "light_mode" if self.dark_mode.value else "dark_mode"
         self.dark_mode_btn.set_icon(icon)
+
 
     # Context menu handlers - all placeholder implementations
     def show_camera_settings_context(self):
@@ -507,6 +528,7 @@ class SimpleGUIApplication:
             progress = min(elapsed / total, 1.0)
             self.experiment_section.experiment_progress.value = progress
     
+
     def _update_alerts_status(self):
         """Update the alerts_enabled status based on current configurations"""
         # Check if any alert configuration has active alert types
@@ -645,12 +667,19 @@ class SimpleGUIApplication:
         active_configs = [
             config
             for config in self.alert_configurations
-            if any(settings.get('enabled', False) for settings in config.get('settings', {}).values())
+            if sum(
+                1
+                for settings in config.get("settings", {}).values()
+                if settings.get("enabled", False)
+            )
+            > 0
+
         ]
 
         if not active_configs:
             ui.notify("Keine aktiven Alert-Konfigurationen vorhanden", type="warning")
             return
+
 
         service = get_email_alert_service()
         if service is None:
@@ -694,7 +723,7 @@ class SimpleGUIApplication:
 
             with ui.row().classes('w-full justify-end mt-4'):
                 ui.button('Schließen', on_click=dialog.close).props('flat')
-        
+
         dialog.open()
 
     def run(self, host: str = "localhost", port: int = 8081):
@@ -758,7 +787,15 @@ class SimpleGUIApplication:
 # Entry point
 def main():
     """Main entry point for the simple GUI application"""
-    app = SimpleGUIApplication()
+    controller_manager = create_cvd_controller_manager()
+    app = SimpleGUIApplication(controller_manager)
+
+    from nicegui import app as ng_app
+
+    @ng_app.on_startup
+    async def _startup() -> None:
+        await controller_manager.start_all_controllers()
+
     app.run()
 
 

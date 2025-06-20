@@ -1,11 +1,28 @@
 from nicegui import ui
+from datetime import datetime
+from typing import Optional, Callable
+
+from src.controllers.controller_manager import ControllerManager
+from src.controllers.algorithms.motion_detection import MotionDetectionResult
 
 
 class MotionStatusSection:
-    def __init__(self, settings):
-        """Initialize motion status section with settings"""
+    def __init__(
+        self,
+        settings: Optional[dict] = None,
+        controller_manager: Optional[ControllerManager] = None,
+        update_callback: Optional[Callable[[bool], None]] = None,
+    ) -> None:
+        """Initialize motion status section with settings and optional controller manager."""
+
+        self.controller_manager = controller_manager
+        self._update_callback = update_callback
+
         self.camera_active = False
         self.motion_detected = False
+        self._last_motion_time: Optional[datetime] = None
+        self._detection_count = 0
+
         settings = settings or {
             "motion_detected": False,
             "confidence": 0,
@@ -84,3 +101,51 @@ class MotionStatusSection:
                         "text-sm"
                     )
                     self.cpu_usage_label = ui.label("CPU Usage: --%").classes("text-sm")
+
+            # periodic refresh
+            ui.timer(1.0, self._refresh_status)
+
+    def _get_result(self) -> Optional[MotionDetectionResult]:
+        """Retrieve the latest MotionDetectionResult from the controller manager"""
+        if not self.controller_manager:
+            return None
+        controller = self.controller_manager.get_controller("motion_detection")
+        if not controller:
+            return None
+        output = controller.get_output()
+        if isinstance(output, MotionDetectionResult):
+            return output
+        return None
+
+    def _refresh_status(self) -> None:
+        """Update display labels with current motion detection results"""
+        result = self._get_result()
+        if not result:
+            return
+
+        self.motion_detected = result.motion_detected
+        self.motion_icon.name = (
+            "motion_photos_on" if result.motion_detected else "motion_photos_off"
+        )
+        self.motion_icon.classes(
+            replace="text-orange-500" if result.motion_detected else "text-gray-500"
+        )
+        self.motion_label.text = (
+            "Motion Detected" if result.motion_detected else "No Motion Detected"
+        )
+        self.motion_percentage.text = f"Motion Level: {result.motion_percentage:.1f}%"
+        self.confidence_label.text = f"Confidence: {result.confidence:.2f}"
+
+        if result.motion_detected:
+            self._last_motion_time = datetime.now()
+            self._detection_count += 1
+
+        if self._last_motion_time:
+            self.last_motion_label.text = (
+                f"Last Motion: {self._last_motion_time.strftime('%H:%M:%S')}"
+            )
+
+        self.detection_count_label.text = f"Detections: {self._detection_count}"
+
+        if self._update_callback:
+            self._update_callback(result.motion_detected)
