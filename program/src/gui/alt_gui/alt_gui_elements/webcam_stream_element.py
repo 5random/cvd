@@ -31,8 +31,8 @@ class WebcamStreamElement:
                         "width: 640px; height: 480px; background-color: #f5f5f5; display: flex; align-items: center; justify-content: center;"
                     )
                 ):
-                    # Image element displaying the MJPEG stream
-                    self.video_element = ui.image("/video_feed").style(
+                    # Video element displaying the MJPEG stream
+                    self.video_element = ui.video("/video_feed").style(
                         "width: 100%; height: 100%; object-fit: contain;"
                     )
 
@@ -67,6 +67,11 @@ class WebcamStreamElement:
                                 "function reset_view_context not yet implemented",
                                 type="info",
                             ),
+                        )
+                        # Recording toggle menu item
+                        self.record_menu_item = ui.menu_item(
+                            "Start Recording",
+                            on_click=self.toggle_recording,
                         )
 
             # Camera controls
@@ -706,10 +711,10 @@ class WebcamStreamElement:
         """Start or stop dummy recording."""
         self.recording = not self.recording
         if self.recording:
-            self.record_menu_item.set_text("Stop Recording")
+            self.record_menu_item.update(text="Stop Recording")
             ui.notify("Recording started", type="positive")
         else:
-            self.record_menu_item.set_text("Start Recording")
+            self.record_menu_item.update(text="Start Recording")
             ui.notify("Recording stopped", type="warning")
 
     def take_snapshot(self):

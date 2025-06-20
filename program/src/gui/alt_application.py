@@ -18,10 +18,11 @@ from src.controllers.controller_utils.controller_data_sources.camera_capture_con
     CameraCaptureController,
 )
 from src.controllers.controller_utils.camera_utils import apply_uvc_settings
-from src.controllers.controller_manager import (
+from ..controllers.controller_manager import (
     ControllerManager,
     create_cvd_controller_manager,
 )
+from src.controllers.controller_utils.motion_detection_controller import MotionDetectionController
 from src.experiment_handler.experiment_manager import (
     ExperimentManager,
     ExperimentConfig,
@@ -102,13 +103,17 @@ class SimpleGUIApplication:
         # Track if we have active alerts
         self._update_alerts_status()
 
-        # Initialize controllers
-        self.camera_controller = self.controller_manager._controllers.get(
-            "camera_capture"
+        from typing import cast
+        
+        # Retrieve and cast controllers to their concrete types
+        self.camera_controller = cast(
+            Optional[CameraCaptureController],
+            self.controller_manager._controllers.get("camera_capture"),
         )
-
-        self.motion_controller = self.controller_manager._controllers.get(
-            "motion_detection"
+        
+        self.motion_controller = cast(
+            Optional[MotionDetectionController],
+            self.controller_manager._controllers.get("motion_detection"),
         )
 
     def create_header(self):
@@ -419,14 +424,13 @@ class SimpleGUIApplication:
             "exposure": self.webcam_stream.exposure_manual_number.value,
         }
         self.settings.update(settings)
-        if self.camera_controller and getattr(self.camera_controller, "_capture", None):
-            asyncio.create_task(
-                apply_uvc_settings(self.camera_controller._capture, settings)
-            )
-        if self.motion_controller and getattr(self.motion_controller, "_capture", None):
-            asyncio.create_task(
-                apply_uvc_settings(self.motion_controller._capture, settings)
-            )
+        # Apply UVC settings asynchronously if capture objects are available
+        if self.camera_controller is not None and self.camera_controller._capture is not None:
+            capture = self.camera_controller._capture
+            asyncio.create_task(apply_uvc_settings(capture, settings))
+        if self.motion_controller is not None and self.motion_controller._capture is not None:
+            capture = self.motion_controller._capture
+            asyncio.create_task(apply_uvc_settings(capture, settings))
         if self.camera_controller:
             self.camera_controller.uvc_settings.update(settings)
         if self.motion_controller:
