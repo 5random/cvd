@@ -1,7 +1,8 @@
 """Email alerting service for critical controller states."""
 import smtplib
 from email.message import EmailMessage
-from typing import Optional
+from typing import Optional, List, Dict
+from datetime import datetime
 
 from program.src.utils.config_service import get_config_service, ConfigurationService, ConfigurationError
 from program.src.utils.log_service import info, warning, error
@@ -15,6 +16,7 @@ class EmailAlertService:
         if self._config_service is None:
             raise ValueError("Configuration service not available")
         self._load_configuration()
+        self._history: List[Dict[str, str]] = []
 
     def _load_configuration(self) -> None:
         assert self._config_service is not None, "Configuration service not available"
@@ -39,16 +41,23 @@ class EmailAlertService:
             warning("EmailAlertService: invalid smtp_port; using 25")
             self.smtp_port = 25
 
-    def send_alert(self, subject: str, body: str) -> bool:
-        """Send an alert e-mail. Returns True on success."""
-        if not self.recipient:
+    def send_alert(self, subject: str, body: str, recipient: Optional[str] = None) -> bool:
+        """Send an alert e-mail. Returns True on success.
+
+        Args:
+            subject: Email subject
+            body: Email body
+            recipient: Optional override for the configured recipient
+        """
+        target = recipient or self.recipient
+        if not target:
             warning("EmailAlertService: no recipient configured")
             return False
         try:
             msg = EmailMessage()
             msg['Subject'] = subject
             msg['From'] = self.smtp_user or 'cvd-tracker'
-            msg['To'] = self.recipient
+            msg['To'] = target
             msg.set_content(body)
             # Establish connection: SSL or plain
             if self.smtp_use_ssl:
@@ -64,11 +73,20 @@ class EmailAlertService:
                 if self.smtp_user and self.smtp_password:
                     smtp.login(self.smtp_user, self.smtp_password)
                 smtp.send_message(msg)
-            info(f"Sent alert email to {self.recipient}")
+            info(f"Sent alert email to {target}")
+            self._history.append({
+                "time": datetime.now().strftime("%H:%M:%S"),
+                "recipient": target,
+                "subject": subject,
+            })
             return True
         except Exception as exc:
             error(f"Failed to send alert email: {exc}")
             return False
+
+    def get_history(self, limit: int = 50) -> List[Dict[str, str]]:
+        """Return a list of recently sent alerts."""
+        return self._history[-limit:]
 
 
 _email_alert_service_instance: Optional[EmailAlertService] = None
