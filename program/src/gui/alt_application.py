@@ -17,22 +17,22 @@ from src.controllers.controller_base import ControllerConfig
 from src.controllers.controller_utils.controller_data_sources.camera_capture_controller import (
     CameraCaptureController,
 )
-
-
-from src.controllers.controller_manager import create_cvd_controller_manager
 from src.controllers.controller_utils.camera_utils import apply_uvc_settings
-
-from pathlib import Path
-
+from src.controllers.controller_manager import (
+    ControllerManager,
+    create_cvd_controller_manager,
+)
 from src.experiment_handler.experiment_manager import (
     ExperimentManager,
     ExperimentConfig,
 )
 from src.utils.config_service import ConfigurationService
 from src.utils.email_alert_service import get_email_alert_service
-from src.utils.config_service import ConfigurationService
 from src.data_handler.sources.sensor_source_manager import SensorManager
-from src.controllers.controller_manager import create_cvd_controller_manager, ControllerManager
+from src.controllers.controller_manager import (
+    create_cvd_controller_manager,
+    ControllerManager,
+)
 from src.experiment_handler.experiment_manager import ExperimentManager
 
 
@@ -46,9 +46,7 @@ from alt_gui import (
     WebcamStreamElement,
     ExperimentManagementSection,
     MotionStatusSection,
-    create_compact_alert_widget,
     create_demo_configurations,
-    create_email_alert_status_display,
     create_email_alert_wizard,
     EmailAlertStatusDisplay,
 )
@@ -57,7 +55,11 @@ from alt_gui import (
 class SimpleGUIApplication:
     """Simple GUI application skeleton with basic CVD functionality"""
 
-    def __init__(self, controller_manager: Optional[ControllerManager] = None, config_dir: Optional[Path] = None):
+    def __init__(
+        self,
+        controller_manager: Optional[ControllerManager] = None,
+        config_dir: Optional[Path] = None,
+    ):
 
         self.camera_active = False
         self.motion_detected = False
@@ -68,18 +70,33 @@ class SimpleGUIApplication:
             if controller_manager is not None
             else create_cvd_controller_manager()
         )
+
         self.camera_controller: Optional[CameraCaptureController] = None
 
-        root = Path(__file__).resolve().parents[3]
-        config_path = root / "config" / "config.json"
-        default_config = root / "program" / "config" / "default_config.json"
-        self.config_service = ConfigurationService(config_path, default_config)
-        self.experiment_manager = ExperimentManager(self.config_service)
+        # Determine configuration directory and initialise core services
+        if config_dir is None:
+            config_dir = Path(__file__).resolve().parents[3] / "config"
+
+        self.config_service = ConfigurationService(
+            config_dir / "config.json",
+            config_dir / "default_config.json",
+        )
+        self.sensor_manager = SensorManager(self.config_service)
+        self.controller_manager = controller_manager or create_cvd_controller_manager()
+        self.experiment_manager = ExperimentManager(
+            config_service=self.config_service,
+            sensor_manager=self.sensor_manager,
+            controller_manager=self.controller_manager,
+        )
+
+        # Additional runtime attributes
+        # Global dark mode controller from NiceGUI
+        self.dark_mode = ui.dark_mode()
         self._current_experiment_id: Optional[str] = None
         self._experiment_start: Optional[datetime] = None
         self._experiment_duration: Optional[int] = None
         self._experiment_timer: Optional[ui.timer] = None
-        
+
         # Placeholder settings
         self.settings = {
             "sensitivity": 50,
@@ -98,18 +115,15 @@ class SimpleGUIApplication:
         self._update_alerts_status()
 
         # Initialize controllers
-        self.camera_controller = self.controller_manager._controllers.get("camera_capture")
-        self.motion_controller = self.controller_manager._controllers.get("motion_detection")
-
-        # --- Backend services -------------------------------------------------
-        if config_dir is None:
-            config_dir = Path(__file__).resolve().parents[3] / "config"
-
-        self.config_service = ConfigurationService(
-            config_dir / "config.json",
-            config_dir / "default_config.json",
+        self.camera_controller = self.controller_manager._controllers.get(
+            "camera_capture"
         )
+
         self.sensor_manager = SensorManager(self.config_service)
+
+        self.motion_controller = self.controller_manager._controllers.get(
+            "motion_detection"
+        )
 
     def create_header(self):
         """Create application header with status indicators"""
@@ -186,13 +200,9 @@ class SimpleGUIApplication:
                     # Dark/Light mode toggle
                     self.dark_mode_btn = (
                         ui.button(
-                            icon="dark_mode",
-                            on_click=lambda: ui.notify(
-                                "function toggle_dark_mode not yet implemented",
-                                type="info",
-                            ),
+                            icon="light_mode" if self.dark_mode.value else "dark_mode",
+                            on_click=self.toggle_dark_mode,
                         )
-
                         .props("flat round")
                         .classes("text-white")
                         .tooltip("Toggle Dark/Light Mode")
@@ -216,15 +226,15 @@ class SimpleGUIApplication:
         setup_global_styles(self)
 
         # Header
-        self.create_header()        # Instantiate shared UI sections
+        self.create_header()  # Instantiate shared UI sections
         self.webcam_stream = WebcamStreamElement(
             self.settings,
             callbacks={
-                'update_sensitivity': self.update_sensitivity,
-                'update_fps': self.update_fps,
-                'update_resolution': self.update_resolution,
-                'set_roi': self.set_roi,
-                'apply_uvc_settings': self.apply_uvc_settings,
+                "update_sensitivity": self.update_sensitivity,
+                "update_fps": self.update_fps,
+                "update_resolution": self.update_resolution,
+                "set_roi": self.set_roi,
+                "apply_uvc_settings": self.apply_uvc_settings,
             },
         )
         self.motion_section = MotionStatusSection(self.settings)
@@ -245,10 +255,10 @@ class SimpleGUIApplication:
             with ui.element("div").style("grid-area: experiment;"):
                 self.experiment_section.create_experiment_section()
                 self.experiment_section.start_experiment_btn.on(
-                    'click', self.toggle_experiment
+                    "click", self.toggle_experiment
                 )
                 self.experiment_section.stop_experiment_btn.on(
-                    'click', self.toggle_experiment
+                    "click", self.toggle_experiment
                 )
 
             # Email Alerts (bottom-right) - New Alert System
@@ -259,7 +269,6 @@ class SimpleGUIApplication:
     def update_time(self):
         """Update the time display in header"""
         self.time_label.text = datetime.now().strftime("%H:%M:%S")
-
 
     def update_camera_status(self, active: bool):
         """Update camera icon color based on active state."""
@@ -289,7 +298,6 @@ class SimpleGUIApplication:
         self.dark_mode.value = not self.dark_mode.value
         icon = "light_mode" if self.dark_mode.value else "dark_mode"
         self.dark_mode_btn.set_icon(icon)
-
 
     # Context menu handlers - all placeholder implementations
     def show_camera_settings_context(self):
@@ -323,9 +331,7 @@ class SimpleGUIApplication:
                     controller_type="camera_capture",
                     parameters={"device_index": 0},
                 )
-                self.camera_controller = CameraCaptureController(
-                    "camera_capture", cfg
-                )
+                self.camera_controller = CameraCaptureController("camera_capture", cfg)
             await self.camera_controller.start()
 
         async def _stop():
@@ -350,35 +356,35 @@ class SimpleGUIApplication:
             if getattr(self.webcam_stream, "start_camera_btn", None):
                 self.webcam_stream.start_camera_btn.set_icon("play_arrow")
                 self.webcam_stream.start_camera_btn.set_text("Play Video")
-    
+
     def update_sensitivity(self, e):
         """Update motion detection sensitivity"""
-        value = int(getattr(e, 'value', e))
-        self.settings['sensitivity'] = value
+        value = int(getattr(e, "value", e))
+        self.settings["sensitivity"] = value
         if self.motion_controller:
             self.motion_controller.motion_threshold_percentage = value / 100.0
         self.webcam_stream.sensitivity_number.value = value
         self.webcam_stream.sensitivity_slider.value = value
-        ui.notify(f'Sensitivity set to {value}%', type='positive')
-    
+        ui.notify(f"Sensitivity set to {value}%", type="positive")
+
     def update_fps(self, e):
         """Update camera FPS setting"""
-        value = int(getattr(e, 'value', e))
-        self.settings['fps'] = value
+        value = int(getattr(e, "value", e))
+        self.settings["fps"] = value
         if self.camera_controller:
             self.camera_controller.fps = value
         if self.motion_controller:
             self.motion_controller.fps = value
         self.webcam_stream.fps_select.value = value
-        ui.notify(f'FPS set to {value}', type='positive')
-    
+        ui.notify(f"FPS set to {value}", type="positive")
+
     def update_resolution(self, e):
         """Update camera resolution setting"""
-        res = getattr(e, 'value', e)
-        self.settings['resolution'] = res
+        res = getattr(e, "value", e)
+        self.settings["resolution"] = res
         try:
             dims = res.split()[0]
-            width, height = map(int, dims.split('x'))
+            width, height = map(int, dims.split("x"))
         except Exception:
             width = height = None
         if width and height:
@@ -389,12 +395,12 @@ class SimpleGUIApplication:
                 self.motion_controller.width = width
                 self.motion_controller.height = height
         self.webcam_stream.resolution_select.value = res
-        ui.notify(f'Resolution set to {res}', type='positive')
-    
+        ui.notify(f"Resolution set to {res}", type="positive")
+
     def set_roi(self):
         """Set region of interest"""
         enabled = self.webcam_stream.roi_checkbox.value
-        self.settings['roi_enabled'] = enabled
+        self.settings["roi_enabled"] = enabled
         if self.motion_controller:
             if not enabled:
                 self.motion_controller.roi_x = 0
@@ -408,35 +414,39 @@ class SimpleGUIApplication:
                 self.motion_controller.roi_y = height // 4
                 self.motion_controller.roi_width = width // 2
                 self.motion_controller.roi_height = height // 2
-        ui.notify('ROI updated', type='positive')
+        ui.notify("ROI updated", type="positive")
 
     def apply_uvc_settings(self):
         """Apply UVC camera settings"""
         settings = {
-            'brightness': self.webcam_stream.brightness_number.value,
-            'contrast': self.webcam_stream.contrast_number.value,
-            'saturation': self.webcam_stream.saturation_number.value,
-            'hue': self.webcam_stream.hue_number.value,
-            'sharpness': self.webcam_stream.sharpness_number.value,
-            'gain': self.webcam_stream.gain_number.value,
-            'gamma': self.webcam_stream.gamma_number.value,
-            'backlight_compensation': self.webcam_stream.backlight_comp_number.value,
-            'white_balance_auto': self.webcam_stream.wb_auto_checkbox.value,
-            'white_balance': self.webcam_stream.wb_manual_number.value,
-            'exposure_auto': self.webcam_stream.exposure_auto_checkbox.value,
-            'exposure': self.webcam_stream.exposure_manual_number.value,
+            "brightness": self.webcam_stream.brightness_number.value,
+            "contrast": self.webcam_stream.contrast_number.value,
+            "saturation": self.webcam_stream.saturation_number.value,
+            "hue": self.webcam_stream.hue_number.value,
+            "sharpness": self.webcam_stream.sharpness_number.value,
+            "gain": self.webcam_stream.gain_number.value,
+            "gamma": self.webcam_stream.gamma_number.value,
+            "backlight_compensation": self.webcam_stream.backlight_comp_number.value,
+            "white_balance_auto": self.webcam_stream.wb_auto_checkbox.value,
+            "white_balance": self.webcam_stream.wb_manual_number.value,
+            "exposure_auto": self.webcam_stream.exposure_auto_checkbox.value,
+            "exposure": self.webcam_stream.exposure_manual_number.value,
         }
         self.settings.update(settings)
-        if self.camera_controller and getattr(self.camera_controller, '_capture', None):
-            asyncio.create_task(apply_uvc_settings(self.camera_controller._capture, settings))
-        if self.motion_controller and getattr(self.motion_controller, '_capture', None):
-            asyncio.create_task(apply_uvc_settings(self.motion_controller._capture, settings))
+        if self.camera_controller and getattr(self.camera_controller, "_capture", None):
+            asyncio.create_task(
+                apply_uvc_settings(self.camera_controller._capture, settings)
+            )
+        if self.motion_controller and getattr(self.motion_controller, "_capture", None):
+            asyncio.create_task(
+                apply_uvc_settings(self.motion_controller._capture, settings)
+            )
         if self.camera_controller:
             self.camera_controller.uvc_settings.update(settings)
         if self.motion_controller:
             self.motion_controller.uvc_settings.update(settings)
-        ui.notify('UVC settings applied', type='positive')
-    
+        ui.notify("UVC settings applied", type="positive")
+
     def toggle_alerts(self, e):
         """Toggle email alerts on/off - opens alert management"""
         self.show_alert_management()
@@ -467,7 +477,7 @@ class SimpleGUIApplication:
                 exp_id = self.experiment_manager.create_experiment(config)
                 success = await self.experiment_manager.start_experiment(exp_id)
                 if not success:
-                    ui.notify('Failed to start experiment', type='negative')
+                    ui.notify("Failed to start experiment", type="negative")
                     return
 
                 self._current_experiment_id = exp_id
@@ -475,39 +485,43 @@ class SimpleGUIApplication:
                 self._experiment_start = datetime.now()
                 self.experiment_section.start_experiment_btn.disable()
                 self.experiment_section.stop_experiment_btn.enable()
-                self.experiment_section.experiment_icon.classes('text-green-600')
-                self.experiment_section.experiment_status_label.text = 'Experiment running'
-                self.experiment_section.experiment_name_label.text = f'Name: {name}'
+                self.experiment_section.experiment_icon.classes("text-green-600")
+                self.experiment_section.experiment_status_label.text = (
+                    "Experiment running"
+                )
+                self.experiment_section.experiment_name_label.text = f"Name: {name}"
                 dur_text = (
-                    f'Duration: {self._experiment_duration} min'
+                    f"Duration: {self._experiment_duration} min"
                     if self._experiment_duration
-                    else 'Duration: unlimited'
+                    else "Duration: unlimited"
                 )
                 self.experiment_section.experiment_duration_label.text = dur_text
-                self.experiment_section.experiment_elapsed_label.text = 'Elapsed: 0s'
+                self.experiment_section.experiment_elapsed_label.text = "Elapsed: 0s"
                 self.experiment_section.experiment_progress.value = 0.0
                 self.experiment_section.experiment_details.set_visibility(True)
                 if self._experiment_timer:
                     self._experiment_timer.cancel()
                 self._experiment_timer = ui.timer(1.0, self._update_experiment_status)
-                ui.notify(f'Started experiment "{name}"', type='positive')
+                ui.notify(f'Started experiment "{name}"', type="positive")
             else:
                 success = await self.experiment_manager.stop_experiment()
                 if not success:
-                    ui.notify('Failed to stop experiment', type='negative')
+                    ui.notify("Failed to stop experiment", type="negative")
                     return
 
                 self.experiment_running = False
                 self._current_experiment_id = None
                 self.experiment_section.start_experiment_btn.enable()
                 self.experiment_section.stop_experiment_btn.disable()
-                self.experiment_section.experiment_icon.classes('text-gray-500')
-                self.experiment_section.experiment_status_label.text = 'No experiment running'
+                self.experiment_section.experiment_icon.classes("text-gray-500")
+                self.experiment_section.experiment_status_label.text = (
+                    "No experiment running"
+                )
                 self.experiment_section.experiment_details.set_visibility(False)
                 if self._experiment_timer:
                     self._experiment_timer.cancel()
                     self._experiment_timer = None
-                ui.notify('Experiment stopped', type='info')
+                ui.notify("Experiment stopped", type="info")
 
         asyncio.create_task(_toggle())
 
@@ -525,7 +539,6 @@ class SimpleGUIApplication:
             total = self._experiment_duration * 60
             progress = min(elapsed / total, 1.0)
             self.experiment_section.experiment_progress.value = progress
-    
 
     def _update_alerts_status(self):
         """Update the alerts_enabled status based on current configurations"""
@@ -538,24 +551,25 @@ class SimpleGUIApplication:
             for config in self.alert_configurations
         )
 
-        if hasattr(self, 'alert_status_icon'):
-            cls = 'text-yellow-300' if self.alerts_enabled else 'text-gray-400'
+        if hasattr(self, "alert_status_icon"):
+            cls = "text-yellow-300" if self.alerts_enabled else "text-gray-400"
             self.alert_status_icon.classes(cls)
-    
+
     def show_alert_setup_wizard(self):
         """Show the email alert setup wizard in a dialog"""
+
         def _on_save(config: Dict[str, Any]):
             self.alert_configurations.append(config)
             self.alert_display.alert_configurations = self.alert_configurations
             self._update_alerts_status()
             service = get_email_alert_service()
-            if service and config.get('emails'):
-                service.recipient = config['emails'][0]
+            if service and config.get("emails"):
+                service.recipient = config["emails"][0]
 
-        with ui.dialog() as dialog, ui.card().classes('w-full max-w-4xl'):
+        with ui.dialog() as dialog, ui.card().classes("w-full max-w-4xl"):
             wizard_card = create_email_alert_wizard(on_save=_on_save)
-            with ui.row().classes('w-full justify-end mt-4'):
-                ui.button('Schließen', on_click=dialog.close).props('flat')
+            with ui.row().classes("w-full justify-end mt-4"):
+                ui.button("Schließen", on_click=dialog.close).props("flat")
 
         dialog.open()
 
@@ -611,11 +625,9 @@ class SimpleGUIApplication:
                     if active_configs > 0:
                         ui.icon("check_circle").classes("text-green-600 text-2xl")
                         status_text = "Aktiv"
-                        status_color = "positive"
                     else:
                         ui.icon("warning").classes("text-orange-600 text-2xl")
                         status_text = "Inaktiv"
-                        status_color = "warning"
 
                     with ui.column().classes("gap-1"):
                         ui.label(f"Status: {status_text}").classes("font-medium")
@@ -671,56 +683,56 @@ class SimpleGUIApplication:
                 if settings.get("enabled", False)
             )
             > 0
-
         ]
 
         if not active_configs:
             ui.notify("Keine aktiven Alert-Konfigurationen vorhanden", type="warning")
             return
 
-
         service = get_email_alert_service()
         if service is None:
-            ui.notify('EmailAlertService nicht verfügbar', type='warning')
+            ui.notify("EmailAlertService nicht verfügbar", type="warning")
             return
 
         total_sent = 0
         for cfg in active_configs:
             subject = f"Test-Alert ({cfg.get('name', 'Alert')})"
-            body = 'Dies ist ein Test des E-Mail-Alert-Systems.'
-            for email in cfg.get('emails', []):
+            body = "Dies ist ein Test des E-Mail-Alert-Systems."
+            for email in cfg.get("emails", []):
                 if service.send_alert(subject, body, recipient=email):
                     total_sent += 1
 
         ui.notify(
-            f'Test-Alerts an {total_sent} Empfänger in {len(active_configs)} Konfigurationen gesendet',
-            type='positive' if total_sent else 'warning'
+            f"Test-Alerts an {total_sent} Empfänger in {len(active_configs)} Konfigurationen gesendet",
+            type="positive" if total_sent else "warning",
         )
-    
+
     def _show_alert_history(self):
         """Show alert history dialog"""
-        with ui.dialog() as dialog, ui.card().classes('w-full max-w-4xl'):
-            ui.label('Alert-Verlauf').classes('text-xl font-bold mb-4')
+        with ui.dialog() as dialog, ui.card().classes("w-full max-w-4xl"):
+            ui.label("Alert-Verlauf").classes("text-xl font-bold mb-4")
 
             service = get_email_alert_service()
             history_entries = service.get_history() if service else []
 
-            with ui.column().classes('gap-3'):
-                ui.label('Letzte gesendete Alerts:').classes('font-medium')
+            with ui.column().classes("gap-3"):
+                ui.label("Letzte gesendete Alerts:").classes("font-medium")
 
                 for entry in history_entries:
-                    with ui.card().classes('w-full p-3'):
-                        with ui.row().classes('items-center justify-between'):
-                            with ui.row().classes('items-center gap-3'):
-                                ui.icon('schedule').classes('text-gray-600')
-                                ui.label(entry['time']).classes('font-mono')
-                                ui.label(entry.get('subject', 'Alert')).classes('font-medium')
-                                ui.label(entry['recipient']).classes('text-gray-600')
+                    with ui.card().classes("w-full p-3"):
+                        with ui.row().classes("items-center justify-between"):
+                            with ui.row().classes("items-center gap-3"):
+                                ui.icon("schedule").classes("text-gray-600")
+                                ui.label(entry["time"]).classes("font-mono")
+                                ui.label(entry.get("subject", "Alert")).classes(
+                                    "font-medium"
+                                )
+                                ui.label(entry["recipient"]).classes("text-gray-600")
 
-                            ui.icon('email').classes('text-blue-600')
+                            ui.icon("email").classes("text-blue-600")
 
-            with ui.row().classes('w-full justify-end mt-4'):
-                ui.button('Schließen', on_click=dialog.close).props('flat')
+            with ui.row().classes("w-full justify-end mt-4"):
+                ui.button("Schließen", on_click=dialog.close).props("flat")
 
         dialog.open()
 
@@ -730,8 +742,8 @@ class SimpleGUIApplication:
         @ui.page("/")
         def index():
             self.create_main_layout()
-            
-        @ui.page('/video_feed')
+
+        @ui.page("/video_feed")
         async def video_feed(request: Request):
             async def gen():
                 while True:
@@ -745,20 +757,24 @@ class SimpleGUIApplication:
                     if self.camera_controller is not None:
                         output = self.camera_controller.get_output()
                         if isinstance(output, dict):
-                            frame = output.get('frame') or output.get('image')
+                            frame = output.get("frame") or output.get("image")
                         elif output is not None:
                             frame = output
 
                     if frame is not None:
-                        success, buf = cv2.imencode('.jpg', frame)
+                        success, buf = cv2.imencode(".jpg", frame)
                         if success:
                             jpeg = buf.tobytes()
                             yield (
-                                b'--frame\r\nContent-Type: image/jpeg\r\n\r\n' + jpeg + b'\r\n'
+                                b"--frame\r\nContent-Type: image/jpeg\r\n\r\n"
+                                + jpeg
+                                + b"\r\n"
                             )
                     await asyncio.sleep(0.03)
 
-            return StreamingResponse(gen(), media_type='multipart/x-mixed-replace; boundary=frame')
+            return StreamingResponse(
+                gen(), media_type="multipart/x-mixed-replace; boundary=frame"
+            )
 
         @app.on_startup
         async def _startup() -> None:
@@ -770,7 +786,7 @@ class SimpleGUIApplication:
             await self.controller_manager.stop_all_controllers()
             await self.sensor_manager.shutdown()
 
-        print(f'Starting Simple CVD GUI on http://{host}:{port}')
+        print(f"Starting Simple CVD GUI on http://{host}:{port}")
 
         ui.run(
             host=host,
