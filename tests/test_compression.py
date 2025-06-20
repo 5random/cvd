@@ -47,3 +47,25 @@ def test_file_maintenance_compress(tmp_path: Path):
     compressed = list((tmp_path / 'compressed').glob('example*.csv.gz'))
     assert len(compressed) == 1
     assert not file_path.exists()
+
+
+def test_is_already_compressed_partial_match(tmp_path: Path):
+    _, compression_service, _ = _init_services(tmp_path)
+
+    assert not compression_service._is_already_compressed(
+        Path("uncompressed/file.csv")
+    )
+
+
+def test_is_already_compressed_dir_name(tmp_path: Path):
+    _, compression_service, _ = _init_services(tmp_path)
+
+    assert compression_service._is_already_compressed(
+        Path("data/compressed/file.csv")
+    )
+
+
+def test_is_already_compressed_extension(tmp_path: Path):
+    _, compression_service, _ = _init_services(tmp_path)
+
+    assert compression_service._is_already_compressed(Path("file.csv.gz"))

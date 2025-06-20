@@ -563,7 +563,7 @@ class ExperimentManager:
                 except Exception as exc:
                     warning(f"Failed to get controller outputs: {exc}")
                     data_point.controller_outputs = {}
-            
+
             # Store data point
             with self._collection_lock:
                 self._collected_data.append(data_point)
@@ -677,7 +677,11 @@ class ExperimentManager:
             error(f"Failed to save experiment summary: {e}")
 
     async def _finalize_experiment(self) -> None:
-        """Finalize the current experiment and save results"""
+        """Finalize the current experiment and save results.
+
+        The experiment result is marked as ``COMPLETED`` while the manager
+        returns to ``IDLE`` to allow starting a new experiment immediately.
+        """
         if not self._current_experiment:
             return
 
@@ -697,10 +701,8 @@ class ExperimentManager:
             if self.auto_zip and self.compression_service and result.result_directory:
                 await self._compress_experiment_results(result)
 
-            # Update state
+            # Update state and reset manager
             await self._change_state(ExperimentState.COMPLETED)
-
-            # Reset current experiment
             self._current_experiment = None
             await self._change_state(ExperimentState.IDLE)
 
@@ -790,6 +792,13 @@ class ExperimentManager:
         """Change experiment state and notify callbacks"""
         old_state = self._current_state
         self._current_state = new_state
+
+        # Keep result state in sync with manager state
+        if (
+            self._current_experiment
+            and self._current_experiment in self._experiment_results
+        ):
+            self._experiment_results[self._current_experiment].state = new_state
 
         # Log state change
         info(f"Experiment state changed: {old_state.value} -> {new_state.value}")

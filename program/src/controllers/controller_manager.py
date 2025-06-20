@@ -110,7 +110,7 @@ class ControllerManager:
                 input_controllers=config.get("input_controllers", []),
                 output_name=config.get("output_name"),
             )
-            
+
             ctrl_cls = CONTROLLER_CLASS_MAP.get(controller_type)
             if ctrl_cls is None:
                 raise ValueError(f"Unknown controller type: {controller_type}")
@@ -475,6 +475,7 @@ class ControllerManager:
                 ],
             }
 
+            config_path.parent.mkdir(parents=True, exist_ok=True)
             with open(config_path, "w") as f:
                 json.dump(config_data, f, indent=2)
 

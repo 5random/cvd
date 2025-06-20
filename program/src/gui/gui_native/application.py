@@ -5,6 +5,7 @@ Main web application class for managing the NiceGUI interface.
 import asyncio
 import contextlib
 import json
+import math
 from typing import Optional
 
 from nicegui import app, ui
@@ -856,5 +857,14 @@ class WebApplication:
             for sensor_id, reading in readings.items():
                 cfg = sensor_configs.get(sensor_id, {})
                 unit = reading.metadata.get("unit") or cfg.get("unit", "°C")
+                value = reading.value
+                if (
+                    value is None
+                    or not isinstance(value, (int, float))
+                    or (isinstance(value, float) and math.isnan(value))
+                ):
+                    value_str = "--"
+                else:
+                    value_str = f"{float(value):.2f}{unit}"
                 ui.label(sensor_id)
-                ui.label(f"{reading.value:.2f}{unit}")
+                ui.label(value_str)
