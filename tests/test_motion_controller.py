@@ -251,3 +251,23 @@ async def test_stop_event_initialized_and_persistent():
     await ctrl.stop()
 
 
+def test_multi_frame_window_defaults_to_one_on_zero():
+    cfg = ControllerConfig(
+        controller_id="md",
+        controller_type="motion_detection",
+        parameters={"multi_frame_window": 0},
+    )
+    ctrl = MotionDetectionController("md", cfg)
+    assert ctrl.multi_frame_window == 1
+
+
+def test_multi_frame_window_defaults_to_one_on_negative():
+    cfg = ControllerConfig(
+        controller_id="md",
+        controller_type="motion_detection",
+        parameters={"multi_frame_window": -5},
+    )
+    ctrl = MotionDetectionController("md", cfg)
+    assert ctrl.multi_frame_window == 1
+
+

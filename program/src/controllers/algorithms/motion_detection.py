@@ -182,6 +182,13 @@ class MotionDetectionController(ImageController):
         self.roundness_threshold = params.get("roundness_threshold", 0.7)
         self.multi_frame_enabled = params.get("multi_frame_enabled", False)
         self.multi_frame_window = params.get("multi_frame_window", 30)
+        if self.multi_frame_window < 1:
+            warning(
+                "multi_frame_window must be >= 1, using default",
+                controller_id=self.controller_id,
+                value=self.multi_frame_window,
+            )
+            self.multi_frame_window = 1
         self.multi_frame_threshold = params.get("multi_frame_threshold", 0.3)
 
         self.multi_frame_method = params.get("multi_frame_method", "threshold")
