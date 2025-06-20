@@ -7,6 +7,7 @@
 from nicegui import ui
 from datetime import datetime
 from typing import Optional, Dict, Any
+from program.src.utils.email_alert_service import get_email_alert_service
 
 from alt_gui import (
     setup_global_styles,
@@ -212,11 +213,22 @@ class SimpleGUIApplication:
             any(settings.get('enabled', False) for settings in config.get('settings', {}).values())
             for config in self.alert_configurations
         )
+        if hasattr(self, 'alert_status_icon'):
+            cls = 'text-yellow-300' if self.alerts_enabled else 'text-gray-400'
+            self.alert_status_icon.classes(cls)
     
     def show_alert_setup_wizard(self):
         """Show the email alert setup wizard in a dialog"""
+        def _on_save(config: Dict[str, Any]):
+            self.alert_configurations.append(config)
+            self.alert_display.alert_configurations = self.alert_configurations
+            self._update_alerts_status()
+            service = get_email_alert_service()
+            if service and config.get('emails'):
+                service.recipient = config['emails'][0]
+
         with ui.dialog() as dialog, ui.card().classes('w-full max-w-4xl'):
-            wizard_card = create_email_alert_wizard()
+            wizard_card = create_email_alert_wizard(on_save=_on_save)
             with ui.row().classes('w-full justify-end mt-4'):
                 ui.button('Schließen', on_click=dialog.close).props('flat')
         dialog.open()
@@ -300,44 +312,56 @@ class SimpleGUIApplication:
                 
     def _send_test_to_all_configs(self):
         """Send test alerts to all active configurations"""
-        active_configs = [config for config in self.alert_configurations 
-                         if sum(1 for settings in config.get('settings', {}).values() 
-                               if settings.get('enabled', False)) > 0]
-        
+        active_configs = [
+            config
+            for config in self.alert_configurations
+            if any(settings.get('enabled', False) for settings in config.get('settings', {}).values())
+        ]
+
         if not active_configs:
             ui.notify('Keine aktiven Alert-Konfigurationen vorhanden', type='warning')
             return
-        
-        total_recipients = sum(len(config.get('emails', [])) for config in active_configs)
-        ui.notify(f'Test-Alerts an {total_recipients} Empfänger in {len(active_configs)} Konfigurationen gesendet', type='positive')
+
+        service = get_email_alert_service()
+        if service is None:
+            ui.notify('EmailAlertService nicht verfügbar', type='warning')
+            return
+
+        total_sent = 0
+        for cfg in active_configs:
+            subject = f"Test-Alert ({cfg.get('name', 'Alert')})"
+            body = 'Dies ist ein Test des E-Mail-Alert-Systems.'
+            for email in cfg.get('emails', []):
+                if service.send_alert(subject, body, recipient=email):
+                    total_sent += 1
+
+        ui.notify(
+            f'Test-Alerts an {total_sent} Empfänger in {len(active_configs)} Konfigurationen gesendet',
+            type='positive' if total_sent else 'warning'
+        )
     
     def _show_alert_history(self):
         """Show alert history dialog"""
         with ui.dialog() as dialog, ui.card().classes('w-full max-w-4xl'):
             ui.label('Alert-Verlauf').classes('text-xl font-bold mb-4')
-            
-            # Placeholder for alert history
+
+            service = get_email_alert_service()
+            history_entries = service.get_history() if service else []
+
             with ui.column().classes('gap-3'):
                 ui.label('Letzte gesendete Alerts:').classes('font-medium')
-                
-                # Mock alert history entries
-                history_entries = [
-                    {'time': '14:35:22', 'type': 'Keine Bewegung', 'config': 'Labor Überwachung', 'recipients': 3},
-                    {'time': '12:18:45', 'type': 'Kamera Offline', 'config': 'Labor Überwachung', 'recipients': 3},
-                    {'time': '09:22:10', 'type': 'Experiment Abgeschlossen', 'config': 'Experiment Benachrichtigungen', 'recipients': 2},
-                ]
-                
+
                 for entry in history_entries:
                     with ui.card().classes('w-full p-3'):
                         with ui.row().classes('items-center justify-between'):
                             with ui.row().classes('items-center gap-3'):
                                 ui.icon('schedule').classes('text-gray-600')
                                 ui.label(entry['time']).classes('font-mono')
-                                ui.label(entry['type']).classes('font-medium')
-                                ui.label(f"({entry['config']})").classes('text-gray-600')
-                            
-                            ui.chip(f"{entry['recipients']} Empfänger", color='blue').props('dense')
-            
+                                ui.label(entry.get('subject', 'Alert')).classes('font-medium')
+                                ui.label(entry['recipient']).classes('text-gray-600')
+
+                            ui.icon('email').classes('text-blue-600')
+
             with ui.row().classes('w-full justify-end mt-4'):
                 ui.button('Schließen', on_click=dialog.close).props('flat')
         

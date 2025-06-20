@@ -4,16 +4,22 @@ Implementiert einen 4-stufigen Wizard für die Konfiguration des Email-Alert-Ser
 """
 
 from nicegui import ui
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Optional, Any, Callable
+from program.src.utils.email_alert_service import get_email_alert_service
 from datetime import datetime
 import re
 
 
 class EmailAlertWizard:
     """4-Step Email Alert Service Setup Wizard using NiceGUI Stepper"""
-    
-    def __init__(self):
-        """Initialize the Email Alert Wizard"""
+
+    def __init__(self, on_save: Optional[Callable[[Dict[str, Any]], None]] = None):
+        """Initialize the Email Alert Wizard
+
+        Args:
+            on_save: optional callback invoked with the configuration when saved
+        """
+        self.on_save = on_save
         self.alert_data = {
             'name': '',
             'emails': [],
@@ -484,7 +490,10 @@ class EmailAlertWizard:
             f'{len(self.alert_data["emails"])} recipients, {active_count} alert types enabled.',
             type='positive'
         )
-        
+
+        if self.on_save:
+            self.on_save(self.get_configuration())
+
         # Optional: Close wizard or reset
         self._reset_wizard()
     
@@ -772,8 +781,22 @@ class EmailAlertStatusDisplay:
     
     def _send_test_alert(self, config: Dict[str, Any]):
         """Send a test alert for the configuration"""
-        email_count = len(config.get('emails', []))
-        ui.notify(f'Test-Alert an {email_count} Empfänger gesendet', type='positive')
+        service = get_email_alert_service()
+        if service is None:
+            ui.notify('EmailAlertService nicht verfügbar', type='warning')
+            return
+
+        subject = f"Test-Alert ({config.get('name', 'Alert')})"
+        body = 'Dies ist ein Test des E-Mail-Alert-Systems.'
+        sent = 0
+        for email in config.get('emails', []):
+            if service.send_alert(subject, body, recipient=email):
+                sent += 1
+
+        ui.notify(
+            f'Test-Alert an {sent} Empfänger gesendet',
+            type='positive' if sent else 'warning'
+        )
     
     def _delete_configuration(self, config: Dict[str, Any]):
         """Delete a configuration with confirmation"""
@@ -786,9 +809,9 @@ class EmailAlertStatusDisplay:
         ui.notify('Alert-Verwaltung würde hier geöffnet werden', type='info')
 
 
-def create_email_alert_wizard() -> ui.card:
+def create_email_alert_wizard(on_save: Optional[Callable[[Dict[str, Any]], None]] = None) -> ui.card:
     """Factory function to create an Email Alert Setup Wizard"""
-    wizard = EmailAlertWizard()
+    wizard = EmailAlertWizard(on_save=on_save)
     return wizard.create_wizard()
 
 
