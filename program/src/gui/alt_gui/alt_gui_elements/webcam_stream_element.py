@@ -23,15 +23,15 @@ class WebcamStreamElement:
             with ui.card().classes('cvd-card w-full'):
                 ui.label('Live Camera Feed').classes('text-lg font-bold mb-2')
                 
-                # Video placeholder for camera stream with context menu
+                # Live camera stream from the /video_feed endpoint
                 with ui.row().classes('justify-center mb-4'):
                     with ui.card().classes('border-2 border-dashed border-gray-300') \
                         .style('width: 640px; height: 480px; background-color: #f5f5f5; display: flex; align-items: center; justify-content: center;'):
-                        
-                        # Video element as placeholder for camera feed
-                        self.video_element = ui.video(
-                            'https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/360/Big_Buck_Bunny_360_10s_1MB.mp4'
-                        ).style('width: 100%; height: 100%; object-fit: contain;')
+
+                        # Image element displaying the MJPEG stream
+                        self.video_element = ui.image('/video_feed').style(
+                            'width: 100%; height: 100%; object-fit: contain;'
+                        )
                         
                         # Right-click context menu for camera
                         with ui.context_menu():
