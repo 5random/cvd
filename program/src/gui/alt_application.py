@@ -223,7 +223,7 @@ class SimpleGUIApplication:
         ui.page_title("CVD Tracker - Simple Monitor")
 
         # Setup global styles using shared theme
-        setup_global_styles(self)
+        setup_global_styles()
 
         # Header
         self.create_header()  # Instantiate shared UI sections

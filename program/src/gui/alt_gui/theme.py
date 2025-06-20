@@ -1,8 +1,9 @@
 from nicegui import ui
 
-def setup_global_styles(self):
-        """Setup CSS styles matching the main application"""
-        ui.add_head_html("""
+
+def setup_global_styles():
+    """Setup CSS styles matching the main application"""
+    ui.add_head_html("""
             <style>
                 .cvd-header { 
                     background: linear-gradient(90deg, #1976d2, #1565c0); 
@@ -65,4 +66,4 @@ def setup_global_styles(self):
                     }
                 }
             </style>
-        """)
+    """)
