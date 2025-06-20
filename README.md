@@ -95,6 +95,12 @@ providing ``"capture_backend"`` in a webcam or controller configuration. Common
 values include ``cv2.CAP_DSHOW`` and ``cv2.CAP_MSMF`` on Windows. If omitted,
 OpenCV will choose the default backend for the platform.
 
+### External camera capture
+
+The motion detection controller can rely on another controller for camera frames.
+Set ``input_controllers`` to the ID of a ``camera_capture`` controller to disable
+its internal capture loop and use the external source instead.
+
 
 ## Running tests
 
