@@ -4,9 +4,15 @@
 # - email alert service for critical events (e.g. when motion is not detected) with alert delay settings (email alert shall include webcam image, motion detection status, timestamp, and other relevant information)
 # - basic experiment management (start/stop experiment, view results/status, alert on critical events)
 
-from nicegui import ui
+from nicegui import ui, app
 from datetime import datetime
+from pathlib import Path
 from typing import Optional, Dict, Any
+
+from src.utils.config_service import ConfigurationService
+from src.data_handler.sources.sensor_source_manager import SensorManager
+from src.controllers.controller_manager import create_cvd_controller_manager, ControllerManager
+from src.experiment_handler.experiment_manager import ExperimentManager
 
 from alt_gui import (
     setup_global_styles,
@@ -23,7 +29,7 @@ from alt_gui import (
 class SimpleGUIApplication:
     """Simple GUI application skeleton with basic CVD functionality"""
     
-    def __init__(self):
+    def __init__(self, config_dir: Optional[Path] = None):
         self.camera_active = False
         self.motion_detected = False
         self.experiment_running = False
@@ -42,9 +48,25 @@ class SimpleGUIApplication:
         # Initialize email alert configurations with demo data
         self.alert_configurations = create_demo_configurations()
         self.alert_display = EmailAlertStatusDisplay(self.alert_configurations)
-        
+
         # Track if we have active alerts
         self._update_alerts_status()
+
+        # --- Backend services -------------------------------------------------
+        if config_dir is None:
+            config_dir = Path(__file__).resolve().parents[3] / "config"
+
+        self.config_service = ConfigurationService(
+            config_dir / "config.json",
+            config_dir / "default_config.json",
+        )
+        self.sensor_manager = SensorManager(self.config_service)
+        self.controller_manager: ControllerManager = create_cvd_controller_manager()
+        self.experiment_manager = ExperimentManager(
+            config_service=self.config_service,
+            sensor_manager=self.sensor_manager,
+            controller_manager=self.controller_manager,
+        )
     
         
     def create_header(self):
@@ -348,6 +370,16 @@ class SimpleGUIApplication:
         @ui.page('/')
         def index():
             self.create_main_layout()
+
+        @app.on_startup
+        async def _startup() -> None:
+            await self.sensor_manager.start_all_configured_sensors()
+            await self.controller_manager.start_all_controllers()
+
+        @app.on_shutdown
+        async def _shutdown() -> None:
+            await self.controller_manager.stop_all_controllers()
+            await self.sensor_manager.shutdown()
         
         print(f'Starting Simple CVD GUI on http://{host}:{port}')
         ui.run(
