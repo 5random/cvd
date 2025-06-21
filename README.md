@@ -106,18 +106,12 @@ its internal capture loop and use the external source instead.
 
 Before running the tests you must install this package and its dependencies.
 Attempting to execute `pytest` without installation will result in import
-errors.  Install everything with:
+errors.
+
+Run the installation and tests in a single sequence:
 
 ```bash
-
 pip install -e .
-make test
-make install    # or: pip install -e .
-```
-
-After installation run the test suite with:
-
-```bash
 pytest          # or: make test
 
 ```
