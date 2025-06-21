@@ -39,7 +39,7 @@ from program.src.utils.config_service import ConfigurationService
 from program.src.utils.email_alert_service import get_email_alert_service
 from program.src.data_handler.sources.sensor_source_manager import SensorManager
 
-from alt_gui import (
+from .alt_gui import (
     setup_global_styles,
     WebcamStreamElement,
     ExperimentManagementSection,
