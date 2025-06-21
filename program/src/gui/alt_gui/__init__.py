@@ -1,3 +1,5 @@
+"""Provide alternate GUI components and theme setup."""
+
 from .theme import setup_global_styles
 from .alt_gui_elements import (
     WebcamStreamElement,
