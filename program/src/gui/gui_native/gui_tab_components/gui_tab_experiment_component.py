@@ -1297,10 +1297,10 @@ class ExperimentHistoryTable(BaseComponent):
                 ui.label("Select Date Range").classes("text-lg font-bold")
 
                 self._date_from_picker = ui.date(
-                    value=from_date.strftime("%Y-%m-%d") if from_date else None
+                    value=from_date.strftime("%Y-%m-%d") if from_date else ""
                 )
                 self._date_to_picker = ui.date(
-                    value=to_date.strftime("%Y-%m-%d") if to_date else None
+                    value=to_date.strftime("%Y-%m-%d") if to_date else ""
                 )
 
                 with ui.row().classes("gap-2 justify-end"):
