@@ -110,6 +110,7 @@ class SimpleGUIApplication:
         # Initialize email alert configurations with demo data
         self.alert_configurations = create_demo_configurations()
         self.alert_display = EmailAlertStatusDisplay(self.alert_configurations)
+        self.alert_display.update_callback = self._on_alert_config_changed
 
         # Track if we have active alerts
         self._update_alerts_status()
@@ -580,6 +581,13 @@ class SimpleGUIApplication:
             cls = "text-yellow-300" if self.alerts_enabled else "text-gray-400"
             self.alert_status_icon.classes(cls)
 
+    def _on_alert_config_changed(self) -> None:
+        """Handle alert configuration updates from the status display."""
+        if hasattr(self, "alert_overview_container"):
+            self.alert_overview_container.clear()
+            self.alert_display.create_alert_overview()
+        self._update_alerts_status()
+
     def show_alert_setup_wizard(self):
         """Show the email alert setup wizard in a dialog"""
 
@@ -603,8 +611,8 @@ class SimpleGUIApplication:
         with ui.dialog() as dialog, ui.card().classes("w-full max-w-6xl"):
             ui.label("E-Mail Alert Verwaltung").classes("text-xl font-bold mb-4")
 
-            # Create the full alert overview
-            self.alert_display.create_alert_overview()
+            with ui.column() as self.alert_overview_container:
+                self.alert_display.create_alert_overview()
 
             with ui.row().classes("w-full justify-end mt-4"):
                 ui.button("Schließen", on_click=dialog.close).props("flat")

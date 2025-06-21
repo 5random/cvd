@@ -544,6 +544,7 @@ class EmailAlertStatusDisplay:
             alert_configurations: List of alert configurations to display
         """
         self.alert_configurations = alert_configurations or []
+        self.update_callback: Optional[Callable[[], None]] = None
         
     def anonymize_email(self, email: str) -> str:
         """
@@ -762,13 +763,21 @@ class EmailAlertStatusDisplay:
         if config in self.alert_configurations:
             self.alert_configurations.remove(config)
     
-    def update_configuration(self, old_config: Dict[str, Any], new_config: Dict[str, Any]):
+    def update_configuration(
+        self,
+        old_config: Dict[str, Any],
+        new_config: Dict[str, Any],
+        callback: Optional[Callable[[], None]] = None,
+    ):
         """Update an existing configuration"""
         try:
             index = self.alert_configurations.index(old_config)
             self.alert_configurations[index] = new_config
         except ValueError:
             pass  # Configuration not found
+        cb = callback or self.update_callback
+        if cb:
+            cb()
     
     # Event handlers for UI actions
     def _show_setup_wizard(self):
@@ -788,6 +797,9 @@ class EmailAlertStatusDisplay:
         """Edit an existing configuration"""
         def _on_save(new_cfg: Dict[str, Any]):
             self.update_configuration(config, new_cfg)
+            cb = self.update_callback
+            if cb:
+                cb()
             dialog.close()
 
         wizard = EmailAlertWizard(on_save=_on_save)
@@ -819,7 +831,11 @@ class EmailAlertStatusDisplay:
             type='positive' if sent else 'warning'
         )
 
-    def _delete_configuration(self, config: Dict[str, Any]):
+    def _delete_configuration(
+        self,
+        config: Dict[str, Any],
+        callback: Optional[Callable[[], None]] = None,
+    ):
         """Delete a configuration with confirmation"""
         config_name = config.get('name', 'Unbenannte Konfiguration')
 
@@ -836,6 +852,9 @@ class EmailAlertStatusDisplay:
                     def _confirm():
                         self.remove_configuration(config)
                         dialog.close()
+                        cb = callback or self.update_callback
+                        if cb:
+                            cb()
 
                     ui.button('Löschen', on_click=_confirm).props('color=negative')
 
