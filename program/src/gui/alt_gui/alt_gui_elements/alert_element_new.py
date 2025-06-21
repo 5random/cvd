@@ -112,14 +112,14 @@ class EmailAlertWizard:
                 "text-lg font-semibold mb-4"
             )
             ui.label(
-                "Add email addresses that should receive alerts. You can add multiple recipients."
+                "Add email addresses that should receive alerts. You can add multiple recipients. Only addresses ending with @tuhh.de are allowed."
             ).classes("text-sm text-gray-600 mb-4")
 
             with ui.column().classes("gap-4 w-full"):
                 # Email Input
                 with ui.row().classes("gap-2 w-full items-end"):
                     email_input = (
-                        ui.input("Email Address", placeholder="user@example.com")
+                        ui.input("Email Address", placeholder="user@tuhh.de")
                         .classes("flex-1")
                         .props("outlined")
                     )
@@ -156,7 +156,7 @@ class EmailAlertWizard:
 
                 # Step validation feedback
                 step2_feedback = ui.label(
-                    "Add at least one valid email address to continue."
+                    "Add at least one valid @tuhh.de email address to continue."
                 ).classes("text-sm text-orange-600 mt-2")
 
             with ui.stepper_navigation():
@@ -449,17 +449,17 @@ class EmailAlertWizard:
                 email_feedback.classes("text-sm text-orange-600")
                 add_email_btn.disable()
             else:
-                email_feedback.text = "✓ Valid email address"
+                email_feedback.text = "✓ Valid @tuhh.de email address"
                 email_feedback.classes("text-sm text-green-600")
                 add_email_btn.enable()
         else:
-            email_feedback.text = "Please enter a valid email address"
+            email_feedback.text = "Please enter a valid @tuhh.de email address"
             email_feedback.classes("text-sm text-red-600")
             add_email_btn.disable()
 
     def _is_valid_email(self, email: str) -> bool:
-        """Check if email format is valid"""
-        pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+        """Check if email format is valid and ends with @tuhh.de"""
+        pattern = r"^[a-zA-Z0-9._%+-]+@tuhh\.de$"
         return re.match(pattern, email) is not None
 
     def _add_email(
@@ -524,7 +524,9 @@ class EmailAlertWizard:
             step2_feedback.classes("text-sm mt-2 text-green-600")
             step2_next_btn.enable()
         else:
-            step2_feedback.text = "Add at least one valid email address to continue."
+            step2_feedback.text = (
+                "Add at least one valid @tuhh.de email address to continue."
+            )
             step2_feedback.classes("text-sm text-orange-600 mt-2")
             step2_next_btn.disable()
 
