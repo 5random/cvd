@@ -28,6 +28,12 @@ uses to display CPU and memory usage.
 
 All dependencies are defined in `pyproject.toml`. Both `setup.py` and
 `requirements.txt` read from this file so there is a single authoritative list.
+Run the helper script whenever you change the dependency list to keep
+`requirements.txt` up to date:
+
+```bash
+python scripts/update_requirements.py
+```
 
 
 The installed package includes a `config/` directory containing the default
