@@ -1,3 +1,10 @@
+# Ensure src package is importable when executed as a script
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))  # program directory
+sys.path.insert(0, str(Path(__file__).resolve().parents[3]))  # project root
+
 # alternative gui application for the program that enables only basic functionality of the program those are:
 # - live view of webcam with basic controls (start/stop webcam, adjust ROI, sensitivity settings, fps settings, resolution settings)
 # - live status of motion detection algorithm applied to the webcam with ROI and sensitivity settings
@@ -6,7 +13,6 @@
 
 from nicegui import ui, app
 from datetime import datetime
-from pathlib import Path
 from typing import Optional, Dict, Any
 import asyncio
 import cv2
@@ -18,11 +24,11 @@ from src.controllers.controller_utils.controller_data_sources.camera_capture_con
     CameraCaptureController,
 )
 from src.controllers.controller_utils.camera_utils import apply_uvc_settings
-from ..controllers.controller_manager import (
+from src.controllers.controller_manager import (
     ControllerManager,
     create_cvd_controller_manager,
 )
-from src.controllers.controller_utils.motion_detection_controller import MotionDetectionController
+from src.controllers.algorithms.motion_detection import MotionDetectionController
 from src.experiment_handler.experiment_manager import (
     ExperimentManager,
     ExperimentConfig,
@@ -833,7 +839,8 @@ if __name__ in {"__main__", "__mp_main__"}:
 #    - Email addresses are partially anonymized in the display
 #
 # Usage:
-# ------
-# Run the application with: python alt_application.py
+#   python src/gui/alt_application.py
+# or
+#   python -m src.gui.alt_application
 # The email alert section will show in the bottom-right grid area.
 # Click "Konfigurieren" to set up new alerts or "Verwalten" to view existing ones.
