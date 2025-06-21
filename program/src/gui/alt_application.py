@@ -278,6 +278,8 @@ class SimpleGUIApplication:
     def update_camera_status(self, active: bool):
         """Update camera icon color based on active state."""
         self.camera_active = active
+        if not hasattr(self, "camera_status_icon"):
+            return
         if active:
             self.camera_status_icon.classes(
                 add="text-green-300", remove="text-gray-400"
@@ -808,6 +810,9 @@ class SimpleGUIApplication:
             install_signal_handlers(self.experiment_manager._task_manager)
             await self.sensor_manager.start_all_configured_sensors()
             await self.controller_manager.start_all_controllers()
+            # Ensure camera status reflects that controllers started
+            self.camera_active = True
+            self.update_camera_status(True)
 
         @app.on_shutdown
         async def _shutdown() -> None:
