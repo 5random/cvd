@@ -41,7 +41,7 @@ from program.src.utils.config_service import ConfigurationService
 from program.src.utils.email_alert_service import get_email_alert_service
 from program.src.data_handler.sources.sensor_source_manager import SensorManager
 
-from alt_gui import (
+from .alt_gui import (
     setup_global_styles,
     WebcamStreamElement,
     ExperimentManagementSection,
@@ -239,9 +239,14 @@ class SimpleGUIApplication:
                 "apply_uvc_settings": self.apply_uvc_settings,
                 "take_snapshot": self.take_snapshot,
                 "adjust_roi": self.adjust_roi,
+                "camera_toggle": self.toggle_camera,
+
             },
+            on_camera_status_change=self.update_camera_status,
         )
-        self.motion_section = MotionStatusSection(self.settings)
+        self.motion_section = MotionStatusSection(
+            self.settings, controller_manager=self.controller_manager
+        )
         self.experiment_section = ExperimentManagementSection(self.settings)
         # Note: EmailAlertsSection replaced with new alert system
 

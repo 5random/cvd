@@ -4,13 +4,21 @@ from nicegui import ui
 class WebcamStreamElement:
     """Initialize webcam stream element with settings and optional callbacks"""
 
-    def __init__(self, settings, callbacks=None, on_camera_status_change=None):
+    def __init__(
+        self,
+        settings,
+        callbacks=None,
+        on_camera_status_change=None,
+        camera_toggle_cb=None,
+    ):
         self.camera_active = False
         self.recording = False
         self._on_camera_status_change = on_camera_status_change
         settings = settings or {"sensitivity": 50, "fps": 30, "roi_enabled": False}
         self.settings = settings
         self.callbacks = callbacks or {}
+        # Store explicit camera toggle callback or look it up in callbacks dict
+        self._camera_toggle_cb = camera_toggle_cb or self.callbacks.get("camera_toggle")
 
         @ui.page("/webcam_stream")
         def webcam_stream_page():
@@ -616,12 +624,16 @@ class WebcamStreamElement:
             self.start_camera_btn.set_text("Pause Video")
             self.start_camera_btn.set_icon("pause")
             self.camera_active = True
+            if self._camera_toggle_cb:
+                self._camera_toggle_cb()
             self._update_status()
         else:
             self.video_element.pause()
             self.start_camera_btn.set_text("Play Video")
             self.start_camera_btn.set_icon("play_arrow")
             self.camera_active = False
+            if self._camera_toggle_cb:
+                self._camera_toggle_cb()
             self._update_status()
 
     def toggle_video_pause(self):
@@ -631,12 +643,16 @@ class WebcamStreamElement:
             self.start_camera_btn.set_text("Play Video")
             self.start_camera_btn.set_icon("play_arrow")
             self.camera_active = False
+            if self._camera_toggle_cb:
+                self._camera_toggle_cb()
             self._update_status()
         else:
             self.video_element.play()
             self.start_camera_btn.set_text("Pause Video")
             self.start_camera_btn.set_icon("pause")
             self.camera_active = True
+            if self._camera_toggle_cb:
+                self._camera_toggle_cb()
             self._update_status()
 
     def toggle_white_balance_auto(self, value):

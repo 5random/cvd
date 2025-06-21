@@ -279,11 +279,30 @@ class MotionDetectionController(ImageController):
 
             # Crop to region of interest if configured
             if self.roi_width is not None and self.roi_height is not None:
-                x1 = max(0, int(self.roi_x))
-                y1 = max(0, int(self.roi_y))
-                x2 = min(frame.shape[1], x1 + int(self.roi_width))
-                y2 = min(frame.shape[0], y1 + int(self.roi_height))
-                frame = frame[y1:y2, x1:x2]
+                if self.roi_width <= 0 or self.roi_height <= 0:
+                    warning(
+                        "Invalid ROI dimensions, skipping crop",
+                        controller_id=self.controller_id,
+                        roi_width=self.roi_width,
+                        roi_height=self.roi_height,
+                    )
+                    self.roi_width = None
+                    self.roi_height = None
+                else:
+                    x1 = max(0, int(self.roi_x))
+                    y1 = max(0, int(self.roi_y))
+                    x2 = min(frame.shape[1], x1 + int(self.roi_width))
+                    y2 = min(frame.shape[0], y1 + int(self.roi_height))
+                    if x2 > x1 and y2 > y1:
+                        frame = frame[y1:y2, x1:x2]
+                    else:
+                        warning(
+                            "ROI results in empty region, skipping crop",
+                            controller_id=self.controller_id,
+                            roi=(x1, y1, self.roi_width, self.roi_height),
+                        )
+                        self.roi_width = None
+                        self.roi_height = None
 
             # Store frame size for calculations
             if self._frame_size is None:
