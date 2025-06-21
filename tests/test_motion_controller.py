@@ -159,6 +159,40 @@ async def test_multi_frame_probability_mode(monkeypatch):
 
 
 @pytest.mark.asyncio
+async def test_multi_frame_probability_decay_influence(monkeypatch):
+    cfg = ControllerConfig(
+        controller_id="md",
+        controller_type="motion_detection",
+        parameters={
+            "multi_frame_enabled": True,
+            "multi_frame_method": "probability",
+            "multi_frame_decay": 0.9,
+            "multi_frame_threshold": 0.2,
+        },
+    )
+    ctrl = MotionDetectionController("md", cfg)
+
+    results = [
+        MotionDetectionResult(False, 0, 0, 0, None, None, 0.0),
+        MotionDetectionResult(True, 0, 0, 0, None, None, 1.0),
+        MotionDetectionResult(False, 0, 0, 0, None, None, 0.0),
+    ]
+
+    async def fake_submit(*a, **k):
+        return results.pop(0)
+
+    monkeypatch.setattr(ctrl._motion_pool, "submit_async", fake_submit)
+
+    await ctrl.start()
+    frame = np.zeros((10, 10, 3), dtype=np.uint8)
+    await ctrl.process_image(frame, {})
+    await ctrl.process_image(frame, {})
+    res = await ctrl.process_image(frame, {})
+    assert res.data.motion_detected is False
+    await ctrl.stop()
+
+
+@pytest.mark.asyncio
 async def test_bg_subtractor_mog2_params(monkeypatch):
     params = {
         "algorithm": "MOG2",
