@@ -48,6 +48,12 @@ class DataSaver:
         self.rotation_check_interval = rotation_check_interval
         self.max_file_age_seconds = max_file_age_hours * 3600
         self.enable_background_operations = enable_background_operations
+        try:
+            flush_interval = int(flush_interval)
+        except Exception:
+            flush_interval = 1
+        if flush_interval <= 0:
+            flush_interval = 1
         self.flush_interval = flush_interval
 
         # mapping: category -> sensor_id -> (writer, file, row_count, last_check_time)

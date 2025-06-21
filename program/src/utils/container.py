@@ -1,6 +1,7 @@
 """
 Application container for dependency injection and service orchestration.
 """
+
 # pylint: disable=too-many-instance-attributes,import-outside-toplevel
 # pylint: disable=broad-exception-caught,protected-access,
 # pylint: disable=attribute-defined-outside-init
@@ -34,13 +35,15 @@ from src.utils.email_alert_service import (
     set_email_alert_service,
 )
 
+
 @dataclass
 class ApplicationContainer:
     """Container for all application services with dependency injection"""
+
     config_service: ConfigurationService
     sensor_manager: SensorManager
     data_saver: DataSaver
-    web_application: 'WebApplication'
+    web_application: "WebApplication"
     compression_service: CompressionService
     email_alert_service: EmailAlertService
     _background_tasks: List[Tuple[ManagedThreadPool, Future]] = field(
@@ -49,7 +52,7 @@ class ApplicationContainer:
     _shutdown_requested: bool = field(default=False)
 
     @classmethod
-    def create(cls, config_dir: Path) -> 'ApplicationContainer':
+    def create(cls, config_dir: Path) -> "ApplicationContainer":
         """Create application container with all services
 
         Args:
@@ -62,7 +65,7 @@ class ApplicationContainer:
             # Initialize configuration service
             config_service = ConfigurationService(
                 config_path=config_dir / "config.json",
-                default_config_path=config_dir / "default_config.json"
+                default_config_path=config_dir / "default_config.json",
             )
             # Set global config service for backward compatibility
             set_config_service(config_service)
@@ -77,16 +80,20 @@ class ApplicationContainer:
             set_email_alert_service(email_alert_service)
             info("Email alert service initialized")
             # Get thread pool configuration
-            max_workers = config_service.get('thread_pool.max_workers', int, 4)
+            max_workers = config_service.get("thread_pool.max_workers", int, 4)
 
             # Initialize unified data saver using configured storage paths
-            storage_paths = config_service.get(
-                'data_storage.storage_paths', dict, {}
-            ) or {}
-            base_dir = Path(storage_paths.get('base', 'data'))
-            flush_interval = config_service.get(
-                'data_storage.flush_interval', int, 10
+            storage_paths = (
+                config_service.get("data_storage.storage_paths", dict, {}) or {}
             )
+            base_dir = Path(storage_paths.get("base", "data"))
+            flush_interval = config_service.get("data_storage.flush_interval", int, 10)
+            try:
+                flush_interval = int(flush_interval)
+            except Exception:
+                flush_interval = 1
+            if flush_interval <= 0:
+                flush_interval = 1
             data_saver = DataSaver(
                 base_output_dir=base_dir,
                 storage_paths=storage_paths,
@@ -99,14 +106,13 @@ class ApplicationContainer:
                 config_service=config_service,
                 max_workers=max_workers,
                 data_saver=data_saver,
-                data_pipeline=pipeline
+                data_pipeline=pipeline,
             )
             # Initialize web application
             from program.src.gui.gui_native.application import WebApplication
 
             web_application = WebApplication(
-                config_service=config_service,
-                sensor_manager=sensor_manager
+                config_service=config_service, sensor_manager=sensor_manager
             )
 
             container = cls(
@@ -115,7 +121,7 @@ class ApplicationContainer:
                 data_saver=data_saver,
                 web_application=web_application,
                 compression_service=compression_service,
-                email_alert_service=email_alert_service
+                email_alert_service=email_alert_service,
             )
 
             info("Application container created successfully")
@@ -126,7 +132,7 @@ class ApplicationContainer:
             raise
 
     @classmethod
-    def create_sync(cls, config_dir: Path) -> 'ApplicationContainer':
+    def create_sync(cls, config_dir: Path) -> "ApplicationContainer":
         """Synchronous factory for NiceGUI compatibility
 
         Args:
@@ -141,6 +147,7 @@ class ApplicationContainer:
     def _start_background_services(self) -> None:
         """Start async services via ManagedThreadPool"""
         import threading
+
         # Spawn a daemon thread for async startup
         # and keep a reference for shutdown
         self._bg_thread = threading.Thread(
@@ -155,9 +162,7 @@ class ApplicationContainer:
         """Async startup for background services"""
         try:
             # Start sensor polling
-            sensor_count = (
-                await self.sensor_manager.start_all_configured_sensors()
-            )
+            sensor_count = await self.sensor_manager.start_all_configured_sensors()
             info(f"Started {sensor_count} sensors")
             # Keep background services running
             while not self._shutdown_requested:
@@ -171,9 +176,7 @@ class ApplicationContainer:
             info("Starting CVD Tracker services...")
 
             # Start sensor manager
-            sensor_count = (
-                await self.sensor_manager.start_all_configured_sensors()
-            )
+            sensor_count = await self.sensor_manager.start_all_configured_sensors()
             info(f"Started {sensor_count} sensors")
 
             # Initialize web application
@@ -211,7 +214,12 @@ class ApplicationContainer:
                 await self.sensor_manager.shutdown()
                 await self.web_application.shutdown()
 
-            ui.run(title=title, favicon="https://www.tuhh.de/favicon.ico", host=host, port=port)
+            ui.run(
+                title=title,
+                favicon="https://www.tuhh.de/favicon.ico",
+                host=host,
+                port=port,
+            )
 
         except Exception as e:
             error(f"Failed to start web interface: {e}")
@@ -224,7 +232,7 @@ class ApplicationContainer:
             # Signal background services to stop
             self._shutdown_requested = True
             # Wait for background startup thread to finish
-            if hasattr(self, '_bg_thread'):
+            if hasattr(self, "_bg_thread"):
                 await asyncio.to_thread(self._bg_thread.join, 5)
             # Shutdown web application
             await self.web_application.shutdown()
@@ -236,7 +244,7 @@ class ApplicationContainer:
                 if not future.done():
                     future.cancel()
                 # Skip shutting down shared GENERAL pool
-                if getattr(pool, 'pool_type', None) == ThreadPoolType.GENERAL:
+                if getattr(pool, "pool_type", None) == ThreadPoolType.GENERAL:
                     continue
                 pool.shutdown()
 
@@ -249,14 +257,14 @@ class ApplicationContainer:
         """Synchronous shutdown for cleanup"""
         self._shutdown_requested = True
         # Wait for background startup thread to finish
-        if hasattr(self, '_bg_thread'):
+        if hasattr(self, "_bg_thread"):
             self._bg_thread.join(timeout=5)
         # Shutdown background tasks
         for pool, future in self._background_tasks:
             if not future.done():
                 future.cancel()
             # Skip shutting down shared GENERAL pool
-            if getattr(pool, 'pool_type', None) == ThreadPoolType.GENERAL:
+            if getattr(pool, "pool_type", None) == ThreadPoolType.GENERAL:
                 continue
             pool.shutdown()
 
@@ -292,8 +300,8 @@ class ApplicationContainer:
             Dictionary with service status information
         """
         return {
-            'sensors': self.sensor_manager.get_sensor_status(),
-            'config_loaded': bool(self.config_service._config_cache),
-            'background_tasks': len(self._background_tasks),
-            'shutdown_requested': self._shutdown_requested
+            "sensors": self.sensor_manager.get_sensor_status(),
+            "config_loaded": bool(self.config_service._config_cache),
+            "background_tasks": len(self._background_tasks),
+            "shutdown_requested": self._shutdown_requested,
         }
