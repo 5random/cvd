@@ -19,6 +19,8 @@ class WebcamStreamElement:
         self.callbacks = callbacks or {}
         # Store explicit camera toggle callback or look it up in callbacks dict
         self._camera_toggle_cb = camera_toggle_cb or self.callbacks.get("camera_toggle")
+        # Callback for ROI updates (defaults to callbacks['set_roi'])
+        self._roi_update_cb = self.callbacks.get("set_roi")
         self.camera_settings_expansion = None
 
         @ui.page("/webcam_stream")
@@ -78,11 +80,10 @@ class WebcamStreamElement:
             # Camera controls
             with ui.row().classes("gap-2 justify-center mb-4"):
                 self.start_camera_btn = ui.button(
-                    "Play Video", icon="play_arrow", on_click=self.toggle_video_play
+                    "Play Video",
+                    icon="play_arrow",
+                    on_click=self.toggle_video_play,
                 ).props("color=positive")
-                self.stop_camera_btn = ui.button(
-                    "Pause Video", icon="pause", on_click=self.toggle_video_pause
-                ).props("color=negative")
             # Collapsible Camera Settings
             with ui.expansion("Camera Settings", icon="settings") as exp:
                 self.camera_settings_expansion = exp
@@ -624,6 +625,7 @@ class WebcamStreamElement:
             self.video_element.play()
             self.start_camera_btn.set_text("Pause Video")
             self.start_camera_btn.set_icon("pause")
+            self.start_camera_btn.props("color=negative")
             self.camera_active = True
             if self._camera_toggle_cb:
                 self._camera_toggle_cb()
@@ -632,26 +634,8 @@ class WebcamStreamElement:
             self.video_element.pause()
             self.start_camera_btn.set_text("Play Video")
             self.start_camera_btn.set_icon("play_arrow")
+            self.start_camera_btn.props("color=positive")
             self.camera_active = False
-            if self._camera_toggle_cb:
-                self._camera_toggle_cb()
-            self._update_status()
-
-    def toggle_video_pause(self):
-        """Toggle video pause state"""
-        if self.camera_active:
-            self.video_element.pause()
-            self.start_camera_btn.set_text("Play Video")
-            self.start_camera_btn.set_icon("play_arrow")
-            self.camera_active = False
-            if self._camera_toggle_cb:
-                self._camera_toggle_cb()
-            self._update_status()
-        else:
-            self.video_element.play()
-            self.start_camera_btn.set_text("Pause Video")
-            self.start_camera_btn.set_icon("pause")
-            self.camera_active = True
             if self._camera_toggle_cb:
                 self._camera_toggle_cb()
             self._update_status()
@@ -724,3 +708,5 @@ class WebcamStreamElement:
             self.video_element.run_method("load")
         if getattr(self, "roi_checkbox", None):
             self.roi_checkbox.value = False
+            if self._roi_update_cb:
+                self._roi_update_cb()

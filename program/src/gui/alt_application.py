@@ -604,7 +604,7 @@ class SimpleGUIApplication:
                 service.recipient = config["emails"][0]
 
         with ui.dialog() as dialog, ui.card().classes("w-full max-w-4xl"):
-            wizard_card = create_email_alert_wizard(on_save=_on_save)
+            create_email_alert_wizard(on_save=_on_save)
             with ui.row().classes("w-full justify-end mt-4"):
                 ui.button("Schließen", on_click=dialog.close).props("flat")
 
@@ -642,6 +642,18 @@ class SimpleGUIApplication:
                             icon="list",
                             on_click=self.show_alert_management,
                         ).props("size=sm color=secondary")
+
+                        ui.button(
+                            "Alert-Verlauf",
+                            icon="history",
+                            on_click=self.show_alert_history,
+                        ).props("size=sm color=secondary")
+
+                        ui.button(
+                            "Test-Alert",
+                            icon="send",
+                            on_click=self.send_test_alert,
+                        ).props("size=sm color=warning")
 
                 # Status overview
                 total_configs = len(self.alert_configurations)
