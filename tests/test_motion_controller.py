@@ -305,3 +305,60 @@ def test_multi_frame_window_defaults_to_one_on_negative():
     assert ctrl.multi_frame_window == 1
 
 
+@pytest.mark.asyncio
+async def test_invalid_roi_dimensions_skip_crop(monkeypatch):
+    cfg = ControllerConfig(
+        controller_id="md",
+        controller_type="motion_detection",
+        parameters={"roi_width": 0, "roi_height": -1},
+    )
+    ctrl = MotionDetectionController("md", cfg)
+
+    async def direct(func, *a, **k):
+        return func(*a, **k)
+
+    monkeypatch.setattr(ctrl._motion_pool, "submit_async", direct)
+
+    import program.src.controllers.algorithms.motion_detection as md
+    warnings: list[str] = []
+    monkeypatch.setattr(md, "warning", lambda msg, **kw: warnings.append(msg))
+
+    await ctrl.start()
+    frame = np.zeros((10, 10, 3), dtype=np.uint8)
+    result = await ctrl.process_image(frame, {})
+    await ctrl.stop()
+
+    assert result.success
+    assert warnings
+    assert ctrl.roi_width is None and ctrl.roi_height is None
+    assert result.data.frame.shape == frame.shape
+
+
+@pytest.mark.asyncio
+async def test_roi_out_of_bounds_skip_crop(monkeypatch):
+    cfg = ControllerConfig(
+        controller_id="md",
+        controller_type="motion_detection",
+        parameters={"roi_width": 5, "roi_height": 5, "roi_x": 20, "roi_y": 20},
+    )
+    ctrl = MotionDetectionController("md", cfg)
+
+    async def direct(func, *a, **k):
+        return func(*a, **k)
+
+    monkeypatch.setattr(ctrl._motion_pool, "submit_async", direct)
+
+    import program.src.controllers.algorithms.motion_detection as md
+    warnings: list[str] = []
+    monkeypatch.setattr(md, "warning", lambda msg, **kw: warnings.append(msg))
+
+    await ctrl.start()
+    frame = np.zeros((10, 10, 3), dtype=np.uint8)
+    result = await ctrl.process_image(frame, {})
+    await ctrl.stop()
+
+    assert result.success
+    assert warnings
+    assert result.data.frame.shape == frame.shape
+
+
