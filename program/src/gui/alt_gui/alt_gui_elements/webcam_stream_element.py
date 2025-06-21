@@ -723,8 +723,10 @@ class WebcamStreamElement:
         """Open a simple ROI adjustment dialog."""
         with ui.dialog() as dialog, ui.card():
             ui.label("Adjust ROI - Demo")
-            ui.slider(min=0, max=100, value=0, label="X start").props("dense")
-            ui.slider(min=0, max=100, value=100, label="Width").props("dense")
+            ui.label("X start")
+            ui.slider(min=0, max=100, value=0).props("dense")
+            ui.label("Width")
+            ui.slider(min=0, max=100, value=100).props("dense")
             ui.button("Apply", on_click=dialog.close)
         dialog.open()
 
