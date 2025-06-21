@@ -82,7 +82,9 @@ class SimpleGUIApplication:
 
         # Determine configuration directory and initialise core services
         if config_dir is None:
-            config_dir = Path(__file__).resolve().parents[3] / "config"
+            # use the configuration bundled with the program by default
+            # (located in ``program/config`` relative to this file)
+            config_dir = Path(__file__).resolve().parents[2] / "config"
 
         self.config_service = ConfigurationService(
             config_dir / "config.json",
