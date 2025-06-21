@@ -563,71 +563,64 @@ class SimpleGUIApplication:
         """Show alert history dialog"""
         self._show_alert_history()
 
-    def toggle_experiment(self):
+    async def toggle_experiment(self):
         """Toggle experiment running state"""
 
-        import asyncio
+        if not self.experiment_running:
+            name = self.experiment_section.experiment_name_input.value
+            duration = self.experiment_section.experiment_duration_input.value
+            self._experiment_duration = int(duration) if duration else None
 
-        async def _toggle() -> None:
-            if not self.experiment_running:
-                name = self.experiment_section.experiment_name_input.value
-                duration = self.experiment_section.experiment_duration_input.value
-                self._experiment_duration = int(duration) if duration else None
+            config = ExperimentConfig(
+                name=name,
+                duration_minutes=self._experiment_duration,
+            )
+            exp_id = self.experiment_manager.create_experiment(config)
+            success = await self.experiment_manager.start_experiment(exp_id)
+            if not success:
+                ui.notify("Failed to start experiment", type="negative")
+                return
 
-                config = ExperimentConfig(
-                    name=name,
-                    duration_minutes=self._experiment_duration,
-                )
-                exp_id = self.experiment_manager.create_experiment(config)
-                success = await self.experiment_manager.start_experiment(exp_id)
-                if not success:
-                    ui.notify("Failed to start experiment", type="negative")
-                    return
+            self._current_experiment_id = exp_id
+            self.experiment_running = True
+            self._experiment_start = datetime.now()
+            self.experiment_section.start_experiment_btn.disable()
+            self.experiment_section.stop_experiment_btn.enable()
+            self.experiment_section.experiment_icon.classes("text-green-600")
+            self.experiment_section.experiment_status_label.text = "Experiment running"
+            self.experiment_section.experiment_name_label.text = f"Name: {name}"
+            dur_text = (
+                f"Duration: {self._experiment_duration} min"
+                if self._experiment_duration
+                else "Duration: unlimited"
+            )
+            self.experiment_section.experiment_duration_label.text = dur_text
+            self.experiment_section.experiment_elapsed_label.text = "Elapsed: 0s"
+            self.experiment_section.experiment_progress.value = 0.0
+            self.experiment_section.experiment_details.set_visibility(True)
+            if self._experiment_timer:
+                self._experiment_timer.cancel()
+            self._experiment_timer = ui.timer(1.0, self._update_experiment_status)
+            ui.notify(f'Started experiment "{name}"', type="positive")
+        else:
+            success = await self.experiment_manager.stop_experiment()
+            if not success:
+                ui.notify("Failed to stop experiment", type="negative")
+                return
 
-                self._current_experiment_id = exp_id
-                self.experiment_running = True
-                self._experiment_start = datetime.now()
-                self.experiment_section.start_experiment_btn.disable()
-                self.experiment_section.stop_experiment_btn.enable()
-                self.experiment_section.experiment_icon.classes("text-green-600")
-                self.experiment_section.experiment_status_label.text = (
-                    "Experiment running"
-                )
-                self.experiment_section.experiment_name_label.text = f"Name: {name}"
-                dur_text = (
-                    f"Duration: {self._experiment_duration} min"
-                    if self._experiment_duration
-                    else "Duration: unlimited"
-                )
-                self.experiment_section.experiment_duration_label.text = dur_text
-                self.experiment_section.experiment_elapsed_label.text = "Elapsed: 0s"
-                self.experiment_section.experiment_progress.value = 0.0
-                self.experiment_section.experiment_details.set_visibility(True)
-                if self._experiment_timer:
-                    self._experiment_timer.cancel()
-                self._experiment_timer = ui.timer(1.0, self._update_experiment_status)
-                ui.notify(f'Started experiment "{name}"', type="positive")
-            else:
-                success = await self.experiment_manager.stop_experiment()
-                if not success:
-                    ui.notify("Failed to stop experiment", type="negative")
-                    return
-
-                self.experiment_running = False
-                self._current_experiment_id = None
-                self.experiment_section.start_experiment_btn.enable()
-                self.experiment_section.stop_experiment_btn.disable()
-                self.experiment_section.experiment_icon.classes("text-gray-500")
-                self.experiment_section.experiment_status_label.text = (
-                    "No experiment running"
-                )
-                self.experiment_section.experiment_details.set_visibility(False)
-                if self._experiment_timer:
-                    self._experiment_timer.cancel()
-                    self._experiment_timer = None
-                ui.notify("Experiment stopped", type="info")
-
-        asyncio.create_task(_toggle())
+            self.experiment_running = False
+            self._current_experiment_id = None
+            self.experiment_section.start_experiment_btn.enable()
+            self.experiment_section.stop_experiment_btn.disable()
+            self.experiment_section.experiment_icon.classes("text-gray-500")
+            self.experiment_section.experiment_status_label.text = (
+                "No experiment running"
+            )
+            self.experiment_section.experiment_details.set_visibility(False)
+            if self._experiment_timer:
+                self._experiment_timer.cancel()
+                self._experiment_timer = None
+            ui.notify("Experiment stopped", type="info")
 
     def _update_experiment_status(self) -> None:
         """Update elapsed time and progress display while running"""
