@@ -1,4 +1,5 @@
 from nicegui import ui
+from program.src.utils.ui_helpers import notify_later
 
 
 # Default values for UVC camera controls
@@ -691,10 +692,10 @@ class WebcamStreamElement:
         self.recording = not self.recording
         if self.recording:
             self.record_menu_item.update(text="Stop Recording")
-            ui.notify("Recording started", type="positive")
+            notify_later("Recording started", type="positive")
         else:
             self.record_menu_item.update(text="Start Recording")
-            ui.notify("Recording stopped", type="warning")
+            notify_later("Recording stopped", type="warning")
 
     def take_snapshot(self):
         """Capture a snapshot of the current video frame."""

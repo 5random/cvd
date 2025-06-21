@@ -10,6 +10,7 @@ from typing import Optional
 
 from nicegui import app, ui
 import cv2
+import numpy as np
 from src.controllers.controller_manager import create_cvd_controller_manager
 from src.data_handler.sources.sensor_source_manager import SensorManager
 from src.gui.gui_elements.gui_live_plot_element import LivePlotComponent, PlotConfig
@@ -190,7 +191,9 @@ class WebApplication:
                     camera = self.component_registry.get_component(cid)
 
             if camera is None:
-                camera = self.component_registry.get_component("dashboard_camera_stream")
+                camera = self.component_registry.get_component(
+                    "dashboard_camera_stream"
+                )
 
             if camera is None:
                 for comp in self.component_registry.get_all_components():
@@ -221,16 +224,17 @@ class WebApplication:
                         break
                     if isinstance(camera, CameraStreamComponent):
                         frame = camera.get_latest_frame()
-                        if frame is not None:
-                            # imencode expects the file extension to start with a dot
-                            success, buf = cv2.imencode(".jpg", frame)
-                            if success:
-                                jpeg_bytes = buf.tobytes()
-                                yield (
-                                    b"--frame\r\nContent-Type: image/jpeg\r\n\r\n"
-                                    + jpeg_bytes
-                                    + b"\r\n"
-                                )
+                        if frame is None:
+                            # Provide a small black frame if no data available yet
+                            frame = np.zeros((10, 10, 3), dtype=np.uint8)
+                        success, buf = cv2.imencode(".jpg", frame)
+                        if success:
+                            jpeg_bytes = buf.tobytes()
+                            yield (
+                                b"--frame\r\nContent-Type: image/jpeg\r\n\r\n"
+                                + jpeg_bytes
+                                + b"\r\n"
+                            )
                     await asyncio.sleep(
                         camera.update_interval
                         if isinstance(camera, CameraStreamComponent)
@@ -358,13 +362,9 @@ class WebApplication:
                 if cfg.get("show_on_dashboard")
             ]
 
-
-            with ui.column().classes('w-1/2'):
-
+            with ui.column().classes("w-1/2"):
                 self._dashboard_component = DashboardComponent(
-                    self.config_service,
-                    self.sensor_manager,
-                    self.controller_manager
+                    self.config_service, self.sensor_manager, self.controller_manager
                 )
                 self.component_registry.register(self._dashboard_component)
                 self._dashboard_component.render()
@@ -376,15 +376,19 @@ class WebApplication:
                     self._temp_camera_stream = None
             # use dashboard's configured sensors for live plot
 
-            dashboard_sensors = getattr(self._dashboard_component, '_dashboard_sensors', [])
-
+            dashboard_sensors = getattr(
+                self._dashboard_component, "_dashboard_sensors", []
+            )
 
             # Right column - live plot
             if dashboard_sensors:
                 with ui.column().classes("w-1/2"):
-
-                    plot_config = PlotConfig(max_points=2000, refresh_rate_ms=1000, history_seconds=3600)
-                    self._live_plot = LivePlotComponent(self.sensor_manager, plot_config, dashboard_sensors)
+                    plot_config = PlotConfig(
+                        max_points=2000, refresh_rate_ms=1000, history_seconds=3600
+                    )
+                    self._live_plot = LivePlotComponent(
+                        self.sensor_manager, plot_config, dashboard_sensors
+                    )
 
                     self.component_registry.register(self._live_plot)
                     self._live_plot.render()
@@ -533,11 +537,10 @@ class WebApplication:
                 )
                 self._network_https_checkbox.classes("mb-2")
 
-
                 with ui.row().classes("gap-2 mt-4"):
-                    ui.button(
-                        "Save Settings", on_click=self._save_settings
-                    ).props("color=primary")
+                    ui.button("Save Settings", on_click=self._save_settings).props(
+                        "color=primary"
+                    )
                     ui.button(
                         "Reset Config", on_click=self._open_reset_config_dialog
                     ).props("outline")
@@ -594,18 +597,12 @@ class WebApplication:
                     int(self._max_notifications_input.value),
                 )
 
-            if (
-                hasattr(self, "_log_level_input")
-                and self._log_level_input is not None
-            ):
+            if hasattr(self, "_log_level_input") and self._log_level_input is not None:
                 self.config_service.set(
                     "logging.level", str(self._log_level_input.value)
                 )
 
-            if (
-                hasattr(self, "_log_dir_input")
-                and self._log_dir_input is not None
-            ):
+            if hasattr(self, "_log_dir_input") and self._log_dir_input is not None:
                 self.config_service.set(
                     "logging.log_dir", str(self._log_dir_input.value)
                 )
@@ -727,20 +724,34 @@ class WebApplication:
                 config_textarea.value = self.config_service.get_raw_config_as_json()
             # Update settings inputs if available
             if hasattr(self, "_title_input") and self._title_input is not None:
-                self._title_input.value = self.config_service.get("ui.title", str, "CVD Tracker")
-            if hasattr(self, "_refresh_rate_input") and self._refresh_rate_input is not None:
+                self._title_input.value = self.config_service.get(
+                    "ui.title", str, "CVD Tracker"
+                )
+            if (
+                hasattr(self, "_refresh_rate_input")
+                and self._refresh_rate_input is not None
+            ):
                 self._refresh_rate_input.value = self.config_service.get(
                     "ui.refresh_rate_ms", int, 1000
                 )
-            if hasattr(self, "_storage_base_input") and self._storage_base_input is not None:
+            if (
+                hasattr(self, "_storage_base_input")
+                and self._storage_base_input is not None
+            ):
                 self._storage_base_input.value = self.config_service.get(
                     "data_storage.storage_paths.base", str, "data"
                 )
-            if hasattr(self, "_flush_interval_input") and self._flush_interval_input is not None:
+            if (
+                hasattr(self, "_flush_interval_input")
+                and self._flush_interval_input is not None
+            ):
                 self._flush_interval_input.value = self.config_service.get(
                     "data_storage.flush_interval", int, 10
                 )
-            if hasattr(self, "_max_notifications_input") and self._max_notifications_input is not None:
+            if (
+                hasattr(self, "_max_notifications_input")
+                and self._max_notifications_input is not None
+            ):
                 self._max_notifications_input.value = self.config_service.get(
                     "ui.notification_center.max_notifications", int, 500
                 )
@@ -752,19 +763,31 @@ class WebApplication:
                 self._log_dir_input.value = self.config_service.get(
                     "logging.log_dir", str, "data/logs"
                 )
-            if hasattr(self, "_log_rotation_input") and self._log_rotation_input is not None:
+            if (
+                hasattr(self, "_log_rotation_input")
+                and self._log_rotation_input is not None
+            ):
                 self._log_rotation_input.value = self.config_service.get(
                     "logging.log_file_rotation_mb", int, 10
                 )
-            if hasattr(self, "_log_retention_input") and self._log_retention_input is not None:
+            if (
+                hasattr(self, "_log_retention_input")
+                and self._log_retention_input is not None
+            ):
                 self._log_retention_input.value = self.config_service.get(
                     "logging.retention_days", int, 30
                 )
-            if hasattr(self, "_network_host_input") and self._network_host_input is not None:
+            if (
+                hasattr(self, "_network_host_input")
+                and self._network_host_input is not None
+            ):
                 self._network_host_input.value = self.config_service.get(
                     "network.host", str, "0.0.0.0"
                 )
-            if hasattr(self, "_network_port_input") and self._network_port_input is not None:
+            if (
+                hasattr(self, "_network_port_input")
+                and self._network_port_input is not None
+            ):
                 self._network_port_input.value = self.config_service.get(
                     "network.port", int, 8080
                 )
@@ -774,7 +797,6 @@ class WebApplication:
             ):
                 self._network_https_checkbox.value = self.config_service.get(
                     "network.enable_https", bool, False
-
                 )
         except (OSError, ConfigurationError) as e:
             ui.notify(f"Error resetting configuration: {e}", type="negative")
@@ -851,7 +873,9 @@ class WebApplication:
         self._sensor_readings_container.clear()
 
         readings = self.sensor_manager.get_latest_readings()
-        sensor_configs = {sid: cfg for sid, cfg in self.config_service.get_sensor_configs()}
+        sensor_configs = {
+            sid: cfg for sid, cfg in self.config_service.get_sensor_configs()
+        }
 
         with self._sensor_readings_container:
             for sensor_id, reading in readings.items():

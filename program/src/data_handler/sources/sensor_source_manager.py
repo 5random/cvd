@@ -5,6 +5,7 @@ Central sensor management service for handling sensor lifecycle and data collect
 import asyncio
 import importlib.metadata
 from typing import Dict, List, Optional, Type, Callable, Any
+from importlib.metadata import EntryPoint
 from concurrent.futures import ThreadPoolExecutor, Executor
 from src.data_handler.interface.sensor_interface import (
     SensorInterface,
@@ -32,11 +33,25 @@ SENSOR_REGISTRY: Dict[str, SensorFactory] = {
     "mock_rs232": MockRS232Sensor,
 }
 
-def load_entry_point_sensors(group: str = 'cvd.sensors') -> None:
+
+def load_entry_point_sensors(group: str = "cvd.sensors") -> None:
     """Load sensor implementations from entry points."""
     try:
         eps = importlib.metadata.entry_points()
-        selected = eps.select(group=group) if hasattr(eps, 'select') else eps.get(group, [])
+        if hasattr(eps, "select"):
+            selected: List[EntryPoint] = list(eps.select(group=group))
+        else:
+            selected = list(eps.get(group, []))
+        # Clear any previously registered entry point sensors to ensure test isolation
+        for name in list(SENSOR_REGISTRY.keys()):
+            if name not in {
+                "arduino_tc_board",
+                "rs232",
+                "mock_arduino_tc_board",
+                "mock_rs232",
+            }:
+                SENSOR_REGISTRY.pop(name, None)
+
         for ep in selected:
             try:
                 factory = ep.load()
@@ -46,6 +61,7 @@ def load_entry_point_sensors(group: str = 'cvd.sensors') -> None:
                 error(f"Failed to load sensor entry point {ep.name}: {e}")
     except Exception as e:  # pragma: no cover - log only
         warning(f"Could not load sensor entry points: {e}")
+
 
 load_entry_point_sensors()
 
