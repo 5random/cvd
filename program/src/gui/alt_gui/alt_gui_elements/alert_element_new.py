@@ -955,7 +955,7 @@ class EmailAlertStatusDisplay:
         cb = callback or self.update_callback
         if cb:
             cb()
-    
+
     def update_configuration(
         self,
         old_config: Dict[str, Any],
@@ -973,7 +973,7 @@ class EmailAlertStatusDisplay:
         cb = callback or self.update_callback
         if cb:
             cb()
-    
+
 
     # Event handlers for UI actions
     def _show_setup_wizard(self):

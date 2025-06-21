@@ -5,17 +5,17 @@ def setup_global_styles():
     """Setup CSS styles matching the main application"""
     ui.add_head_html("""
             <style>
-                .cvd-header { 
-                    background: linear-gradient(90deg, #1976d2, #1565c0); 
+                .cvd-header {
+                    background: linear-gradient(90deg, #1976d2, #1565c0);
                 }
-                .cvd-card { 
-                    border-radius: 8px; 
+                .cvd-card {
+                    border-radius: 8px;
                     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
                     padding: 16px;
                 }
-                .cvd-sensor-value { 
-                    font-size: 1.5rem; 
-                    font-weight: bold; 
+                .cvd-sensor-value {
+                    font-size: 1.5rem;
+                    font-weight: bold;
                 }
                 .placeholder-content {
                     background: #f5f5f5;
@@ -50,7 +50,7 @@ def setup_global_styles():
                     grid-template-columns: 2fr 1fr;
                     grid-template-rows: auto auto;
                     gap: 1rem;
-                    grid-template-areas: 
+                    grid-template-areas:
                         "camera motion"
                         "experiment alerts";
                 }
@@ -58,10 +58,10 @@ def setup_global_styles():
                 @media (max-width: 1024px) {
                     .masonry-grid {
                         grid-template-columns: 1fr !important;
-                        grid-template-areas: 
+                        grid-template-areas:
                             "camera"
                             "motion"
-                            "experiment" 
+                            "experiment"
                             "alerts" !important;
                     }
                 }
