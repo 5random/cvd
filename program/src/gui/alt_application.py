@@ -30,10 +30,8 @@ from program.src.controllers.controller_utils.controller_data_sources.camera_cap
     CameraCaptureController,
 )
 from program.src.controllers.controller_utils.camera_utils import apply_uvc_settings
-from program.src.controllers.controller_manager import (
-    ControllerManager,
-    create_cvd_controller_manager,
-)
+from program.src.controllers import controller_manager as controller_manager_module
+from program.src.controllers.controller_manager import ControllerManager
 from program.src.controllers.algorithms.motion_detection import (
     MotionDetectionController,
 )
@@ -46,11 +44,7 @@ from program.src.utils.config_service import (
     ConfigurationService,
     set_config_service,
 )
-from program.src.utils.email_alert_service import (
-    get_email_alert_service,
-    EmailAlertService,
-    set_email_alert_service,
-)
+from program.src.utils import email_alert_service
 from program.src.data_handler.sources.sensor_source_manager import SensorManager
 
 from program.src.gui.alt_gui import (
@@ -92,13 +86,13 @@ class SimpleGUIApplication:
         self.controller_manager = (
             controller_manager
             if controller_manager is not None
-            else create_cvd_controller_manager()
+            else controller_manager_module.create_cvd_controller_manager()
         )
 
         self.sensor_manager = SensorManager(self.config_service)
 
-        self.email_alert_service = EmailAlertService(self.config_service)
-        set_email_alert_service(self.email_alert_service)
+        self.email_alert_service = email_alert_service.EmailAlertService(self.config_service)
+        email_alert_service.set_email_alert_service(self.email_alert_service)
         # use the already created controller manager for the experiment manager
         self.experiment_manager = ExperimentManager(
             config_service=self.config_service,
@@ -289,7 +283,7 @@ class SimpleGUIApplication:
                 )
 
             # Email Alerts (bottom-right) - New Alert System
-            with ui.element("div").style("grid-area: alerts;"):
+            with ui.element("div").style("grid-area: alerts;") as self.alerts_container:
                 self._create_enhanced_alerts_section()
             # Event handlers - placeholder implementations
 
@@ -658,6 +652,10 @@ class SimpleGUIApplication:
             self.alert_overview_container.clear()
             with self.alert_overview_container:
                 self.alert_display.create_alert_overview()
+        if hasattr(self, "alerts_container"):
+            self.alerts_container.clear()
+            with self.alerts_container:
+                self._create_enhanced_alerts_section()
         self._update_alerts_status()
 
     def show_alert_setup_wizard(self):
@@ -667,7 +665,7 @@ class SimpleGUIApplication:
             self.alert_configurations.append(config)
             self.alert_display.alert_configurations = self.alert_configurations
             self._update_alerts_status()
-            service = get_email_alert_service()
+            service = email_alert_service.get_email_alert_service()
             if service and config.get("emails"):
                 service.recipient = config["emails"][0]
 
@@ -806,7 +804,7 @@ class SimpleGUIApplication:
             ui.notify("Keine aktiven Alert-Konfigurationen vorhanden", type="warning")
             return
 
-        service = get_email_alert_service()
+        service = email_alert_service.get_email_alert_service()
         if service is None:
             ui.notify("EmailAlertService nicht verfügbar", type="warning")
             return
@@ -829,7 +827,7 @@ class SimpleGUIApplication:
         with ui.dialog() as dialog, ui.card().classes("w-full max-w-4xl"):
             ui.label("Alert-Verlauf").classes("text-xl font-bold mb-4")
 
-            service = get_email_alert_service()
+            service = email_alert_service.get_email_alert_service()
             history_entries = service.get_history() if service else []
 
             with ui.column().classes("gap-3"):
@@ -922,7 +920,7 @@ class SimpleGUIApplication:
 # Entry point
 def main():
     """Main entry point for the simple GUI application"""
-    controller_manager = create_cvd_controller_manager()
+    controller_manager = controller_manager_module.create_cvd_controller_manager()
     app = SimpleGUIApplication(controller_manager)
 
     # Startup logic is defined in ``SimpleGUIApplication.run``.
