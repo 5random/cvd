@@ -589,7 +589,8 @@ class SimpleGUIApplication:
         """Handle alert configuration updates from the status display."""
         if hasattr(self, "alert_overview_container"):
             self.alert_overview_container.clear()
-            self.alert_display.create_alert_overview()
+            with self.alert_overview_container:
+                self.alert_display.create_alert_overview()
         self._update_alerts_status()
 
     def show_alert_setup_wizard(self):
