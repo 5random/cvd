@@ -195,6 +195,9 @@ class MotionDetectionController(ImageController):
         self.multi_frame_method = params.get("multi_frame_method", "threshold")
         self.multi_frame_decay = params.get("multi_frame_decay", 0.5)
 
+        # Decayed confidence average for probability method
+        self._multi_frame_avg: float = 0.0
+
         self.warmup_frames = params.get("warmup_frames", 0)
         self._warmup_counter = 0
 
@@ -334,22 +337,16 @@ class MotionDetectionController(ImageController):
                             recent = list(self._motion_history)[-self.multi_frame_window :]
                             count = sum(1 for h in recent if h["motion_detected"])
                             probability = count / self.multi_frame_window
-                    elif self.multi_frame_method == "probability":
-                        recent = list(self._motion_history)[-self.multi_frame_window :]
-                        if recent:
-                            probability = float(
-                                np.mean([h["confidence"] for h in recent])
-                            )
-                        else:
-                            probability = 0.0
-
-                    if self.multi_frame_method == "probability":
-                        motion_result.motion_detected = (
-                            probability >= self.multi_frame_threshold
-                        )
-                    else:
                         if probability < self.multi_frame_threshold:
                             motion_result.motion_detected = False
+                    elif self.multi_frame_method == "probability":
+                        self._multi_frame_avg = (
+                            self.multi_frame_decay * self._multi_frame_avg
+                            + (1 - self.multi_frame_decay) * probability
+                        )
+                        motion_result.motion_detected = (
+                            self._multi_frame_avg >= self.multi_frame_threshold
+                        )
 
                 # Attach frame and mask for optional visualization
                 motion_result.frame = frame
