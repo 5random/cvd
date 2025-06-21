@@ -1,6 +1,7 @@
 """
 Email Alert Service Setup Wizard
-Implementiert einen 4-stufigen Wizard für die Konfiguration des Email-Alert-Service mit NiceGUI Stepper
+Implementiert einen 4-stufigen Wizard für die Konfiguration des
+Email-Alert-Service mit NiceGUI Stepper
 """
 
 from nicegui import ui
@@ -269,7 +270,8 @@ class EmailAlertWizard:
                 step3_next_btn = ui.button(
                     "Review", on_click=self._next_to_step4, icon="arrow_forward"
                 ).props("color=primary")
-                step3_next_btn.enable()  # Always enabled, user can proceed even with no alerts selected
+                step3_next_btn.enable()
+                # Always enabled, user can proceed even with no alerts selected
 
     def _create_step4_review(self):
         """Step 4: Review Configuration Before Saving"""
@@ -760,7 +762,8 @@ class EmailAlertStatusDisplay:
                         "text-gray-600 text-center"
                     )
                     ui.label(
-                        "Erstellen Sie eine neue Konfiguration um E-Mail Benachrichtigungen zu erhalten."
+                        "Erstellen Sie eine neue Konfiguration um E-Mail "
+                        "Benachrichtigungen zu erhalten."
                     ).classes("text-sm text-gray-500 text-center")
                     ui.button(
                         "Erste Konfiguration erstellen",
@@ -972,7 +975,6 @@ class EmailAlertStatusDisplay:
         cb = callback or self.update_callback
         if cb:
             cb()
-
 
     # Event handlers for UI actions
     def _show_setup_wizard(self):

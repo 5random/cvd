@@ -56,7 +56,8 @@ class WebcamStreamElement:
                     ui.card()
                     .classes("border-2 border-dashed border-gray-300")
                     .style(
-                        "width: 640px; height: 480px; background-color: #f5f5f5; display: flex; align-items: center; justify-content: center;"
+                        "width: 640px; height: 480px; background-color: #f5f5f5; "
+                        "display: flex; align-items: center; justify-content: center;"
                     )
                 ):
                     # Image element displaying the MJPEG stream
@@ -699,12 +700,20 @@ class WebcamStreamElement:
         """Capture a snapshot of the current video frame."""
         js = f"""
         const v = document.getElementById('{self.video_element.id}');
-        const c = Object.assign(document.createElement('canvas'), {{width: v.naturalWidth, height: v.naturalHeight}});
+        const c = Object.assign(
+            document.createElement('canvas'),
+            {{width: v.naturalWidth, height: v.naturalHeight}}
+        );
         c.getContext('2d').drawImage(v, 0, 0);
         c.toBlob(b => {{
             const url = URL.createObjectURL(b);
-            const a = Object.assign(document.createElement('a'), {{href: url, download: 'snapshot.png'}});
-            document.body.appendChild(a); a.click(); document.body.removeChild(a);
+            const a = Object.assign(
+                document.createElement('a'),
+                {{href: url, download: 'snapshot.png'}}
+            );
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
             URL.revokeObjectURL(url);
         }}, 'image/png');
         """
