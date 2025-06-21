@@ -50,6 +50,7 @@ from .alt_gui import (
     create_email_alert_wizard,
     EmailAlertStatusDisplay,
 )
+from .alt_gui.alt_gui_elements.webcam_stream_element import UVC_DEFAULTS
 
 
 class SimpleGUIApplication:
@@ -193,7 +194,9 @@ class SimpleGUIApplication:
                     ui.button(
                         icon="refresh",
                         on_click=self.reload_page,
-                    ).props("flat round").classes("text-white").tooltip("Reload Page")
+                    ).props(
+                        "flat round"
+                    ).classes("text-white").tooltip("Reload Page")
 
                     # Dark/Light mode toggle
                     self.dark_mode_btn = (
@@ -233,6 +236,7 @@ class SimpleGUIApplication:
                 "update_resolution": self.update_resolution,
                 "set_roi": self.set_roi,
                 "apply_uvc_settings": self.apply_uvc_settings,
+                "reset_uvc_defaults": self.reset_uvc_defaults,
                 "take_snapshot": self.take_snapshot_context,
                 "adjust_roi": self.adjust_roi_context,
                 "show_camera_settings": self.show_camera_settings_context,
@@ -474,6 +478,59 @@ class SimpleGUIApplication:
         if self.motion_controller:
             self.motion_controller.uvc_settings.update(settings)
         ui.notify("UVC settings applied", type="positive")
+
+    def reset_uvc_defaults(self):
+        """Reset all UVC controls to their default values."""
+        if not self.webcam_stream:
+            return
+
+        defaults = UVC_DEFAULTS.copy()
+
+        ws = self.webcam_stream
+
+        ws.brightness_number.value = defaults["brightness"]
+        ws.brightness_slider.value = defaults["brightness"]
+        ws.contrast_number.value = defaults["contrast"]
+        ws.contrast_slider.value = defaults["contrast"]
+        ws.saturation_number.value = defaults["saturation"]
+        ws.saturation_slider.value = defaults["saturation"]
+        ws.hue_number.value = defaults["hue"]
+        ws.hue_slider.value = defaults["hue"]
+        ws.sharpness_number.value = defaults["sharpness"]
+        ws.sharpness_slider.value = defaults["sharpness"]
+        ws.gain_number.value = defaults["gain"]
+        ws.gain_slider.value = defaults["gain"]
+        ws.gamma_number.value = defaults["gamma"]
+        ws.gamma_slider.value = defaults["gamma"]
+        ws.backlight_comp_number.value = defaults["backlight_compensation"]
+        ws.backlight_comp_slider.value = defaults["backlight_compensation"]
+        ws.wb_auto_checkbox.value = defaults["white_balance_auto"]
+        ws.wb_manual_number.value = defaults["white_balance"]
+        ws.wb_manual_slider.value = defaults["white_balance"]
+        ws.exposure_auto_checkbox.value = defaults["exposure_auto"]
+        ws.exposure_manual_number.value = defaults["exposure"]
+        ws.exposure_manual_slider.value = defaults["exposure"]
+
+        ws.toggle_white_balance_auto(defaults["white_balance_auto"])
+        ws.toggle_exposure_auto(defaults["exposure_auto"])
+
+        self.settings.update(defaults)
+
+        if self.camera_controller:
+            self.camera_controller.uvc_settings.update(defaults)
+            if self.camera_controller._capture is not None:
+                asyncio.create_task(
+                    apply_uvc_settings(self.camera_controller._capture, defaults)
+                )
+
+        if self.motion_controller:
+            self.motion_controller.uvc_settings.update(defaults)
+            if self.motion_controller._capture is not None:
+                asyncio.create_task(
+                    apply_uvc_settings(self.motion_controller._capture, defaults)
+                )
+
+        ui.notify("UVC settings reset to defaults", type="positive")
 
     def toggle_alerts(self, value):
         """Enable or disable alerts based on checkbox value."""

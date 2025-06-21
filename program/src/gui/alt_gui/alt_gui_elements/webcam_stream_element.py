@@ -1,6 +1,23 @@
 from nicegui import ui
 
 
+# Default values for UVC camera controls
+UVC_DEFAULTS = {
+    "brightness": 0,
+    "contrast": 100,
+    "saturation": 100,
+    "hue": 0,
+    "sharpness": 50,
+    "gain": 50,
+    "gamma": 100,
+    "backlight_compensation": 0,
+    "white_balance_auto": True,
+    "white_balance": 5000,
+    "exposure_auto": True,
+    "exposure": 100,
+}
+
+
 class WebcamStreamElement:
     """Initialize webcam stream element with settings and optional callbacks"""
 
@@ -218,7 +235,7 @@ class WebcamStreamElement:
                     with ui.row().classes("gap-3 items-center mb-3 w-full"):
                         self.brightness_number = (
                             ui.number(
-                                value=0,
+                                value=UVC_DEFAULTS["brightness"],
                                 min=-100,
                                 max=100,
                                 step=1,
@@ -233,7 +250,7 @@ class WebcamStreamElement:
                             ui.slider(
                                 min=-100,
                                 max=100,
-                                value=0,
+                                value=UVC_DEFAULTS["brightness"],
                                 step=1,
                                 on_change=self.callbacks.get(
                                     "update_brightness", lambda value: None
@@ -257,7 +274,7 @@ class WebcamStreamElement:
                     with ui.row().classes("gap-3 items-center mb-3 w-full"):
                         self.contrast_number = (
                             ui.number(
-                                value=100,
+                                value=UVC_DEFAULTS["contrast"],
                                 min=0,
                                 max=200,
                                 step=1,
@@ -272,7 +289,7 @@ class WebcamStreamElement:
                             ui.slider(
                                 min=0,
                                 max=200,
-                                value=100,
+                                value=UVC_DEFAULTS["contrast"],
                                 step=1,
                                 on_change=self.callbacks.get(
                                     "update_contrast", lambda value: None
@@ -292,7 +309,7 @@ class WebcamStreamElement:
                     with ui.row().classes("gap-3 items-center mb-3 w-full"):
                         self.saturation_number = (
                             ui.number(
-                                value=100,
+                                value=UVC_DEFAULTS["saturation"],
                                 min=0,
                                 max=200,
                                 step=1,
@@ -307,7 +324,7 @@ class WebcamStreamElement:
                             ui.slider(
                                 min=0,
                                 max=200,
-                                value=100,
+                                value=UVC_DEFAULTS["saturation"],
                                 step=1,
                                 on_change=self.callbacks.get(
                                     "update_saturation", lambda value: None
@@ -331,7 +348,7 @@ class WebcamStreamElement:
                     with ui.row().classes("gap-3 items-center mb-3 w-full"):
                         self.hue_number = (
                             ui.number(
-                                value=0,
+                                value=UVC_DEFAULTS["hue"],
                                 min=-180,
                                 max=180,
                                 step=1,
@@ -346,7 +363,7 @@ class WebcamStreamElement:
                             ui.slider(
                                 min=-180,
                                 max=180,
-                                value=0,
+                                value=UVC_DEFAULTS["hue"],
                                 step=1,
                                 on_change=self.callbacks.get(
                                     "update_hue", lambda value: None
@@ -366,7 +383,7 @@ class WebcamStreamElement:
                     with ui.row().classes("gap-3 items-center mb-4 w-full"):
                         self.sharpness_number = (
                             ui.number(
-                                value=50,
+                                value=UVC_DEFAULTS["sharpness"],
                                 min=0,
                                 max=100,
                                 step=1,
@@ -381,7 +398,7 @@ class WebcamStreamElement:
                             ui.slider(
                                 min=0,
                                 max=100,
-                                value=50,
+                                value=UVC_DEFAULTS["sharpness"],
                                 step=1,
                                 on_change=self.callbacks.get(
                                     "update_sharpness", lambda value: None
@@ -405,11 +422,13 @@ class WebcamStreamElement:
                     with ui.row().classes("gap-3 mb-3 items-center w-full"):
                         # Auto/manual toggle for white balance
                         self.wb_auto_checkbox = ui.checkbox(
-                            "Auto", value=True, on_change=self.toggle_white_balance_auto
+                            "Auto",
+                            value=UVC_DEFAULTS["white_balance_auto"],
+                            on_change=self.toggle_white_balance_auto,
                         ).classes("text-xs")
                         self.wb_manual_number = (
                             ui.number(
-                                value=5000,
+                                value=UVC_DEFAULTS["white_balance"],
                                 min=2800,
                                 max=6500,
                                 step=100,
@@ -425,7 +444,7 @@ class WebcamStreamElement:
                             ui.slider(
                                 min=2800,
                                 max=6500,
-                                value=5000,
+                                value=UVC_DEFAULTS["white_balance"],
                                 step=100,
                                 on_change=self.callbacks.get(
                                     "update_white_balance_manual",
@@ -450,11 +469,13 @@ class WebcamStreamElement:
                     with ui.row().classes("gap-3 mb-3 items-center w-full"):
                         # Auto/manual toggle for exposure
                         self.exposure_auto_checkbox = ui.checkbox(
-                            "Auto", value=True, on_change=self.toggle_exposure_auto
+                            "Auto",
+                            value=UVC_DEFAULTS["exposure_auto"],
+                            on_change=self.toggle_exposure_auto,
                         ).classes("text-xs")
                         self.exposure_manual_number = (
                             ui.number(
-                                value=100,
+                                value=UVC_DEFAULTS["exposure"],
                                 min=1,
                                 max=1000,
                                 step=1,
@@ -469,7 +490,7 @@ class WebcamStreamElement:
                             ui.slider(
                                 min=1,
                                 max=1000,
-                                value=100,
+                                value=UVC_DEFAULTS["exposure"],
                                 step=1,
                                 on_change=self.callbacks.get(
                                     "update_exposure_manual", lambda value: None
@@ -498,7 +519,7 @@ class WebcamStreamElement:
                     with ui.row().classes("gap-3 items-center mb-3 w-full"):
                         self.gain_number = (
                             ui.number(
-                                value=50,
+                                value=UVC_DEFAULTS["gain"],
                                 min=0,
                                 max=100,
                                 step=1,
@@ -513,7 +534,7 @@ class WebcamStreamElement:
                             ui.slider(
                                 min=0,
                                 max=100,
-                                value=50,
+                                value=UVC_DEFAULTS["gain"],
                                 step=1,
                                 on_change=self.callbacks.get(
                                     "update_gain", lambda value: None
@@ -533,7 +554,7 @@ class WebcamStreamElement:
                     with ui.row().classes("gap-3 items-center mb-3 w-full"):
                         self.gamma_number = (
                             ui.number(
-                                value=100,
+                                value=UVC_DEFAULTS["gamma"],
                                 min=50,
                                 max=300,
                                 step=1,
@@ -548,7 +569,7 @@ class WebcamStreamElement:
                             ui.slider(
                                 min=50,
                                 max=300,
-                                value=100,
+                                value=UVC_DEFAULTS["gamma"],
                                 step=1,
                                 on_change=self.callbacks.get(
                                     "update_gamma", lambda value: None
@@ -568,7 +589,7 @@ class WebcamStreamElement:
                     with ui.row().classes("gap-3 items-center mb-4 w-full"):
                         self.backlight_comp_number = (
                             ui.number(
-                                value=0,
+                                value=UVC_DEFAULTS["backlight_compensation"],
                                 min=0,
                                 max=100,
                                 step=1,
@@ -583,7 +604,7 @@ class WebcamStreamElement:
                             ui.slider(
                                 min=0,
                                 max=100,
-                                value=0,
+                                value=UVC_DEFAULTS["backlight_compensation"],
                                 step=1,
                                 on_change=self.callbacks.get(
                                     "update_backlight_comp", lambda value: None
