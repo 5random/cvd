@@ -189,8 +189,10 @@ class CameraStreamComponent(BaseComponent):
             self.fps_counter = 0
             self.last_fps_time = time.time()
 
-            # Create timer for periodic updates
-            self.timer = ui.timer(self.update_interval, self._update_frame)
+            # Create timer for periodic updates only when a UI context is available
+            self.timer = None
+            if ui.context.slot_stack and self.image_element is not None:
+                self.timer = ui.timer(self.update_interval, self._update_frame)
 
             if self.status_label:
                 self.status_label.text = "Starting..."
