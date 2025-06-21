@@ -643,6 +643,18 @@ class SimpleGUIApplication:
                             on_click=self.show_alert_management,
                         ).props("size=sm color=secondary")
 
+                        ui.button(
+                            "Alert-Verlauf",
+                            icon="history",
+                            on_click=self.show_alert_history,
+                        ).props("size=sm color=secondary")
+
+                        ui.button(
+                            "Test-Alert",
+                            icon="send",
+                            on_click=self.send_test_alert,
+                        ).props("size=sm color=warning")
+
                 # Status overview
                 total_configs = len(self.alert_configurations)
                 active_configs = sum(
