@@ -19,6 +19,7 @@ class WebcamStreamElement:
         self.callbacks = callbacks or {}
         # Store explicit camera toggle callback or look it up in callbacks dict
         self._camera_toggle_cb = camera_toggle_cb or self.callbacks.get("camera_toggle")
+        self.camera_settings_expansion = None
 
         @ui.page("/webcam_stream")
         def webcam_stream_page():
@@ -83,9 +84,9 @@ class WebcamStreamElement:
                     "Pause Video", icon="pause", on_click=self.toggle_video_pause
                 ).props("color=negative")
             # Collapsible Camera Settings
-            with ui.expansion("Camera Settings", icon="settings").classes(
-                "w-full mt-4"
-            ):
+            with ui.expansion("Camera Settings", icon="settings") as exp:
+                self.camera_settings_expansion = exp
+                exp.classes("w-full mt-4")
                 with ui.column().classes("gap-4 w-full mt-2"):
                     # Basic Camera Settings
                     ui.label("Basic Settings").classes(
@@ -711,3 +712,15 @@ class WebcamStreamElement:
             ui.slider(min=0, max=100, value=100, label="Width").props("dense")
             ui.button("Apply", on_click=dialog.close)
         dialog.open()
+
+    def show_camera_settings(self):
+        """Open the camera settings expansion from the context menu."""
+        if self.camera_settings_expansion is not None:
+            self.camera_settings_expansion.open()
+
+    def reset_view(self):
+        """Reset the view to its default state."""
+        if hasattr(self, "video_element"):
+            self.video_element.run_method("load")
+        if getattr(self, "roi_checkbox", None):
+            self.roi_checkbox.value = False
