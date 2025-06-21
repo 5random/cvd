@@ -339,12 +339,22 @@ class ExperimentConfigDialog(CancelableDialogMixin):
         try:
             success = await self.experiment_manager.start_experiment(experiment_id)
             if success:
-                notify_later("Experiment started successfully", color="positive", slot=self._dialog)
+                notify_later(
+                    "Experiment started successfully",
+                    color="positive",
+                    slot=self._dialog,
+                )
             else:
-                notify_later("Failed to start experiment", color="negative", slot=self._dialog)
+                notify_later(
+                    "Failed to start experiment", color="negative", slot=self._dialog
+                )
         except Exception as e:
             error(f"Error starting experiment: {e}")
-            notify_later(f"Error starting experiment: {str(e)}", color="negative", slot=self._dialog)
+            notify_later(
+                f"Error starting experiment: {str(e)}",
+                color="negative",
+                slot=self._dialog,
+            )
 
 
 class ExperimentCard(BaseComponent):

@@ -407,7 +407,6 @@ class DataFilesList(BaseComponent):
         # Download monitoring
         self._download_timer = None
 
-
     def render(self) -> ui.card:
         """Render files list"""
         with ui.card().classes("cvd-card p-4") as card:
