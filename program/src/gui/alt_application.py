@@ -78,7 +78,7 @@ class SimpleGUIApplication:
             config_dir / "default_config.json",
         )
         self.sensor_manager = SensorManager(self.config_service)
-        self.controller_manager = controller_manager or create_cvd_controller_manager()
+        # use the already created controller manager for the experiment manager
         self.experiment_manager = ExperimentManager(
             config_service=self.config_service,
             sensor_manager=self.sensor_manager,
