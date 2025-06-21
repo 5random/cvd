@@ -54,7 +54,7 @@ optional `show_on_dashboard` field to control whether the sensor appears on the
 dashboard.
 
 ```python
-from src.utils.config_utils.config_service import ConfigurationService
+from src.utils.config_service import ConfigurationService
 
 service = ConfigurationService(Path("program/config/config.json"), Path("program/config/default_config.json"))
 service.add_sensor_config({
