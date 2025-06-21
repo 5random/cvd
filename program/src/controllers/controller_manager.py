@@ -4,6 +4,7 @@ Controller manager for orchestrating multiple controllers with dependency manage
 
 import asyncio
 from typing import Dict, List, Any, Optional, Callable, Type
+from collections import deque
 from dataclasses import dataclass
 import time
 import json
@@ -200,11 +201,11 @@ class ControllerManager:
             in_degree[dep.target_controller_id] += 1
 
         # Topological sort
-        queue = [cid for cid, degree in in_degree.items() if degree == 0]
+        queue = deque(cid for cid, degree in in_degree.items() if degree == 0)
         execution_order = []
 
         while queue:
-            current = queue.pop(0)
+            current = queue.popleft()
             execution_order.append(current)
 
             for neighbor in graph[current]:

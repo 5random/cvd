@@ -1,4 +1,5 @@
-from typing import Dict, List
+from typing import Dict, Deque
+from collections import deque
 
 from src.data_handler.processing.processing_base import (
     ProcessingResult,
@@ -18,7 +19,7 @@ class MovingAverageFilter(ProcessingStage):
             raise ValueError("window_size must be greater than 0")
         self.stage_type = ProcessingStageType.FILTER
         self.window_size = window_size
-        self._data_windows: Dict[str, List[float]] = {}
+        self._data_windows: Dict[str, Deque[float]] = {}
     
     async def process(self, data: SensorReading) -> ProcessingResult[SensorReading]:
         """Apply moving average filter to sensor reading"""
@@ -27,16 +28,12 @@ class MovingAverageFilter(ProcessingStage):
         
         # Initialize window for sensor if needed
         if data.sensor_id not in self._data_windows:
-            self._data_windows[data.sensor_id] = []
+            self._data_windows[data.sensor_id] = deque(maxlen=self.window_size)
         
         window = self._data_windows[data.sensor_id]
         
         # Add new value
         window.append(data.value)
-        
-        # Keep window size
-        if len(window) > self.window_size:
-            window.pop(0)
         
         # Calculate moving average
         if len(window) >= self.window_size:
