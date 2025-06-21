@@ -33,6 +33,7 @@ from src.experiment_handler.experiment_manager import (
     ExperimentManager,
     ExperimentConfig,
 )
+from src.utils.concurrency.async_utils import install_signal_handlers
 from src.utils.config_service import ConfigurationService
 from src.utils.email_alert_service import get_email_alert_service
 from src.data_handler.sources.sensor_source_manager import SensorManager
@@ -82,6 +83,7 @@ class SimpleGUIApplication:
             config_service=self.config_service,
             sensor_manager=self.sensor_manager,
             controller_manager=self.controller_manager,
+            auto_install_signal_handlers=False,
         )
 
         # Additional runtime attributes
@@ -110,13 +112,13 @@ class SimpleGUIApplication:
         self._update_alerts_status()
 
         from typing import cast
-        
+
         # Retrieve and cast controllers to their concrete types
         self.camera_controller = cast(
             Optional[CameraCaptureController],
             self.controller_manager._controllers.get("camera_capture"),
         )
-        
+
         self.motion_controller = cast(
             Optional[MotionDetectionController],
             self.controller_manager._controllers.get("motion_detection"),
@@ -431,10 +433,16 @@ class SimpleGUIApplication:
         }
         self.settings.update(settings)
         # Apply UVC settings asynchronously if capture objects are available
-        if self.camera_controller is not None and self.camera_controller._capture is not None:
+        if (
+            self.camera_controller is not None
+            and self.camera_controller._capture is not None
+        ):
             capture = self.camera_controller._capture
             asyncio.create_task(apply_uvc_settings(capture, settings))
-        if self.motion_controller is not None and self.motion_controller._capture is not None:
+        if (
+            self.motion_controller is not None
+            and self.motion_controller._capture is not None
+        ):
             capture = self.motion_controller._capture
             asyncio.create_task(apply_uvc_settings(capture, settings))
         if self.camera_controller:
@@ -774,6 +782,7 @@ class SimpleGUIApplication:
 
         @app.on_startup
         async def _startup() -> None:
+            install_signal_handlers(self.experiment_manager._task_manager)
             await self.sensor_manager.start_all_configured_sensors()
             await self.controller_manager.start_all_controllers()
 
