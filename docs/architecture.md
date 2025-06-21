@@ -49,7 +49,11 @@ regenerate the diagram. The `full_class_diagram.mmd` file is already
 included in the repository and can be updated whenever the source code
 changes.
 
-```{literalinclude} full_class_diagram.mmd
-:language: mermaid
+The full diagram is available in
+[`full_class_diagram.mmd`](full_class_diagram.mmd).
+
+```mermaid
+classDiagram
+    class ExampleService
 ```
 
