@@ -1,3 +1,5 @@
+"""Define global styles for the alternate GUI."""
+
 from nicegui import ui
 
 
