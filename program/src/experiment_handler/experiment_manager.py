@@ -138,6 +138,8 @@ class ExperimentManager:
         sensor_manager: Optional[SensorManager] = None,
         controller_manager: Optional[ControllerManager] = None,
         data_saver: Optional[DataSaver] = None,
+        *,
+        auto_install_signal_handlers: bool = True,
     ):
         """
         Initialize experiment manager with service dependencies.
@@ -147,6 +149,8 @@ class ExperimentManager:
             sensor_manager: Optional sensor manager for data collection
             controller_manager: Optional controller manager for equipment control
             data_saver: Optional data saver for storage
+            auto_install_signal_handlers: Install SIGINT/SIGTERM handlers if an
+                event loop is running
         """
         self.config_service = config_service
         self.sensor_manager = sensor_manager
@@ -190,7 +194,14 @@ class ExperimentManager:
         # Shutdown flag and async task manager
         self._shutdown_event = asyncio.Event()
         self._task_manager = AsyncTaskManager("ExperimentManager")
-        install_signal_handlers(self._task_manager)
+
+        if auto_install_signal_handlers:
+            try:
+                install_signal_handlers(self._task_manager)
+            except RuntimeError:
+                # Called before an event loop exists; caller can invoke
+                # ``install_signal_handlers`` later once the loop is running.
+                warning("no_event_loop", msg="Signal handlers not installed yet")
 
         info("ExperimentManager initialized")
 
