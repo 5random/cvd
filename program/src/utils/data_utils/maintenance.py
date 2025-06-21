@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import time
 from pathlib import Path
-from typing import Tuple, List
+from typing import Any, Tuple, List
 
 from src.utils.data_utils.indexing import DataCategory, DirectoryEventHandler
 from program.src.utils.log_service import info, warning, error, debug
@@ -15,7 +15,7 @@ class MaintenanceManager:
     def __init__(self, manager: "DataManager") -> None:
         self._manager = manager
         self._observer = None
-        self._background_tasks: List[Tuple[ManagedThreadPool, any]] = []
+        self._background_tasks: List[Tuple[ManagedThreadPool, Any]] = []
 
     def start_worker(self) -> None:
         mgr = get_thread_pool_manager()
