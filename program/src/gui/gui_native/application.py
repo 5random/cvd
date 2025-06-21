@@ -356,12 +356,6 @@ class WebApplication:
         with ui.row().classes("w-full h-full gap-4"):
             # Left column - sensor dashboard
 
-            dashboard_sensors = [
-                sid
-                for sid, cfg in self.config_service.get_sensor_configs()
-                if cfg.get("show_on_dashboard")
-            ]
-
             with ui.column().classes("w-1/2"):
                 self._dashboard_component = DashboardComponent(
                     self.config_service, self.sensor_manager, self.controller_manager
