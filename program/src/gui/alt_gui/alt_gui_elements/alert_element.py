@@ -2,12 +2,13 @@ from nicegui import ui
 
 
 class EmailAlertsSection:
-    def __init__(self, settings):
+    def __init__(self, settings, callbacks=None):
         """Initialize email alerts section with settings"""
         self.experiment_running = False
         self.alerts_enabled = False
         settings = settings or {"email": "user@example.com", "alert_delay": 5}
         self.settings = settings
+        self.callbacks = callbacks or {}
 
         @ui.page("/email_alerts")
         def page():
@@ -23,9 +24,7 @@ class EmailAlertsSection:
             self.alerts_enabled_checkbox = ui.checkbox(
                 "Enable Email Alerts",
                 value=self.alerts_enabled,
-                on_change=lambda value: ui.notify(
-                    "function toggle_alerts not yet implemented", type="info"
-                ),
+                on_change=self.callbacks.get("toggle_alerts", lambda value: None),
             ).classes("mb-3")
 
             # Email settings
@@ -69,16 +68,12 @@ class EmailAlertsSection:
                 ui.button(
                     "Send Test Alert",
                     icon="send",
-                    on_click=lambda: ui.notify(
-                        "function send_test_alert not yet implemented", type="info"
-                    ),
+                    on_click=self.callbacks.get("send_test_alert", lambda: None),
                 ).props("color=warning").classes("flex-1")
                 ui.button(
                     "Alert History",
                     icon="history",
-                    on_click=lambda: ui.notify(
-                        "function show_alert_history not yet implemented", type="info"
-                    ),
+                    on_click=self.callbacks.get("show_alert_history", lambda: None),
                 ).props("color=secondary outline").classes("flex-1")
 
             # Last alert status
