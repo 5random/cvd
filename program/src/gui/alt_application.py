@@ -42,8 +42,15 @@ from program.src.experiment_handler.experiment_manager import (
     ExperimentConfig,
 )
 from program.src.utils.concurrency.async_utils import install_signal_handlers
-from program.src.utils.config_service import ConfigurationService
-from program.src.utils.email_alert_service import get_email_alert_service
+from program.src.utils.config_service import (
+    ConfigurationService,
+    set_config_service,
+)
+from program.src.utils.email_alert_service import (
+    get_email_alert_service,
+    EmailAlertService,
+    set_email_alert_service,
+)
 from program.src.data_handler.sources.sensor_source_manager import SensorManager
 
 from .alt_gui import (
@@ -70,12 +77,6 @@ class SimpleGUIApplication:
         self.motion_detected = False
         self.experiment_running = False
         self.alerts_enabled = False
-        self.controller_manager = (
-            controller_manager
-            if controller_manager is not None
-            else create_cvd_controller_manager()
-        )
-
         self.camera_controller: Optional[CameraCaptureController] = None
 
         # Determine configuration directory and initialise core services
@@ -86,7 +87,18 @@ class SimpleGUIApplication:
             config_dir / "config.json",
             config_dir / "default_config.json",
         )
+        set_config_service(self.config_service)
+
+        self.controller_manager = (
+            controller_manager
+            if controller_manager is not None
+            else create_cvd_controller_manager()
+        )
+
         self.sensor_manager = SensorManager(self.config_service)
+
+        self.email_alert_service = EmailAlertService(self.config_service)
+        set_email_alert_service(self.email_alert_service)
         # use the already created controller manager for the experiment manager
         self.experiment_manager = ExperimentManager(
             config_service=self.config_service,

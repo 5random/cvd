@@ -736,7 +736,8 @@ class WebcamStreamElement:
     def reset_view(self):
         """Reset the view to its default state."""
         if hasattr(self, "video_element"):
-            self.video_element.force_reload()
+            # Reload by resetting the source path instead of using force_reload
+            self.video_element.set_source(self.video_element.source)
         if getattr(self, "roi_checkbox", None):
             self.roi_checkbox.value = False
             if self._roi_update_cb:
