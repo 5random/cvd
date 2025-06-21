@@ -11,6 +11,11 @@
 #   alert on critical events)
 
 from pathlib import Path
+import sys
+
+# Allow running this file directly without installing the package
+if __name__ == "__main__" and __package__ is None:
+    sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from nicegui import ui, app
 from datetime import datetime
@@ -949,8 +954,8 @@ if __name__ in {"__main__", "__mp_main__"}:
 #    - Email addresses are partially anonymized in the display
 #
 # Usage:
-#   python src/gui/alt_application.py
+#   python program/src/gui/alt_application.py
 # or
-#   python -m src.gui.alt_application
+#   python -m program.src.gui.alt_application
 # The email alert section will show in the bottom-right grid area.
 # Click "Konfigurieren" to set up new alerts or "Verwalten" to view existing ones.
