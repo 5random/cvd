@@ -4,9 +4,10 @@ This page gives a few quick examples of how to use components of the CVD Tracker
 
 ## Starting the GUI
 
-The application is started through the :class:`~src.utils.container.ApplicationContainer` which wires
-up all services and launches the NiceGUI interface.  The configuration directory can be specified on
-the command line using ``--config-dir`` or via the ``CVD_CONFIG_DIR`` environment variable.
+The application is started through the `ApplicationContainer` which wires
+up all services and launches the NiceGUI interface. The configuration directory
+can be specified on the command line using ``--config-dir`` or via the
+``CVD_CONFIG_DIR`` environment variable.
 
 ```python
 from pathlib import Path
@@ -95,7 +96,7 @@ reads once and then cleans up, displaying the result as a notification.
 
 Controller settings use predefined option lists for certain values. For example
 the motion detection controller only accepts ``"MOG2"`` or ``"KNN"`` as the
-background subtraction algorithm. The :class:`ConfigurationService` exposes
+background subtraction algorithm. The `ConfigurationService` exposes
 helpers such as ``get_controller_type_options()`` and ``get_webcam_ids()`` which
 GUI components use to populate dropdown menus.
 
