@@ -934,23 +934,17 @@ class CurrentExperimentDisplay(BaseComponent):
             # Determine sensor count
             if config.sensor_ids:
                 sensor_count = len(config.sensor_ids)
-
-            elif self.experiment_manager.sensor_manager:
-                try:
-                    sensor_count = len(
-                        self.experiment_manager.sensor_manager.get_all_sensors()
-                    )
-                except Exception:
-                    sensor_count = 0
-
             else:
                 sensor_count = 0
                 sensor_mgr = getattr(self.experiment_manager, "sensor_manager", None)
                 if sensor_mgr:
-                    active = sensor_mgr.get_active_sensors()
-                    if not active:
-                        active = sensor_mgr.get_all_sensors()
-                    sensor_count = len(active)
+                    try:
+                        active = sensor_mgr.get_active_sensors()
+                        if not active:
+                            active = sensor_mgr.get_all_sensors()
+                        sensor_count = len(active)
+                    except Exception:
+                        sensor_count = 0
 
             # Determine controller count
             if config.controller_ids:
