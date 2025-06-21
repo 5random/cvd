@@ -1,6 +1,6 @@
 import logging
 import pytest
-from src.utils.config_utils.config_service import ConfigurationService, ValidationError
+from src.utils.config_service import ConfigurationService, ValidationError
 
 
 @pytest.mark.asyncio

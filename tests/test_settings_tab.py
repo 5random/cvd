@@ -4,7 +4,7 @@ import pytest
 from nicegui import ui
 
 from src.gui.application import WebApplication
-from src.utils.config_utils.config_service import ConfigurationService
+from src.utils.config_service import ConfigurationService
 
 
 class DummySensorManager:

@@ -39,7 +39,7 @@ class DummyCompressionService:
 def data_manager(tmp_path, monkeypatch):
     monkeypatch.setenv("ENABLE_WATCHDOG", "0")
     # Ensure configuration service does not override test paths
-    import src.utils.config_utils.config_service as cs_module
+    import src.utils.config_service as cs_module
     cs_module._config_service_instance = None
     monkeypatch.setattr(MaintenanceManager, "start_worker", lambda self: None)
     mgr = DataManager(base_output_dir=tmp_path)

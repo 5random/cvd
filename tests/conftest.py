@@ -15,7 +15,7 @@ def mute_logging(monkeypatch: pytest.MonkeyPatch) -> None:
     these functions, so it is patched as well.
     """
 
-    from src.utils.log_utils import log_service
+    from src.utils import log_service
     from src.utils.concurrency import async_utils
 
     for name in ["debug", "info", "warning", "error"]:

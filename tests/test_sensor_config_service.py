@@ -1,5 +1,5 @@
 import json
-from src.utils.config_utils.config_service import ConfigurationService
+from src.utils.config_service import ConfigurationService
 
 
 def create_service(tmp_path, cfg):

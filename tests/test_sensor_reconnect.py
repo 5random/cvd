@@ -8,7 +8,7 @@ from src.data_handler.interface.sensor_interface import (
     SensorReading,
     SensorStatus,
 )
-from src.utils.config_utils.config_service import ConfigurationService
+from src.utils.config_service import ConfigurationService
 
 
 class FailingSensor(SensorInterface):

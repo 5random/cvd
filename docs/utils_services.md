@@ -36,6 +36,6 @@ log.info("message")
 
 Legacy paths like `src.utils.config_utils.config_service` and
 `src.utils.log_utils.log_service` are still available for backward
-compatibility.  New code should import from `src.utils.config_service` and
-`src.utils.log_service` instead.
+compatibility but emit a `DeprecationWarning`. New code should import from
+`src.utils.config_service` and `src.utils.log_service` instead.
 

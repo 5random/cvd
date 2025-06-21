@@ -1,6 +1,6 @@
 import json
 
-from src.utils.config_utils.config_service import ConfigurationService
+from src.utils.config_service import ConfigurationService
 import src.gui.gui_tab_components.gui_tab_experiment_component as exp_mod
 
 

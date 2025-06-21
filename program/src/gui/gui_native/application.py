@@ -211,14 +211,8 @@ class WebApplication:
                 camera = self._temp_camera_stream
 
             async def gen():
+                first = True
                 while True:
-                    try:
-                        if await request.is_disconnected():
-                            info("Client disconnected from video feed")
-                            break
-                    except asyncio.CancelledError:
-                        info("Video feed cancelled")
-                        break
                     if isinstance(camera, CameraStreamComponent):
                         frame = camera.get_latest_frame()
                         if frame is not None:
@@ -231,6 +225,17 @@ class WebApplication:
                                     + jpeg_bytes
                                     + b"\r\n"
                                 )
+                    if not first:
+                        try:
+                            if await request.is_disconnected():
+                                info("Client disconnected from video feed")
+                                break
+                        except asyncio.CancelledError:
+                            info("Video feed cancelled")
+                            break
+                    else:
+                        first = False
+
                     await asyncio.sleep(
                         camera.update_interval
                         if isinstance(camera, CameraStreamComponent)
