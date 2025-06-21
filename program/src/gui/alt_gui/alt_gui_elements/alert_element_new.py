@@ -188,7 +188,7 @@ class EmailAlertWizard:
                     "No Motion Detected Alert", icon="motion_photos_off"
                 ).classes("w-full"):
                     with ui.column().classes("gap-3 p-4"):
-                        no_motion_checkbox = ui.checkbox(
+                        ui.checkbox(
                             "Send alert when no motion is detected for extended period",
                             value=False,
                             on_change=lambda e: self._update_no_motion_setting(
@@ -198,7 +198,7 @@ class EmailAlertWizard:
 
                         with ui.row().classes("gap-4 items-center ml-6"):
                             ui.label("Alert delay:").classes("text-sm")
-                            no_motion_delay = (
+                            (
                                 ui.number(
                                     "Minutes",
                                     value=5,
@@ -220,7 +220,7 @@ class EmailAlertWizard:
                     "w-full"
                 ):
                     with ui.column().classes("gap-3 p-4"):
-                        camera_offline_checkbox = ui.checkbox(
+                        ui.checkbox(
                             "Send alert when camera goes offline or becomes unavailable",
                             value=False,
                             on_change=lambda e: self._update_camera_offline_setting(
@@ -234,7 +234,7 @@ class EmailAlertWizard:
                 # System Error Alert
                 with ui.expansion("System Error Alert", icon="error").classes("w-full"):
                     with ui.column().classes("gap-3 p-4"):
-                        system_error_checkbox = ui.checkbox(
+                        ui.checkbox(
                             "Send alert when system errors occur",
                             value=False,
                             on_change=lambda e: self._update_system_error_setting(
@@ -249,7 +249,7 @@ class EmailAlertWizard:
                     "w-full"
                 ):
                     with ui.column().classes("gap-3 p-4"):
-                        experiment_complete_checkbox = ui.checkbox(
+                        ui.checkbox(
                             "Send alert when experiments complete",
                             value=False,
                             on_change=lambda e: self._update_experiment_complete_setting(
@@ -972,6 +972,7 @@ class EmailAlertStatusDisplay:
         cb = callback or self.update_callback
         if cb:
             cb()
+
 
     # Event handlers for UI actions
     def _show_setup_wizard(self):
