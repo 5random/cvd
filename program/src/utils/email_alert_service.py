@@ -65,10 +65,12 @@ class EmailAlertService:
             else:
                 smtp_conn = smtplib.SMTP(self.smtp_host, self.smtp_port)
             with smtp_conn as smtp:
-                smtp.ehlo()
+                if hasattr(smtp, "ehlo"):
+                    smtp.ehlo()
                 if not self.smtp_use_ssl:
                     smtp.starttls()
-                    smtp.ehlo()
+                    if hasattr(smtp, "ehlo"):
+                        smtp.ehlo()
                 # Authenticate only if both user and password provided
                 if self.smtp_user and self.smtp_password:
                     smtp.login(self.smtp_user, self.smtp_password)
