@@ -56,11 +56,12 @@ class WebcamStreamElement:
                     ui.card()
                     .classes("border-2 border-dashed border-gray-300")
                     .style(
-                        "width: 640px; height: 480px; background-color: #f5f5f5; display: flex; align-items: center; justify-content: center;"
+                        "width: 640px; height: 480px; background-color: #f5f5f5; "
+                        "display: flex; align-items: center; justify-content: center;"
                     )
                 ):
-                    # Video element displaying the MJPEG stream
-                    self.video_element = ui.video("/video_feed").style(
+                    # Image element displaying the MJPEG stream
+                    self.video_element = ui.image("/video_feed").style(
                         "width: 100%; height: 100%; object-fit: contain;"
                     )
 
@@ -643,7 +644,7 @@ class WebcamStreamElement:
     def toggle_video_play(self):
         """Toggle video play state"""
         if not self.camera_active:
-            self.video_element.play()
+            self.video_element.set_source("/video_feed")
             self.start_camera_btn.set_text("Pause Video")
             self.start_camera_btn.set_icon("pause")
             self.start_camera_btn.props("color=negative")
@@ -652,7 +653,8 @@ class WebcamStreamElement:
                 self._camera_toggle_cb()
             self._update_status()
         else:
-            self.video_element.pause()
+            # Clear the image source to stop streaming
+            self.video_element.set_source("")
             self.start_camera_btn.set_text("Play Video")
             self.start_camera_btn.set_icon("play_arrow")
             self.start_camera_btn.props("color=positive")
@@ -698,12 +700,20 @@ class WebcamStreamElement:
         """Capture a snapshot of the current video frame."""
         js = f"""
         const v = document.getElementById('{self.video_element.id}');
-        const c = Object.assign(document.createElement('canvas'), {{width: v.videoWidth, height: v.videoHeight}});
+        const c = Object.assign(
+            document.createElement('canvas'),
+            {{width: v.naturalWidth, height: v.naturalHeight}}
+        );
         c.getContext('2d').drawImage(v, 0, 0);
         c.toBlob(b => {{
             const url = URL.createObjectURL(b);
-            const a = Object.assign(document.createElement('a'), {{href: url, download: 'snapshot.png'}});
-            document.body.appendChild(a); a.click(); document.body.removeChild(a);
+            const a = Object.assign(
+                document.createElement('a'),
+                {{href: url, download: 'snapshot.png'}}
+            );
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
             URL.revokeObjectURL(url);
         }}, 'image/png');
         """
@@ -726,7 +736,8 @@ class WebcamStreamElement:
     def reset_view(self):
         """Reset the view to its default state."""
         if hasattr(self, "video_element"):
-            self.video_element.run_method("load")
+            # Reload by resetting the source path instead of using force_reload
+            self.video_element.set_source(self.video_element.source)
         if getattr(self, "roi_checkbox", None):
             self.roi_checkbox.value = False
             if self._roi_update_cb:

@@ -1,6 +1,7 @@
 """
 Email Alert Service Setup Wizard
-Implementiert einen 4-stufigen Wizard für die Konfiguration des Email-Alert-Service mit NiceGUI Stepper
+Implementiert einen 4-stufigen Wizard für die Konfiguration des
+Email-Alert-Service mit NiceGUI Stepper
 """
 
 from nicegui import ui
@@ -188,7 +189,7 @@ class EmailAlertWizard:
                     "No Motion Detected Alert", icon="motion_photos_off"
                 ).classes("w-full"):
                     with ui.column().classes("gap-3 p-4"):
-                        no_motion_checkbox = ui.checkbox(
+                        ui.checkbox(
                             "Send alert when no motion is detected for extended period",
                             value=False,
                             on_change=lambda e: self._update_no_motion_setting(
@@ -198,7 +199,7 @@ class EmailAlertWizard:
 
                         with ui.row().classes("gap-4 items-center ml-6"):
                             ui.label("Alert delay:").classes("text-sm")
-                            no_motion_delay = (
+                            (
                                 ui.number(
                                     "Minutes",
                                     value=5,
@@ -220,7 +221,7 @@ class EmailAlertWizard:
                     "w-full"
                 ):
                     with ui.column().classes("gap-3 p-4"):
-                        camera_offline_checkbox = ui.checkbox(
+                        ui.checkbox(
                             "Send alert when camera goes offline or becomes unavailable",
                             value=False,
                             on_change=lambda e: self._update_camera_offline_setting(
@@ -234,7 +235,7 @@ class EmailAlertWizard:
                 # System Error Alert
                 with ui.expansion("System Error Alert", icon="error").classes("w-full"):
                     with ui.column().classes("gap-3 p-4"):
-                        system_error_checkbox = ui.checkbox(
+                        ui.checkbox(
                             "Send alert when system errors occur",
                             value=False,
                             on_change=lambda e: self._update_system_error_setting(
@@ -249,7 +250,7 @@ class EmailAlertWizard:
                     "w-full"
                 ):
                     with ui.column().classes("gap-3 p-4"):
-                        experiment_complete_checkbox = ui.checkbox(
+                        ui.checkbox(
                             "Send alert when experiments complete",
                             value=False,
                             on_change=lambda e: self._update_experiment_complete_setting(
@@ -269,7 +270,8 @@ class EmailAlertWizard:
                 step3_next_btn = ui.button(
                     "Review", on_click=self._next_to_step4, icon="arrow_forward"
                 ).props("color=primary")
-                step3_next_btn.enable()  # Always enabled, user can proceed even with no alerts selected
+                step3_next_btn.enable()
+                # Always enabled, user can proceed even with no alerts selected
 
     def _create_step4_review(self):
         """Step 4: Review Configuration Before Saving"""
@@ -415,15 +417,15 @@ class EmailAlertWizard:
 
         if len(name) < 3:
             step1_feedback.text = "Name must be at least 3 characters long"
-            step1_feedback.classes = "text-sm mt-2 text-red-600"
+            step1_feedback.classes("text-sm mt-2 text-red-600")
             step1_next_btn.disable()
         elif len(name) > 50:
             step1_feedback.text = "Name must be 50 characters or less"
-            step1_feedback.classes = "text-sm mt-2 text-red-600"
+            step1_feedback.classes("text-sm mt-2 text-red-600")
             step1_next_btn.disable()
         else:
             step1_feedback.text = "✓ Valid configuration name"
-            step1_feedback.classes = "text-sm mt-2 text-green-600"
+            step1_feedback.classes("text-sm mt-2 text-green-600")
             step1_next_btn.enable()
             self.alert_data["name"] = name
 
@@ -444,15 +446,15 @@ class EmailAlertWizard:
         if self._is_valid_email(email):
             if email in self.alert_data["emails"]:
                 email_feedback.text = "Email already added"
-                email_feedback.classes = "text-sm text-orange-600"
+                email_feedback.classes("text-sm text-orange-600")
                 add_email_btn.disable()
             else:
                 email_feedback.text = "✓ Valid email address"
-                email_feedback.classes = "text-sm text-green-600"
+                email_feedback.classes("text-sm text-green-600")
                 add_email_btn.enable()
         else:
             email_feedback.text = "Please enter a valid email address"
-            email_feedback.classes = "text-sm text-red-600"
+            email_feedback.classes("text-sm text-red-600")
             add_email_btn.disable()
 
     def _is_valid_email(self, email: str) -> bool:
@@ -519,11 +521,11 @@ class EmailAlertWizard:
             step2_feedback.text = (
                 f'✓ {len(self.alert_data["emails"])} email address(es) configured'
             )
-            step2_feedback.classes = "text-sm mt-2 text-green-600"
+            step2_feedback.classes("text-sm mt-2 text-green-600")
             step2_next_btn.enable()
         else:
             step2_feedback.text = "Add at least one valid email address to continue."
-            step2_feedback.classes = "text-sm text-orange-600 mt-2"
+            step2_feedback.classes("text-sm text-orange-600 mt-2")
             step2_next_btn.disable()
 
     def _next_to_step2(self, name_input):
@@ -760,7 +762,8 @@ class EmailAlertStatusDisplay:
                         "text-gray-600 text-center"
                     )
                     ui.label(
-                        "Erstellen Sie eine neue Konfiguration um E-Mail Benachrichtigungen zu erhalten."
+                        "Erstellen Sie eine neue Konfiguration um E-Mail "
+                        "Benachrichtigungen zu erhalten."
                     ).classes("text-sm text-gray-500 text-center")
                     ui.button(
                         "Erste Konfiguration erstellen",
@@ -955,13 +958,12 @@ class EmailAlertStatusDisplay:
         cb = callback or self.update_callback
         if cb:
             cb()
-    
+
     def update_configuration(
         self,
         old_config: Dict[str, Any],
         new_config: Dict[str, Any],
         callback: Optional[Callable[[], None]] = None,
-
     ):
         """Update an existing configuration"""
         try:
@@ -973,7 +975,6 @@ class EmailAlertStatusDisplay:
         cb = callback or self.update_callback
         if cb:
             cb()
-    
 
     # Event handlers for UI actions
     def _show_setup_wizard(self):
