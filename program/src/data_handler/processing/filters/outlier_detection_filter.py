@@ -1,4 +1,5 @@
-from typing import Dict, List
+from typing import Dict, Deque
+from collections import deque
 
 from src.data_handler.processing.processing_base import (
     ProcessingResult,
@@ -17,7 +18,7 @@ class OutlierDetectionFilter(ProcessingStage):
         self.stage_type = ProcessingStageType.VALIDATE
         self.threshold_std = threshold_std
         self.min_samples = min_samples
-        self._data_history: Dict[str, List[float]] = {}
+        self._data_history: Dict[str, Deque[float]] = {}
     
     async def process(self, data: SensorReading) -> ProcessingResult[SensorReading]:
         """Detect and filter outliers"""
@@ -26,7 +27,7 @@ class OutlierDetectionFilter(ProcessingStage):
         
         # Initialize history for sensor if needed
         if data.sensor_id not in self._data_history:
-            self._data_history[data.sensor_id] = []
+            self._data_history[data.sensor_id] = deque(maxlen=self.min_samples * 2)
         
         history = self._data_history[data.sensor_id]
         
@@ -67,9 +68,5 @@ class OutlierDetectionFilter(ProcessingStage):
         
         # Value is normal, add to history
         history.append(data.value)
-        
-        # Keep history size manageable
-        if len(history) > self.min_samples * 2:
-            history.pop(0)
-        
+
         return ProcessingResult.success_result(data)

@@ -5,7 +5,8 @@ Motion detection controller using OpenCV background subtraction.
 import cv2
 import numpy as np
 from PIL import Image
-from typing import Dict, Any, Optional, Tuple
+from typing import Dict, Any, Optional, Tuple, Deque
+from collections import deque
 from dataclasses import dataclass
 import time
 import math
@@ -210,8 +211,8 @@ class MotionDetectionController(ImageController):
         self._frame_size: Optional[Tuple[int, int]] = None
 
         # Statistics
-        self._motion_history: list[dict[str, Any]] = []
         self._max_history = params.get("max_history", 100)
+        self._motion_history: Deque[dict[str, Any]] = deque(maxlen=self._max_history)
 
         # Lock to protect shared state in async processing
         self._state_lock = asyncio.Lock()
@@ -330,11 +331,11 @@ class MotionDetectionController(ImageController):
                     probability = motion_result.confidence
                     if self.multi_frame_method == "threshold":
                         if len(self._motion_history) >= self.multi_frame_window:
-                            recent = self._motion_history[-self.multi_frame_window :]
+                            recent = list(self._motion_history)[-self.multi_frame_window :]
                             count = sum(1 for h in recent if h["motion_detected"])
                             probability = count / self.multi_frame_window
                     elif self.multi_frame_method == "probability":
-                        recent = self._motion_history[-self.multi_frame_window :]
+                        recent = list(self._motion_history)[-self.multi_frame_window :]
                         if recent:
                             probability = float(
                                 np.mean([h["confidence"] for h in recent])
@@ -474,10 +475,6 @@ class MotionDetectionController(ImageController):
                 "confidence": result.confidence,
             }
         )
-
-        # Limit history size
-        if len(self._motion_history) > self._max_history:
-            self._motion_history.pop(0)
 
     def get_motion_statistics(self) -> Dict[str, Any]:
         """Get motion detection statistics"""
