@@ -184,19 +184,14 @@ class SimpleGUIApplication:
                     # Control buttons
                     ui.button(
                         icon="fullscreen",
-                        on_click=lambda: ui.notify(
-                            "function toggle_fullscreen not yet implemented",
-                            type="info",
-                        ),
+                        on_click=self.toggle_fullscreen,
                     ).props("flat round").classes("text-white").tooltip(
                         "Toggle Fullscreen"
                     )
 
                     ui.button(
                         icon="refresh",
-                        on_click=lambda: ui.notify(
-                            "function reload_page not yet implemented", type="info"
-                        ),
+                        on_click=self.reload_page,
                     ).props("flat round").classes("text-white").tooltip("Reload Page")
 
                     # Dark/Light mode toggle
