@@ -63,6 +63,7 @@ CONTROLLER_SCHEMA = {
             "type": "string",
             "enum": [
                 "motion_detection",
+                "camera_capture",
                 "reactor_state",
             ],
         },
