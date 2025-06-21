@@ -48,33 +48,25 @@ class WebcamStreamElement:
                     with ui.context_menu():
                         ui.menu_item(
                             "Camera Settings",
-                            on_click=lambda: ui.notify(
-                                "function show_camera_settings_context not yet implemented",
-                                type="info",
+                            on_click=self.callbacks.get(
+                                "show_camera_settings", lambda: None
                             ),
                         )
                         ui.separator()
                         ui.menu_item(
                             "Take Snapshot",
-                            on_click=lambda: ui.notify(
-                                "function take_snapshot_context not yet implemented",
-                                type="info",
+                            on_click=self.callbacks.get(
+                                "take_snapshot", self.take_snapshot
                             ),
                         )
                         ui.separator()
                         ui.menu_item(
                             "Adjust ROI",
-                            on_click=lambda: ui.notify(
-                                "function adjust_roi_context not yet implemented",
-                                type="info",
-                            ),
+                            on_click=self.callbacks.get("adjust_roi", self.adjust_roi),
                         )
                         ui.menu_item(
                             "Reset View",
-                            on_click=lambda: ui.notify(
-                                "function reset_view_context not yet implemented",
-                                type="info",
-                            ),
+                            on_click=self.callbacks.get("reset_view", lambda: None),
                         )
                         # Recording toggle menu item
                         self.record_menu_item = ui.menu_item(
@@ -112,10 +104,7 @@ class WebcamStreamElement:
                                 step=1,
                                 on_change=self.callbacks.get(
                                     "update_sensitivity",
-                                    lambda v: ui.notify(
-                                        "function update_sensitivity not yet implemented",
-                                        type="info",
-                                    ),
+                                    lambda v: None,
                                 ),
                             )
                             .classes("w-20")
@@ -129,10 +118,7 @@ class WebcamStreamElement:
                                 step=1,
                                 on_change=self.callbacks.get(
                                     "update_sensitivity",
-                                    lambda v: ui.notify(
-                                        "function update_sensitivity not yet implemented",
-                                        type="info",
-                                    ),
+                                    lambda v: None,
                                 ),
                             )
                             .props("thumb-label")
@@ -161,10 +147,7 @@ class WebcamStreamElement:
                                     value=self.settings["fps"],
                                     on_change=self.callbacks.get(
                                         "update_fps",
-                                        lambda v: ui.notify(
-                                            "function update_fps not yet implemented",
-                                            type="info",
-                                        ),
+                                        lambda v: None,
                                     ),
                                 )
                                 .classes("w-full")
@@ -192,10 +175,7 @@ class WebcamStreamElement:
                                     value="640x480 (30fps)",
                                     on_change=self.callbacks.get(
                                         "update_resolution",
-                                        lambda v: ui.notify(
-                                            "function update_resolution not yet implemented",
-                                            type="info",
-                                        ),
+                                        lambda v: None,
                                     ),
                                 )
                                 .classes("w-full")
@@ -215,9 +195,7 @@ class WebcamStreamElement:
                             icon="crop_free",
                             on_click=self.callbacks.get(
                                 "set_roi",
-                                lambda: ui.notify(
-                                    "function set_roi not yet implemented", type="info"
-                                ),
+                                lambda: None,
                             ),
                         ).props("size=sm")
 
@@ -242,9 +220,8 @@ class WebcamStreamElement:
                                 min=-100,
                                 max=100,
                                 step=1,
-                                on_change=lambda value: ui.notify(
-                                    "function update_brightness not yet implemented",
-                                    type="info",
+                                on_change=self.callbacks.get(
+                                    "update_brightness", lambda value: None
                                 ),
                             )
                             .classes("w-20")
@@ -256,9 +233,8 @@ class WebcamStreamElement:
                                 max=100,
                                 value=0,
                                 step=1,
-                                on_change=lambda value: ui.notify(
-                                    "function update_brightness not yet implemented",
-                                    type="info",
+                                on_change=self.callbacks.get(
+                                    "update_brightness", lambda value: None
                                 ),
                             )
                             .props("thumb-label")
@@ -283,9 +259,8 @@ class WebcamStreamElement:
                                 min=0,
                                 max=200,
                                 step=1,
-                                on_change=lambda value: ui.notify(
-                                    "function update_contrast not yet implemented",
-                                    type="info",
+                                on_change=self.callbacks.get(
+                                    "update_contrast", lambda value: None
                                 ),
                             )
                             .classes("w-20")
@@ -297,9 +272,8 @@ class WebcamStreamElement:
                                 max=200,
                                 value=100,
                                 step=1,
-                                on_change=lambda value: ui.notify(
-                                    "function update_contrast not yet implemented",
-                                    type="info",
+                                on_change=self.callbacks.get(
+                                    "update_contrast", lambda value: None
                                 ),
                             )
                             .props("thumb-label")
@@ -320,9 +294,8 @@ class WebcamStreamElement:
                                 min=0,
                                 max=200,
                                 step=1,
-                                on_change=lambda value: ui.notify(
-                                    "function update_saturation not yet implemented",
-                                    type="info",
+                                on_change=self.callbacks.get(
+                                    "update_saturation", lambda value: None
                                 ),
                             )
                             .classes("w-20")
@@ -334,9 +307,8 @@ class WebcamStreamElement:
                                 max=200,
                                 value=100,
                                 step=1,
-                                on_change=lambda value: ui.notify(
-                                    "function update_saturation not yet implemented",
-                                    type="info",
+                                on_change=self.callbacks.get(
+                                    "update_saturation", lambda value: None
                                 ),
                             )
                             .props("thumb-label")
@@ -361,9 +333,8 @@ class WebcamStreamElement:
                                 min=-180,
                                 max=180,
                                 step=1,
-                                on_change=lambda value: ui.notify(
-                                    "function update_hue not yet implemented",
-                                    type="info",
+                                on_change=self.callbacks.get(
+                                    "update_hue", lambda value: None
                                 ),
                             )
                             .classes("w-20")
@@ -375,9 +346,8 @@ class WebcamStreamElement:
                                 max=180,
                                 value=0,
                                 step=1,
-                                on_change=lambda value: ui.notify(
-                                    "function update_hue not yet implemented",
-                                    type="info",
+                                on_change=self.callbacks.get(
+                                    "update_hue", lambda value: None
                                 ),
                             )
                             .props("thumb-label")
@@ -398,9 +368,8 @@ class WebcamStreamElement:
                                 min=0,
                                 max=100,
                                 step=1,
-                                on_change=lambda value: ui.notify(
-                                    "function update_sharpness not yet implemented",
-                                    type="info",
+                                on_change=self.callbacks.get(
+                                    "update_sharpness", lambda value: None
                                 ),
                             )
                             .classes("w-20")
@@ -412,9 +381,8 @@ class WebcamStreamElement:
                                 max=100,
                                 value=50,
                                 step=1,
-                                on_change=lambda value: ui.notify(
-                                    "function update_sharpness not yet implemented",
-                                    type="info",
+                                on_change=self.callbacks.get(
+                                    "update_sharpness", lambda value: None
                                 ),
                             )
                             .props("thumb-label")
@@ -443,9 +411,9 @@ class WebcamStreamElement:
                                 min=2800,
                                 max=6500,
                                 step=100,
-                                on_change=lambda value: ui.notify(
-                                    "function update_white_balance_manual not yet implemented",
-                                    type="info",
+                                on_change=self.callbacks.get(
+                                    "update_white_balance_manual",
+                                    lambda value: None,
                                 ),
                             )
                             .classes("w-24")
@@ -457,9 +425,9 @@ class WebcamStreamElement:
                                 max=6500,
                                 value=5000,
                                 step=100,
-                                on_change=lambda value: ui.notify(
-                                    "function update_white_balance_manual not yet implemented",
-                                    type="info",
+                                on_change=self.callbacks.get(
+                                    "update_white_balance_manual",
+                                    lambda value: None,
                                 ),
                             )
                             .props("thumb-label")
@@ -488,9 +456,8 @@ class WebcamStreamElement:
                                 min=1,
                                 max=1000,
                                 step=1,
-                                on_change=lambda value: ui.notify(
-                                    "function update_exposure_manual not yet implemented",
-                                    type="info",
+                                on_change=self.callbacks.get(
+                                    "update_exposure_manual", lambda value: None
                                 ),
                             )
                             .classes("w-24")
@@ -502,9 +469,8 @@ class WebcamStreamElement:
                                 max=1000,
                                 value=100,
                                 step=1,
-                                on_change=lambda value: ui.notify(
-                                    "function update_exposure_manual not yet implemented",
-                                    type="info",
+                                on_change=self.callbacks.get(
+                                    "update_exposure_manual", lambda value: None
                                 ),
                             )
                             .props("thumb-label")
@@ -534,9 +500,8 @@ class WebcamStreamElement:
                                 min=0,
                                 max=100,
                                 step=1,
-                                on_change=lambda value: ui.notify(
-                                    "function update_gain not yet implemented",
-                                    type="info",
+                                on_change=self.callbacks.get(
+                                    "update_gain", lambda value: None
                                 ),
                             )
                             .classes("w-20")
@@ -548,9 +513,8 @@ class WebcamStreamElement:
                                 max=100,
                                 value=50,
                                 step=1,
-                                on_change=lambda value: ui.notify(
-                                    "function update_gain not yet implemented",
-                                    type="info",
+                                on_change=self.callbacks.get(
+                                    "update_gain", lambda value: None
                                 ),
                             )
                             .props("thumb-label")
@@ -571,9 +535,8 @@ class WebcamStreamElement:
                                 min=50,
                                 max=300,
                                 step=1,
-                                on_change=lambda value: ui.notify(
-                                    "function update_gamma not yet implemented",
-                                    type="info",
+                                on_change=self.callbacks.get(
+                                    "update_gamma", lambda value: None
                                 ),
                             )
                             .classes("w-20")
@@ -585,9 +548,8 @@ class WebcamStreamElement:
                                 max=300,
                                 value=100,
                                 step=1,
-                                on_change=lambda value: ui.notify(
-                                    "function update_gamma not yet implemented",
-                                    type="info",
+                                on_change=self.callbacks.get(
+                                    "update_gamma", lambda value: None
                                 ),
                             )
                             .props("thumb-label")
@@ -608,9 +570,8 @@ class WebcamStreamElement:
                                 min=0,
                                 max=100,
                                 step=1,
-                                on_change=lambda value: ui.notify(
-                                    "function update_backlight_comp not yet implemented",
-                                    type="info",
+                                on_change=self.callbacks.get(
+                                    "update_backlight_comp", lambda value: None
                                 ),
                             )
                             .classes("w-20")
@@ -622,9 +583,8 @@ class WebcamStreamElement:
                                 max=100,
                                 value=0,
                                 step=1,
-                                on_change=lambda value: ui.notify(
-                                    "function update_backlight_comp not yet implemented",
-                                    type="info",
+                                on_change=self.callbacks.get(
+                                    "update_backlight_comp", lambda value: None
                                 ),
                             )
                             .props("thumb-label")
@@ -645,20 +605,15 @@ class WebcamStreamElement:
                         ui.button(
                             "Reset to Defaults",
                             icon="restore",
-                            on_click=lambda: ui.notify(
-                                "function reset_uvc_defaults not yet implemented",
-                                type="info",
+                            on_click=self.callbacks.get(
+                                "reset_uvc_defaults", lambda: None
                             ),
                         ).props("size=sm color=orange")
                         ui.button(
                             "Apply UVC Settings",
                             icon="check",
                             on_click=self.callbacks.get(
-                                "apply_uvc_settings",
-                                lambda: ui.notify(
-                                    "function apply_uvc_settings not yet implemented",
-                                    type="info",
-                                ),
+                                "apply_uvc_settings", lambda: None
                             ),
                         ).props("size=sm")
 

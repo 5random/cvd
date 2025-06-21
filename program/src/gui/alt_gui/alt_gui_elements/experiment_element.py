@@ -61,7 +61,6 @@ class ExperimentManagementSection:
                 # Experiment options
                 ui.label("Recording Options").classes("text-sm font-semibold")
                 with ui.column().classes("ml-4 gap-1"):
-
                     self.record_motion_data_checkbox = ui.checkbox(
                         "Record motion detection data", value=True
                     )
@@ -78,10 +77,6 @@ class ExperimentManagementSection:
                     ui.button(
                         "Start Experiment",
                         icon="play_arrow",
-                        on_click=lambda: ui.notify(
-                            "function toggle_experiment not yet implemented",
-                            type="info",
-                        ),
                     )
                     .props("color=positive")
                     .classes("flex-1")
@@ -91,10 +86,6 @@ class ExperimentManagementSection:
                     ui.button(
                         "Stop Experiment",
                         icon="stop",
-                        on_click=lambda: ui.notify(
-                            "function toggle_experiment not yet implemented",
-                            type="info",
-                        ),
                     )
                     .props("color=negative")
                     .classes("flex-1")

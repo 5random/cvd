@@ -29,7 +29,9 @@ from program.src.controllers.controller_manager import (
     ControllerManager,
     create_cvd_controller_manager,
 )
-from program.src.controllers.algorithms.motion_detection import MotionDetectionController
+from program.src.controllers.algorithms.motion_detection import (
+    MotionDetectionController,
+)
 from program.src.experiment_handler.experiment_manager import (
     ExperimentManager,
     ExperimentConfig,
@@ -235,7 +237,10 @@ class SimpleGUIApplication:
                 "update_resolution": self.update_resolution,
                 "set_roi": self.set_roi,
                 "apply_uvc_settings": self.apply_uvc_settings,
+                "take_snapshot": self.take_snapshot,
+                "adjust_roi": self.adjust_roi,
                 "camera_toggle": self.toggle_camera,
+
             },
             on_camera_status_change=self.update_camera_status,
         )
@@ -323,6 +328,16 @@ class SimpleGUIApplication:
     def reset_view_context(self):
         """Reset view from context menu"""
         ui.notify("Reset View (Rechtsklick) noch nicht implementiert", type="info")
+
+    def take_snapshot(self):
+        """Trigger snapshot on the webcam element."""
+        if self.webcam_stream:
+            self.webcam_stream.take_snapshot()
+
+    def adjust_roi(self):
+        """Open ROI adjustment dialog on the webcam element."""
+        if self.webcam_stream:
+            self.webcam_stream.adjust_roi()
 
     # Main event handlers - placeholder implementations
     def toggle_camera(self):
