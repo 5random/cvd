@@ -383,10 +383,10 @@ class SensorSetupWizardComponent(WizardMixin, BaseComponent):
                     port_names = [p.device for p in list_ports.comports()]
                 except Exception as e:  # pragma: no cover - extremely unlikely
                     warning(f"Failed to list serial ports: {e}")
-                # Include current port in options to avoid invalid default value
+
                 default_port = self._wizard_data.get("port")
-                if default_port and default_port not in port_names:
-                    port_names.insert(0, default_port)
+                if not port_names:
+                    port_names = [default_port] if default_port else []
 
                 with ui.row().classes("items-center gap-4"):
                     ui.label("Port:").classes("w-32 font-semibold")
@@ -737,12 +737,18 @@ class SensorSetupWizardComponent(WizardMixin, BaseComponent):
             # Create sensor instance without registering
             sensor = self.sensor_manager.create_sensor(sensor_config)
             if not sensor:
-                notify_later("Failed to create sensor instance", color="negative", slot=self._dialog)
+                notify_later(
+                    "Failed to create sensor instance",
+                    color="negative",
+                    slot=self._dialog,
+                )
                 return
 
             if not await sensor.initialize():
                 await sensor.cleanup()
-                notify_later("Sensor initialization failed", color="negative", slot=self._dialog)
+                notify_later(
+                    "Sensor initialization failed", color="negative", slot=self._dialog
+                )
                 return
 
             reading = await sensor.read()
@@ -757,7 +763,9 @@ class SensorSetupWizardComponent(WizardMixin, BaseComponent):
 
         except Exception as e:
             error(f"Connection test error: {e}")
-            notify_later(f"Connection test failed: {e}", color="negative", slot=self._dialog)
+            notify_later(
+                f"Connection test failed: {e}", color="negative", slot=self._dialog
+            )
 
     def _create_sensor(self) -> None:
         """Create the sensor with the configured settings."""
