@@ -339,12 +339,22 @@ class ExperimentConfigDialog(CancelableDialogMixin):
         try:
             success = await self.experiment_manager.start_experiment(experiment_id)
             if success:
-                notify_later("Experiment started successfully", color="positive", slot=self._dialog)
+                notify_later(
+                    "Experiment started successfully",
+                    color="positive",
+                    slot=self._dialog,
+                )
             else:
-                notify_later("Failed to start experiment", color="negative", slot=self._dialog)
+                notify_later(
+                    "Failed to start experiment", color="negative", slot=self._dialog
+                )
         except Exception as e:
             error(f"Error starting experiment: {e}")
-            notify_later(f"Error starting experiment: {str(e)}", color="negative", slot=self._dialog)
+            notify_later(
+                f"Error starting experiment: {str(e)}",
+                color="negative",
+                slot=self._dialog,
+            )
 
 
 class ExperimentCard(BaseComponent):
@@ -1297,10 +1307,10 @@ class ExperimentHistoryTable(BaseComponent):
                 ui.label("Select Date Range").classes("text-lg font-bold")
 
                 self._date_from_picker = ui.date(
-                    value=from_date.strftime("%Y-%m-%d") if from_date else None
+                    value=from_date.strftime("%Y-%m-%d") if from_date else ""
                 )
                 self._date_to_picker = ui.date(
-                    value=to_date.strftime("%Y-%m-%d") if to_date else None
+                    value=to_date.strftime("%Y-%m-%d") if to_date else ""
                 )
 
                 with ui.row().classes("gap-2 justify-end"):
