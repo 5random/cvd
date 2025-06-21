@@ -472,9 +472,11 @@ class SimpleGUIApplication:
             self.motion_controller.uvc_settings.update(settings)
         ui.notify("UVC settings applied", type="positive")
 
-    def toggle_alerts(self, e):
-        """Toggle email alerts on/off - opens alert management"""
-        self.show_alert_management()
+    def toggle_alerts(self, value):
+        """Enable or disable alerts based on checkbox value."""
+        value = getattr(value, "value", value)
+        self.alerts_enabled = bool(value)
+        self._update_alerts_status()
 
     def send_test_alert(self):
         """Send a test email alert"""
