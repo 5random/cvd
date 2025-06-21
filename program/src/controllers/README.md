@@ -96,7 +96,7 @@ Registered types can then be referenced from configuration files or when calling
 
 ## Logging Guidelines
 
-Controllers log via `src.utils.log_utils.log_service`. Include the
+Controllers log via `src.utils.log_service`. Include the
 `controller_id` and any relevant metadata (e.g. source sensor or algorithm)
 with every message.
 
@@ -107,6 +107,7 @@ with every message.
 Example:
 
 ```python
+from src.utils.log_service import info, warning, error
 info("Controller started", controller_id=self.controller_id, algorithm="MOG2")
 warning(
     "Camera not opened, reinitializing",
