@@ -981,6 +981,9 @@ class EmailAlertStatusDisplay:
 
         def _on_save(config: Dict[str, Any]):
             self.add_configuration(config)
+            cb = self.update_callback
+            if cb:
+                cb()
             dialog.close()
 
         with ui.dialog() as dialog, ui.card().classes("w-full max-w-4xl"):
