@@ -19,6 +19,8 @@ class WebcamStreamElement:
         self.callbacks = callbacks or {}
         # Store explicit camera toggle callback or look it up in callbacks dict
         self._camera_toggle_cb = camera_toggle_cb or self.callbacks.get("camera_toggle")
+        # Callback for ROI updates (defaults to callbacks['set_roi'])
+        self._roi_update_cb = self.callbacks.get("set_roi")
         self.camera_settings_expansion = None
 
         @ui.page("/webcam_stream")
@@ -724,3 +726,5 @@ class WebcamStreamElement:
             self.video_element.run_method("load")
         if getattr(self, "roi_checkbox", None):
             self.roi_checkbox.value = False
+            if self._roi_update_cb:
+                self._roi_update_cb()
