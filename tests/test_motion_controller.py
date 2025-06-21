@@ -4,11 +4,11 @@ import asyncio
 from PIL import Image
 import cv2
 
-from src.controllers.algorithms.motion_detection import (
+from program.src.controllers.algorithms.motion_detection import (
     MotionDetectionController,
     MotionDetectionResult,
 )
-from src.controllers.controller_base import ControllerConfig
+from program.src.controllers.controller_base import ControllerConfig
 
 messages: list[str] = []
 
@@ -75,7 +75,7 @@ async def test_initialize_logs_algorithm(monkeypatch):
     config = ControllerConfig(controller_id="md", controller_type="motion_detection")
     ctrl = MotionDetectionController("md", config)
 
-    import src.controllers.algorithms.motion_detection as md
+    import program.src.controllers.algorithms.motion_detection as md
     monkeypatch.setattr(md, "info", lambda msg, **kwargs: messages.append(msg))
 
     success = await ctrl.initialize()

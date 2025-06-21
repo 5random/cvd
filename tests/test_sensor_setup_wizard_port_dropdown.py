@@ -3,9 +3,9 @@ import types
 import pytest
 from nicegui import ui
 
-from src.utils.config_utils.config_service import ConfigurationService
-from src.gui.gui_elements import gui_sensor_setup_wizard_element as wizard_mod
-from src.gui.gui_elements.gui_sensor_setup_wizard_element import (
+from program.src.utils.config_utils.config_service import ConfigurationService
+from program.src.gui.gui_elements import gui_sensor_setup_wizard_element as wizard_mod
+from program.src.gui.gui_elements.gui_sensor_setup_wizard_element import (
     SensorSetupWizardComponent,
 )
 

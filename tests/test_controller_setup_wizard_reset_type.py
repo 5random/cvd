@@ -1,19 +1,18 @@
 import json
 import pytest
 from nicegui import ui
-import sys, os
+import os
 
 # mypy: ignore-errors
 
-sys.path.insert(0, os.path.abspath("program"))
 
-from src.utils.log_utils import log_service as ls
+from program.src.utils.log_utils import log_service as ls
 
 for name in ["debug", "info", "warning", "error"]:
     setattr(ls, name, lambda *a, **k: None)
 
-from src.utils.config_utils.config_service import ConfigurationService
-from src.gui.gui_elements.gui_controller_setup_wizard_element import (
+from program.src.utils.config_utils.config_service import ConfigurationService
+from program.src.gui.gui_elements.gui_controller_setup_wizard_element import (
     ControllerSetupWizardComponent,
 )
 

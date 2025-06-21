@@ -2,8 +2,8 @@ import json
 import pytest
 from nicegui import ui
 
-from src.utils.config_utils.config_service import ConfigurationService
-from src.gui.gui_tab_components.gui_tab_dashboard_component import DashboardComponent
+from program.src.utils.config_utils.config_service import ConfigurationService
+from program.src.gui.gui_tab_components.gui_tab_dashboard_component import DashboardComponent
 
 
 def create_service(tmp_path, cfg=None):

@@ -2,9 +2,9 @@ import json
 import sys
 import types
 
-from src.utils.config_utils.config_service import ConfigurationService
-from src.gui.gui_elements import gui_controller_setup_wizard_element as wizard_mod
-from src.gui.gui_elements.gui_controller_setup_wizard_element import (
+from program.src.utils.config_utils.config_service import ConfigurationService
+from program.src.gui.gui_elements import gui_controller_setup_wizard_element as wizard_mod
+from program.src.gui.gui_elements.gui_controller_setup_wizard_element import (
     ControllerSetupWizardComponent,
 )
 

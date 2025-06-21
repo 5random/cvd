@@ -2,13 +2,13 @@ import asyncio
 import json
 import pytest
 
-from src.data_handler.sources.sensor_source_manager import SensorManager
-from src.data_handler.interface.sensor_interface import (
+from program.src.data_handler.sources.sensor_source_manager import SensorManager
+from program.src.data_handler.interface.sensor_interface import (
     SensorInterface,
     SensorReading,
     SensorStatus,
 )
-from src.utils.config_utils.config_service import ConfigurationService
+from program.src.utils.config_utils.config_service import ConfigurationService
 
 
 class FailingSensor(SensorInterface):
@@ -62,13 +62,13 @@ async def test_sensor_reconnect(tmp_path, monkeypatch):
 
     # silence logging
     monkeypatch.setattr(
-        "src.data_handler.sources.sensor_source_manager.info", lambda *a, **k: None
+        "program.src.data_handler.sources.sensor_source_manager.info", lambda *a, **k: None
     )
     monkeypatch.setattr(
-        "src.data_handler.sources.sensor_source_manager.warning", lambda *a, **k: None
+        "program.src.data_handler.sources.sensor_source_manager.warning", lambda *a, **k: None
     )
     monkeypatch.setattr(
-        "src.data_handler.sources.sensor_source_manager.error", lambda *a, **k: None
+        "program.src.data_handler.sources.sensor_source_manager.error", lambda *a, **k: None
     )
 
     manager = SensorManager(service)

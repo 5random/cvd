@@ -3,13 +3,11 @@ import numpy as np
 import pytest
 import types
 from nicegui import ui
-import sys, os
+import os
 
-sys.path.insert(0, os.path.abspath("program"))
-
-from src.utils.config_utils.config_service import ConfigurationService
-from src.gui.gui_elements import gui_controller_setup_wizard_element as wizard_mod
-from src.gui.gui_elements.gui_controller_setup_wizard_element import (
+from program.src.utils.config_utils.config_service import ConfigurationService
+from program.src.gui.gui_elements import gui_controller_setup_wizard_element as wizard_mod
+from program.src.gui.gui_elements.gui_controller_setup_wizard_element import (
     ControllerSetupWizardComponent,
 )
 

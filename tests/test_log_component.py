@@ -6,10 +6,10 @@ from pathlib import Path
 from nicegui import ui
 import pytest
 
-from src.utils.config_utils.config_service import ConfigurationService
-from src.utils.log_utils.log_service import LogService
-import src.gui.gui_tab_components.gui_tab_log_component as log_component
-from src.gui.gui_tab_components.gui_tab_log_component import (
+from program.src.utils.config_utils.config_service import ConfigurationService
+from program.src.utils.log_utils.log_service import LogService
+import program.src.gui.gui_tab_components.gui_tab_log_component as log_component
+from program.src.gui.gui_tab_components.gui_tab_log_component import (
     LogComponent,
     LogViewerComponent,
     LogFileInfo,

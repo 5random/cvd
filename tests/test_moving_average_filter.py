@@ -1,5 +1,5 @@
 import pytest
-from src.data_handler.processing.filters.simple_moving_avg_filter import MovingAverageFilter
+from program.src.data_handler.processing.filters.simple_moving_avg_filter import MovingAverageFilter
 
 
 def test_window_size_validation():

@@ -4,8 +4,8 @@ import time
 
 import pytest
 
-from src.utils.concurrency.process_pool import ManagedProcessPool, ProcessPoolConfig
-from src.utils.log_utils import log_service
+from program.src.utils.concurrency.process_pool import ManagedProcessPool, ProcessPoolConfig
+from program.src.utils.log_utils import log_service
 
 
 def add(x: int, y: int) -> int:
@@ -41,7 +41,7 @@ async def test_timeout_kills_pool(monkeypatch, sig):
     def fake_kill(pid: int, s: int) -> None:
         killed.append(s)
 
-    monkeypatch.setattr("src.utils.concurrency.process_pool.os.kill", fake_kill)
+    monkeypatch.setattr("program.src.utils.concurrency.process_pool.os.kill", fake_kill)
 
     cfg = ProcessPoolConfig(max_workers=1, timeout=0.1, kill_on_timeout=True, kill_signal=sig)
     pool = ManagedProcessPool(cfg)

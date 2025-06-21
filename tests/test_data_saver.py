@@ -5,8 +5,8 @@ import threading
 
 import pytest
 
-from src.utils.data_utils import data_saver as ds_module
-from src.data_handler.interface.sensor_interface import SensorReading, SensorStatus
+from program.src.utils.data_utils import data_saver as ds_module
+from program.src.data_handler.interface.sensor_interface import SensorReading, SensorStatus
 
 
 class DummyCompressionService:

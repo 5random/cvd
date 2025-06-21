@@ -1,6 +1,6 @@
 import json
 import asyncio
-from src.utils.container import ApplicationContainer
+from program.src.utils.container import ApplicationContainer
 
 
 def test_shutdown_sync_stops_polling_tasks(tmp_path):

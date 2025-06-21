@@ -3,11 +3,11 @@ import pytest
 from nicegui import Client, app
 import numpy as np
 import cv2
-from src.utils.log_utils import log_service
+from program.src.utils.log_utils import log_service
 
 pytest_plugins = ['nicegui.testing.user_plugin']
 
-from src.utils.container import ApplicationContainer
+from program.src.utils.container import ApplicationContainer
 
 @pytest.mark.asyncio
 async def test_gui_pages(user):
@@ -79,7 +79,7 @@ async def test_video_feed_creates_temp_camera(monkeypatch):
             pass
 
     monkeypatch.setattr(
-        "src.gui.application.CameraStreamComponent",
+        "program.src.gui.application.CameraStreamComponent",
         DummyCam,
     )
     monkeypatch.setattr(

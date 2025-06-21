@@ -3,9 +3,9 @@ import time
 from datetime import datetime
 import pytest
 
-from src.data_handler.interface.sensor_interface import SensorReading, SensorStatus
-from src.experiment_handler import experiment_manager as em_module
-from src.experiment_handler.experiment_manager import (
+from program.src.data_handler.interface.sensor_interface import SensorReading, SensorStatus
+from program.src.experiment_handler import experiment_manager as em_module
+from program.src.experiment_handler.experiment_manager import (
     ExperimentManager,
     ExperimentResult,
     ExperimentPhase,
