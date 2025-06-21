@@ -232,10 +232,11 @@ class SimpleGUIApplication:
                 "update_resolution": self.update_resolution,
                 "set_roi": self.set_roi,
                 "apply_uvc_settings": self.apply_uvc_settings,
-                "take_snapshot": self.take_snapshot,
-                "adjust_roi": self.adjust_roi,
+                "take_snapshot": self.take_snapshot_context,
+                "adjust_roi": self.adjust_roi_context,
+                "show_camera_settings": self.show_camera_settings_context,
+                "reset_view": self.reset_view_context,
                 "camera_toggle": self.toggle_camera,
-
             },
             on_camera_status_change=self.update_camera_status,
         )
@@ -303,26 +304,31 @@ class SimpleGUIApplication:
         icon = "light_mode" if self.dark_mode.value else "dark_mode"
         self.dark_mode_btn.set_icon(icon)
 
-    # Context menu handlers - all placeholder implementations
+    # Context menu handlers
     def show_camera_settings_context(self):
         """Show camera settings from context menu"""
-        ui.notify("Camera Settings (Rechtsklick) noch nicht implementiert", type="info")
+        if self.webcam_stream:
+            self.webcam_stream.show_camera_settings()
 
     def start_recording_context(self):
-        """Start recording from context menu"""
-        ui.notify("Start Recording (Rechtsklick) noch nicht implementiert", type="info")
+        """Start or stop recording from context menu"""
+        if self.webcam_stream:
+            self.webcam_stream.toggle_recording()
 
     def take_snapshot_context(self):
         """Take snapshot from context menu"""
-        ui.notify("Take Snapshot (Rechtsklick) noch nicht implementiert", type="info")
+        if self.webcam_stream:
+            self.webcam_stream.take_snapshot()
 
     def adjust_roi_context(self):
         """Adjust ROI from context menu"""
-        ui.notify("Adjust ROI (Rechtsklick) noch nicht implementiert", type="info")
+        if self.webcam_stream:
+            self.webcam_stream.adjust_roi()
 
     def reset_view_context(self):
         """Reset view from context menu"""
-        ui.notify("Reset View (Rechtsklick) noch nicht implementiert", type="info")
+        if self.webcam_stream:
+            self.webcam_stream.reset_view()
 
     def take_snapshot(self):
         """Trigger snapshot on the webcam element."""
