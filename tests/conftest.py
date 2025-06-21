@@ -27,8 +27,13 @@ def mute_logging(monkeypatch: pytest.MonkeyPatch) -> None:
     # Also patch any imported logging helpers in already loaded modules
     import sys
     for mod in list(sys.modules.values()):
-        if mod and getattr(mod, "__name__", "").startswith("src."):
-            for name in ["debug", "info", "warning", "error"]:
-                if hasattr(mod, name):
-                    monkeypatch.setattr(mod, name, lambda *a, **k: None, raising=False)
+        mod_name = getattr(mod, "__name__", "")
+        if not mod or not mod_name.startswith("src."):
+            continue
+        if mod_name.startswith("src.utils.config_service"):
+            # Keep real logging for config service so validation warnings are emitted
+            continue
+        for name in ["debug", "info", "warning", "error"]:
+            if hasattr(mod, name):
+                monkeypatch.setattr(mod, name, lambda *a, **k: None, raising=False)
 
