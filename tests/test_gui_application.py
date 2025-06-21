@@ -79,6 +79,10 @@ async def test_video_feed_creates_temp_camera(monkeypatch):
             pass
 
     monkeypatch.setattr(
+        "src.gui.gui_native.application.CameraStreamComponent",
+        DummyCam,
+    )
+    monkeypatch.setattr(
         "src.gui.application.CameraStreamComponent",
         DummyCam,
     )
@@ -105,6 +109,7 @@ async def test_video_feed_creates_temp_camera(monkeypatch):
 
     response = await endpoint(request=DummyRequest())
     gen = response.body_iterator
+    await gen.__anext__()
     await gen.__anext__()
     with pytest.raises(StopAsyncIteration):
         await gen.__anext__()
