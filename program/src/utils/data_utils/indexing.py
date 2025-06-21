@@ -23,6 +23,8 @@ except Exception:  # pragma: no cover - optional dependency
     FileSystemEvent = object  # type: ignore
     WATCHDOG_AVAILABLE = False
 
+DirectoryEventHandler: Optional[type] = None
+
 
 class DataCategory(Enum):
     """Categories of data managed by the system"""
@@ -139,7 +141,7 @@ class DownloadRequest:
 
 if WATCHDOG_AVAILABLE:
 
-    class DirectoryEventHandler(FileSystemEventHandler):
+    class _DirectoryEventHandler(FileSystemEventHandler):
         """Handle filesystem events to update the index incrementally."""
 
         def __init__(self, manager: "DataManager", category: DataCategory) -> None:
@@ -158,6 +160,8 @@ if WATCHDOG_AVAILABLE:
                 self._manager._process_changed_file(
                     Path(event.src_path), self._category
                 )
+
+    DirectoryEventHandler = _DirectoryEventHandler
 
 
 class Indexer:
