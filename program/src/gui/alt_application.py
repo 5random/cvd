@@ -46,7 +46,7 @@ from program.src.utils.config_service import ConfigurationService
 from program.src.utils.email_alert_service import get_email_alert_service
 from program.src.data_handler.sources.sensor_source_manager import SensorManager
 
-from .alt_gui import (
+from program.src.gui.alt_gui import (
     setup_global_styles,
     WebcamStreamElement,
     ExperimentManagementSection,
@@ -55,7 +55,7 @@ from .alt_gui import (
     create_email_alert_wizard,
     EmailAlertStatusDisplay,
 )
-from .alt_gui.alt_gui_elements.webcam_stream_element import UVC_DEFAULTS
+from program.src.gui.alt_gui.alt_gui_elements.webcam_stream_element import UVC_DEFAULTS
 
 
 class SimpleGUIApplication:
