@@ -944,11 +944,18 @@ class EmailAlertStatusDisplay:
         """Add a new alert configuration"""
         self.alert_configurations.append(config)
 
-    def remove_configuration(self, config: Dict[str, Any]):
+    def remove_configuration(
+        self,
+        config: Dict[str, Any],
+        callback: Optional[Callable[[], None]] = None,
+    ) -> None:
         """Remove an alert configuration"""
         if config in self.alert_configurations:
             self.alert_configurations.remove(config)
-
+        cb = callback or self.update_callback
+        if cb:
+            cb()
+    
     def update_configuration(
         self,
         old_config: Dict[str, Any],
@@ -987,10 +994,11 @@ class EmailAlertStatusDisplay:
         """Edit an existing configuration"""
 
         def _on_save(new_cfg: Dict[str, Any]):
-            self.update_configuration(config, new_cfg)
-            cb = self.update_callback
-            if cb:
-                cb()
+            self.update_configuration(
+                config,
+                new_cfg,
+                callback=self.update_callback,
+            )
             dialog.close()
 
         wizard = EmailAlertWizard(on_save=_on_save)
@@ -1041,11 +1049,8 @@ class EmailAlertStatusDisplay:
                     ui.button("Abbrechen", on_click=dialog.close).props("flat")
 
                     def _confirm():
-                        self.remove_configuration(config)
+                        self.remove_configuration(config, callback)
                         dialog.close()
-                        cb = callback or self.update_callback
-                        if cb:
-                            cb()
 
                     ui.button("Löschen", on_click=_confirm).props("color=negative")
 
