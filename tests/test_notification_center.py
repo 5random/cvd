@@ -5,8 +5,8 @@ from pathlib import Path
 
 import pytest
 
-from program.src.utils.config_utils.config_service import ConfigurationService
-from program.src.utils.log_utils.log_service import LogService
+from src.utils.config_service import ConfigurationService
+from src.utils.log_service import LogService
 from program.src.gui.gui_elements.gui_notification_center_element import (
     NotificationCenter,
     NotificationSeverity,

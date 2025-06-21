@@ -3,7 +3,7 @@ import pytest
 
 from nicegui import ui
 
-from program.src.utils.config_utils.config_service import ConfigurationService
+from src.utils.config_service import ConfigurationService
 from program.src.gui.gui_tab_components.gui_tab_dashboard_component import DashboardComponent
 from program.src.controllers.controller_base import ControllerStatus
 

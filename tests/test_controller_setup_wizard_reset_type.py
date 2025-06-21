@@ -6,12 +6,12 @@ import os
 # mypy: ignore-errors
 
 
-from program.src.utils.log_utils import log_service as ls
+from src.utils import log_service as ls
 
 for name in ["debug", "info", "warning", "error"]:
     setattr(ls, name, lambda *a, **k: None)
 
-from program.src.utils.config_utils.config_service import ConfigurationService
+from src.utils.config_service import ConfigurationService
 from program.src.gui.gui_elements.gui_controller_setup_wizard_element import (
     ControllerSetupWizardComponent,
 )

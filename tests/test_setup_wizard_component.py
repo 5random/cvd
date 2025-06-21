@@ -1,5 +1,5 @@
 import json
-from program.src.utils.config_utils.config_service import ConfigurationService
+from src.utils.config_service import ConfigurationService
 from program.src.gui.gui_tab_components.gui_setup_wizard_component import SetupWizardComponent
 
 class Dummy:

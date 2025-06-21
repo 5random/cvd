@@ -3,7 +3,7 @@ import time
 import pytest
 
 from program.src.utils.concurrency.thread_pool import ManagedThreadPool, ThreadPoolConfig
-from program.src.utils.log_utils import log_service
+from src.utils import log_service
 
 
 def _hold_event(evt: threading.Event) -> int:
