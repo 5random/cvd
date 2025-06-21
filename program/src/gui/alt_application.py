@@ -235,7 +235,9 @@ class SimpleGUIApplication:
                 "update_resolution": self.update_resolution,
                 "set_roi": self.set_roi,
                 "apply_uvc_settings": self.apply_uvc_settings,
+                "camera_toggle": self.toggle_camera,
             },
+            on_camera_status_change=self.update_camera_status,
         )
         self.motion_section = MotionStatusSection(self.settings)
         self.experiment_section = ExperimentManagementSection(self.settings)
