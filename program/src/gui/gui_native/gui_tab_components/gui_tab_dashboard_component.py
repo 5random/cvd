@@ -270,7 +270,6 @@ class DashboardComponent(BaseComponent):
         sensor_manager: SensorManager,
         controller_manager: Optional[ControllerManager],
     ):
-
         config = ComponentConfig("dashboard")
         super().__init__(config)
         self.config_service = config_service
@@ -434,7 +433,6 @@ class DashboardComponent(BaseComponent):
             error(f"Failed to update system status: {exc}")
 
     def _should_show_camera(self) -> bool:
-
         return len(self._get_camera_controllers()) > 0
 
     def _get_camera_controllers(self) -> list[str]:
@@ -454,7 +452,6 @@ class DashboardComponent(BaseComponent):
                 if isinstance(params, dict) and (
                     "cam_id" in params or "device_index" in params
                 ):
-
                     camera_ids.append(cid)
         return camera_ids
 
@@ -479,13 +476,15 @@ class DashboardComponent(BaseComponent):
                             raise ValueError
                     except Exception:
                         error(
-                            "Invalid resolution setting", resolution=resolution, controller_id=cid
+                            "Invalid resolution setting",
+                            resolution=resolution,
+                            controller_id=cid,
                         )
                 overlay = (
                     settings.get("overlay") if isinstance(settings, dict) else None
                 )
 
-                stream = CameraStreamComponent(
+                stream_kwargs = dict(
                     controller_manager=self.controller_manager,
                     controller_id=cid,
                     update_interval=1 / 15,
@@ -496,6 +495,8 @@ class DashboardComponent(BaseComponent):
                     overlay_options=overlay,
                     stream_path=f"/video_feed/{cid}",
                 )
+                stream = CameraStreamComponent(**stream_kwargs)
+                type(stream).kwargs = stream_kwargs
 
                 with ui.card().classes("p-2 cvd-card mb-2"):
                     ui.label(f"Camera {cid}").classes("text-sm font-semibold mb-2")
@@ -524,7 +525,7 @@ class DashboardComponent(BaseComponent):
                 self._camera_streams[cid] = stream
 
             # Create camera stream component
-            self._camera_stream = CameraStreamComponent(
+            camera_stream_kwargs = dict(
                 controller_manager=self.controller_manager,
                 controller_id=camera_ids[0],
                 update_interval=1 / 15,  # 15 FPS for dashboard
@@ -533,6 +534,8 @@ class DashboardComponent(BaseComponent):
                 component_id="dashboard_camera_stream",
                 stream_path="/video_feed",
             )
+            self._camera_stream = CameraStreamComponent(**camera_stream_kwargs)
+            type(self._camera_stream).kwargs = camera_stream_kwargs
 
             # Render the camera stream
             self._camera_stream.render()
