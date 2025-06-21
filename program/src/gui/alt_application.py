@@ -45,7 +45,6 @@ from program.src.utils.config_service import (
     set_config_service,
 )
 from program.src.utils import email_alert_service
-from program.src.data_handler.sources.sensor_source_manager import SensorManager
 
 from program.src.gui.alt_gui import (
     setup_global_styles,
@@ -89,14 +88,12 @@ class SimpleGUIApplication:
             else controller_manager_module.create_cvd_controller_manager()
         )
 
-        self.sensor_manager = SensorManager(self.config_service)
-
         self.email_alert_service = email_alert_service.EmailAlertService(self.config_service)
         email_alert_service.set_email_alert_service(self.email_alert_service)
         # use the already created controller manager for the experiment manager
         self.experiment_manager = ExperimentManager(
             config_service=self.config_service,
-            sensor_manager=self.sensor_manager,
+            sensor_manager=None,
             controller_manager=self.controller_manager,
             auto_install_signal_handlers=False,
         )
@@ -894,7 +891,6 @@ class SimpleGUIApplication:
         @app.on_startup
         async def _startup() -> None:
             install_signal_handlers(self.experiment_manager._task_manager)
-            await self.sensor_manager.start_all_configured_sensors()
             await self.controller_manager.start_all_controllers()
             # Ensure camera status reflects that controllers started
             self.camera_active = True
@@ -903,7 +899,6 @@ class SimpleGUIApplication:
         @app.on_shutdown
         async def _shutdown() -> None:
             await self.controller_manager.stop_all_controllers()
-            await self.sensor_manager.shutdown()
 
         print(f"Starting Simple CVD GUI on http://{host}:{port}")
 
