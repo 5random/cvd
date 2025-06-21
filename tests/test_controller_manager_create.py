@@ -1,10 +1,10 @@
 import logging
 import pytest
-from src.controllers.controller_manager import ControllerManager
-from src.controllers.algorithms.motion_detection import MotionDetectionController
-from src.controllers.algorithms.reactor_state import ReactorStateController
-from src.utils.config_utils.config_service import ConfigurationError
-from src.utils.log_utils import log_service
+from program.src.controllers.controller_manager import ControllerManager
+from program.src.controllers.algorithms.motion_detection import MotionDetectionController
+from program.src.controllers.algorithms.reactor_state import ReactorStateController
+from program.src.utils.config_utils.config_service import ConfigurationError
+from program.src.utils.log_utils import log_service
 
 
 def test_create_known_controller_types():

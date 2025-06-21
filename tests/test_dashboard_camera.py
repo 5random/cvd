@@ -2,8 +2,8 @@ import json
 import pytest
 from nicegui import ui
 
-from src.utils.config_utils.config_service import ConfigurationService
-from src.gui.gui_tab_components.gui_tab_dashboard_component import DashboardComponent
+from program.src.utils.config_utils.config_service import ConfigurationService
+from program.src.gui.gui_tab_components.gui_tab_dashboard_component import DashboardComponent
 
 
 def create_service(tmp_path, cfg):
@@ -150,7 +150,7 @@ def test_render_camera_stream_invalid_resolution(tmp_path, monkeypatch, dummy_ui
     service = create_service(tmp_path, cfg)
     dashboard = DashboardComponent(service, None, None)
     monkeypatch.setattr(
-        "src.gui.gui_tab_components.gui_tab_dashboard_component.CameraStreamComponent",
+        "program.src.gui.gui_tab_components.gui_tab_dashboard_component.CameraStreamComponent",
         DummyStream,
     )
     dashboard._render_camera_stream()
@@ -182,7 +182,7 @@ def test_render_camera_stream_string_resolution(tmp_path, monkeypatch, dummy_ui)
             streams.append((k.get("max_width"), k.get("max_height")))
 
     monkeypatch.setattr(
-        "src.gui.gui_tab_components.gui_tab_dashboard_component.CameraStreamComponent",
+        "program.src.gui.gui_tab_components.gui_tab_dashboard_component.CameraStreamComponent",
         RecStream,
     )
     dashboard._render_camera_stream()

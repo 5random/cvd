@@ -681,3 +681,4 @@ def log_structured(event_type: str, data: Dict[str, Any]):
 module = sys.modules[__name__]
 sys.modules.setdefault("src.utils.log_utils.log_service", module)
 sys.modules.setdefault("program.src.utils.log_service", module)
+sys.modules.setdefault("program.src.utils.log_utils.log_service", module)

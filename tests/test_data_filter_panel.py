@@ -3,8 +3,8 @@ import types
 import pytest
 from nicegui import ui
 
-from src.gui.gui_tab_components.gui_tab_base_component import ComponentConfig
-from src.gui.gui_tab_components.gui_tab_data_component import DataFilterPanel
+from program.src.gui.gui_tab_components.gui_tab_base_component import ComponentConfig
+from program.src.gui.gui_tab_components.gui_tab_data_component import DataFilterPanel
 
 
 def test_invalid_date_notifies(monkeypatch):

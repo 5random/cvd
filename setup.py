@@ -15,8 +15,8 @@ setup(
     name='cvd',
     version='0.1.0',
     install_requires=read_dependencies(),
-    packages=find_packages('program'),
-    package_dir={'': 'program'},
+    packages=find_packages(include=["program", "program.*", "src"]),
+    package_dir={"program": "program", "src": "src"},
 
     data_files=[
         ("cvd/config", glob("config/*.json")),

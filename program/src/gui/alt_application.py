@@ -1,15 +1,16 @@
-# Ensure src package is importable when executed as a script
-import sys
+# Alternative GUI application for the program that enables only basic
+# functionality of the program:
+# - live view of webcam with basic controls (start/stop webcam, adjust ROI,
+#   sensitivity settings, fps settings, resolution settings)
+# - live status of motion detection algorithm applied to the webcam with ROI and
+#   sensitivity settings
+# - email alert service for critical events (e.g. when motion is not detected)
+#   with alert delay settings (email alert includes webcam image, motion
+#   detection status, timestamp, and other relevant information)
+# - basic experiment management (start/stop experiment, view results/status,
+#   alert on critical events)
+
 from pathlib import Path
-
-sys.path.insert(0, str(Path(__file__).resolve().parents[2]))  # program directory
-sys.path.insert(0, str(Path(__file__).resolve().parents[3]))  # project root
-
-# alternative gui application for the program that enables only basic functionality of the program those are:
-# - live view of webcam with basic controls (start/stop webcam, adjust ROI, sensitivity settings, fps settings, resolution settings)
-# - live status of motion detection algorithm applied to the webcam with ROI and sensitivity settings
-# - email alert service for critical events (e.g. when motion is not detected) with alert delay settings (email alert shall include webcam image, motion detection status, timestamp, and other relevant information)
-# - basic experiment management (start/stop experiment, view results/status, alert on critical events)
 
 from nicegui import ui, app
 from datetime import datetime
@@ -19,24 +20,24 @@ import cv2
 from fastapi.responses import StreamingResponse
 from fastapi import Request
 
-from src.controllers.controller_base import ControllerConfig
-from src.controllers.controller_utils.controller_data_sources.camera_capture_controller import (
+from program.src.controllers.controller_base import ControllerConfig
+from program.src.controllers.controller_utils.controller_data_sources.camera_capture_controller import (
     CameraCaptureController,
 )
-from src.controllers.controller_utils.camera_utils import apply_uvc_settings
-from src.controllers.controller_manager import (
+from program.src.controllers.controller_utils.camera_utils import apply_uvc_settings
+from program.src.controllers.controller_manager import (
     ControllerManager,
     create_cvd_controller_manager,
 )
-from src.controllers.algorithms.motion_detection import MotionDetectionController
-from src.experiment_handler.experiment_manager import (
+from program.src.controllers.algorithms.motion_detection import MotionDetectionController
+from program.src.experiment_handler.experiment_manager import (
     ExperimentManager,
     ExperimentConfig,
 )
-from src.utils.concurrency.async_utils import install_signal_handlers
-from src.utils.config_service import ConfigurationService
-from src.utils.email_alert_service import get_email_alert_service
-from src.data_handler.sources.sensor_source_manager import SensorManager
+from program.src.utils.concurrency.async_utils import install_signal_handlers
+from program.src.utils.config_service import ConfigurationService
+from program.src.utils.email_alert_service import get_email_alert_service
+from program.src.data_handler.sources.sensor_source_manager import SensorManager
 
 from alt_gui import (
     setup_global_styles,

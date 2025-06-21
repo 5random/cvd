@@ -1,7 +1,7 @@
 import pytest
 
-from src.data_handler.processing.pipeline.pipeline import DataPipeline
-from src.data_handler.processing.processing_base import ProcessingStage, ProcessingResult
+from program.src.data_handler.processing.pipeline.pipeline import DataPipeline
+from program.src.data_handler.processing.processing_base import ProcessingStage, ProcessingResult
 
 class AddOneStage(ProcessingStage):
     async def process(self, data):

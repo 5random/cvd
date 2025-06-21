@@ -1,5 +1,5 @@
 from pathlib import Path
-from src.utils.container import ApplicationContainer
+from program.src.utils.container import ApplicationContainer
 
 
 def test_data_saver_flush_interval_from_config(tmp_path):

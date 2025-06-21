@@ -5,9 +5,9 @@ from types import SimpleNamespace
 
 import pytest
 
-from src.utils.alert_system_utils.email_alert_service import EmailAlertService
-from src.utils.data_utils.file_management_service import FileMaintenanceService
-from src.utils.data_utils.compression_service import CompressionService
+from program.src.utils.alert_system_utils.email_alert_service import EmailAlertService
+from program.src.utils.data_utils.file_management_service import FileMaintenanceService
+from program.src.utils.data_utils.compression_service import CompressionService
 from typing import cast
 
 
@@ -125,7 +125,7 @@ def test_rotate_old_files(tmp_path: Path, monkeypatch):
         return SimpleNamespace(get_pool=lambda t: DummyPool())
 
     monkeypatch.setattr(
-        "src.utils.data_utils.file_management_service.get_thread_pool_manager", get_mgr
+        "program.src.utils.data_utils.file_management_service.get_thread_pool_manager", get_mgr
     )
 
     service = FileMaintenanceService(
