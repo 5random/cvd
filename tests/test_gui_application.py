@@ -3,7 +3,7 @@ import pytest
 from nicegui import Client, app
 import numpy as np
 import cv2
-from program.src.utils.log_utils import log_service
+from src.utils import log_service
 
 pytest_plugins = ['nicegui.testing.user_plugin']
 

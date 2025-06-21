@@ -677,8 +677,5 @@ def log_structured(event_type: str, data: Dict[str, Any]):
     get_log_service().structured(event_type, data)
 
 
-# Ensure module is importable via legacy ``log_utils.log_service`` path
 module = sys.modules[__name__]
-sys.modules.setdefault("src.utils.log_utils.log_service", module)
 sys.modules.setdefault("program.src.utils.log_service", module)
-sys.modules.setdefault("program.src.utils.log_utils.log_service", module)

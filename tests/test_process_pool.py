@@ -5,7 +5,7 @@ import time
 import pytest
 
 from program.src.utils.concurrency.process_pool import ManagedProcessPool, ProcessPoolConfig
-from program.src.utils.log_utils import log_service
+from src.utils import log_service
 
 
 def add(x: int, y: int) -> int:

@@ -2,7 +2,7 @@ import json
 import pytest
 from pathlib import Path
 
-from program.src.utils.config_utils.config_service import ConfigurationService, set_config_service
+from src.utils.config_service import ConfigurationService, set_config_service
 from program.src.controllers.controller_base import ControllerConfig
 from program.src.controllers.algorithms.motion_detection import MotionDetectionController
 

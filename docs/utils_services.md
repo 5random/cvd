@@ -1,8 +1,6 @@
 # Configuration and Logging Services
 
-This repository bundles shared services under the `src.utils` package.  Two new packages
-`config_service` and `log_service` replace the older `config_utils` and
-`log_utils` modules.
+This repository bundles shared services under the `src.utils` package. The modern `config_service` and `log_service` packages supersede the deprecated `config_utils` and `log_utils` modules. Compatibility shims have been removed, so always import from the new packages.
 
 ## `config_service`
 
@@ -34,8 +32,6 @@ log.info("message")
 
 ### Migrating imports
 
-Legacy paths like `src.utils.config_utils.config_service` and
-`src.utils.log_utils.log_service` are still available for backward
-compatibility.  New code should import from `src.utils.config_service` and
-`src.utils.log_service` instead.
+Legacy import paths using the old `config_utils` or `log_utils` packages have been removed. Update any code to import directly from `src.utils.config_service` and `src.utils.log_service`.
+
 
