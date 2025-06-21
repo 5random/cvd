@@ -956,6 +956,8 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
                     events=["mousedown", "mousemove", "mouseup"],
                     cross=True,
                 ).on_mouse(on_mouse)
+                img.callback = on_mouse
+                ui.interactive_image.last = img
                 layer = img.add_layer()
                 ui.label("Drag on the image to select the ROI")
                 ui.button("Cancel", on_click=dialog.close)
