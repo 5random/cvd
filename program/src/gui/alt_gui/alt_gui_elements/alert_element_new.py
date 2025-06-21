@@ -93,8 +93,8 @@ class EmailAlertWizard:
 
                 # Set up validation
                 name_input.on(
-                    "input",
-                    lambda: self._validate_step1(
+                    "update:model-value",
+                    lambda e: self._validate_step1(
                         name_input, step1_feedback, step1_next_btn
                     ),
                 )
@@ -144,8 +144,8 @@ class EmailAlertWizard:
 
                 # Set up email validation
                 email_input.on(
-                    "input",
-                    lambda: self._validate_email_input(
+                    "update:model-value",
+                    lambda e: self._validate_email_input(
                         email_input, email_feedback, add_email_btn
                     ),
                 )
