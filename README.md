@@ -23,6 +23,21 @@ pip install -e .
 pip install pre-commit black
 ```
 
+You may also install the pinned dependencies from the generated
+`requirements.txt` file. This is useful for running the test suite on a
+fresh environment:
+
+```bash
+pip install -r requirements.txt
+```
+
+Development utilities such as linters and the pre-commit hook are collected in
+`dev-requirements.txt`:
+
+```bash
+pip install -r dev-requirements.txt
+```
+
 This installs all Python dependencies including `psutil`, which the dashboard
 uses to display CPU and memory usage.
 
@@ -120,11 +135,19 @@ Before running the tests you must install this package and its dependencies.
 Attempting to execute `pytest` without installation will result in import
 errors.
 
-Run the installation and tests in a single sequence:
+Install the dependencies and run the tests in a single sequence. You can
+either install the package in editable mode or use the requirements files:
 
 ```bash
 pip install -e .
 pytest          # or: make test
+
+# or install from the requirements files
+pip install -r requirements.txt
+pytest
+
+# for development utilities (linters, pre-commit hook)
+pip install -r dev-requirements.txt
 
 ```
 
