@@ -110,6 +110,7 @@ class SimpleGUIApplication:
         # Initialize email alert configurations with demo data
         self.alert_configurations = create_demo_configurations()
         self.alert_display = EmailAlertStatusDisplay(self.alert_configurations)
+        self.alert_display.update_callback = self._on_alert_config_changed
 
         # Track if we have active alerts
         self._update_alerts_status()
@@ -278,6 +279,8 @@ class SimpleGUIApplication:
     def update_camera_status(self, active: bool):
         """Update camera icon color based on active state."""
         self.camera_active = active
+        if not hasattr(self, "camera_status_icon"):
+            return
         if active:
             self.camera_status_icon.classes(
                 add="text-green-300", remove="text-gray-400"
@@ -472,9 +475,11 @@ class SimpleGUIApplication:
             self.motion_controller.uvc_settings.update(settings)
         ui.notify("UVC settings applied", type="positive")
 
-    def toggle_alerts(self, e):
-        """Toggle email alerts on/off - opens alert management"""
-        self.show_alert_management()
+    def toggle_alerts(self, value):
+        """Enable or disable alerts based on checkbox value."""
+        value = getattr(value, "value", value)
+        self.alerts_enabled = bool(value)
+        self._update_alerts_status()
 
     def send_test_alert(self):
         """Send a test email alert"""
@@ -580,6 +585,13 @@ class SimpleGUIApplication:
             cls = "text-yellow-300" if self.alerts_enabled else "text-gray-400"
             self.alert_status_icon.classes(cls)
 
+    def _on_alert_config_changed(self) -> None:
+        """Handle alert configuration updates from the status display."""
+        if hasattr(self, "alert_overview_container"):
+            self.alert_overview_container.clear()
+            self.alert_display.create_alert_overview()
+        self._update_alerts_status()
+
     def show_alert_setup_wizard(self):
         """Show the email alert setup wizard in a dialog"""
 
@@ -603,8 +615,8 @@ class SimpleGUIApplication:
         with ui.dialog() as dialog, ui.card().classes("w-full max-w-6xl"):
             ui.label("E-Mail Alert Verwaltung").classes("text-xl font-bold mb-4")
 
-            # Create the full alert overview
-            self.alert_display.create_alert_overview()
+            with ui.column() as self.alert_overview_container:
+                self.alert_display.create_alert_overview()
 
             with ui.row().classes("w-full justify-end mt-4"):
                 ui.button("Schließen", on_click=dialog.close).props("flat")
@@ -630,6 +642,18 @@ class SimpleGUIApplication:
                             icon="list",
                             on_click=self.show_alert_management,
                         ).props("size=sm color=secondary")
+
+                        ui.button(
+                            "Alert-Verlauf",
+                            icon="history",
+                            on_click=self.show_alert_history,
+                        ).props("size=sm color=secondary")
+
+                        ui.button(
+                            "Test-Alert",
+                            icon="send",
+                            on_click=self.send_test_alert,
+                        ).props("size=sm color=warning")
 
                 # Status overview
                 total_configs = len(self.alert_configurations)
@@ -806,6 +830,9 @@ class SimpleGUIApplication:
             install_signal_handlers(self.experiment_manager._task_manager)
             await self.sensor_manager.start_all_configured_sensors()
             await self.controller_manager.start_all_controllers()
+            # Ensure camera status reflects that controllers started
+            self.camera_active = True
+            self.update_camera_status(True)
 
         @app.on_shutdown
         async def _shutdown() -> None:
