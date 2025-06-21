@@ -30,7 +30,7 @@ mock_rs232 = "src.data_handler.sources.mock_sensors:MockRS232Sensor"
 
 [tool.black]
 line-length = 88
-target-version = ['py39']
+target-version = ['py311']
 
 [tool.mypy]
 python_version = "3.11"
