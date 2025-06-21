@@ -237,7 +237,9 @@ class SimpleGUIApplication:
                 "apply_uvc_settings": self.apply_uvc_settings,
             },
         )
-        self.motion_section = MotionStatusSection(self.settings)
+        self.motion_section = MotionStatusSection(
+            self.settings, controller_manager=self.controller_manager
+        )
         self.experiment_section = ExperimentManagementSection(self.settings)
         # Note: EmailAlertsSection replaced with new alert system
 
