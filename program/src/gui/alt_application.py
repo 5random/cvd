@@ -809,12 +809,7 @@ def main():
     controller_manager = create_cvd_controller_manager()
     app = SimpleGUIApplication(controller_manager)
 
-    from nicegui import app as ng_app
-
-    @ng_app.on_startup
-    async def _startup() -> None:
-        await controller_manager.start_all_controllers()
-
+    # Startup logic is defined in ``SimpleGUIApplication.run``.
     app.run()
 
 
