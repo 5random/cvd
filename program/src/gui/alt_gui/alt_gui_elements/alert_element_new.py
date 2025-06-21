@@ -415,15 +415,15 @@ class EmailAlertWizard:
 
         if len(name) < 3:
             step1_feedback.text = "Name must be at least 3 characters long"
-            step1_feedback.classes = "text-sm mt-2 text-red-600"
+            step1_feedback.classes("text-sm mt-2 text-red-600")
             step1_next_btn.disable()
         elif len(name) > 50:
             step1_feedback.text = "Name must be 50 characters or less"
-            step1_feedback.classes = "text-sm mt-2 text-red-600"
+            step1_feedback.classes("text-sm mt-2 text-red-600")
             step1_next_btn.disable()
         else:
             step1_feedback.text = "✓ Valid configuration name"
-            step1_feedback.classes = "text-sm mt-2 text-green-600"
+            step1_feedback.classes("text-sm mt-2 text-green-600")
             step1_next_btn.enable()
             self.alert_data["name"] = name
 
@@ -444,15 +444,15 @@ class EmailAlertWizard:
         if self._is_valid_email(email):
             if email in self.alert_data["emails"]:
                 email_feedback.text = "Email already added"
-                email_feedback.classes = "text-sm text-orange-600"
+                email_feedback.classes("text-sm text-orange-600")
                 add_email_btn.disable()
             else:
                 email_feedback.text = "✓ Valid email address"
-                email_feedback.classes = "text-sm text-green-600"
+                email_feedback.classes("text-sm text-green-600")
                 add_email_btn.enable()
         else:
             email_feedback.text = "Please enter a valid email address"
-            email_feedback.classes = "text-sm text-red-600"
+            email_feedback.classes("text-sm text-red-600")
             add_email_btn.disable()
 
     def _is_valid_email(self, email: str) -> bool:
@@ -519,11 +519,11 @@ class EmailAlertWizard:
             step2_feedback.text = (
                 f'✓ {len(self.alert_data["emails"])} email address(es) configured'
             )
-            step2_feedback.classes = "text-sm mt-2 text-green-600"
+            step2_feedback.classes("text-sm mt-2 text-green-600")
             step2_next_btn.enable()
         else:
             step2_feedback.text = "Add at least one valid email address to continue."
-            step2_feedback.classes = "text-sm text-orange-600 mt-2"
+            step2_feedback.classes("text-sm text-orange-600 mt-2")
             step2_next_btn.disable()
 
     def _next_to_step2(self, name_input):
@@ -961,7 +961,6 @@ class EmailAlertStatusDisplay:
         old_config: Dict[str, Any],
         new_config: Dict[str, Any],
         callback: Optional[Callable[[], None]] = None,
-
     ):
         """Update an existing configuration"""
         try:
