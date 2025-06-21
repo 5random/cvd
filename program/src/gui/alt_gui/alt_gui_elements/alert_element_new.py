@@ -770,14 +770,35 @@ class EmailAlertStatusDisplay:
         except ValueError:
             pass  # Configuration not found
     
-    # Event handlers (placeholder implementations)
+    # Event handlers for UI actions
     def _show_setup_wizard(self):
         """Show the setup wizard dialog"""
-        ui.notify('Setup Wizard würde hier geöffnet werden', type='info')
-    
+        def _on_save(config: Dict[str, Any]):
+            self.add_configuration(config)
+            dialog.close()
+
+        with ui.dialog() as dialog, ui.card().classes('w-full max-w-4xl'):
+            create_email_alert_wizard(on_save=_on_save)
+            with ui.row().classes('w-full justify-end mt-4'):
+                ui.button('Schließen', on_click=dialog.close).props('flat')
+
+        dialog.open()
+
     def _edit_configuration(self, config: Dict[str, Any]):
         """Edit an existing configuration"""
-        ui.notify(f'Bearbeitung von "{config.get("name", "Konfiguration")}" würde hier geöffnet werden', type='info')
+        def _on_save(new_cfg: Dict[str, Any]):
+            self.update_configuration(config, new_cfg)
+            dialog.close()
+
+        wizard = EmailAlertWizard(on_save=_on_save)
+        wizard.alert_data = config.copy()
+
+        with ui.dialog() as dialog, ui.card().classes('w-full max-w-4xl'):
+            wizard.create_wizard()
+            with ui.row().classes('w-full justify-end mt-4'):
+                ui.button('Schließen', on_click=dialog.close).props('flat')
+
+        dialog.open()
     
     def _send_test_alert(self, config: Dict[str, Any]):
         """Send a test alert for the configuration"""
@@ -797,16 +818,38 @@ class EmailAlertStatusDisplay:
             f'Test-Alert an {sent} Empfänger gesendet',
             type='positive' if sent else 'warning'
         )
-    
+
     def _delete_configuration(self, config: Dict[str, Any]):
         """Delete a configuration with confirmation"""
         config_name = config.get('name', 'Unbenannte Konfiguration')
-        # In a real implementation, this would show a confirmation dialog
-        ui.notify(f'Löschung von "{config_name}" würde hier bestätigt werden', type='warning')
-    
+
+        with ui.dialog() as dialog:
+            with ui.card():
+                ui.label('Konfiguration löschen').classes('text-lg font-bold')
+                ui.label(
+                    f'Möchten Sie "{config_name}" wirklich löschen?'
+                ).classes('mt-2')
+
+                with ui.row().classes('gap-2 justify-end mt-4'):
+                    ui.button('Abbrechen', on_click=dialog.close).props('flat')
+
+                    def _confirm():
+                        self.remove_configuration(config)
+                        dialog.close()
+
+                    ui.button('Löschen', on_click=_confirm).props('color=negative')
+
+        dialog.open()
+
     def _show_management_dialog(self):
         """Show the alert management dialog"""
-        ui.notify('Alert-Verwaltung würde hier geöffnet werden', type='info')
+        with ui.dialog() as dialog, ui.card().classes('w-full max-w-6xl'):
+            ui.label('E-Mail Alert Verwaltung').classes('text-xl font-bold mb-4')
+            self.create_alert_overview()
+            with ui.row().classes('w-full justify-end mt-4'):
+                ui.button('Schließen', on_click=dialog.close).props('flat')
+
+        dialog.open()
 
 
 def create_email_alert_wizard(on_save: Optional[Callable[[Dict[str, Any]], None]] = None) -> ui.card:
