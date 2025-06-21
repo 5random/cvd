@@ -5,6 +5,8 @@ Email-Alert-Service mit NiceGUI Stepper
 """
 
 from nicegui import ui
+from program.src.utils.ui_helpers import notify_later
+from program.src.utils.concurrency import run_network_io, gather_with_concurrency
 from typing import Dict, List, Optional, Any, Callable
 from src.utils.email_alert_service import get_email_alert_service
 from datetime import datetime
@@ -614,11 +616,11 @@ class EmailAlertWizard:
     def _save_configuration(self):
         """Save the alert configuration"""
         if not self.alert_data["name"]:
-            ui.notify("Please provide a configuration name", type="warning")
+            notify_later("Please provide a configuration name", type="warning")
             return
 
         if not self.alert_data["emails"]:
-            ui.notify("Please add at least one email address", type="warning")
+            notify_later("Please add at least one email address", type="warning")
             return
 
         # Count active alerts
@@ -629,11 +631,11 @@ class EmailAlertWizard:
         )
 
         if active_count == 0:
-            ui.notify("Please enable at least one alert type", type="warning")
+            notify_later("Please enable at least one alert type", type="warning")
             return
 
         # Here you would save the configuration to a file, database, etc.
-        ui.notify(
+        notify_later(
             f'Configuration "{self.alert_data["name"]}" saved successfully! '
             f'{len(self.alert_data["emails"])} recipients, {active_count} alert types enabled.',
             type="positive",
@@ -648,11 +650,11 @@ class EmailAlertWizard:
     def _test_alerts(self):
         """Send test alerts to verify configuration"""
         if not self.alert_data["emails"]:
-            ui.notify("Please add email addresses before testing", type="warning")
+            notify_later("Please add email addresses before testing", type="warning")
             return
 
         # Simulate sending test emails
-        ui.notify(
+        notify_later(
             f'Test alerts sent to {len(self.alert_data["emails"])} recipient(s). '
             "Check your email for the test message.",
             type="info",
@@ -674,7 +676,7 @@ class EmailAlertWizard:
         # Go back to first step
         self.stepper.value = "alert_name"
 
-        ui.notify("Wizard reset", type="info")
+        notify_later("Wizard reset", type="info")
 
     def get_configuration(self) -> Dict[str, Any]:
         """Get current configuration data"""
@@ -1017,21 +1019,31 @@ class EmailAlertStatusDisplay:
 
         dialog.open()
 
-    def _send_test_alert(self, config: Dict[str, Any]):
+    async def _send_test_alert(self, config: Dict[str, Any]):
         """Send a test alert for the configuration"""
         service = get_email_alert_service()
         if service is None:
-            ui.notify("EmailAlertService nicht verfügbar", type="warning")
+            notify_later("EmailAlertService nicht verfügbar", type="warning")
             return
 
         subject = f"Test-Alert ({config.get('name', 'Alert')})"
         body = "Dies ist ein Test des E-Mail-Alert-Systems."
-        sent = 0
-        for email in config.get("emails", []):
-            if service.send_alert(subject, body, recipient=email):
-                sent += 1
 
-        ui.notify(
+        async def _send(recipient: str) -> bool:
+            return await run_network_io(
+                service.send_alert, subject, body, recipient=recipient
+            )
+
+        tasks = [_send(email) for email in config.get("emails", [])]
+        if tasks:
+            results = await gather_with_concurrency(
+                tasks, label="test_alert", cancel_on_exception=False
+            )
+            sent = sum(1 for ok in results if ok)
+        else:
+            sent = 0
+
+        notify_later(
             f"Test-Alert an {sent} Empfänger gesendet",
             type="positive" if sent else "warning",
         )

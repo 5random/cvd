@@ -18,6 +18,13 @@ if __name__ == "__main__" and __package__ is None:
     sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from nicegui import ui, app
+
+from program.src.utils.ui_helpers import notify_later
+from program.src.utils.concurrency import (
+    run_in_executor,
+    run_network_io,
+    gather_with_concurrency,
+)
 from datetime import datetime
 from typing import Optional, Dict, Any
 import asyncio
@@ -89,7 +96,9 @@ class SimpleGUIApplication:
             else controller_manager_module.create_cvd_controller_manager()
         )
 
-        self.email_alert_service = email_alert_service.EmailAlertService(self.config_service)
+        self.email_alert_service = email_alert_service.EmailAlertService(
+            self.config_service
+        )
         email_alert_service.set_email_alert_service(self.email_alert_service)
         # use the already created controller manager for the experiment manager
         self.experiment_manager = ExperimentManager(
@@ -402,7 +411,7 @@ class SimpleGUIApplication:
             self.motion_controller.motion_threshold_percentage = value / 100.0
         self.webcam_stream.sensitivity_number.value = value
         self.webcam_stream.sensitivity_slider.value = value
-        ui.notify(f"Sensitivity set to {value}%", type="positive")
+        notify_later(f"Sensitivity set to {value}%", type="positive")
 
     def update_fps(self, e):
         """Update camera FPS setting"""
@@ -413,7 +422,7 @@ class SimpleGUIApplication:
         if self.motion_controller:
             self.motion_controller.fps = value
         self.webcam_stream.fps_select.value = value
-        ui.notify(f"FPS set to {value}", type="positive")
+        notify_later(f"FPS set to {value}", type="positive")
 
     def update_resolution(self, e):
         """Update camera resolution setting"""
@@ -432,7 +441,7 @@ class SimpleGUIApplication:
                 self.motion_controller.width = width
                 self.motion_controller.height = height
         self.webcam_stream.resolution_select.value = res
-        ui.notify(f"Resolution set to {res}", type="positive")
+        notify_later(f"Resolution set to {res}", type="positive")
 
     def set_roi(self):
         """Set region of interest"""
@@ -451,7 +460,7 @@ class SimpleGUIApplication:
                 self.motion_controller.roi_y = height // 4
                 self.motion_controller.roi_width = width // 2
                 self.motion_controller.roi_height = height // 2
-        ui.notify("ROI updated", type="positive")
+        notify_later("ROI updated", type="positive")
 
     def apply_uvc_settings(self):
         """Apply UVC camera settings"""
@@ -487,7 +496,7 @@ class SimpleGUIApplication:
             self.camera_controller.uvc_settings.update(settings)
         if self.motion_controller:
             self.motion_controller.uvc_settings.update(settings)
-        ui.notify("UVC settings applied", type="positive")
+        notify_later("UVC settings applied", type="positive")
 
     def reset_uvc_defaults(self):
         """Reset all UVC controls to their default values."""
@@ -540,7 +549,7 @@ class SimpleGUIApplication:
                     apply_uvc_settings(self.motion_controller._capture, defaults)
                 )
 
-        ui.notify("UVC settings reset to defaults", type="positive")
+        notify_later("UVC settings reset to defaults", type="positive")
 
     def toggle_alerts(self, value):
         """Enable or disable alerts based on checkbox value."""
@@ -548,9 +557,9 @@ class SimpleGUIApplication:
         self.alerts_enabled = bool(value)
         self._update_alerts_status()
 
-    def send_test_alert(self):
+    async def send_test_alert(self):
         """Send a test email alert"""
-        self._send_test_to_all_configs()
+        await self._send_test_to_all_configs()
 
     def show_alert_history(self):
         """Show alert history dialog"""
@@ -571,7 +580,7 @@ class SimpleGUIApplication:
             exp_id = self.experiment_manager.create_experiment(config)
             success = await self.experiment_manager.start_experiment(exp_id)
             if not success:
-                ui.notify("Failed to start experiment", type="negative")
+                notify_later("Failed to start experiment", type="negative")
                 return
 
             self._current_experiment_id = exp_id
@@ -594,11 +603,11 @@ class SimpleGUIApplication:
             if self._experiment_timer:
                 self._experiment_timer.cancel()
             self._experiment_timer = ui.timer(1.0, self._update_experiment_status)
-            ui.notify(f'Started experiment "{name}"', type="positive")
+            notify_later(f'Started experiment "{name}"', type="positive")
         else:
             success = await self.experiment_manager.stop_experiment()
             if not success:
-                ui.notify("Failed to stop experiment", type="negative")
+                notify_later("Failed to stop experiment", type="negative")
                 return
 
             self.experiment_running = False
@@ -613,7 +622,7 @@ class SimpleGUIApplication:
             if self._experiment_timer:
                 self._experiment_timer.cancel()
                 self._experiment_timer = None
-            ui.notify("Experiment stopped", type="info")
+            notify_later("Experiment stopped", type="info")
 
     def _update_experiment_status(self) -> None:
         """Update elapsed time and progress display while running"""
@@ -786,37 +795,52 @@ class SimpleGUIApplication:
                                             f"{email_count} Empfänger", color="blue"
                                         ).props("dense")
 
-    def _send_test_to_all_configs(self):
+    async def _send_test_to_all_configs(self):
         """Send test alerts to all active configurations"""
         active_configs = [
-            config
-            for config in self.alert_configurations
-            if sum(
-                1
-                for settings in config.get("settings", {}).values()
-                if settings.get("enabled", False)
+            cfg
+            for cfg in self.alert_configurations
+            if any(
+                settings.get("enabled", False)
+                for settings in cfg.get("settings", {}).values()
             )
-            > 0
         ]
 
         if not active_configs:
-            ui.notify("Keine aktiven Alert-Konfigurationen vorhanden", type="warning")
+            notify_later(
+                "Keine aktiven Alert-Konfigurationen vorhanden", type="warning"
+            )
             return
 
         service = email_alert_service.get_email_alert_service()
         if service is None:
-            ui.notify("EmailAlertService nicht verfügbar", type="warning")
+            notify_later("EmailAlertService nicht verfügbar", type="warning")
             return
 
-        total_sent = 0
-        for cfg in active_configs:
-            subject = f"Test-Alert ({cfg.get('name', 'Alert')})"
-            body = "Dies ist ein Test des E-Mail-Alert-Systems."
-            for email in cfg.get("emails", []):
-                if service.send_alert(subject, body, recipient=email):
-                    total_sent += 1
+        async def _send(recipient: str, subject: str, body: str) -> bool:
+            return await run_network_io(
+                service.send_alert, subject, body, recipient=recipient
+            )
 
-        ui.notify(
+        tasks = [
+            _send(
+                email,
+                f"Test-Alert ({cfg.get('name', 'Alert')})",
+                "Dies ist ein Test des E-Mail-Alert-Systems.",
+            )
+            for cfg in active_configs
+            for email in cfg.get("emails", [])
+        ]
+
+        if tasks:
+            results = await gather_with_concurrency(
+                tasks, label="test_alerts", cancel_on_exception=False
+            )
+            total_sent = sum(1 for ok in results if ok)
+        else:
+            total_sent = 0
+
+        notify_later(
             f"Test-Alerts an {total_sent} Empfänger in {len(active_configs)} Konfigurationen gesendet",
             type="positive" if total_sent else "warning",
         )
@@ -891,7 +915,9 @@ class SimpleGUIApplication:
                             frame = output
 
                     if frame is not None:
-                        success, buf = cv2.imencode(".jpg", frame)
+                        success, buf = await run_in_executor(
+                            cv2.imencode, ".jpg", frame
+                        )
                         if success:
                             jpeg = buf.tobytes()
                             yield (

@@ -4,7 +4,9 @@ import logging
 from jsonschema import Draft7Validator
 from typing import Dict, Any, List, Set
 
-warning = logging.warning
+# Use a differently named variable so test fixtures that monkeypatch a
+# ``warning`` attribute on this module do not silence standard logging.
+log_warning = logging.warning
 
 
 def validate_config(
@@ -21,6 +23,6 @@ def validate_config(
     known_fields: Set[str] = set(schema.get("properties", {}).keys())
     known_fields.update({"sensor_id", "controller_id", "algorithm_id", "webcam_id"})
     for field in set(config.keys()) - known_fields:
-        warning(f"Unknown field in {config_type} config: {field}")
+        log_warning(f"Unknown field in {config_type} config: {field}")
 
     return errors
