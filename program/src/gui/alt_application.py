@@ -21,6 +21,7 @@ from nicegui import ui, app
 from datetime import datetime
 from typing import Optional, Dict, Any
 import asyncio
+import contextlib
 import cv2
 from fastapi.responses import StreamingResponse
 from fastapi import Request
@@ -105,6 +106,7 @@ class SimpleGUIApplication:
         self._experiment_start: Optional[datetime] = None
         self._experiment_duration: Optional[int] = None
         self._experiment_timer: Optional[ui.timer] = None
+        self._processing_task: Optional[asyncio.Task] = None
 
         # Placeholder settings
         self.settings = {
@@ -848,6 +850,21 @@ class SimpleGUIApplication:
 
         dialog.open()
 
+    async def _processing_loop(self) -> None:
+        """Continuously process controller data."""
+        while True:
+            try:
+                interval_ms = self.config_service.get(
+                    "controller_manager.processing_interval_ms", int, 30
+                )
+                interval = max(0.001, interval_ms / 1000.0)
+                await asyncio.sleep(interval)
+                await self.controller_manager.process_data({})
+            except asyncio.CancelledError:
+                break
+            except Exception as exc:
+                print(f"Processing loop error: {exc}")
+
     def run(self, host: str = "localhost", port: int = 8081):
         """Run the simple GUI application"""
 
@@ -892,12 +909,18 @@ class SimpleGUIApplication:
         async def _startup() -> None:
             install_signal_handlers(self.experiment_manager._task_manager)
             await self.controller_manager.start_all_controllers()
+            self._processing_task = asyncio.create_task(self._processing_loop())
             # Ensure camera status reflects that controllers started
             self.camera_active = True
             self.update_camera_status(True)
 
         @app.on_shutdown
         async def _shutdown() -> None:
+            if self._processing_task:
+                self._processing_task.cancel()
+                with contextlib.suppress(Exception):
+                    await self._processing_task
+                self._processing_task = None
             await self.controller_manager.stop_all_controllers()
 
         print(f"Starting Simple CVD GUI on http://{host}:{port}")
