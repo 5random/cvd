@@ -604,7 +604,7 @@ class SimpleGUIApplication:
                 service.recipient = config["emails"][0]
 
         with ui.dialog() as dialog, ui.card().classes("w-full max-w-4xl"):
-            wizard_card = create_email_alert_wizard(on_save=_on_save)
+            create_email_alert_wizard(on_save=_on_save)
             with ui.row().classes("w-full justify-end mt-4"):
                 ui.button("Schließen", on_click=dialog.close).props("flat")
 
