@@ -208,7 +208,6 @@ class LogService:
         log_level_str = self.log_level or "INFO"
         log_level = getattr(logging, log_level_str, logging.INFO)
         logger.setLevel(log_level)
-        logger.handlers.clear()
 
         # Rotating file handler
         info_file = self.log_dir / "info.log"
@@ -234,7 +233,6 @@ class LogService:
         """Setup error/warning logger"""
         logger = logging.getLogger("cvd_tracker.error")
         logger.setLevel(logging.WARNING)
-        logger.handlers.clear()
 
         # Rotating file handler
         error_file = self.log_dir / "error.log"
@@ -260,7 +258,6 @@ class LogService:
         """Setup performance logger"""
         logger = logging.getLogger("cvd_tracker.performance")
         logger.setLevel(logging.INFO)
-        logger.handlers.clear()
 
         # Timed rotating file handler (daily)
         perf_file = self.log_dir / "performance.log"
@@ -286,7 +283,6 @@ class LogService:
         """Setup audit logger"""
         logger = logging.getLogger("cvd_tracker.audit")
         logger.setLevel(logging.INFO)
-        logger.handlers.clear()
 
         # Timed rotating file handler (daily)
         audit_file = self.log_dir / "audit.log"
@@ -312,7 +308,6 @@ class LogService:
         """Setup structured logger for JSON output"""
         logger = logging.getLogger("cvd_tracker.structured")
         logger.setLevel(logging.INFO)
-        logger.handlers.clear()
 
         # Timed rotating file handler (daily)
         structured_file = self.log_dir / "structured.log"
