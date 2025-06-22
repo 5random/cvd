@@ -32,12 +32,12 @@ class EmailAlertsSection:
                 self.email_input = ui.input(
                     "Alert Email Address",
                     placeholder="user@example.com",
-                    value=self.settings["email"],
+                    value=self.settings.get("email", "user@example.com"),
                 ).classes("w-full")
 
                 self.alert_delay_input = ui.number(
                     "Alert Delay (minutes)",
-                    value=self.settings["alert_delay"],
+                    value=self.settings.get("alert_delay", 5),
                     min=1,
                     max=60,
                 ).classes("w-full")
