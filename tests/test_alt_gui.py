@@ -129,7 +129,7 @@ def simple_gui_app(mock_controller_manager, mock_config_service, tmp_path):
     """Erstelle eine SimpleGUIApplication für Tests"""
     # Mock external dependencies
     import src.controllers.controller_manager as cm_module
-    import src.experiment_handler.experiment_manager as em_module
+    import src.experiment_manager as em_module
 
     # Patch the module-level functions to return our mocks
     original_create_manager = getattr(cm_module, "create_cvd_controller_manager", None)

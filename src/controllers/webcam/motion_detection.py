@@ -27,7 +27,7 @@ from src.utils.concurrency.process_pool import (
 )
 from src.utils.log_service import info, warning, error
 from src.utils.concurrency.thread_pool import run_camera_io
-from src.controllers.controller_utils.camera_utils import (
+from src.controllers.camera_utils import (
     apply_uvc_settings,
     rotate_frame,
 )

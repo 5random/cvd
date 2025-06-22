@@ -15,7 +15,7 @@ from src.controllers.controller_base import (
     ControllerResult,
 )
 from src.utils.log_service import info, warning, error
-from src.controllers.controller_utils.camera_utils import (
+from src.controllers.camera_utils import (
     apply_uvc_settings,
     rotate_frame,
 )

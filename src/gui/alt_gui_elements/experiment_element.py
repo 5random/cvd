@@ -2,7 +2,7 @@ from nicegui import ui
 from datetime import datetime
 from typing import List, Optional
 
-from src.experiment_handler.experiment_manager import (
+from src.experiment_manager import (
     ExperimentConfig,
     get_experiment_manager,
 )

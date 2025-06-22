@@ -5,7 +5,6 @@ from types import SimpleNamespace
 import contextlib
 from concurrent.futures import Future
 from src.utils.concurrency.thread_pool import get_thread_pool_manager, ThreadPoolType
-from src.data_handler.interface.sensor_interface import SensorReading
 from src.utils.log_service import info, warning, error
 import threading
 import time
@@ -185,7 +184,6 @@ class DataSaver:
             if not preserve and file_path.exists():
                 msg = f"Source file was not deleted after compression: {file_path}"
                 warning(msg)
-                logging.getLogger("cvd_tracker.error").warning(msg)
 
             if preserve:
                 info(f"Compressed file {file_path} -> {compressed_path}")
@@ -220,7 +218,6 @@ class DataSaver:
             if not preserve and file_path.exists():
                 msg = f"Source file was not deleted after compression: {file_path}"
                 warning(msg)
-                logging.getLogger("cvd_tracker.error").warning(msg)
 
             if preserve:
                 info(f"Compressed file {file_path} -> {compressed_path}")
@@ -289,7 +286,7 @@ class DataSaver:
         except Exception as e:
             error(f"Error compressing inactive files: {e}")
 
-    def save(self, reading: SensorReading, category: str = "raw") -> None:
+    def save(self, reading: Any, category: str = "raw") -> None:
         """Save a SensorReading under the given category ('raw' or 'processed') with performance optimizations."""
         if category not in self._writers:
             error(f"Unknown data saver category: {category}")

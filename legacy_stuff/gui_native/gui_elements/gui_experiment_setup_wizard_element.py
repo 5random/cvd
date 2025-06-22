@@ -11,7 +11,7 @@ from src.gui.gui_tab_components.gui_tab_base_component import (
     ComponentConfig,
 )
 from .gui_wizard_mixin import WizardMixin
-from src.experiment_handler.experiment_manager import (
+from src.experiment_manager import (
     ExperimentManager, ExperimentConfig, get_experiment_manager
 )
 from src.data_handler.sources.sensor_source_manager import SensorManager

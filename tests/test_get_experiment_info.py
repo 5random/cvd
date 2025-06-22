@@ -3,7 +3,7 @@ from datetime import datetime
 from src.gui.gui_tab_components.gui_tab_experiment_component import (
     CurrentExperimentDisplay,
 )
-from src.experiment_handler.experiment_manager import (
+from src.experiment_manager import (
     ExperimentConfig,
     ExperimentResult,
     ExperimentState,

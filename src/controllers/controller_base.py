@@ -8,7 +8,6 @@ from abc import ABC, abstractmethod
 from enum import Enum
 import time
 
-from src.data_handler.interface.sensor_interface import SensorReading
 from src.utils.log_service import info, error
 
 T = TypeVar("T")
@@ -35,7 +34,7 @@ class ControllerStatus(Enum):
 class ControllerInput:
     """Input data for controllers"""
 
-    sensor_data: Dict[str, SensorReading] = field(default_factory=dict)
+    sensor_data: Dict[str, Any] = field(default_factory=dict)
     controller_data: Dict[str, Any] = field(default_factory=dict)
     timestamp: float = field(default_factory=time.time)
     metadata: Dict[str, Any] = field(default_factory=dict)
@@ -289,7 +288,7 @@ class StateController(ControllerStage):
     @abstractmethod
     async def derive_state(
         self,
-        sensor_data: Dict[str, SensorReading],
+        sensor_data: Dict[str, Any],
         controller_outputs: Dict[str, Any],
         metadata: Dict[str, Any],
     ) -> ControllerResult:

@@ -31,17 +31,17 @@ from src.controllers import controller_manager as controller_manager_module
 from src.controllers.webcam import MotionDetectionController
 from src.controllers.controller_base import ControllerConfig, ControllerStatus
 from src.controllers.controller_manager import ControllerManager
-from src.controllers.controller_utils.camera_utils import (
+from src.controllers.camera_utils import (
     apply_uvc_settings,
     probe_camera_modes,
 )
 from src.controllers.webcam import CameraCaptureController
-from src.experiment_handler.experiment_manager import (
+from src.experiment_manager import (
     ExperimentConfig,
     ExperimentManager,
     set_experiment_manager,
 )
-from src.gui.alt_gui import (
+from src.gui import (
     EmailAlertStatusDisplay,
     ExperimentManagementSection,
     MotionStatusSection,
@@ -50,11 +50,11 @@ from src.gui.alt_gui import (
     create_email_alert_wizard,
     setup_global_styles,
 )
-from src.gui.alt_gui.alt_gui_elements.alert_element_new import (
+from src.gui.alt_gui_elements.alert_element_new import (
     load_alert_configs,
     save_alert_configs,
 )
-from src.gui.alt_gui.alt_gui_elements.webcam_stream_element import UVC_DEFAULTS
+from src.gui.alt_gui_elements.webcam_stream_element import UVC_DEFAULTS
 from src.utils import email_alert_service
 from src.utils.concurrency import (
     gather_with_concurrency,
@@ -112,7 +112,6 @@ class SimpleGUIApplication:
         # use the already created controller manager for the experiment manager
         self.experiment_manager = ExperimentManager(
             config_service=self.config_service,
-            sensor_manager=None,
             controller_manager=self.controller_manager,
             auto_install_signal_handlers=False,
         )

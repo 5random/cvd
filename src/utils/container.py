@@ -21,15 +21,8 @@ from src.utils.config_service import (
     ConfigurationError,
     set_config_service,
 )
-from src.data_handler.sources.sensor_source_manager import (
-    SensorManager,
-    load_entry_point_sensors,
-)
+
 from src.utils.data_utils.data_saver import DataSaver
-from src.data_handler.processing.pipeline.pipeline import (
-    create_temperature_pipeline,
-)
-from src.gui.gui_native.application import WebApplication
 from src.utils.data_utils.compression_service import (
     CompressionService,
     set_compression_service,
@@ -45,7 +38,6 @@ class ApplicationContainer:
     """Container for all application services with dependency injection"""
 
     config_service: ConfigurationService
-    sensor_manager: SensorManager
     data_saver: DataSaver
     web_application: "WebApplication"
     compression_service: CompressionService
@@ -103,29 +95,16 @@ class ApplicationContainer:
                 storage_paths=storage_paths,
                 flush_interval=flush_interval,
             )
-            # Create a default temperature processing pipeline
-            pipeline = create_temperature_pipeline("temperature_pipeline")
 
-            disable_hw = config_service.get("disable_hardware_sensors", bool, False)
-            load_entry_point_sensors(disable_hardware=disable_hw)
-
-            # Initialize sensor manager with data_saver and pipeline
-            sensor_manager = SensorManager(
-                config_service=config_service,
-                max_workers=max_workers,
-                data_saver=data_saver,
-                data_pipeline=pipeline,
-            )
             # Initialize web application
-            from src.gui.gui_native.application import WebApplication
+            from src.gui.alt_application import 
 
             web_application = WebApplication(
-                config_service=config_service, sensor_manager=sensor_manager
+                config_service=config_service
             )
 
             container = cls(
                 config_service=config_service,
-                sensor_manager=sensor_manager,
                 data_saver=data_saver,
                 web_application=web_application,
                 compression_service=compression_service,
@@ -172,9 +151,6 @@ class ApplicationContainer:
     async def _async_startup(self) -> None:
         """Async startup for background services"""
         try:
-            # Start sensor polling
-            sensor_count = await self.sensor_manager.start_all_configured_sensors()
-            info(f"Started {sensor_count} sensors")
             # Keep background services running
             while not self._shutdown_requested:
                 await asyncio.sleep(1)
@@ -188,10 +164,6 @@ class ApplicationContainer:
         """Async startup for all services"""
         try:
             info("Starting CVD Tracker services...")
-
-            # Start sensor manager
-            sensor_count = await self.sensor_manager.start_all_configured_sensors()
-            info(f"Started {sensor_count} sensors")
 
             # Initialize web application
             await self.web_application.startup()
@@ -224,11 +196,9 @@ class ApplicationContainer:
             @app.on_startup
             async def _startup() -> None:
                 await self.web_application.startup()
-                await self.sensor_manager.start_all_configured_sensors()
 
             @app.on_shutdown
             async def _shutdown() -> None:
-                await self.sensor_manager.shutdown()
                 await self.web_application.shutdown()
 
             ui.run(
@@ -256,8 +226,6 @@ class ApplicationContainer:
                 await asyncio.to_thread(self._bg_thread.join, 5)
             # Shutdown web application
             await self.web_application.shutdown()
-            # Shutdown sensor manager
-            await self.sensor_manager.shutdown()
 
             # Shutdown background tasks
             for pool, future in self._background_tasks:
@@ -293,10 +261,7 @@ class ApplicationContainer:
 
         # Shutdown async services synchronously
         async def _async_shutdown() -> None:
-            await asyncio.gather(
-                asyncio.create_task(self.sensor_manager.shutdown()),
-                asyncio.create_task(self.web_application.shutdown()),
-            )
+            await self.web_application.shutdown()
 
         try:
             try:
@@ -339,7 +304,6 @@ class ApplicationContainer:
             Dictionary with service status information
         """
         return {
-            "sensors": self.sensor_manager.get_sensor_status(),
             "config_loaded": bool(self.config_service._config_cache),
             "background_tasks": len(self._background_tasks),
             "shutdown_requested": self._shutdown_requested,

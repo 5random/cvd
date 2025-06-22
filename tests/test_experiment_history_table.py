@@ -2,7 +2,7 @@ from datetime import datetime, date
 import types
 
 
-from src.experiment_handler.experiment_manager import (
+from src.experiment_manager import (
     ExperimentConfig,
     ExperimentResult,
     ExperimentState,

@@ -18,7 +18,7 @@ from src.controllers.controller_base import (
     ControllerConfig,
     ControllerStatus,
 )
-from src.data_handler.interface.sensor_interface import SensorReading
+# Removed SensorReading import since sensors are not used
 from src.utils.log_service import info, error, debug
 
 
@@ -261,7 +261,7 @@ class ControllerManager:
 
     async def process_data(
         self,
-        sensor_data: Dict[str, SensorReading],
+        sensor_data: Dict[str, Any],
         metadata: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, ControllerResult]:
         """Process sensor data through all controllers in dependency order"""
@@ -312,7 +312,7 @@ class ControllerManager:
     def _prepare_controller_input(
         self,
         controller_id: str,
-        sensor_data: Dict[str, SensorReading],
+        sensor_data: Dict[str, Any],
         controller_outputs: Dict[str, Any],
         metadata: Dict[str, Any],
     ) -> ControllerInput:

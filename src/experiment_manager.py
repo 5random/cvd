@@ -26,9 +26,7 @@ from src.utils.config_service import (
     ConfigurationService,
     ConfigurationError,
 )
-from src.data_handler.sources.sensor_source_manager import SensorManager
 from src.utils.data_utils.data_saver import DataSaver
-from src.data_handler.interface.sensor_interface import SensorReading, SensorStatus
 from src.utils.data_utils.compression_service import (
     get_compression_service,
     CompressionError,
@@ -116,7 +114,7 @@ class ExperimentDataPoint:
     timestamp: float
     experiment_id: Optional[str]
     phase: ExperimentPhase
-    sensor_readings: Dict[str, SensorReading] = field(default_factory=dict)
+    sensor_readings: Dict[str, Any] = field(default_factory=dict)
     controller_outputs: Dict[str, Any] = field(default_factory=dict)
     custom_data: Dict[str, Any] = field(default_factory=dict)
 
@@ -137,7 +135,6 @@ class ExperimentManager:
     def __init__(
         self,
         config_service: ConfigurationService,
-        sensor_manager: Optional[SensorManager] = None,
         controller_manager: Optional[ControllerManager] = None,
         data_saver: Optional[DataSaver] = None,
         *,
@@ -148,14 +145,12 @@ class ExperimentManager:
 
         Args:
             config_service: Configuration service for settings
-            sensor_manager: Optional sensor manager for data collection
             controller_manager: Optional controller manager for equipment control
             data_saver: Optional data saver for storage
             auto_install_signal_handlers: Install SIGINT/SIGTERM handlers if an
                 event loop is running
         """
         self.config_service = config_service
-        self.sensor_manager = sensor_manager
         self.controller_manager = controller_manager
         self.data_saver = data_saver
         # Initialize compression and maintenance service
@@ -361,10 +356,6 @@ class ExperimentManager:
             # Initialize data collection
             self._collected_data.clear()
 
-            # Start sensors if configured
-            if config.auto_start_sensors and self.sensor_manager:
-                await self._start_sensors(config.sensor_ids)
-
             # Start controllers if configured
             if config.auto_start_controllers and self.controller_manager:
                 await self._start_controllers(config.controller_ids)
@@ -533,20 +524,6 @@ class ExperimentManager:
             error(f"Unexpected error cancelling experiment: {e}")
             raise
 
-    async def _start_sensors(self, sensor_ids: List[str]) -> None:
-        """Start specified sensors or all if empty list"""
-        if not self.sensor_manager:
-            warning("No sensor manager available")
-            return
-
-        if not sensor_ids:
-            # Start all configured sensors
-            await self.sensor_manager.start_all_configured_sensors()
-        else:
-            # Start specific sensors
-            for sensor_id in sensor_ids:
-                await self.sensor_manager.start_sensor(sensor_id)
-
     async def _start_controllers(self, controller_ids: List[str]) -> None:
         """Start specified controllers or all if empty list"""
         if not self.controller_manager:
@@ -616,11 +593,6 @@ class ExperimentManager:
                 phase=self._current_phase,
             )
 
-            # Collect sensor readings
-            if self.sensor_manager:
-                sensor_readings = self.sensor_manager.get_latest_readings()
-                data_point.sensor_readings = sensor_readings
-
             # Collect controller outputs
             if self.controller_manager:
                 try:
@@ -652,7 +624,6 @@ class ExperimentManager:
             # Update remaining statistics
             if self._current_experiment in self._experiment_results:
                 result = self._experiment_results[self._current_experiment]
-                result.sensor_readings_count += len(data_point.sensor_readings)
                 result.controller_outputs_count += len(data_point.controller_outputs)
 
         except (RuntimeError, OSError) as e:
@@ -668,24 +639,11 @@ class ExperimentManager:
     async def _save_data_point(self, data_point: ExperimentDataPoint) -> None:
         """Save a data point to storage"""
         try:
-            # Save sensor readings using DataSaver
+            # Save sensor readings using DataSaver (no SensorReading wrapper)
             for sensor_id, reading in data_point.sensor_readings.items():
-                # Create a modified reading with experiment context
-                exp_reading = SensorReading(
-                    sensor_id=f"{data_point.experiment_id or 'unknown'}_{sensor_id}",
-                    value=reading.value,
-                    timestamp=data_point.timestamp,
-                    status=reading.status,
-                    error_message=reading.error_message,
-                    metadata={
-                        **reading.metadata,
-                        "experiment_id": data_point.experiment_id,
-                        "experiment_phase": data_point.phase.value,
-                        "original_sensor_id": sensor_id,
-                    },
-                )
                 if self.data_saver:
-                    self.data_saver.save(exp_reading, category="raw")
+                    # Save raw reading object or dict directly
+                    self.data_saver.save(reading, category="raw")
 
             # Save experiment-specific summary file
             await self._save_experiment_summary(data_point)
@@ -727,16 +685,9 @@ class ExperimentManager:
                         ]
                     )
 
-                valid_sensors = sum(
-                    1
-                    for r in data_point.sensor_readings.values()
-                    if r.status == SensorStatus.OK
-                )
-                error_sensors = sum(
-                    1
-                    for r in data_point.sensor_readings.values()
-                    if r.status != SensorStatus.OK
-                )
+                # Count all sensor readings; status metrics not available
+                valid_sensors = len(data_point.sensor_readings)
+                error_sensors = 0
 
                 writer.writerow(
                     [
