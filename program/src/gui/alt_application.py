@@ -1098,7 +1098,7 @@ class SimpleGUIApplication:
             except asyncio.CancelledError:
                 break
             except Exception as exc:
-                error(f"Processing loop error: {exc}")
+                error("Processing loop error", exc_info=exc)
                 await asyncio.sleep(0.1)
 
     def run(self, host: str = "localhost", port: int = 8081):
