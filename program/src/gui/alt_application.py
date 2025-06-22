@@ -126,6 +126,7 @@ class SimpleGUIApplication:
         self._experiment_start: Optional[datetime] = None
         self._experiment_duration: Optional[int] = None
         self._experiment_timer: Optional[ui.timer] = None
+        self._time_timer: Optional[ui.timer] = None
         self._processing_task: Optional[asyncio.Task] = None
         self.supported_camera_modes: list[tuple[int, int, int]] = []
 
@@ -256,7 +257,7 @@ class SimpleGUIApplication:
                     # Current time
                     self.time_label = ui.label("")
                     # schedule update_time every second
-                    ui.timer(1.0, lambda: self.update_time())
+                    self._time_timer = ui.timer(1.0, lambda: self.update_time())
 
     def create_main_layout(self):
         """Create the main application layout"""
@@ -1229,6 +1230,12 @@ class SimpleGUIApplication:
                 with contextlib.suppress(Exception):
                     await self._processing_task
                 self._processing_task = None
+            if self._time_timer:
+                try:
+                    self._time_timer.cancel()
+                except Exception:
+                    pass
+                self._time_timer = None
             await self.controller_manager.stop_all_controllers()
 
         info(f"Starting Simple CVD GUI on http://{host}:{port}")
