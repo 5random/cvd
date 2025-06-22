@@ -1076,7 +1076,9 @@ class SimpleGUIApplication:
                                 ui.label(str(entry.get("subject", "Alert"))).classes(
                                     "font-medium"
                                 )
-                                ui.label(str(entry["recipient"])).classes("text-gray-600")
+                                ui.label(
+                                    str(entry.get("recipient", "Unknown"))
+                                ).classes("text-gray-600")
 
                             ui.icon("email").classes("text-blue-600")
 
