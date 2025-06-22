@@ -21,7 +21,10 @@ from src.utils.config_service import (
     ConfigurationError,
     set_config_service,
 )
-from src.data_handler.sources.sensor_source_manager import SensorManager
+from src.data_handler.sources.sensor_source_manager import (
+    SensorManager,
+    load_entry_point_sensors,
+)
 from src.utils.data_utils.data_saver import DataSaver
 from src.data_handler.processing.pipeline.pipeline import (
     create_temperature_pipeline,
@@ -102,6 +105,10 @@ class ApplicationContainer:
             )
             # Create a default temperature processing pipeline
             pipeline = create_temperature_pipeline("temperature_pipeline")
+
+            disable_hw = config_service.get("disable_hardware_sensors", bool, False)
+            load_entry_point_sensors(disable_hardware=disable_hw)
+
             # Initialize sensor manager with data_saver and pipeline
             sensor_manager = SensorManager(
                 config_service=config_service,
