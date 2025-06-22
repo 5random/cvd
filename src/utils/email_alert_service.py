@@ -1,4 +1,5 @@
 """Email alerting service for critical controller states."""
+
 import smtplib
 from email.message import EmailMessage
 from typing import Optional, List, Dict, Iterable, Union, Any
@@ -29,23 +30,29 @@ class EmailAlertService:
 
     def _load_configuration(self) -> None:
         assert self._config_service is not None, "Configuration service not available"
-        cfg = self._config_service.get('alerting', dict, {}) or {}
+        cfg = self._config_service.get("alerting", dict, {}) or {}
         self.recipient = cfg.get("email_recipient")
-        self.smtp_host: str = cfg.get('smtp_host', 'localhost')
-        self.smtp_port: int = cfg.get('smtp_port', 25)
-        self.smtp_user: Optional[str] = cfg.get('smtp_user')
-        self.smtp_password: Optional[str] = cfg.get('smtp_password')
+        self.smtp_host: str = cfg.get("smtp_host", "localhost")
+        self.smtp_port: int = cfg.get("smtp_port", 25)
+        self.smtp_user: Optional[str] = cfg.get("smtp_user")
+        self.smtp_password: Optional[str] = cfg.get("smtp_password")
         # Use SSL connection if True, else use STARTTLS on standard SMTP
-        self.smtp_use_ssl: bool = cfg.get('smtp_use_ssl', False)
-        self.critical_timeout: int = cfg.get('critical_state_timeout_s', 60)
+        self.smtp_use_ssl: bool = cfg.get("smtp_use_ssl", False)
+        self.critical_timeout: int = cfg.get("critical_state_timeout_s", 60)
 
         # Validate configuration and fall back to safe defaults rather than raising
-        if not self.recipient or not isinstance(self.recipient, str) or not self.recipient.strip():
-            warning("EmailAlertService: email recipient not configured; alert emails disabled")
+        if (
+            not self.recipient
+            or not isinstance(self.recipient, str)
+            or not self.recipient.strip()
+        ):
+            warning(
+                "EmailAlertService: email recipient not configured; alert emails disabled"
+            )
             self.recipient = None
         if not isinstance(self.smtp_host, str) or not self.smtp_host.strip():
             warning("EmailAlertService: invalid smtp_host; using 'localhost'")
-            self.smtp_host = 'localhost'
+            self.smtp_host = "localhost"
         if not isinstance(self.smtp_port, int) or not (1 <= self.smtp_port <= 65535):
             warning("EmailAlertService: invalid smtp_port; using 25")
             self.smtp_port = 25
@@ -68,16 +75,23 @@ class EmailAlertService:
             status_text: Optional additional status text appended to body
             image_attachment: Optional JPEG image bytes to attach
         """
-        target = recipient or self.recipients or ([] if self.recipient is None else [self.recipient])
-        if isinstance(target, str):
-            targets = [target]
+        if recipient is not None:
+            raw_targets: Union[str, Iterable[str]] = recipient
+        elif self.recipients:
+            raw_targets = self.recipients
         else:
-            targets = list(target)
+            raw_targets = []
+
+        if isinstance(raw_targets, str):
+            targets = [raw_targets]
+        else:
+            targets = list(raw_targets)
         if not targets:
             warning("EmailAlertService: no recipient configured")
             return False
         try:
             # Establish connection: SSL or plain
+            smtp_conn: smtplib.SMTP
             if self.smtp_use_ssl:
                 smtp_conn = smtplib.SMTP_SSL(self.smtp_host, self.smtp_port)
             else:
@@ -94,9 +108,9 @@ class EmailAlertService:
                     smtp.login(self.smtp_user, self.smtp_password)
                 for addr in targets:
                     msg = EmailMessage()
-                    msg['Subject'] = subject
-                    msg['From'] = self.smtp_user or 'cvd-tracker'
-                    msg['To'] = addr
+                    msg["Subject"] = subject
+                    msg["From"] = self.smtp_user or "cvd-tracker"
+                    msg["To"] = addr
                     full_body = body
                     if status_text:
                         full_body += f"\n\n{status_text}"
@@ -104,18 +118,20 @@ class EmailAlertService:
                     if image_attachment is not None:
                         msg.add_attachment(
                             image_attachment,
-                            maintype='image',
-                            subtype='jpeg',
-                            filename='attachment.jpg',
+                            maintype="image",
+                            subtype="jpeg",
+                            filename="attachment.jpg",
                         )
                     smtp.send_message(msg)
                     info(f"Sent alert email to {addr}")
-                    self._history.append({
-                        "time": datetime.now().strftime("%H:%M:%S"),
-                        "recipient": addr,
-                        "subject": subject,
-                        "attachment": bool(image_attachment),
-                    })
+                    self._history.append(
+                        {
+                            "time": datetime.now().strftime("%H:%M:%S"),
+                            "recipient": addr,
+                            "subject": subject,
+                            "attachment": bool(image_attachment),
+                        }
+                    )
             return True
         except Exception as exc:
             error(f"Failed to send alert email: {exc}")
