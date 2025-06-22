@@ -3,14 +3,19 @@ from __future__ import annotations
 import time
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Tuple, List
-
 if TYPE_CHECKING:
     from src.utils.data_utils.data_manager import DataManager
 from concurrent.futures import Future
-
 from src.utils.data_utils.indexing import DataCategory, DirectoryEventHandler
 from src.utils.log_service import info, warning, error, debug
-from src.utils.concurrency.thread_pool import get_thread_pool_manager, ThreadPoolType, ManagedThreadPool
+from src.utils.concurrency.thread_pool import (
+    get_thread_pool_manager,
+    ThreadPoolType,
+    ManagedThreadPool,
+)
+
+if TYPE_CHECKING:
+    from .data_manager import DataManager
 
 
 class MaintenanceManager:
@@ -37,7 +42,9 @@ class MaintenanceManager:
     def start_worker(self) -> None:
         mgr = get_thread_pool_manager()
         pool = mgr.get_pool(ThreadPoolType.FILE_IO)
-        fut = pool.submit_task(lambda: self._background_worker(), task_id="data_maintenance")
+        fut = pool.submit_task(
+            lambda: self._background_worker(), task_id="data_maintenance"
+        )
         self._track(pool, fut)
 
     def shutdown(self) -> None:
@@ -62,8 +69,12 @@ class MaintenanceManager:
                 mgr.indexer.scan_directories()
                 self._cleanup_expired_downloads()
                 mgr.compression_mgr.process_compression_queue()
-                mgr._maintenance_service.rotate_old_files([mgr.raw_dir, mgr.processed_dir])
-                mgr._maintenance_service.compress_inactive_files([mgr.raw_dir, mgr.processed_dir])
+                mgr._maintenance_service.rotate_old_files(
+                    [mgr.raw_dir, mgr.processed_dir]
+                )
+                mgr._maintenance_service.compress_inactive_files(
+                    [mgr.raw_dir, mgr.processed_dir]
+                )
                 mgr._shutdown_event.wait(mgr.index_scan_interval * 60)
             except Exception as e:
                 error(f"Error in background maintenance: {e}")
@@ -71,9 +82,13 @@ class MaintenanceManager:
         info("Background maintenance worker stopped")
 
     def start_watchers(self) -> None:
-        if not DirectoryEventHandler or getattr(DirectoryEventHandler, '__name__', None) is None:
+        if (
+            not DirectoryEventHandler
+            or getattr(DirectoryEventHandler, "__name__", None) is None
+        ):
             return
         from watchdog.observers import Observer  # lazy import
+
         self._observer = Observer()
         directories = [
             (self._manager.raw_dir, DataCategory.RAW),
@@ -104,7 +119,9 @@ class MaintenanceManager:
             metadata = mgr.indexer._create_file_metadata(file_path, category)
             if metadata:
                 idx.files[file_key] = metadata
-                idx.dir_mtimes[str(file_path.parent.resolve())] = file_path.parent.stat().st_mtime
+                idx.dir_mtimes[
+                    str(file_path.parent.resolve())
+                ] = file_path.parent.stat().st_mtime
                 mgr.indexer.save_index()
 
     def _cleanup_expired_downloads(self) -> None:

@@ -1,12 +1,15 @@
 from __future__ import annotations
-
 from typing import TYPE_CHECKING, List
 
 if TYPE_CHECKING:
     from src.utils.data_utils.data_manager import DataManager
 
+
 from src.utils.log_service import debug, error
 from src.utils.data_utils.indexing import FileStatus
+
+if TYPE_CHECKING:
+    from .data_manager import DataManager
 
 
 class CompressionManager:
@@ -22,7 +25,9 @@ class CompressionManager:
         idx = mgr._index
         if not idx:
             return
-        pending_files = [m for m in idx.files.values() if m.status == FileStatus.PENDING_COMPRESSION]
+        pending_files = [
+            m for m in idx.files.values() if m.status == FileStatus.PENDING_COMPRESSION
+        ]
         updated = False
         for metadata in pending_files:
             try:

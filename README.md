@@ -67,14 +67,14 @@ only used by the test suite and should not be modified for normal operation.
 Launch the GUI application specifying the configuration directory:
 
 ```bash
-python program/main.py --config-dir program/config
+python src/main.py --config-dir program/config
 ```
 
 To run the application with your own configuration directory simply point
 `--config-dir` to the folder containing your files:
 
 ```bash
-python program/main.py --config-dir path/to/my_config
+python src/main.py --config-dir path/to/my_config
 ```
 
 You may also set the ``CVD_CONFIG_DIR`` environment variable instead of passing
@@ -108,7 +108,7 @@ The controller manager controls how many controllers may execute in parallel.
 Set the ``CONTROLLER_MANAGER_CONCURRENCY_LIMIT`` environment variable to adjust
 this number. If unset, it defaults to ``10``. You can also provide the same
 value on startup using the ``--controller-concurrency-limit`` option of
-``program/main.py`` which simply sets this environment variable for you.
+``src/main.py`` which simply sets this environment variable for you.
 
 ### Webcam UVC settings
 

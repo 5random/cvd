@@ -183,7 +183,9 @@ class DataSaver:
             ).preserve_original
 
             if not preserve and file_path.exists():
-                warning(f"Source file was not deleted after compression: {file_path}")
+                msg = f"Source file was not deleted after compression: {file_path}"
+                warning(msg)
+                logging.getLogger("cvd_tracker.error").warning(msg)
 
             if preserve:
                 info(f"Compressed file {file_path} -> {compressed_path}")
@@ -216,7 +218,9 @@ class DataSaver:
             ).preserve_original
 
             if not preserve and file_path.exists():
-                warning(f"Source file was not deleted after compression: {file_path}")
+                msg = f"Source file was not deleted after compression: {file_path}"
+                warning(msg)
+                logging.getLogger("cvd_tracker.error").warning(msg)
 
             if preserve:
                 info(f"Compressed file {file_path} -> {compressed_path}")
