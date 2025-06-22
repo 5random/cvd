@@ -277,6 +277,27 @@ class TestSimpleGUIApplicationCameraFunctionality:
         assert ws.video_element.source == ""
         assert ws.camera_active is False
 
+    async def test_motion_header_icon_updates(self, user: User, simple_gui_app):
+        """Header motion icon should change on motion events"""
+
+        @ui.page("/")
+        def main_page():
+            simple_gui_app.create_header()
+
+        await user.open("/")
+
+        assert "text-gray-400" in simple_gui_app.motion_status_icon.classes
+
+        simple_gui_app.update_motion_status(True)
+        assert simple_gui_app.motion_detected is True
+        assert simple_gui_app.motion_status_icon.name == "motion_photos_on"
+        assert "text-orange-300" in simple_gui_app.motion_status_icon.classes
+
+        simple_gui_app.update_motion_status(False)
+        assert simple_gui_app.motion_detected is False
+        assert simple_gui_app.motion_status_icon.name == "motion_photos_off"
+        assert "text-gray-400" in simple_gui_app.motion_status_icon.classes
+
     async def test_camera_settings_update(self, simple_gui_app):
         """Test: Kamera-Einstellungen werden korrekt aktualisiert"""
         # Test sensitivity update

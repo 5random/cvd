@@ -287,7 +287,9 @@ class SimpleGUIApplication:
             on_camera_status_change=self.update_camera_status,
         )
         self.motion_section = MotionStatusSection(
-            self.settings, controller_manager=self.controller_manager
+            self.settings,
+            controller_manager=self.controller_manager,
+            update_callback=self.update_motion_status,
         )
         self.experiment_section = ExperimentManagementSection(
             self.settings,
@@ -319,6 +321,8 @@ class SimpleGUIApplication:
         # Ensure webcam widget reflects current camera state on page load
         if self.camera_active:
             self.update_camera_status(True)
+        if self.motion_detected:
+            self.update_motion_status(True)
 
     def update_time(self):
         """Update the time display in header"""
@@ -355,6 +359,22 @@ class SimpleGUIApplication:
                     start_btn.set_icon("play_arrow")
                     start_btn.props("color=positive")
                 ws.camera_active = False
+
+    def update_motion_status(self, detected: bool) -> None:
+        """Update motion icon and state based on detection status."""
+        self.motion_detected = detected
+        if hasattr(self, "motion_status_icon"):
+            self.motion_status_icon.name = (
+                "motion_photos_on" if detected else "motion_photos_off"
+            )
+            if detected:
+                self.motion_status_icon.classes(
+                    add="text-orange-300", remove="text-gray-400"
+                )
+            else:
+                self.motion_status_icon.classes(
+                    add="text-gray-400", remove="text-orange-300"
+                )
 
     # Header button handlers
     def toggle_fullscreen(self):
