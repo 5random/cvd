@@ -1,7 +1,9 @@
 from __future__ import annotations
 
-from pathlib import Path
-from typing import List
+from typing import TYPE_CHECKING, List
+
+if TYPE_CHECKING:
+    from src.utils.data_utils.data_manager import DataManager
 
 from src.utils.log_service import debug, error
 from src.utils.data_utils.indexing import FileStatus

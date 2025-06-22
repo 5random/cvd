@@ -2,8 +2,6 @@ from nicegui import ui, events
 import asyncio
 import inspect
 from src.utils.ui_helpers import notify_later
-import asyncio
-import inspect
 
 
 # Default values for UVC camera controls

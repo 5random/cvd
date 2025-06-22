@@ -2,11 +2,10 @@
 Core interfaces and data structures for the CVD Tracker system.
 """
 from abc import ABC, abstractmethod
-from typing import Dict, Optional, Any, AsyncIterator
+from typing import Dict, Optional, Any
 from dataclasses import dataclass, field
 from enum import Enum
 import time
-from src.utils.log_service import info, warning, error, debug
 
 class SensorStatus(Enum):
     """Status enumeration for sensor readings"""

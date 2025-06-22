@@ -6,7 +6,7 @@ from abc import ABC, abstractmethod
 from typing import Any, Dict, Optional, List, Callable
 from dataclasses import dataclass, field
 from nicegui import ui
-from src.utils.log_service import info, warning, error, debug
+from src.utils.log_service import info
 
 
 @dataclass
@@ -191,7 +191,7 @@ class CardComponent(BaseComponent):
 
         # Add content section
         with card:
-            with ui.card_section() as content_section:
+            with ui.card_section():
                 if self.content_factory:
                     self._content_element = self.content_factory()
                 else:

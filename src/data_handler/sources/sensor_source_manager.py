@@ -4,7 +4,7 @@ Central sensor management service for handling sensor lifecycle and data collect
 
 import asyncio
 import importlib.metadata
-from typing import Dict, List, Optional, Type, Callable, Any
+from typing import Dict, List, Optional, Callable, Any
 from importlib.metadata import EntryPoint
 from concurrent.futures import ThreadPoolExecutor, Executor
 from src.data_handler.interface.sensor_interface import (
@@ -22,7 +22,7 @@ from src.data_handler.sources.mock_sensors import (
 )
 from src.utils.data_utils.data_saver import DataSaver
 from src.data_handler.processing.pipeline.pipeline import DataPipeline
-from src.utils.log_service import info, warning, error, debug
+from src.utils.log_service import info, warning, error
 
 # Registry for sensor implementations
 SensorFactory = Callable[[SensorConfig, Optional[Executor]], SensorInterface]
@@ -205,7 +205,7 @@ class SensorManager:
             sensor_configs = self.config_service.get_sensor_configs()
             # sensor_configs may be a dict or list of (id,config) tuples
             if sensor_configs is None:
-                error(f"No sensor configurations available")
+                error("No sensor configurations available")
                 return False
             try:
                 if isinstance(sensor_configs, dict):

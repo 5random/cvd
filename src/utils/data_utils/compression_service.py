@@ -7,12 +7,11 @@ import zipfile
 import bz2
 import lzma
 import shutil
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
-from typing import Optional, Dict, Any, List, Union, Callable
+from typing import Optional, Dict, Any, List, Union
 from dataclasses import dataclass
 from threading import Lock
-import os
 
 from src.utils.config_service import get_config_service, ConfigurationError
 from src.utils.log_service import debug, info, warning, error

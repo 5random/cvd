@@ -5,21 +5,18 @@ der SimpleGUIApplication zu testen.
 """
 
 import pytest
-from pathlib import Path
 from typing import Dict, Any
 import types
 from unittest.mock import Mock, AsyncMock
 
-from nicegui import ui, Client
+from nicegui import ui
 from nicegui.testing import User
+from src.gui.alt_application import SimpleGUIApplication
+from src.utils.config_service import ConfigurationService
+from src.utils.email_alert_service import EmailAlertService
 
 # Plugin für NiceGUI Testing Framework
 pytest_plugins = ["nicegui.testing.user_plugin"]
-
-from src.gui.alt_application import SimpleGUIApplication
-from src.controllers.controller_manager import ControllerManager
-from src.utils.config_service import ConfigurationService
-from src.utils.email_alert_service import EmailAlertService
 
 
 class MockEmailAlertService(EmailAlertService):
@@ -97,11 +94,6 @@ def mock_config_service(tmp_path):
     """Erstelle einen Mock Configuration Service"""
     config_path = tmp_path / "config.json"
     default_path = tmp_path / "default_config.json"
-
-    config_data = {
-        "webapp": {"fps_cap": 30},
-        "ui": {"title": "CVD Tracker Test", "refresh_rate_ms": 1000},
-    }
 
     config_path.write_text("{}")
     default_path.write_text("{}")
@@ -486,7 +478,10 @@ class TestSimpleGUIApplicationWithMockControllers:
         simple_gui_app.camera_controller = mock_camera
 
         notifications = []
-        notifier = lambda msg, **kw: notifications.append(msg)
+
+        def notifier(msg, **kw):
+            notifications.append(msg)
+
         monkeypatch.setattr("src.utils.ui_helpers.notify_later", notifier)
         monkeypatch.setattr("src.gui.alt_application.notify_later", notifier)
 
@@ -508,7 +503,10 @@ class TestSimpleGUIApplicationWithMockControllers:
 
         mock_camera.stop = AsyncMock(side_effect=RuntimeError("boom"))
         notifications = []
-        notifier = lambda msg, **kw: notifications.append(msg)
+
+        def notifier(msg, **kw):
+            notifications.append(msg)
+
         monkeypatch.setattr("src.utils.ui_helpers.notify_later", notifier)
         monkeypatch.setattr("src.gui.alt_application.notify_later", notifier)
 

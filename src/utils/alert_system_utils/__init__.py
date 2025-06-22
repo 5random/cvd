@@ -1,4 +1,4 @@
-from ..email_alert_service import *  # re-export everything
+from ..email_alert_service import *  # re-export everything  # noqa: F401,F403
 import sys
 
 module = sys.modules[__name__]

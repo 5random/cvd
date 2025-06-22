@@ -3,7 +3,6 @@ from __future__ import annotations
 import gzip
 import shutil
 from datetime import datetime, timedelta
-from typing import Any, Dict
 
 
 def rotate_logs(service) -> None:

@@ -3,9 +3,6 @@ import numpy as np
 
 import pytest
 
-from src.controllers.controller_utils.controller_data_sources import (
-    camera_capture_controller,
-)
 from src.controllers.controller_utils.controller_data_sources.camera_capture_controller import (
     CameraCaptureController,
 )

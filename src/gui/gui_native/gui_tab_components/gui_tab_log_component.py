@@ -4,14 +4,14 @@ Displays logs created by log_service.py and allows downloading.
 FIXED VERSION - All logic errors corrected
 """
 
-from typing import Dict, Any, Optional, List, Callable
+from typing import Dict, Any, Optional, List
 from collections import deque
 import asyncio
 import contextlib
 from dataclasses import dataclass
 from nicegui import ui
 from pathlib import Path
-from datetime import datetime, timedelta
+from datetime import datetime
 import io
 import zipfile
 import gzip
@@ -20,9 +20,7 @@ import lzma
 import tempfile
 
 from src.utils.log_service import (
-    LogService,
     get_log_service,
-    info,
     warning,
     error,
     debug,
@@ -117,7 +115,7 @@ class LogViewerComponent(TimedComponent):
                     ).on("click", self._refresh_content)
 
             # Content area
-            with ui.column().classes("w-full") as content_container:
+            with ui.column().classes("w-full"):
                 self._content_area = ui.column().classes("w-full p-4")
                 with self._content_area:
                     # placeholder elements which will be updated
@@ -355,8 +353,8 @@ class LogComponent(BaseComponent):
 
             # Tabs for different sections
             with ui.tabs().classes("w-full") as tabs:
-                overview_tab = ui.tab("overview", label="Overview", icon="dashboard")
-                logs_tab = ui.tab("logs", label="Log Files", icon="description")
+                ui.tab("overview", label="Overview", icon="dashboard")
+                ui.tab("logs", label="Log Files", icon="description")
 
             with ui.tab_panels(tabs, value="overview").classes("w-full"):
                 # Overview panel
@@ -518,7 +516,7 @@ class LogComponent(BaseComponent):
 
     def _render_log_files(self) -> None:
         """Render log files section"""
-        with ui.column().classes("w-full gap-4") as log_files_container:
+        with ui.column().classes("w-full gap-4"):
             try:
                 log_files = self._get_log_files()
 

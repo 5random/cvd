@@ -14,7 +14,6 @@ if TYPE_CHECKING:
     from .data_manager import DataManager
 
 try:
-    from watchdog.observers import Observer  # pragma: no cover - optional
     from watchdog.events import FileSystemEventHandler, FileSystemEvent
 
     WATCHDOG_AVAILABLE = True

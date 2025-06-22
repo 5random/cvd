@@ -6,9 +6,7 @@ import json
 import copy
 import logging
 import re
-from jsonschema import Draft7Validator
-
-from typing import Dict, Any, Optional, Type, TypeVar, Union, List, Set
+from typing import Dict, Any, Optional, Type, TypeVar, List
 from pathlib import Path
 from dataclasses import dataclass
 import sys

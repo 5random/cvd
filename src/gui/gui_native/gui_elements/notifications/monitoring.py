@@ -7,7 +7,7 @@ from nicegui import ui
 
 from src.utils.email_alert_service import get_email_alert_service
 from src.controllers.controller_base import ControllerStatus
-from src.gui.gui_elements.notifications.models import Notification, NotificationSeverity, NotificationSource
+from src.gui.gui_elements.notifications.models import NotificationSeverity, NotificationSource
 
 # Stub for add_notification to satisfy usage and return type
 def add_notification(

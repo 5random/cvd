@@ -18,7 +18,6 @@ from src.gui.gui_elements.gui_notification_center_element import (
     create_notification_center,
 )
 from src.gui.gui_tab_components.gui_tab_base_component import (
-    ComponentRegistry,
     get_component_registry,
 )
 from src.gui.gui_tab_components.gui_tab_controllers_component import (

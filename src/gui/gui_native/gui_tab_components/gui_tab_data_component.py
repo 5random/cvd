@@ -17,25 +17,23 @@ Fixed issues:
 - Download functionality with proper file selection
 """
 
-from datetime import datetime, timedelta, date
-
-# Constants
-TIME_FORMAT = "%H:%M:%S"
+from datetime import datetime, date
 from pathlib import Path
 from typing import Dict, Any, Optional, List, Set
 from dataclasses import dataclass
-from nicegui import ui
-import asyncio
-import time
 import hashlib
+from nicegui import ui
 
-from src.utils.log_service import info, warning, error, debug
+from src.utils.log_service import warning, error
 from src.gui.gui_tab_components.gui_tab_base_component import (
     BaseComponent,
     ComponentConfig,
 )
 from src.utils.data_utils.data_manager import DataManager, get_data_manager
 from src.utils.data_utils.indexing import DataCategory, FileStatus, FileMetadata
+
+# Constants
+TIME_FORMAT = "%H:%M:%S"
 
 
 @dataclass

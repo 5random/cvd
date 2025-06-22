@@ -1,4 +1,3 @@
-from pathlib import Path
 from src.utils.container import ApplicationContainer
 
 
