@@ -7,7 +7,6 @@ from program.src.experiment_handler.experiment_manager import get_experiment_man
 class ExperimentManagementSection:
     def __init__(self, settings):
         """Initialize experiment management section with settings"""
-        self.experiment_running = False
         settings = settings or {
             "experiment_name": f'Experiment_{datetime.now().strftime("%Y%m%d_%H%M")}',
             "duration": 60,  # Default duration in minutes
