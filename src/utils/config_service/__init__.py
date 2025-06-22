@@ -280,6 +280,10 @@ class ConfigurationService:
         """Return the next available webcam ID."""
         return self._generate_next_id("webcams", prefix, padding)
 
+    def disable_sensors(self) -> bool:
+        """Return True if sensor startup is globally disabled."""
+        return self.get("disable_sensors", bool, False)
+
     def get_sensor_configs(
         self, interface_type: Optional[str] = None
     ) -> List[tuple[str, Dict[str, Any]]]:

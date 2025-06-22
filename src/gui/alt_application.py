@@ -4,6 +4,9 @@ The module provides a NiceGUI based interface for camera control, motion
 detection, basic experiment management and email alert configuration.
 It is intended for running the application without the full desktop GUI.
 It expects the example configuration from ``program/config/simple_config.json``.
+Set ``"disable_sensors": true`` in the configuration to skip starting sensors
+entirely. This is useful for tests or camera-only setups.
+
 """
 
 from pathlib import Path

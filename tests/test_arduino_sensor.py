@@ -1,6 +1,6 @@
 import pytest
 
-from src.data_handler.sources.sensors import arduino_tc_sensor
+from src.legacy_sensors import arduino_tc_sensor
 from src.data_handler.sources.mock_hardware.arduino_tc_board import (
     MockArduinoTCBoardSerial,
 )
