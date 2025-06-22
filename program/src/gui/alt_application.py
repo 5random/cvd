@@ -133,7 +133,7 @@ class SimpleGUIApplication:
         self.settings = {
             "sensitivity": 50,
             "fps": 30,
-            "fps_cap": self.config_service.get("webapp.fps_cap", int, FPS_CAP),
+            "fps_cap": max(self.config_service.get("webapp.fps_cap", int, FPS_CAP), 1),
             "resolution": "640x480 (30fps)",
             "rotation": 0,
             "roi_enabled": False,
@@ -340,17 +340,20 @@ class SimpleGUIApplication:
         # Synchronise webcam stream widget if it exists
         ws = getattr(self, "webcam_stream", None)
         if ws and getattr(ws, "video_element", None):
+            start_btn = getattr(ws, "start_camera_btn", None)
             if active:
                 ws.video_element.set_source("/video_feed")
-                ws.start_camera_btn.set_text("Pause Video")
-                ws.start_camera_btn.set_icon("pause")
-                ws.start_camera_btn.props("color=negative")
+                if start_btn:
+                    start_btn.set_text("Pause Video")
+                    start_btn.set_icon("pause")
+                    start_btn.props("color=negative")
                 ws.camera_active = True
             else:
                 ws.video_element.set_source("")
-                ws.start_camera_btn.set_text("Play Video")
-                ws.start_camera_btn.set_icon("play_arrow")
-                ws.start_camera_btn.props("color=positive")
+                if start_btn:
+                    start_btn.set_text("Play Video")
+                    start_btn.set_icon("play_arrow")
+                    start_btn.props("color=positive")
                 ws.camera_active = False
 
     # Header button handlers
@@ -1074,9 +1077,9 @@ class SimpleGUIApplication:
                                 ui.label(str(entry.get("subject", "Alert"))).classes(
                                     "font-medium"
                                 )
-                                ui.label(str(entry["recipient"])).classes(
-                                    "text-gray-600"
-                                )
+                                ui.label(
+                                    str(entry.get("recipient", "Unknown"))
+                                ).classes("text-gray-600")
 
                             ui.icon("email").classes("text-blue-600")
 
@@ -1112,8 +1115,8 @@ class SimpleGUIApplication:
         async def video_feed(request: Request):
             async def gen():
                 last_sent = 0.0
-                fps_cap = float(self.settings.get("fps_cap", FPS_CAP))
-                interval = 1 / fps_cap if fps_cap > 0 else 0.0
+                fps_cap = max(float(self.settings.get("fps_cap", FPS_CAP)), 1.0)
+                interval = 1 / fps_cap
                 no_frame_start: Optional[float] = None
                 timeout = 3.0
                 placeholder_bytes: Optional[bytes] = None
@@ -1166,7 +1169,7 @@ class SimpleGUIApplication:
                                     + b"\r\n"
                                 )
                             break
-                    await asyncio.sleep(0.03)
+                    await asyncio.sleep(max(0.001, interval))
 
             return StreamingResponse(
                 gen(), media_type="multipart/x-mixed-replace; boundary=frame"

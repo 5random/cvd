@@ -17,7 +17,14 @@ import re
 
 
 class EmailAlertWizard:
-    """4-Step Email Alert Service Setup Wizard using NiceGUI Stepper"""
+    """4-Step Email Alert Service Setup Wizard using NiceGUI Stepper.
+
+    Lifecycle of a wizard instance:
+    1. Create :class:`EmailAlertWizard` with an optional ``on_save`` callback.
+    2. Call :meth:`create_wizard` and embed the returned card in a dialog.
+    3. Once the dialog is closed, invoke :meth:`cleanup` or discard the
+       instance to release references to UI elements and callbacks.
+    """
 
     def __init__(self, on_save: Optional[Callable[[Dict[str, Any]], None]] = None):
         """Initialize the Email Alert Wizard
@@ -33,7 +40,7 @@ class EmailAlertWizard:
                 "no_motion_detected": {"enabled": False, "delay_minutes": 5},
                 "camera_offline": {"enabled": False},
                 "system_error": {"enabled": False},
-                "experiment_completes": {"enabled": False},
+                "experiment_complete_alert": {"enabled": False},
             },
         }
 
@@ -260,7 +267,7 @@ class EmailAlertWizard:
                         ui.checkbox(
                             "Send alert when experiments complete",
                             value=False,
-                            on_change=lambda e: self._update_experiment_complete_setting(
+                            on_change=lambda e: self._update_experiment_complete_alert_setting(
                                 e.value, summary_container
                             ),
                         )
@@ -338,7 +345,7 @@ class EmailAlertWizard:
                         ),
                         ("camera_offline", "Camera Offline", "videocam_off"),
                         ("system_error", "System Error", "error"),
-                        ("experiment_completes", "Experiment Complete", "check_circle"),
+                        ("experiment_complete_alert", "Experiment Complete", "check_circle"),
                     ]
 
                     active_alerts_count = 0
@@ -498,7 +505,12 @@ class EmailAlertWizard:
             emails.remove(email)
             self._update_email_list(email_list, step2_feedback, step2_next_btn)
 
-    def _update_email_list(self, email_list, step2_feedback: Optional[Any] = None, step2_next_btn: Optional[Any] = None):
+    def _update_email_list(
+        self,
+        email_list,
+        step2_feedback: Optional[Any] = None,
+        step2_next_btn: Optional[Any] = None,
+    ):
         """Update the email list display"""
         email_list.clear()
 
@@ -527,10 +539,17 @@ class EmailAlertWizard:
 
     def _validate_step2(self, step2_feedback, step2_next_btn):
         """Validate Step 2: Email Addresses"""
-        if len(self.alert_data["emails"]) > 0:
+        emails = self.alert_data["emails"]
+        invalid = [e for e in emails if not self._is_valid_email(e)]
+
+        if invalid:
             step2_feedback.text = (
-                f'✓ {len(self.alert_data["emails"])} email address(es) configured'
+                "Invalid email address(es) found. Please correct them to continue."
             )
+            step2_feedback.classes("text-sm text-orange-600 mt-2")
+            step2_next_btn.disable()
+        elif emails:
+            step2_feedback.text = f"✓ {len(emails)} email address(es) configured"
             step2_feedback.classes("text-sm mt-2 text-green-600")
             step2_next_btn.enable()
         else:
@@ -575,9 +594,9 @@ class EmailAlertWizard:
         self.alert_data["settings"]["system_error"]["enabled"] = value
         self._update_summary(summary_container)
 
-    def _update_experiment_complete_setting(self, value, summary_container):
+    def _update_experiment_complete_alert_setting(self, value, summary_container):
         """Update experiment complete setting"""
-        self.alert_data["settings"]["experiment_completes"]["enabled"] = value
+        self.alert_data["settings"]["experiment_complete_alert"]["enabled"] = value
         self._update_summary(summary_container)
 
     def _update_summary(self, summary_container):
@@ -611,7 +630,7 @@ class EmailAlertWizard:
                         active_alerts.append("Camera Offline")
                     elif alert_type == "system_error":
                         active_alerts.append("System Errors")
-                    elif alert_type == "experiment_completes":
+                    elif alert_type == "experiment_complete_alert":
                         active_alerts.append("Experiment Complete")
 
             with ui.row().classes("gap-2 items-center"):
@@ -700,7 +719,7 @@ class EmailAlertWizard:
                 "no_motion_detected": {"enabled": False, "delay_minutes": 5},
                 "camera_offline": {"enabled": False},
                 "system_error": {"enabled": False},
-                "experiment_completes": {"enabled": False},
+                "experiment_complete_alert": {"enabled": False},
             },
         }
 
@@ -708,6 +727,11 @@ class EmailAlertWizard:
         self.stepper.value = "alert_name"
 
         notify_later("Wizard reset", type="info")
+
+    def cleanup(self) -> None:
+        """Release references to UI elements and callbacks."""
+        self.on_save = None
+        self.stepper = None
 
     def get_configuration(self) -> Dict[str, Any]:
         """Get current configuration data"""
@@ -763,7 +787,7 @@ class EmailAlertStatusDisplay:
             "no_motion_detected": ("Keine Bewegung", "motion_photos_off"),
             "camera_offline": ("Kamera Offline", "videocam_off"),
             "system_error": ("Systemfehler", "error"),
-            "experiment_completes": ("Experiment Abgeschlossen", "science"),
+            "experiment_complete_alert": ("Experiment Abgeschlossen", "science"),
         }
         return alert_display_map.get(
             alert_key, (alert_key.replace("_", " ").title(), "notifications")
@@ -1014,11 +1038,13 @@ class EmailAlertStatusDisplay:
             if cb:
                 cb()
             dialog.close()
+        wizard = EmailAlertWizard(on_save=_on_save)
 
         with ui.dialog() as dialog, ui.card().classes("w-full max-w-4xl"):
-            create_email_alert_wizard(on_save=_on_save)
+            wizard.create_wizard()
             with ui.row().classes("w-full justify-end mt-4"):
                 ui.button("Schließen", on_click=dialog.close).props("flat")
+            dialog.on("close", lambda _: wizard.cleanup())
 
         dialog.open()
 
@@ -1040,6 +1066,7 @@ class EmailAlertStatusDisplay:
             wizard.create_wizard()
             with ui.row().classes("w-full justify-end mt-4"):
                 ui.button("Schließen", on_click=dialog.close).props("flat")
+            dialog.on("close", lambda _: wizard.cleanup())
 
         dialog.open()
 
@@ -1148,7 +1175,7 @@ def create_demo_configurations() -> List[Dict[str, Any]]:
                 "no_motion_detected": {"enabled": True, "delay_minutes": 10},
                 "camera_offline": {"enabled": True},
                 "system_error": {"enabled": True},
-                "experiment_completes": {"enabled": False},
+                "experiment_complete_alert": {"enabled": False},
             },
         },
         {
@@ -1158,7 +1185,7 @@ def create_demo_configurations() -> List[Dict[str, Any]]:
                 "no_motion_detected": {"enabled": False, "delay_minutes": 5},
                 "camera_offline": {"enabled": False},
                 "system_error": {"enabled": True},
-                "experiment_completes": {"enabled": True},
+                "experiment_complete_alert": {"enabled": True},
             },
         },
         {
@@ -1168,7 +1195,7 @@ def create_demo_configurations() -> List[Dict[str, Any]]:
                 "no_motion_detected": {"enabled": False, "delay_minutes": 5},
                 "camera_offline": {"enabled": False},
                 "system_error": {"enabled": False},
-                "experiment_completes": {"enabled": False},
+                "experiment_complete_alert": {"enabled": False},
             },
         },
     ]
@@ -1193,6 +1220,10 @@ def load_alert_configs(
         with open(path, "r", encoding="utf-8") as f:
             data = json.load(f)
             if isinstance(data, list):
+                for config in data:
+                    settings = config.get("settings", {})
+                    if "experiment_completes" in settings:
+                        settings["experiment_complete_alert"] = settings.pop("experiment_completes")
                 return data
     except Exception:
         pass
@@ -1208,5 +1239,10 @@ def save_alert_configs(
         return
     path = _get_alert_config_path(service)
     path.parent.mkdir(parents=True, exist_ok=True)
+    # ensure consistent key usage when persisting
+    for config in configs:
+        settings = config.get("settings", {})
+        if "experiment_completes" in settings:
+            settings["experiment_complete_alert"] = settings.pop("experiment_completes")
     with open(path, "w", encoding="utf-8") as f:
         json.dump(configs, f, indent=2, ensure_ascii=False)
