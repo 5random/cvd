@@ -78,6 +78,7 @@ class SimpleGUIApplication:
         controller_manager: Optional[ControllerManager] = None,
         config_dir: Optional[Path] = None,
         *,
+        config_service: Optional[ConfigurationService] = None,
         email_alert_service_cls: (
             Type[email_alert_service.EmailAlertService] | None
         ) = None,
@@ -89,15 +90,19 @@ class SimpleGUIApplication:
         self.camera_controller: Optional[CameraCaptureController] = None
 
         # Determine configuration directory and initialise core services
-        if config_dir is None:
-            # use the configuration bundled with the program by default
-            # (located in ``src/config`` relative to this file)
-            config_dir = Path(__file__).resolve().parents[2] / "src" / "config"
+        if config_service is None:
+            if config_dir is None:
+                # use the configuration bundled with the program by default
+                # (located in ``src/config`` relative to this file)
+                config_dir = Path(__file__).resolve().parents[2] / "src" / "config"
 
-        self.config_service = ConfigurationService(
-            config_dir / "config.json",
-            config_dir / "default_config.json",
-        )
+            self.config_service = ConfigurationService(
+                config_dir / "config.json",
+                config_dir / "default_config.json",
+            )
+        else:
+            self.config_service = config_service
+
         set_config_service(self.config_service)
 
         self.controller_manager = (
@@ -1239,11 +1244,11 @@ class SimpleGUIApplication:
                 error("Processing loop error", exc_info=exc)
                 await asyncio.sleep(0.1)
 
-    def run(self, host: str = "localhost", port: int = 8081):
-        """Run the simple GUI application"""
+    def register_components(self) -> None:
+        """Register NiceGUI pages"""
 
         @ui.page("/")
-        def index():
+        def index() -> None:
             self.create_main_layout()
 
         @ui.page("/video_feed")
@@ -1320,68 +1325,77 @@ class SimpleGUIApplication:
                 media_type="multipart/x-mixed-replace; boundary=frame",
             )
 
-        @app.on_startup
-        async def _startup() -> None:
-            install_signal_handlers(self.experiment_manager._task_manager)
-            try:
-                self.supported_camera_modes = await probe_camera_modes()
-            except Exception:
-                self.supported_camera_modes = []
+    async def startup(self) -> None:
+        """Start controllers and processing loop"""
+        install_signal_handlers(self.experiment_manager._task_manager)
+        try:
+            self.supported_camera_modes = await probe_camera_modes()
+        except Exception:
+            self.supported_camera_modes = []
 
-            if getattr(self, "webcam_stream", None):
-                self.webcam_stream.available_resolutions = self.supported_camera_modes
-                self.webcam_stream.update_resolutions(self.supported_camera_modes)
-            await self.controller_manager.start_all_controllers()
+        if getattr(self, "webcam_stream", None):
+            self.webcam_stream.available_resolutions = self.supported_camera_modes
+            self.webcam_stream.update_resolutions(self.supported_camera_modes)
+
+        await self.controller_manager.start_all_controllers()
+        self._processing_task = asyncio.create_task(self._processing_loop())
+
+        if (
+            self.camera_controller is not None
+            and self.camera_controller.status == ControllerStatus.RUNNING
+        ):
+            self.update_camera_status(True)
+        else:
+            warning("Camera controller failed to start")
+
+        success = await self.controller_manager.start_all_controllers()
+
+        if success:
             self._processing_task = asyncio.create_task(self._processing_loop())
+            self.camera_active = True
+            self.update_camera_status(True)
+        else:
+            ui.notify("Some controllers failed to start", type="warning")
+            error("Failed to start controllers")
 
-            # verify camera controller actually started
-            if (
-                self.camera_controller is not None
-                and self.camera_controller.status == ControllerStatus.RUNNING
-            ):
-                self.update_camera_status(True)
-            else:
-                warning("Camera controller failed to start")
+    async def shutdown(self) -> None:
+        """Shutdown controllers and cleanup"""
+        if self._processing_task:
+            self._processing_task.cancel()
+            with contextlib.suppress(Exception):
+                await self._processing_task
+            self._processing_task = None
+        if self._experiment_timer:
+            try:
+                self._experiment_timer.cancel()
+            except Exception:
+                pass
+            self._experiment_timer = None
+        if self._time_timer:
+            try:
+                self._time_timer.cancel()
+            except Exception:
+                pass
+            self._time_timer = None
+        await self.controller_manager.stop_all_controllers()
+        if self._time_timer:
+            self._time_timer.cancel()
+            self._time_timer = None
+        if self.motion_section:
+            self.motion_section.cleanup()
 
-            success = await self.controller_manager.start_all_controllers()
+    def run(self, host: str = "localhost", port: int = 8081):
+        """Run the simple GUI application."""
 
-            if success:
-                self._processing_task = asyncio.create_task(self._processing_loop())
-                # Ensure camera status reflects that controllers started
-                self.camera_active = True
-                self.update_camera_status(True)
-            else:
-                ui.notify(
-                    "Some controllers failed to start",
-                    type="warning",
-                )
-                error("Failed to start controllers")
+        self.register_components()
+
+        @app.on_startup
+        async def _startup() -> None:  # pragma: no cover - event hook
+            await self.startup()
 
         @app.on_shutdown
-        async def _shutdown() -> None:
-            if self._processing_task:
-                self._processing_task.cancel()
-                with contextlib.suppress(Exception):
-                    await self._processing_task
-                self._processing_task = None
-            if self._experiment_timer:
-                try:
-                    self._experiment_timer.cancel()
-                except Exception:
-                    pass
-                self._experiment_timer = None
-            if self._time_timer:
-                try:
-                    self._time_timer.cancel()
-                except Exception:
-                    pass
-                self._time_timer = None
-            await self.controller_manager.stop_all_controllers()
-            if self._time_timer:
-                self._time_timer.cancel()
-                self._time_timer = None
-            if self.motion_section:
-                self.motion_section.cleanup()
+        async def _shutdown() -> None:  # pragma: no cover - event hook
+            await self.shutdown()
 
         info(f"Starting Simple CVD GUI on http://{host}:{port}")
 
@@ -1396,16 +1410,11 @@ class SimpleGUIApplication:
 
 
 # Entry point
-def main():
-    """Main entry point for the simple GUI application"""
-    controller_manager = controller_manager_module.create_cvd_controller_manager()
-    # Use the example configuration bundled with the program under src/config
-    # This will be used to load the initial settings and configurations.
-    config_dir = Path(__file__).resolve().parents[2] / "src" / "simple_config"
-    app = SimpleGUIApplication(controller_manager, config_dir=config_dir)
+def main() -> None:
+    """Delegate to the project-wide entry point."""
+    from main import main as entry_point
 
-    # Startup logic is defined in ``SimpleGUIApplication.run``.
-    app.run()
+    entry_point()
 
 
 if __name__ in {"__main__", "__mp_main__"}:
