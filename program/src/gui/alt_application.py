@@ -46,6 +46,7 @@ from program.src.controllers.algorithms.motion_detection import (
 from program.src.experiment_handler.experiment_manager import (
     ExperimentManager,
     ExperimentConfig,
+    set_experiment_manager,
 )
 from program.src.utils.concurrency.async_utils import install_signal_handlers
 from program.src.utils.config_service import (
@@ -113,6 +114,8 @@ class SimpleGUIApplication:
             controller_manager=self.controller_manager,
             auto_install_signal_handlers=False,
         )
+        # expose globally for UI elements
+        set_experiment_manager(self.experiment_manager)
 
         # Additional runtime attributes
         # Global dark mode controller from NiceGUI
@@ -297,6 +300,8 @@ class SimpleGUIApplication:
                 self.experiment_section.stop_experiment_btn.on(
                     "click", self.toggle_experiment
                 )
+                # populate initial recent experiment list
+                self.experiment_section.load_recent_experiments()
 
             # Email Alerts (bottom-right) - New Alert System
             with ui.element("div").style("grid-area: alerts;") as self.alerts_container:
@@ -636,6 +641,8 @@ class SimpleGUIApplication:
             if self._experiment_timer:
                 self._experiment_timer.cancel()
                 self._experiment_timer = None
+            # update recent experiments display
+            self.experiment_section.load_recent_experiments()
             notify_later("Experiment stopped", type="info")
 
     def _update_experiment_status(self) -> None:
