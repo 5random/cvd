@@ -6,10 +6,15 @@ It is intended for running the application without the full desktop GUI.
 """
 
 from pathlib import Path
+import sys
+
+# Allow running this file directly without installing the package
+if __name__ == "__main__" and __package__ is None:
+    sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
+
 import asyncio
 import contextlib
 from datetime import datetime
-import sys
 from typing import Any, Dict, Optional, Type, cast
 
 import cv2
@@ -60,10 +65,6 @@ from program.src.utils.concurrency.async_utils import install_signal_handlers
 from program.src.utils.config_service import ConfigurationService, set_config_service
 from program.src.utils.ui_helpers import notify_later
 from program.src.utils.log_service import info, error
-
-# Allow running this file directly without installing the package
-if __name__ == "__main__" and __package__ is None:
-    sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 # Maximum frames per second for the MJPEG video feed
 FPS_CAP = 30
