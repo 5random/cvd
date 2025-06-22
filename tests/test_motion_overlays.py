@@ -1,7 +1,7 @@
 import numpy as np
 
 from src.gui.gui_elements.gui_webcam_stream_element import CameraStreamComponent
-from src.controllers.algorithms.motion_detection import MotionDetectionResult
+from src.controllers.webcam import MotionDetectionResult
 
 
 def _create_component():

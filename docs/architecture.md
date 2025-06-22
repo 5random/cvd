@@ -9,6 +9,7 @@ Sensor implementations live in `src/data_handler/sources` and adhere to the `Sen
 ## Controllers
 
 Controllers implement processing algorithms that operate on sensor data. They are managed by `ControllerManager` under `src/controllers`. Controllers can depend on the outputs of other controllers. The manager handles creation from configuration, dependency resolution and orchestrated execution when new sensor data arrives.
+Webcam-oriented controllers are located in the `src/controllers/webcam` subpackage.
 
 ## GUI
 

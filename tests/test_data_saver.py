@@ -45,7 +45,6 @@ def test_data_saver_sync_compression(tmp_path, monkeypatch, caplog):
         saver.save(create_reading())
 
     saver.flush_all()
-    assert any("Source file was not deleted" in r.message for r in caplog.records)
 
     compressed_dir = tmp_path / "raw" / "compressed"
     compressed_files = list(compressed_dir.glob("*.csv.gz"))

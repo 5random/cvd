@@ -17,10 +17,8 @@ class BadSerial:
 
 @pytest.mark.asyncio
 async def test_rs232sensor_read_invalid_data(monkeypatch):
-    monkeypatch.setattr(rs232_sensor, "info", lambda *a, **k: None)
-    monkeypatch.setattr(rs232_sensor, "warning", lambda *a, **k: None)
-    monkeypatch.setattr(rs232_sensor, "error", lambda *a, **k: None)
-    monkeypatch.setattr(rs232_sensor, "debug", lambda *a, **k: None)
+    for name in ["info", "warning", "error", "debug"]:
+        monkeypatch.setattr(rs232_sensor, name, lambda *a, **k: None, raising=False)
 
     cfg = SensorConfig(sensor_id="sen1", sensor_type="rs232")
     sensor = RS232Sensor(cfg)

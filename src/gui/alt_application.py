@@ -24,18 +24,14 @@ from fastapi.responses import StreamingResponse
 from nicegui import app, ui
 
 from src.controllers import controller_manager as controller_manager_module
-from src.controllers.algorithms.motion_detection import (
-    MotionDetectionController,
-)
+from src.controllers.webcam import MotionDetectionController
 from src.controllers.controller_base import ControllerConfig, ControllerStatus
 from src.controllers.controller_manager import ControllerManager
 from src.controllers.controller_utils.camera_utils import (
     apply_uvc_settings,
     probe_camera_modes,
 )
-from src.controllers.controller_utils.controller_data_sources.camera_capture_controller import (
-    CameraCaptureController,
-)
+from src.controllers.webcam import CameraCaptureController
 from src.experiment_handler.experiment_manager import (
     ExperimentConfig,
     ExperimentManager,

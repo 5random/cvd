@@ -17,10 +17,7 @@ from src.gui.gui_tab_components.gui_tab_base_component import (
     ComponentConfig,
 )
 from ...controllers.controller_manager import ControllerManager
-from ...controllers.algorithms.motion_detection import (
-    MotionDetectionController,
-    MotionDetectionResult,
-)
+from ...controllers.webcam import MotionDetectionController, MotionDetectionResult
 from src.utils.log_service import warning, error, debug
 from src.utils import log_service
 

@@ -1,13 +1,15 @@
 import logging
 import pytest
 from src.controllers.controller_manager import ControllerManager
-from src.controllers.algorithms.motion_detection import MotionDetectionController
+from src.controllers.webcam import MotionDetectionController
 from src.controllers.algorithms.reactor_state import ReactorStateController
+from src.controllers.controller_registry import register_controller_type
 from src.utils.config_service import ConfigurationError
 
 
 def test_create_known_controller_types():
     manager = ControllerManager()
+    register_controller_type("reactor_state", ReactorStateController)
     md = manager.create_controller({"controller_id": "md1", "type": "motion_detection"})
     rs = manager.create_controller({"controller_id": "rs1", "type": "reactor_state"})
     assert isinstance(md, MotionDetectionController)

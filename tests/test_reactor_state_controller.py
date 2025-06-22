@@ -57,10 +57,8 @@ async def test_reactor_state_transitions(monkeypatch):
 async def test_motion_metadata_multiple_controllers(monkeypatch):
     from src.controllers.algorithms import reactor_state as module
 
-    monkeypatch.setattr(module, "info", lambda *a, **k: None)
-    monkeypatch.setattr(module, "warning", lambda *a, **k: None)
-    monkeypatch.setattr(module, "error", lambda *a, **k: None)
-    monkeypatch.setattr(module, "debug", lambda *a, **k: None)
+    for name in ["info", "warning", "error", "debug"]:
+        monkeypatch.setattr(module, name, lambda *a, **k: None, raising=False)
 
     cfg = ControllerConfig(
         controller_id="rs",
