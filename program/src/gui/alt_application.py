@@ -17,6 +17,7 @@ if __name__ == "__main__" and __package__ is None:
     sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 import cv2
+import numpy as np
 from fastapi import Request
 from fastapi.responses import StreamingResponse
 from nicegui import app, ui
@@ -1099,6 +1100,9 @@ class SimpleGUIApplication:
                 last_sent = 0.0
                 fps_cap = float(self.settings.get("fps_cap", FPS_CAP))
                 interval = 1 / fps_cap if fps_cap > 0 else 0.0
+                no_frame_start: Optional[float] = None
+                timeout = 3.0
+                placeholder_bytes: Optional[bytes] = None
                 while True:
                     try:
                         if await request.is_disconnected():
@@ -1115,20 +1119,39 @@ class SimpleGUIApplication:
                             frame = output
 
                     now = asyncio.get_running_loop().time()
-                    if frame is not None and (
-                        interval <= 0 or now - last_sent >= interval
-                    ):
-                        success, buf = await run_in_executor(
-                            cv2.imencode, ".jpg", frame
-                        )
-                        if success:
-                            jpeg = buf.tobytes()
-                            yield (
-                                b"--frame\r\nContent-Type: image/jpeg\r\n\r\n"
-                                + jpeg
-                                + b"\r\n"
+                    if frame is not None:
+                        no_frame_start = None
+                        if interval <= 0 or now - last_sent >= interval:
+                            success, buf = await run_in_executor(
+                                cv2.imencode, ".jpg", frame
                             )
-                            last_sent = now
+                            if success:
+                                jpeg = buf.tobytes()
+                                yield (
+                                    b"--frame\r\nContent-Type: image/jpeg\r\n\r\n"
+                                    + jpeg
+                                    + b"\r\n"
+                                )
+                                last_sent = now
+                    else:
+                        if no_frame_start is None:
+                            no_frame_start = now
+                        if now - no_frame_start >= timeout:
+                            error(
+                                f"Camera failed to provide frames for {timeout} seconds"
+                            )
+                            if placeholder_bytes is None:
+                                placeholder = np.zeros((10, 10, 3), dtype=np.uint8)
+                                success, buf = cv2.imencode(".jpg", placeholder)
+                                if success:
+                                    placeholder_bytes = buf.tobytes()
+                            if placeholder_bytes:
+                                yield (
+                                    b"--frame\r\nContent-Type: image/jpeg\r\n\r\n"
+                                    + placeholder_bytes
+                                    + b"\r\n"
+                                )
+                            break
                     await asyncio.sleep(0.03)
 
             return StreamingResponse(
