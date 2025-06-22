@@ -958,7 +958,7 @@ class ExperimentManager:
 
         try:
             self._experiment_configs.pop(experiment_id, None)
-            result = self._experiment_results.pop(experiment_id, None)
+            self._experiment_results.pop(experiment_id, None)
 
             exp_dir = self.experiments_base_dir / experiment_id
             if exp_dir.exists():
