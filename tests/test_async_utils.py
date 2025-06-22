@@ -89,6 +89,19 @@ async def test_async_task_manager_stop_task_exception_removed():
 
 
 @pytest.mark.asyncio
+async def test_async_task_manager_stop_task_completed_success():
+    mgr = AsyncTaskManager("tst")
+
+    async with mgr:
+        task = asyncio.create_task(asyncio.sleep(0))
+        await task
+        mgr._tasks["w"] = task
+        result = await mgr.stop_task("w", timeout=0.1)
+        assert result is True
+        assert "w" not in mgr._tasks
+
+
+@pytest.mark.asyncio
 async def test_gather_with_concurrency_cancels_remaining():
     cancelled = asyncio.Event()
 
