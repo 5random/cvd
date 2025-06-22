@@ -15,6 +15,9 @@ def test_global_services_set(tmp_path, monkeypatch):
     class DummyManager:
         _controllers = {}
 
+        def get_controller(self, controller_id: str):
+            return self._controllers.get(controller_id)
+
     def dummy_create_manager():
         captured['config'] = get_config_service()
         return DummyManager()
