@@ -671,7 +671,7 @@ class SimpleGUIApplication:
                 )
         notify_later("ROI updated", type="positive")
 
-    def apply_uvc_settings(self):
+    async def apply_uvc_settings(self):
         """Apply UVC camera settings"""
         settings = {
             "brightness": self.webcam_stream.brightness_number.value,
@@ -689,25 +689,31 @@ class SimpleGUIApplication:
         }
         self.settings.update(settings)
         # Apply UVC settings asynchronously if capture objects are available
+        tasks = []
         if (
             self.camera_controller is not None
             and self.camera_controller._capture is not None
         ):
             capture = self.camera_controller._capture
-            asyncio.create_task(apply_uvc_settings(capture, settings))
+            tasks.append(asyncio.create_task(apply_uvc_settings(capture, settings)))
         if (
             self.motion_controller is not None
             and self.motion_controller._capture is not None
         ):
             capture = self.motion_controller._capture
-            asyncio.create_task(apply_uvc_settings(capture, settings))
+            tasks.append(asyncio.create_task(apply_uvc_settings(capture, settings)))
         if self.camera_controller:
             self.camera_controller.uvc_settings.update(settings)
         if self.motion_controller:
             self.motion_controller.uvc_settings.update(settings)
+        if tasks:
+            results = await asyncio.gather(*tasks, return_exceptions=True)
+            for res in results:
+                if isinstance(res, Exception):
+                    error("apply_uvc_failed", exc_info=res)
         notify_later("UVC settings applied", type="positive")
 
-    def reset_uvc_defaults(self):
+    async def reset_uvc_defaults(self):
         """Reset all UVC controls to their default values."""
         if not self.webcam_stream:
             return
@@ -744,19 +750,30 @@ class SimpleGUIApplication:
 
         self.settings.update(defaults)
 
+        tasks = []
         if self.camera_controller:
             self.camera_controller.uvc_settings.update(defaults)
             if self.camera_controller._capture is not None:
-                asyncio.create_task(
-                    apply_uvc_settings(self.camera_controller._capture, defaults)
+                tasks.append(
+                    asyncio.create_task(
+                        apply_uvc_settings(self.camera_controller._capture, defaults)
+                    )
                 )
 
         if self.motion_controller:
             self.motion_controller.uvc_settings.update(defaults)
             if self.motion_controller._capture is not None:
-                asyncio.create_task(
-                    apply_uvc_settings(self.motion_controller._capture, defaults)
+                tasks.append(
+                    asyncio.create_task(
+                        apply_uvc_settings(self.motion_controller._capture, defaults)
+                    )
                 )
+
+        if tasks:
+            results = await asyncio.gather(*tasks, return_exceptions=True)
+            for res in results:
+                if isinstance(res, Exception):
+                    error("apply_uvc_failed", exc_info=res)
 
         notify_later("UVC settings reset to defaults", type="positive")
 
