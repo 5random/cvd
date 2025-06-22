@@ -24,6 +24,12 @@ import smtplib
 from datetime import datetime
 from email.message import EmailMessage
 from typing import Iterable
+import sys
+
+# Ensure `program` package is importable when running script directly
+if __name__ == "__main__" and __package__ is None:
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
 
 from program.src.utils.config_service import (
     ConfigurationService,
