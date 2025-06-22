@@ -1,12 +1,30 @@
 from nicegui import ui
 from datetime import datetime
-from typing import List
-from program.src.experiment_handler.experiment_manager import get_experiment_manager
+from typing import List, Optional, Callable
+
+from program.src.experiment_handler.experiment_manager import (
+    ExperimentConfig,
+    get_experiment_manager,
+)
+from program.src.utils.ui_helpers import notify_later
 
 
 class ExperimentManagementSection:
-    def __init__(self, settings):
-        """Initialize experiment management section with settings"""
+
+    def __init__(self, settings: Optional[dict] = None, callbacks: Optional[dict] = None):
+        """Initialize experiment management section with settings
+        Args:
+            settings: optional configuration dictionary
+            callbacks: optional callbacks for button actions
+        """
+        self.experiment_running = False
+        self.callbacks = callbacks or {}
+        self._experiment_start: Optional[datetime] = None
+        self._experiment_duration: Optional[int] = None
+        self._experiment_timer: Optional[ui.timer] = None
+        self._current_experiment_id: Optional[str] = None
+        self.experiment_manager = get_experiment_manager()
+
         settings = settings or {
             "experiment_name": f'Experiment_{datetime.now().strftime("%Y%m%d_%H%M")}',
             "duration": 60,  # Default duration in minutes
@@ -49,27 +67,54 @@ class ExperimentManagementSection:
             ui.label("Quick Experiment Setup").classes("text-sm font-semibold mb-2")
 
             with ui.column().classes("gap-3"):
-                self.experiment_name_input = ui.input(
-                    "Experiment Name",
-                    placeholder="Enter experiment name",
-                    value=f'Experiment_{datetime.now().strftime("%Y%m%d_%H%M")}',
-                ).classes("w-full")
+                self.experiment_name_input = (
+                    ui.input(
+                        "Experiment Name",
+                        placeholder="Enter experiment name",
+                        value=self.settings["experiment_name"],
+                    )
+                    .on("update:model-value", self._on_name_change)
+                    .classes("w-full")
+                )
 
-                self.experiment_duration_input = ui.number(
-                    "Duration (minutes)", value=60, min=1, max=100000
-                ).classes("w-full")
+                self.experiment_duration_input = (
+                    ui.number(
+                        "Duration (minutes)",
+                        value=self.settings["duration"],
+                        min=1,
+                        max=100000,
+                    )
+                    .on("update:model-value", self._on_duration_change)
+                    .classes("w-full")
+                )
 
                 # Experiment options
                 ui.label("Recording Options").classes("text-sm font-semibold")
                 with ui.column().classes("ml-4 gap-1"):
                     self.record_motion_data_checkbox = ui.checkbox(
-                        "Record motion detection data", value=True
+                        "Record motion detection data",
+                        value=self.settings["record_motion_data"],
+                    ).on(
+                        "update:model-value",
+                        lambda e: self._on_checkbox_change(
+                            "record_motion_data", e.value
+                        ),
                     )
                     self.record_timestamps_checkbox = ui.checkbox(
-                        "Record event timestamps", value=True
+                        "Record event timestamps",
+                        value=self.settings["record_timestamps"],
+                    ).on(
+                        "update:model-value",
+                        lambda e: self._on_checkbox_change(
+                            "record_timestamps", e.value
+                        ),
                     )
                     self.save_alerts_checkbox = ui.checkbox(
-                        "Save alert events", value=False
+                        "Save alert events",
+                        value=self.settings["save_alerts"],
+                    ).on(
+                        "update:model-value",
+                        lambda e: self._on_checkbox_change("save_alerts", e.value),
                     )
 
             # Control buttons
@@ -93,6 +138,15 @@ class ExperimentManagementSection:
                 )
                 self.stop_experiment_btn.disable()
 
+            # Bind default callbacks if none provided
+            cb = self.callbacks.get("toggle_experiment")
+            if cb is not None:
+                self.start_experiment_btn.on("click", cb)
+                self.stop_experiment_btn.on("click", cb)
+            else:
+                self.start_experiment_btn.on("click", self.toggle_experiment)
+                self.stop_experiment_btn.on("click", self.toggle_experiment)
+
             # Recent experiments
             ui.separator().classes("my-3")
             with ui.expansion("Recent Experiments").classes(
@@ -105,6 +159,25 @@ class ExperimentManagementSection:
 
         # populate recent experiments initially
         self.load_recent_experiments()
+
+    def _on_name_change(self, event) -> None:
+        """Update experiment name in settings."""
+        value = getattr(event, "value", None)
+        if value is not None:
+            self.settings["experiment_name"] = value
+
+    def _on_duration_change(self, event) -> None:
+        """Update experiment duration in settings."""
+        value = getattr(event, "value", None)
+        if value is not None:
+            try:
+                self.settings["duration"] = int(value)
+            except (TypeError, ValueError):
+                return
+
+    def _on_checkbox_change(self, key: str, value: bool) -> None:
+        """Handle checkbox value changes."""
+        self.settings[key] = bool(value)
 
     def _format_duration(self, seconds: float) -> str:
         """Return human readable duration"""
@@ -148,3 +221,78 @@ class ExperimentManagementSection:
                     ui.label(self._format_duration(duration)).classes(
                         "text-sm text-gray-600"
                     )
+
+    async def toggle_experiment(self) -> None:
+        """Start or stop an experiment using the global ExperimentManager."""
+        manager = self.experiment_manager
+        if manager is None:
+            notify_later("No experiment manager available", type="negative")
+            return
+
+        if not self.experiment_running:
+            name = self.experiment_name_input.value
+            duration = self.experiment_duration_input.value
+            self._experiment_duration = int(duration) if duration else None
+
+            config = ExperimentConfig(
+                name=name,
+                duration_minutes=self._experiment_duration,
+            )
+            exp_id = manager.create_experiment(config)
+            success = await manager.start_experiment(exp_id)
+            if not success:
+                notify_later("Failed to start experiment", type="negative")
+                return
+
+            self._current_experiment_id = exp_id
+            self.experiment_running = True
+            self._experiment_start = datetime.now()
+            self.start_experiment_btn.disable()
+            self.stop_experiment_btn.enable()
+            self.experiment_icon.classes("text-green-600")
+            self.experiment_status_label.text = "Experiment running"
+            self.experiment_name_label.text = f"Name: {name}"
+            dur_text = (
+                f"Duration: {self._experiment_duration} min"
+                if self._experiment_duration
+                else "Duration: unlimited"
+            )
+            self.experiment_duration_label.text = dur_text
+            self.experiment_elapsed_label.text = "Elapsed: 0s"
+            self.experiment_progress.value = 0.0
+            self.experiment_details.set_visibility(True)
+            if self._experiment_timer:
+                self._experiment_timer.cancel()
+            self._experiment_timer = ui.timer(1.0, self._update_experiment_status)
+            notify_later(f'Started experiment "{name}"', type="positive")
+        else:
+            success = await manager.stop_experiment()
+            if not success:
+                notify_later("Failed to stop experiment", type="negative")
+                return
+
+            self.experiment_running = False
+            self._current_experiment_id = None
+            self.start_experiment_btn.enable()
+            self.stop_experiment_btn.disable()
+            self.experiment_icon.classes("text-gray-500")
+            self.experiment_status_label.text = "No experiment running"
+            self.experiment_details.set_visibility(False)
+            if self._experiment_timer:
+                self._experiment_timer.cancel()
+                self._experiment_timer = None
+            self.load_recent_experiments()
+            notify_later("Experiment stopped", type="info")
+
+    def _update_experiment_status(self) -> None:
+        """Update elapsed time and progress bar during a running experiment."""
+        if not self.experiment_running or not self._experiment_start:
+            return
+
+        elapsed = (datetime.now() - self._experiment_start).total_seconds()
+        self.experiment_elapsed_label.text = f"Elapsed: {int(elapsed)}s"
+
+        if self._experiment_duration:
+            total = self._experiment_duration * 60
+            progress = min(elapsed / total, 1.0)
+            self.experiment_progress.value = progress

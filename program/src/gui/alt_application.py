@@ -57,6 +57,7 @@ from program.src.utils.concurrency import (
 from program.src.utils.concurrency.async_utils import install_signal_handlers
 from program.src.utils.config_service import ConfigurationService, set_config_service
 from program.src.utils.ui_helpers import notify_later
+from program.src.utils.log_service import info, error
 
 
 class SimpleGUIApplication:
@@ -264,7 +265,10 @@ class SimpleGUIApplication:
         self.motion_section = MotionStatusSection(
             self.settings, controller_manager=self.controller_manager
         )
-        self.experiment_section = ExperimentManagementSection(self.settings)
+        self.experiment_section = ExperimentManagementSection(
+            self.settings,
+            callbacks={"toggle_experiment": self.toggle_experiment},
+        )
         # Note: EmailAlertsSection replaced with new alert system
 
         # Main content area - Masonry-style layout with CSS Grid
@@ -280,12 +284,6 @@ class SimpleGUIApplication:
             # Experiment Management (bottom-left)
             with ui.element("div").style("grid-area: experiment;"):
                 self.experiment_section.create_experiment_section()
-                self.experiment_section.start_experiment_btn.on(
-                    "click", self.toggle_experiment
-                )
-                self.experiment_section.stop_experiment_btn.on(
-                    "click", self.toggle_experiment
-                )
                 # populate initial recent experiment list
                 self.experiment_section.load_recent_experiments()
 
@@ -944,7 +942,7 @@ class SimpleGUIApplication:
             except asyncio.CancelledError:
                 break
             except Exception as exc:
-                print(f"Processing loop error: {exc}")
+                error(f"Processing loop error: {exc}")
 
     def run(self, host: str = "localhost", port: int = 8081):
         """Run the simple GUI application"""
@@ -1006,7 +1004,7 @@ class SimpleGUIApplication:
                 self._processing_task = None
             await self.controller_manager.stop_all_controllers()
 
-        print(f"Starting Simple CVD GUI on http://{host}:{port}")
+        info(f"Starting Simple CVD GUI on http://{host}:{port}")
 
         ui.run(
             host=host,

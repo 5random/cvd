@@ -1140,9 +1140,9 @@ def create_demo_configurations() -> List[Dict[str, Any]]:
         {
             "name": "Labor Überwachung",
             "emails": [
-                "admin@lab.example.com",
-                "security@lab.example.com",
-                "technician@lab.example.com",
+                "admin@tuhh.de",
+                "security@tuhh.de",
+                "technician@tuhh.de",
             ],
             "settings": {
                 "no_motion_detected": {"enabled": True, "delay_minutes": 10},
@@ -1153,7 +1153,7 @@ def create_demo_configurations() -> List[Dict[str, Any]]:
         },
         {
             "name": "Experiment Benachrichtigungen",
-            "emails": ["researcher@university.edu", "supervisor@university.edu"],
+            "emails": ["researcher@tuhh.de", "supervisor@tuhh.de"],
             "settings": {
                 "no_motion_detected": {"enabled": False, "delay_minutes": 5},
                 "camera_offline": {"enabled": False},
@@ -1163,7 +1163,7 @@ def create_demo_configurations() -> List[Dict[str, Any]]:
         },
         {
             "name": "Inaktive Konfiguration",
-            "emails": ["test@example.com"],
+            "emails": ["test@tuhh.de"],
             "settings": {
                 "no_motion_detected": {"enabled": False, "delay_minutes": 5},
                 "camera_offline": {"enabled": False},

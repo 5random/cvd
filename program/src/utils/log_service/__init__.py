@@ -131,16 +131,18 @@ class LogService:
 
         If ``config_service`` is not provided and no global configuration
         service has been set, this constructor attempts to initialise a default
-        :class:`ConfigurationService` using the repository's ``config``
-        directory.  This mirrors the behaviour expected by the tests where no
-        explicit configuration is created before the logger is accessed.
+        :class:`ConfigurationService` using the project's ``config`` directory.
+        This is the same location used by :class:`ApplicationContainer` when no
+        configuration directory is specified.  It mirrors the behaviour expected
+        by the tests where no explicit configuration is created before the
+        logger is accessed.
         """
 
         service = config_service or get_config_service()
         if service is None:
             # Lazily create a configuration service so that ``get_log_service``
             # works even when the caller has not initialised one explicitly.
-            repo_root = Path(__file__).resolve().parents[3]
+            repo_root = Path(__file__).resolve().parents[4]
             config_path = repo_root / "config" / "config.json"
             default_config_path = repo_root / "config" / "default_config.json"
             try:
@@ -679,3 +681,4 @@ def log_structured(event_type: str, data: Dict[str, Any]):
 
 module = sys.modules[__name__]
 sys.modules.setdefault("program.src.utils.log_service", module)
+sys.modules.setdefault("src.utils.log_service", module)

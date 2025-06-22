@@ -28,9 +28,30 @@ import signal
 import sys
 import time
 import weakref
-from src.utils.log_service import info, warning, error, debug, performance, timer, context
+from src.utils.log_service import (
+    info,
+    warning,
+    error,
+    debug,
+    performance,
+    timer,
+    context,
+)
 from dataclasses import dataclass
-from typing import Any, Awaitable, Callable, Generic, Iterable, List, Optional, ParamSpec, Self, TypeVar, cast
+from typing import (
+    Any,
+    Awaitable,
+    Callable,
+    Generic,
+    Iterable,
+    List,
+    Optional,
+    ParamSpec,
+    Self,
+    TypeVar,
+    cast,
+)
+
 
 # Stub to satisfy __all__, real logging handled by LogService
 def setup_logging(level: int = logging.INFO) -> None:
@@ -42,6 +63,7 @@ def setup_logging(level: int = logging.INFO) -> None:
 T = TypeVar("T")
 R = TypeVar("R")
 P = ParamSpec("P")
+
 
 # ----------------- Retry-Decorator ----------------
 def retry_async(
@@ -66,10 +88,23 @@ def retry_async(
                 except exceptions as exc:
                     last_exc = exc
                     if attempt == attempts:
-                        error("retry_exhausted", fn=fn.__qualname__, attempts=attempts, exc_info=exc)
+                        error(
+                            "retry_exhausted",
+                            fn=fn.__qualname__,
+                            attempts=attempts,
+                            exc_info=exc,
+                        )
                         raise
-                    delay = base_delay * (backoff_factor ** (attempt - 1)) + random.uniform(0, jitter)
-                    warning("retry_scheduled", fn=fn.__qualname__, attempt=attempt, sleep=f"{delay:.3f}", exc_info=exc)
+                    delay = base_delay * (
+                        backoff_factor ** (attempt - 1)
+                    ) + random.uniform(0, jitter)
+                    warning(
+                        "retry_scheduled",
+                        fn=fn.__qualname__,
+                        attempt=attempt,
+                        sleep=f"{delay:.3f}",
+                        exc_info=exc,
+                    )
                     await asyncio.sleep(delay)
             # should not reach here
             assert last_exc is not None
@@ -81,7 +116,9 @@ def retry_async(
 
 
 # ───────────────────── Timeout-Wrapper ───────────────────────
-def run_with_timeout(timeout: float) -> Callable[[Callable[P, Awaitable[T]]], Callable[P, Awaitable[T]]]:
+def run_with_timeout(
+    timeout: float,
+) -> Callable[[Callable[P, Awaitable[T]]], Callable[P, Awaitable[T]]]:
     """Cancel wrapped coroutine after *timeout* seconds."""
 
     def decorator(fn: Callable[P, Awaitable[T]]) -> Callable[P, Awaitable[T]]:
@@ -135,7 +172,9 @@ class AsyncRateLimiter:
         elapsed = now - self._updated_at
         if elapsed <= 0:
             return
-        self._tokens = min(self._rate, self._tokens + elapsed * (self._rate / self._period))
+        self._tokens = min(
+            self._rate, self._tokens + elapsed * (self._rate / self._period)
+        )
         self._updated_at = now
 
 
@@ -274,13 +313,29 @@ class AsyncTaskManager:
             info("task_started", task_id=task_id, manager=self._name)
             try:
                 res = await coro
-                info("task_finished", dt=time.perf_counter() - start, task_id=task_id, manager=self._name)
+                info(
+                    "task_finished",
+                    dt=time.perf_counter() - start,
+                    task_id=task_id,
+                    manager=self._name,
+                )
                 return res
             except asyncio.CancelledError:
-                warning("task_cancelled", dt=time.perf_counter() - start, task_id=task_id, manager=self._name)
+                warning(
+                    "task_cancelled",
+                    dt=time.perf_counter() - start,
+                    task_id=task_id,
+                    manager=self._name,
+                )
                 raise
             except Exception as exc:
-                error("task_failed", dt=time.perf_counter() - start, exc_info=exc, task_id=task_id, manager=self._name)
+                error(
+                    "task_failed",
+                    dt=time.perf_counter() - start,
+                    exc_info=exc,
+                    task_id=task_id,
+                    manager=self._name,
+                )
                 if on_error:
                     with contextlib.suppress(Exception):
                         await on_error(exc)
@@ -308,6 +363,8 @@ class AsyncTaskManager:
             return True
         except (asyncio.TimeoutError, Exception):
             return False
+        finally:
+            self._tasks.pop(task_id, None)
 
     async def stop_all_tasks(self, *, timeout: float = 5.0) -> None:
         if not self._tasks:
@@ -318,11 +375,13 @@ class AsyncTaskManager:
         _, pending = await asyncio.wait(self._tasks.values(), timeout=timeout)
         if pending:
             warning("pending_after_shutdown", count=len(pending))
+        self._tasks.clear()
 
 
 ###############################################################################
 # Graceful shutdown signals
 ###############################################################################
+
 
 def install_signal_handlers(manager: AsyncTaskManager) -> None:
     """Install SIGINT/SIGTERM handlers to shutdown *manager* cleanly."""
@@ -337,7 +396,9 @@ def install_signal_handlers(manager: AsyncTaskManager) -> None:
 
     for sig in (signal.SIGINT, signal.SIGTERM):
         try:
-            loop.add_signal_handler(sig, lambda s=sig: asyncio.create_task(_shutdown(s.name)))
+            loop.add_signal_handler(
+                sig, lambda s=sig: asyncio.create_task(_shutdown(s.name))
+            )
         except NotImplementedError:  # Windows
             signal.signal(sig, lambda *_: asyncio.create_task(_shutdown(sig.name)))
 

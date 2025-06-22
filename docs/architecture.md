@@ -52,8 +52,4 @@ changes.
 The full diagram is available in
 [`full_class_diagram.mmd`](full_class_diagram.mmd).
 
-```mermaid
-classDiagram
-    class ExampleService
-```
 
