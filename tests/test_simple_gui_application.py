@@ -20,7 +20,7 @@ def test_global_services_set(tmp_path, monkeypatch):
             return self._controllers.get(controller_id)
 
     def dummy_create_manager():
-        captured['config'] = get_config_service()
+        captured["config"] = get_config_service()
         return DummyManager()
 
     monkeypatch.setattr(
@@ -37,14 +37,24 @@ def test_global_services_set(tmp_path, monkeypatch):
         fromlist=["EmailAlertService"],
     )
     monkeypatch.setattr(email_mod, "EmailAlertService", DummyEmailAlertService)
+    try:
+        other_mod = __import__(
+            "src.utils.email_alert_service",
+            fromlist=["EmailAlertService"],
+        )
+        monkeypatch.setattr(other_mod, "EmailAlertService", DummyEmailAlertService)
+    except ImportError:
+        pass
 
     try:
-        app = SimpleGUIApplication(config_dir=cfg_dir)
+        app = SimpleGUIApplication(
+            config_dir=cfg_dir,
+            email_alert_service_cls=DummyEmailAlertService,
+        )
         assert get_config_service() is app.config_service
         assert isinstance(app.email_alert_service, DummyEmailAlertService)
         assert app.email_alert_service.service is app.config_service
-        assert captured['config'] is app.config_service
+        assert captured["config"] is app.config_service
     finally:
         set_config_service(None)
         set_email_alert_service(None)
-
