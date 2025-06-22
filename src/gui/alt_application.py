@@ -3,7 +3,7 @@
 The module provides a NiceGUI based interface for camera control, motion
 detection, basic experiment management and email alert configuration.
 It is intended for running the application without the full desktop GUI.
-It expects the example configuration from ``program/config/simple_config.json``.
+It expects the example configuration from ``src/config/simple_config.json``.
 Set ``"disable_sensors": true`` in the configuration to skip starting sensors
 entirely. This is useful for tests or camera-only setups.
 
@@ -95,8 +95,8 @@ class SimpleGUIApplication:
         # Determine configuration directory and initialise core services
         if config_dir is None:
             # use the configuration bundled with the program by default
-            # (located in ``program/config`` relative to this file)
-            config_dir = Path(__file__).resolve().parents[2] / "config"
+            # (located in ``src/config`` relative to this file)
+            config_dir = Path(__file__).resolve().parents[2] / "src" / "config"
 
         self.config_service = ConfigurationService(
             config_dir / "config.json",
@@ -1402,8 +1402,9 @@ class SimpleGUIApplication:
 def main():
     """Main entry point for the simple GUI application"""
     controller_manager = controller_manager_module.create_cvd_controller_manager()
-    # Use the example configuration bundled with the program
-    config_dir = Path(__file__).resolve().parents[2] / "program" / "config"
+    # Use the example configuration bundled with the program under src/config
+    # This will be used to load the initial settings and configurations.
+    config_dir = Path(__file__).resolve().parents[2] / "src" / "simple_config"
     app = SimpleGUIApplication(controller_manager, config_dir=config_dir)
 
     # Startup logic is defined in ``SimpleGUIApplication.run``.
@@ -1444,6 +1445,6 @@ if __name__ in {"__main__", "__mp_main__"}:
 # or
 #   python -m src.gui.alt_application
 #
-# The application uses the configuration in ``program/config/simple_config.json``.
+# The application uses the configuration in ``src/config/simple_config.json``.
 # The email alert section will show in the bottom-right grid area.
 # Click "Konfigurieren" to set up new alerts or "Verwalten" to view existing ones.
