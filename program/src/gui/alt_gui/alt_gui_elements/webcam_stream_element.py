@@ -751,11 +751,11 @@ class WebcamStreamElement:
         self.recording = not self.recording
         if self.recording:
             # update the label of the menu item
-            self.record_menu_item.props('text="Stop Recording"')
+            self.record_menu_item.set_text("Stop Recording")
             notify_later("Recording started", type="positive")
         else:
             # reset the label when stopping the recording
-            self.record_menu_item.props('text="Start Recording"')
+            self.record_menu_item.set_text("Start Recording")
             notify_later("Recording stopped", type="warning")
 
     def take_snapshot(self):
