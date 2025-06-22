@@ -103,6 +103,16 @@ the same configuration instance.
 
 Use the fullscreen button in the header to toggle between windowed and fullscreen mode.
 
+### Simplified GUI
+
+For a minimal webcam demo you can run the alternative GUI located in
+``src/gui/alt_application.py``. It loads the example configuration from
+``program/config/simple_config.json``:
+
+```bash
+python src/gui/alt_application.py
+```
+
 ### Camera stream endpoints
 
 Each camera stream component exposes its frames via an HTTP endpoint.  The
