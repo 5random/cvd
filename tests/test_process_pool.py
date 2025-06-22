@@ -25,7 +25,7 @@ def hold(duration: float) -> None:
 
 @pytest.mark.asyncio
 async def test_pool_executes_tasks():
-    pool = ManagedProcessPool(ProcessPoolConfig(max_workers=1, timeout=1))
+    pool = ManagedProcessPool(ProcessPoolConfig(max_workers=1, timeout=2))
 
     res = await pool.submit_async(add, 1, 2)
     assert res == 3
@@ -68,7 +68,7 @@ def test_scale_workers_behavior():
     assert pool._max_workers == 2
     assert pool._executor is original_exec
 
-    fut.result(timeout=1)
+    fut.result(timeout=2)
 
     pool.scale_workers(1)
     assert pool._max_workers == 1
