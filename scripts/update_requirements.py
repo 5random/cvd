@@ -11,6 +11,7 @@ def main() -> None:
         data = tomllib.load(f)
 
     deps = data.get("project", {}).get("dependencies", [])
+    deps = sorted(deps)
     req_file.write_text("\n".join(deps) + "\n")
 
 
