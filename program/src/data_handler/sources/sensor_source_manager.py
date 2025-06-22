@@ -4,6 +4,7 @@ Central sensor management service for handling sensor lifecycle and data collect
 
 import asyncio
 import importlib.metadata
+import src  # ensure aliasing between 'src' and 'program.src'
 from typing import Dict, List, Optional, Type, Callable, Any
 from importlib.metadata import EntryPoint
 from concurrent.futures import ThreadPoolExecutor, Executor
@@ -37,6 +38,7 @@ SENSOR_REGISTRY: Dict[str, SensorFactory] = {
 def load_entry_point_sensors(group: str = "cvd.sensors") -> None:
     """Load sensor implementations from entry points."""
     try:
+        importlib.invalidate_caches()
         eps = importlib.metadata.entry_points()
         if hasattr(eps, "select"):
             selected: List[EntryPoint] = list(eps.select(group=group))

@@ -164,10 +164,14 @@ class ExperimentManager:
         # Initialize compression and maintenance service
         self.compression_service = get_compression_service()
         threshold = self.config_service.get(
-            "data_storage.compression.threshold_bytes", int, 10 * 1024 * 1024
+            "data_storage.compression.threshold_bytes",
+            expected_type=int,
+            default=10 * 1024 * 1024,
         )
         max_age = self.config_service.get(
-            "data_storage.compression.max_file_age_seconds", int, 24 * 3600
+            "data_storage.compression.max_file_age_seconds",
+            expected_type=int,
+            default=24 * 3600,
         )
         self._maintenance_service = FileMaintenanceService(
             compression_service=self.compression_service,
@@ -215,7 +219,9 @@ class ExperimentManager:
         """Load experiment configuration from config service"""
         try:
             # Load legacy experiment config (auto_zip, naming, state messages)
-            exp_config = self.config_service.get("experiment", dict, {})
+            exp_config = self.config_service.get(
+                "experiment", expected_type=dict, default={}
+            )
             self.auto_zip = exp_config.get("auto_zip", True)
             self.naming_pattern = exp_config.get("naming_pattern", "%Y-%m-%dT%H-%M-%S")
             self.state_messages = exp_config.get(
@@ -225,7 +231,9 @@ class ExperimentManager:
             # Load new experiments storage paths from data_storage
             storage_cfg = (
                 self.config_service.get(
-                    "data_storage.storage_paths.experiments", dict, {}
+                    "data_storage.storage_paths.experiments",
+                    expected_type=dict,
+                    default={},
                 )
                 or {}
             )
