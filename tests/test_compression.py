@@ -3,12 +3,15 @@ from pathlib import Path
 import pytest
 
 from src.utils.config_service import ConfigurationService, set_config_service
-from program.src.utils.data_utils.compression_service import CompressionService, set_compression_service
+from program.src.utils.data_utils.compression_service import (
+    CompressionService,
+    set_compression_service,
+)
 from program.src.utils.data_utils.data_saver import DataSaver
 from program.src.utils.data_utils.file_management_service import FileMaintenanceService
 
 
-def _init_services(tmp_path: Path) -> tuple[ConfigurationService, CompressionService, DataSaver]:
+def _init_services(tmp_path: Path, request: pytest.FixtureRequest) -> tuple[ConfigurationService, CompressionService, DataSaver]:
     cfg_dir = Path('program/config')
     config_service = ConfigurationService(cfg_dir / 'config.json', cfg_dir / 'default_config.json')
     set_config_service(config_service)
@@ -17,11 +20,16 @@ def _init_services(tmp_path: Path) -> tuple[ConfigurationService, CompressionSer
     set_compression_service(compression_service)
 
     data_saver = DataSaver(base_output_dir=tmp_path, enable_background_operations=False)
+    def cleanup() -> None:
+        set_config_service(None)
+        set_compression_service(None)
+
+    request.addfinalizer(cleanup)
     return config_service, compression_service, data_saver
 
 
-def test_data_saver_compress_sync(tmp_path: Path):
-    _, compression_service, data_saver = _init_services(tmp_path)
+def test_data_saver_compress_sync(tmp_path: Path, request: pytest.FixtureRequest):
+    _, compression_service, data_saver = _init_services(tmp_path, request)
 
     file_path = tmp_path / 'raw' / 'sample.csv'
     file_path.parent.mkdir(parents=True, exist_ok=True)
@@ -35,8 +43,8 @@ def test_data_saver_compress_sync(tmp_path: Path):
     assert not file_path.exists()
 
 
-def test_file_maintenance_compress(tmp_path: Path):
-    _, compression_service, _ = _init_services(tmp_path)
+def test_file_maintenance_compress(tmp_path: Path, request: pytest.FixtureRequest):
+    _, compression_service, _ = _init_services(tmp_path, request)
     service = FileMaintenanceService(compression_service, compression_threshold_bytes=0, max_file_age_seconds=0)
 
     file_path = tmp_path / 'example.csv'
@@ -49,23 +57,23 @@ def test_file_maintenance_compress(tmp_path: Path):
     assert not file_path.exists()
 
 
-def test_is_already_compressed_partial_match(tmp_path: Path):
-    _, compression_service, _ = _init_services(tmp_path)
+def test_is_already_compressed_partial_match(tmp_path: Path, request: pytest.FixtureRequest):
+    _, compression_service, _ = _init_services(tmp_path, request)
 
     assert not compression_service._is_already_compressed(
         Path("uncompressed/file.csv")
     )
 
 
-def test_is_already_compressed_dir_name(tmp_path: Path):
-    _, compression_service, _ = _init_services(tmp_path)
+def test_is_already_compressed_dir_name(tmp_path: Path, request: pytest.FixtureRequest):
+    _, compression_service, _ = _init_services(tmp_path, request)
 
     assert compression_service._is_already_compressed(
         Path("data/compressed/file.csv")
     )
 
 
-def test_is_already_compressed_extension(tmp_path: Path):
-    _, compression_service, _ = _init_services(tmp_path)
+def test_is_already_compressed_extension(tmp_path: Path, request: pytest.FixtureRequest):
+    _, compression_service, _ = _init_services(tmp_path, request)
 
     assert compression_service._is_already_compressed(Path("file.csv.gz"))

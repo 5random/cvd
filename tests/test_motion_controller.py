@@ -13,6 +13,11 @@ from program.src.controllers.controller_base import ControllerConfig
 messages: list[str] = []
 
 
+@pytest.fixture(autouse=True)
+def _clear_messages():
+    messages.clear()
+
+
 @pytest.mark.asyncio
 async def test_motion_detection_on_black_frame(monkeypatch):
     config = ControllerConfig(controller_id="md", controller_type="motion_detection")
@@ -135,6 +140,9 @@ async def test_multi_frame_probability_mode(monkeypatch):
         },
     )
     ctrl = MotionDetectionController("md", cfg)
+
+    import program.src.controllers.algorithms.motion_detection as md
+    monkeypatch.setattr(md, "info", lambda msg, **kw: messages.append(msg))
 
     results = [
         MotionDetectionResult(False, 0, 0, 0, None, None, 0.0),

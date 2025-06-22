@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import List
 
 from program.src.utils.log_service import debug, error
-from src.utils.data_utils.indexing import FileStatus
+from program.src.utils.data_utils.indexing import FileStatus
 
 
 class CompressionManager:

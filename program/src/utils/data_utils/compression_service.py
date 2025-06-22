@@ -16,7 +16,7 @@ import os
 
 from program.src.utils.config_service import get_config_service, ConfigurationError
 from program.src.utils.log_service import debug, info, warning, error
-from src.utils.concurrency.thread_pool import get_thread_pool_manager, ThreadPoolType
+from program.src.utils.concurrency.thread_pool import get_thread_pool_manager, ThreadPoolType
 
 @dataclass
 class CompressionSettings:

@@ -12,13 +12,13 @@ from typing import Any, Dict, List, Optional, Tuple, Type
 from types import TracebackType
 
 from program.src.utils.config_service import get_config_service
-from src.utils.concurrency.thread_pool import (
+from program.src.utils.concurrency.thread_pool import (
     get_thread_pool_manager,
     ThreadPoolType,
 )
-from src.utils.data_utils.compression_service import get_compression_service
-from src.utils.data_utils.file_management_service import FileMaintenanceService
-from src.utils.data_utils.indexing import (
+from program.src.utils.data_utils.compression_service import get_compression_service
+from program.src.utils.data_utils.file_management_service import FileMaintenanceService
+from program.src.utils.data_utils.indexing import (
     DataCategory,
     FileStatus,
     FileMetadata,
@@ -27,8 +27,8 @@ from src.utils.data_utils.indexing import (
     Indexer,
     DirectoryEventHandler,
 )
-from src.utils.data_utils.compression_manager import CompressionManager
-from src.utils.data_utils.maintenance import MaintenanceManager
+from program.src.utils.data_utils.compression_manager import CompressionManager
+from program.src.utils.data_utils.maintenance import MaintenanceManager
 from program.src.utils.log_service import info, warning, error
 
 

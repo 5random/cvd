@@ -5,8 +5,8 @@ import time
 import os
 
 from program.src.utils.log_service import info, warning, error
-from src.utils.concurrency.thread_pool import get_thread_pool_manager, ThreadPoolType
-from src.utils.data_utils.compression_service import CompressionService
+from program.src.utils.concurrency.thread_pool import get_thread_pool_manager, ThreadPoolType
+from program.src.utils.data_utils.compression_service import CompressionService
 
 
 class FileMaintenanceService:

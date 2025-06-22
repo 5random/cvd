@@ -5,9 +5,13 @@ from pathlib import Path
 from typing import Any, Tuple, List
 from concurrent.futures import Future
 
-from src.utils.data_utils.indexing import DataCategory, DirectoryEventHandler
+from program.src.utils.data_utils.indexing import DataCategory, DirectoryEventHandler
 from program.src.utils.log_service import info, warning, error, debug
-from src.utils.concurrency.thread_pool import get_thread_pool_manager, ThreadPoolType, ManagedThreadPool
+from program.src.utils.concurrency.thread_pool import (
+    get_thread_pool_manager,
+    ThreadPoolType,
+    ManagedThreadPool,
+)
 
 
 class MaintenanceManager:
