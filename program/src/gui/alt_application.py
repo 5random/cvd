@@ -57,6 +57,7 @@ from program.src.utils.concurrency import (
 from program.src.utils.concurrency.async_utils import install_signal_handlers
 from program.src.utils.config_service import ConfigurationService, set_config_service
 from program.src.utils.ui_helpers import notify_later
+from program.src.utils.log_service import info, error
 
 
 class SimpleGUIApplication:
@@ -944,7 +945,7 @@ class SimpleGUIApplication:
             except asyncio.CancelledError:
                 break
             except Exception as exc:
-                print(f"Processing loop error: {exc}")
+                error(f"Processing loop error: {exc}")
 
     def run(self, host: str = "localhost", port: int = 8081):
         """Run the simple GUI application"""
@@ -1006,7 +1007,7 @@ class SimpleGUIApplication:
                 self._processing_task = None
             await self.controller_manager.stop_all_controllers()
 
-        print(f"Starting Simple CVD GUI on http://{host}:{port}")
+        info(f"Starting Simple CVD GUI on http://{host}:{port}")
 
         ui.run(
             host=host,
