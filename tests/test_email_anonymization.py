@@ -1,4 +1,4 @@
-from program.src.gui.alt_gui.alt_gui_elements.alert_element_new import (
+from src.gui.alt_gui.alt_gui_elements.alert_element_new import (
     EmailAlertStatusDisplay,
 )
 

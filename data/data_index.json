@@ -389,14 +389,96 @@
       "compressed_path": null,
       "checksum": null,
       "tags": null
+    },
+    "/workspace/cvd/data/experiment_data/Experiment_20250622_1621_2025-06-22T16-24-02/metadata/compressed/experiment_metadata.json.gz": {
+      "file_path": "data/experiment_data/Experiment_20250622_1621_2025-06-22T16-24-02/metadata/compressed/experiment_metadata.json.gz",
+      "category": "experiments",
+      "status": "compressed",
+      "size_bytes": 398,
+      "created_at": "2025-06-22T18:46:26.351354",
+      "modified_at": "2025-06-22T18:46:26.351354",
+      "sensor_id": null,
+      "experiment_id": "data",
+      "compressed_path": null,
+      "checksum": null,
+      "tags": null
+    },
+    "/workspace/cvd/data/logs/error.log": {
+      "file_path": "data/logs/error.log",
+      "category": "logs",
+      "status": "active",
+      "size_bytes": 10539,
+      "created_at": "2025-06-22T18:57:18.872637",
+      "modified_at": "2025-06-22T18:57:18.872637",
+      "sensor_id": "error",
+      "experiment_id": null,
+      "compressed_path": null,
+      "checksum": null,
+      "tags": null
+    },
+    "/workspace/cvd/data/logs/audit.log": {
+      "file_path": "data/logs/audit.log",
+      "category": "logs",
+      "status": "active",
+      "size_bytes": 0,
+      "created_at": "2025-06-22T18:48:45.135925",
+      "modified_at": "2025-06-22T18:48:45.135925",
+      "sensor_id": "audit",
+      "experiment_id": null,
+      "compressed_path": null,
+      "checksum": null,
+      "tags": null
+    },
+    "/workspace/cvd/data/logs/performance.log": {
+      "file_path": "data/logs/performance.log",
+      "category": "logs",
+      "status": "active",
+      "size_bytes": 0,
+      "created_at": "2025-06-22T18:48:45.135925",
+      "modified_at": "2025-06-22T18:48:45.135925",
+      "sensor_id": "performance",
+      "experiment_id": null,
+      "compressed_path": null,
+      "checksum": null,
+      "tags": null
+    },
+    "/workspace/cvd/data/logs/info.log": {
+      "file_path": "data/logs/info.log",
+      "category": "logs",
+      "status": "active",
+      "size_bytes": 16878,
+      "created_at": "2025-06-22T18:48:55.143891",
+      "modified_at": "2025-06-22T18:48:55.143891",
+      "sensor_id": "info",
+      "experiment_id": null,
+      "compressed_path": null,
+      "checksum": null,
+      "tags": null
+    },
+    "/workspace/cvd/data/logs/structured.log": {
+      "file_path": "data/logs/structured.log",
+      "category": "logs",
+      "status": "active",
+      "size_bytes": 0,
+      "created_at": "2025-06-22T18:48:45.135925",
+      "modified_at": "2025-06-22T18:48:45.135925",
+      "sensor_id": "structured",
+      "experiment_id": null,
+      "compressed_path": null,
+      "checksum": null,
+      "tags": null
     }
   },
-  "last_updated": "2025-06-22T16:28:58.459757",
+  "last_updated": "2025-06-22T18:57:24.252429",
   "dir_mtimes": {
     "data/raw": 1749628139.7117362,
     "data/processed": 1749628139.7117362,
     "data/experiments": 1749540052.7895098,
-    "data/logs": 1749532440.2002645
+    "data/logs": 1749532440.2002645,
+    "/workspace/cvd/data/sensor_data/raw": 1750618131.758577,
+    "/workspace/cvd/data/sensor_data/processed": 1750618131.758577,
+    "/workspace/cvd/data/experiment_data": 1750618129.4519103,
+    "/workspace/cvd/data/logs": 1750618126.2559214
   },
   "version": "1.0"
 }

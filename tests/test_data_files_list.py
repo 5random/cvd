@@ -1,12 +1,12 @@
 from datetime import datetime
 from pathlib import Path
 
-from program.src.gui.gui_tab_components.gui_tab_base_component import ComponentConfig
-from program.src.gui.gui_tab_components.gui_tab_data_component import (
+from src.gui.gui_tab_components.gui_tab_base_component import ComponentConfig
+from src.gui.gui_tab_components.gui_tab_data_component import (
     DataComponentConfig,
     DataFilesList,
 )
-from program.src.utils.data_utils.indexing import FileMetadata, DataCategory, FileStatus
+from src.utils.data_utils.indexing import FileMetadata, DataCategory, FileStatus
 
 
 class DummyManager:

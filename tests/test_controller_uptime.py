@@ -2,7 +2,7 @@ import asyncio
 import pytest
 import time
 
-from program.src.controllers.controller_base import ControllerStage, ControllerConfig, ControllerResult
+from src.controllers.controller_base import ControllerStage, ControllerConfig, ControllerResult
 
 class DummyController(ControllerStage):
     async def process(self, input_data):

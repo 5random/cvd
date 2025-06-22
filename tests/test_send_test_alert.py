@@ -2,9 +2,9 @@ import asyncio
 import contextlib
 import pytest
 
-from program.src.gui.alt_application import SimpleGUIApplication
-from program.src.utils.config_service import set_config_service
-from program.src.utils.email_alert_service import set_email_alert_service
+from src.gui.alt_application import SimpleGUIApplication
+from src.utils.config_service import set_config_service
+from src.utils.email_alert_service import set_email_alert_service
 
 
 @pytest.mark.asyncio
@@ -25,7 +25,7 @@ async def test_send_test_alert_handles_exceptions(tmp_path, monkeypatch):
             return self._controllers.get(controller_id)
 
     monkeypatch.setattr(
-        "program.src.controllers.controller_manager.create_cvd_controller_manager",
+        "src.controllers.controller_manager.create_cvd_controller_manager",
         lambda: DummyManager(),
     )
 
@@ -35,7 +35,7 @@ async def test_send_test_alert_handles_exceptions(tmp_path, monkeypatch):
 
     # patch email alert service globally
     email_mod = __import__(
-        "program.src.utils.email_alert_service",
+        "src.utils.email_alert_service",
         fromlist=["EmailAlertService"],
     )
     monkeypatch.setattr(email_mod, "EmailAlertService", DummyEmailAlertService)
@@ -56,8 +56,8 @@ async def test_send_test_alert_handles_exceptions(tmp_path, monkeypatch):
 
     notifications = []
     notifier = lambda msg, **kw: notifications.append((msg, kw))
-    monkeypatch.setattr("program.src.utils.ui_helpers.notify_later", notifier)
-    monkeypatch.setattr("program.src.gui.alt_application.notify_later", notifier)
+    monkeypatch.setattr("src.utils.ui_helpers.notify_later", notifier)
+    monkeypatch.setattr("src.gui.alt_application.notify_later", notifier)
 
     async def failing_gather(tasks, *args, **kwargs):
         for t in tasks:
@@ -66,7 +66,7 @@ async def test_send_test_alert_handles_exceptions(tmp_path, monkeypatch):
         raise RuntimeError("boom")
 
     monkeypatch.setattr(
-        "program.src.gui.alt_application.gather_with_concurrency", failing_gather
+        "src.gui.alt_application.gather_with_concurrency", failing_gather
     )
 
     try:

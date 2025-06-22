@@ -4,11 +4,11 @@ import asyncio
 from PIL import Image
 import cv2
 
-from program.src.controllers.algorithms.motion_detection import (
+from src.controllers.algorithms.motion_detection import (
     MotionDetectionController,
     MotionDetectionResult,
 )
-from program.src.controllers.controller_base import ControllerConfig
+from src.controllers.controller_base import ControllerConfig
 
 messages: list[str] = []
 
@@ -75,7 +75,7 @@ async def test_initialize_logs_algorithm(monkeypatch):
     config = ControllerConfig(controller_id="md", controller_type="motion_detection")
     ctrl = MotionDetectionController("md", config)
 
-    import program.src.controllers.algorithms.motion_detection as md
+    import src.controllers.algorithms.motion_detection as md
     monkeypatch.setattr(md, "info", lambda msg, **kwargs: messages.append(msg))
 
     success = await ctrl.initialize()
@@ -319,7 +319,7 @@ async def test_invalid_roi_dimensions_skip_crop(monkeypatch):
 
     monkeypatch.setattr(ctrl._motion_pool, "submit_async", direct)
 
-    import program.src.controllers.algorithms.motion_detection as md
+    import src.controllers.algorithms.motion_detection as md
     warnings: list[str] = []
     monkeypatch.setattr(md, "warning", lambda msg, **kw: warnings.append(msg))
 
@@ -348,7 +348,7 @@ async def test_roi_out_of_bounds_skip_crop(monkeypatch):
 
     monkeypatch.setattr(ctrl._motion_pool, "submit_async", direct)
 
-    import program.src.controllers.algorithms.motion_detection as md
+    import src.controllers.algorithms.motion_detection as md
     warnings: list[str] = []
     monkeypatch.setattr(md, "warning", lambda msg, **kw: warnings.append(msg))
 

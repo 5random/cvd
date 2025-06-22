@@ -1,7 +1,7 @@
 import types
 import pytest
 
-from program.src.gui.alt_gui.alt_gui_elements.webcam_stream_element import WebcamStreamElement
+from src.gui.alt_gui.alt_gui_elements.webcam_stream_element import WebcamStreamElement
 
 class DummyMenuItem:
     def __init__(self):
@@ -16,7 +16,7 @@ def dummy_ws(monkeypatch):
     ws.record_menu_item = DummyMenuItem()
     # disable notify_later to avoid side effects
     monkeypatch.setattr(
-        "program.src.gui.alt_gui.alt_gui_elements.webcam_stream_element.notify_later",
+        "src.gui.alt_gui.alt_gui_elements.webcam_stream_element.notify_later",
         lambda *a, **k: None,
     )
     return ws

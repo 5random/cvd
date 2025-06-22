@@ -4,9 +4,9 @@ from pathlib import Path
 import pytest
 
 from src.utils.config_service import ConfigurationService, set_config_service
-from program.src.utils.data_utils.compression_service import CompressionService, set_compression_service
-from program.src.utils.data_utils.data_saver import DataSaver
-from program.src.utils.data_utils.file_management_service import FileMaintenanceService
+from src.utils.data_utils.compression_service import CompressionService, set_compression_service
+from src.utils.data_utils.data_saver import DataSaver
+from src.utils.data_utils.file_management_service import FileMaintenanceService
 
 
 def _init_services(tmp_path: Path) -> tuple[ConfigurationService, CompressionService, DataSaver]:

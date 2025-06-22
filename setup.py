@@ -15,7 +15,7 @@ setup(
     name='cvd',
     version='0.1.0',
     install_requires=read_dependencies(),
-    packages=find_packages(include=["program", "program.*", "src"]),
+    packages=find_packages(include=["program", "program.*", "src", "src.*"]),
     package_dir={"program": "program", "src": "src"},
 
     data_files=[

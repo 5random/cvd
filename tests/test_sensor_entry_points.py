@@ -21,7 +21,7 @@ def test_entry_point_registration(monkeypatch):
         "entry_points",
         lambda: EntryPoints([ep]),
     )
-    from program.src.data_handler.sources import sensor_source_manager as manager
+    from src.data_handler.sources import sensor_source_manager as manager
 
     importlib.reload(manager)
     # Reload may return the existing module due to src/program aliasing.

@@ -8,7 +8,7 @@ from tests.test_alt_gui import (
     mock_controller_manager,
     mock_config_service,
 )
-from program.src.controllers.controller_base import ControllerStatus
+from src.controllers.controller_base import ControllerStatus
 
 class DummyButton:
     def set_icon(self, *args, **kwargs):

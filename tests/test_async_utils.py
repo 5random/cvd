@@ -1,13 +1,13 @@
 import asyncio
 import pytest
 
-from program.src.utils.concurrency.async_utils import (
+from src.utils.concurrency.async_utils import (
     AsyncTaskManager,
     gather_with_concurrency,
     run_with_timeout,
 )
 from src.utils import log_service
-from program.src.utils.concurrency import async_utils
+from src.utils.concurrency import async_utils
 
 
 @pytest.mark.asyncio
