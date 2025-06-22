@@ -264,7 +264,10 @@ class SimpleGUIApplication:
         self.motion_section = MotionStatusSection(
             self.settings, controller_manager=self.controller_manager
         )
-        self.experiment_section = ExperimentManagementSection(self.settings)
+        self.experiment_section = ExperimentManagementSection(
+            self.settings,
+            callbacks={"toggle_experiment": self.toggle_experiment},
+        )
         # Note: EmailAlertsSection replaced with new alert system
 
         # Main content area - Masonry-style layout with CSS Grid
@@ -280,12 +283,6 @@ class SimpleGUIApplication:
             # Experiment Management (bottom-left)
             with ui.element("div").style("grid-area: experiment;"):
                 self.experiment_section.create_experiment_section()
-                self.experiment_section.start_experiment_btn.on(
-                    "click", self.toggle_experiment
-                )
-                self.experiment_section.stop_experiment_btn.on(
-                    "click", self.toggle_experiment
-                )
                 # populate initial recent experiment list
                 self.experiment_section.load_recent_experiments()
 
