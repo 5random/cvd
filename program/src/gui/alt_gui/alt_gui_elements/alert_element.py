@@ -81,23 +81,23 @@ class EmailAlertsSection:
                 self.no_motion_alert = ui.checkbox(
                     "No motion detected (extended period)",
                     value=self.settings.get("no_motion_alert", True),
-                ).on(
-                    "update:model-value",
-                    lambda e: self._on_checkbox_change("no_motion_alert", e.value),
+                    on_change=lambda e: self._on_checkbox_change(
+                        "no_motion_alert", e.value
+                    ),
                 )
                 self.camera_offline_alert = ui.checkbox(
                     "Camera goes offline",
                     value=self.settings.get("camera_offline_alert", True),
-                ).on(
-                    "update:model-value",
-                    lambda e: self._on_checkbox_change("camera_offline_alert", e.value),
+                    on_change=lambda e: self._on_checkbox_change(
+                        "camera_offline_alert", e.value
+                    ),
                 )
                 self.system_error_alert = ui.checkbox(
                     "System errors occur",
                     value=self.settings.get("system_error_alert", True),
-                ).on(
-                    "update:model-value",
-                    lambda e: self._on_checkbox_change("system_error_alert", e.value),
+                    on_change=lambda e: self._on_checkbox_change(
+                        "system_error_alert", e.value
+                    ),
                 )
 
                 self.system_error_alert = ui.checkbox(
@@ -108,9 +108,7 @@ class EmailAlertsSection:
                 self.experiment_complete_alert = ui.checkbox(
                     "Experiment completes",
                     value=self.settings.get("experiment_complete_alert", False),
-                ).on(
-                    "update:model-value",
-                    lambda e: self._on_checkbox_change(
+                    on_change=lambda e: self._on_checkbox_change(
                         "experiment_complete_alert", e.value
                     ),
                 )
