@@ -1,74 +1,62 @@
-# Alternative GUI application for the program that enables only basic
-# functionality of the program:
-# - live view of webcam with basic controls (start/stop webcam, adjust ROI,
-#   sensitivity settings, fps settings, resolution settings)
-# - live status of motion detection algorithm applied to the webcam with ROI and
-#   sensitivity settings
-# - email alert service for critical events (e.g. when motion is not detected)
-#   with alert delay settings (email alert includes webcam image, motion
-#   detection status, timestamp, and other relevant information)
-# - basic experiment management (start/stop experiment, view results/status,
-#   alert on critical events)
+"""Simplified GUI application exposing core CVD functionality.
+
+The module provides a NiceGUI based interface for camera control, motion
+detection, basic experiment management and email alert configuration.
+It is intended for running the application without the full desktop GUI.
+"""
 
 from pathlib import Path
+import asyncio
+import contextlib
+from datetime import datetime
 import sys
+from typing import Any, Dict, Optional, cast
 
 # Allow running this file directly without installing the package
 if __name__ == "__main__" and __package__ is None:
     sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from nicegui import ui, app
-
-from program.src.utils.ui_helpers import notify_later
-from program.src.utils.concurrency import (
-    run_in_executor,
-    run_network_io,
-    gather_with_concurrency,
-)
-from datetime import datetime
-from typing import Optional, Dict, Any
-import asyncio
-import contextlib
 import cv2
-from fastapi.responses import StreamingResponse
 from fastapi import Request
+from fastapi.responses import StreamingResponse
+from nicegui import app, ui
 
+from program.src.controllers import controller_manager as controller_manager_module
+from program.src.controllers.algorithms.motion_detection import MotionDetectionController
 from program.src.controllers.controller_base import ControllerConfig
+from program.src.controllers.controller_manager import ControllerManager
+from program.src.controllers.controller_utils.camera_utils import apply_uvc_settings
 from program.src.controllers.controller_utils.controller_data_sources.camera_capture_controller import (
     CameraCaptureController,
 )
-from program.src.controllers.controller_utils.camera_utils import apply_uvc_settings
-from program.src.controllers import controller_manager as controller_manager_module
-from program.src.controllers.controller_manager import ControllerManager
-from program.src.controllers.algorithms.motion_detection import (
-    MotionDetectionController,
-)
 from program.src.experiment_handler.experiment_manager import (
-    ExperimentManager,
     ExperimentConfig,
+    ExperimentManager,
     set_experiment_manager,
 )
-from program.src.utils.concurrency.async_utils import install_signal_handlers
-from program.src.utils.config_service import (
-    ConfigurationService,
-    set_config_service,
-)
-from program.src.utils import email_alert_service
-
 from program.src.gui.alt_gui import (
-    setup_global_styles,
-    WebcamStreamElement,
+    EmailAlertStatusDisplay,
     ExperimentManagementSection,
     MotionStatusSection,
+    WebcamStreamElement,
     create_demo_configurations,
     create_email_alert_wizard,
-    EmailAlertStatusDisplay,
+    setup_global_styles,
 )
 from program.src.gui.alt_gui.alt_gui_elements.alert_element_new import (
     load_alert_configs,
     save_alert_configs,
 )
 from program.src.gui.alt_gui.alt_gui_elements.webcam_stream_element import UVC_DEFAULTS
+from program.src.utils import email_alert_service
+from program.src.utils.concurrency import (
+    gather_with_concurrency,
+    run_in_executor,
+    run_network_io,
+)
+from program.src.utils.concurrency.async_utils import install_signal_handlers
+from program.src.utils.config_service import ConfigurationService, set_config_service
+from program.src.utils.ui_helpers import notify_later
 
 
 class SimpleGUIApplication:
@@ -145,8 +133,6 @@ class SimpleGUIApplication:
 
         # Track if we have active alerts
         self._update_alerts_status()
-
-        from typing import cast
 
         # Retrieve and cast controllers to their concrete types
         self.camera_controller = cast(
