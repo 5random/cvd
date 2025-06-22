@@ -20,6 +20,7 @@ import shutil
 from dataclasses import dataclass, field, asdict
 from enum import Enum
 from contextlib import asynccontextmanager
+import contextlib
 import threading
 
 from program.src.utils.config_service import (
@@ -182,6 +183,7 @@ class ExperimentManager:
 
         # Data collection
         self._data_collection_handle: Optional[TaskHandle[Any]] = None
+        self._auto_stop_handle: Optional[TaskHandle[Any]] = None
         self._collected_data: List[ExperimentDataPoint] = []
         self._collection_lock = threading.Lock()
 
@@ -372,7 +374,7 @@ class ExperimentManager:
             # Schedule automatic stop if duration is set
             if config.duration_minutes:
                 # schedule automatic stop via task manager
-                self._task_manager.create_task(
+                self._auto_stop_handle = self._task_manager.create_task(
                     self._auto_stop_experiment(config.duration_minutes),
                     task_id="auto_stop",
                 )
@@ -404,6 +406,13 @@ class ExperimentManager:
                 self._data_collection_handle.cancel()
                 await self._data_collection_handle.wait()
                 self._data_collection_handle = None
+
+            if self._auto_stop_handle:
+                if self._auto_stop_handle._task is not asyncio.current_task():
+                    self._auto_stop_handle.cancel()
+                    with contextlib.suppress(asyncio.CancelledError):
+                        await self._auto_stop_handle.wait()
+                self._auto_stop_handle = None
 
             # Finalize experiment
             await self._finalize_experiment()
@@ -476,6 +485,13 @@ class ExperimentManager:
                 self._data_collection_handle.cancel()
                 await self._data_collection_handle.wait()
                 self._data_collection_handle = None
+
+            if self._auto_stop_handle:
+                if self._auto_stop_handle._task is not asyncio.current_task():
+                    self._auto_stop_handle.cancel()
+                    with contextlib.suppress(asyncio.CancelledError):
+                        await self._auto_stop_handle.wait()
+                self._auto_stop_handle = None
 
             # Reset state
             self._current_experiment = None
