@@ -22,7 +22,9 @@ from fastapi.responses import StreamingResponse
 from nicegui import app, ui
 
 from program.src.controllers import controller_manager as controller_manager_module
-from program.src.controllers.algorithms.motion_detection import MotionDetectionController
+from program.src.controllers.algorithms.motion_detection import (
+    MotionDetectionController,
+)
 from program.src.controllers.controller_base import ControllerConfig
 from program.src.controllers.controller_manager import ControllerManager
 from program.src.controllers.controller_utils.camera_utils import apply_uvc_settings
@@ -120,6 +122,7 @@ class SimpleGUIApplication:
             "sensitivity": 50,
             "fps": 30,
             "resolution": "640x480 (30fps)",
+            "rotation": 0,
             "roi_enabled": False,
             "email": "",
             "alert_delay": 5,
@@ -257,6 +260,7 @@ class SimpleGUIApplication:
                 "update_sensitivity": self.update_sensitivity,
                 "update_fps": self.update_fps,
                 "update_resolution": self.update_resolution,
+                "update_rotation": self.update_rotation,
                 "set_roi": self.set_roi,
                 "apply_uvc_settings": self.apply_uvc_settings,
                 "reset_uvc_defaults": self.reset_uvc_defaults,
@@ -465,6 +469,82 @@ class SimpleGUIApplication:
         self.webcam_stream.resolution_select.value = res
         notify_later(f"Resolution set to {res}", type="positive")
 
+    def update_rotation(self, e):
+        """Update camera rotation setting."""
+        value = int(getattr(e, "value", e)) % 360
+        if value not in {0, 90, 180, 270}:
+            value = ((value + 45) // 90 * 90) % 360
+
+        old_rotation = self.settings.get("rotation", 0)
+        if value == old_rotation:
+            if hasattr(self.webcam_stream, "rotation_select"):
+                self.webcam_stream.rotation_select.value = value
+            return
+
+        self.settings["rotation"] = value
+
+        if self.camera_controller:
+            self.camera_controller.rotation = value
+        if self.motion_controller:
+            self.motion_controller.rotation = value
+
+        # Transform existing ROI to maintain orientation
+        if self.settings.get("roi_enabled"):
+            width = None
+            height = None
+            if (
+                self.camera_controller
+                and self.camera_controller.width
+                and self.camera_controller.height
+            ):
+                width = self.camera_controller.width
+                height = self.camera_controller.height
+            elif (
+                self.motion_controller
+                and self.motion_controller.width
+                and self.motion_controller.height
+            ):
+                width = self.motion_controller.width
+                height = self.motion_controller.height
+            if width is None or height is None:
+                try:
+                    dims = self.settings.get("resolution", "").split()[0]
+                    width, height = map(int, dims.split("x"))
+                except Exception:
+                    width = height = None
+
+            if width and height:
+                roi = (
+                    self.webcam_stream.roi_x,
+                    self.webcam_stream.roi_y,
+                    self.webcam_stream.roi_width,
+                    self.webcam_stream.roi_height,
+                )
+                roi = self._rot_roi(roi, old_rotation, value, width, height)
+                roi = self._clamp_roi(
+                    roi,
+                    width if value in {0, 180} else height,
+                    height if value in {0, 180} else width,
+                )
+                x, y, w, h = roi
+                self.webcam_stream.roi_x = x
+                self.webcam_stream.roi_y = y
+                self.webcam_stream.roi_width = w
+                self.webcam_stream.roi_height = h
+                if self.motion_controller:
+                    self.motion_controller.roi_x = x
+                    self.motion_controller.roi_y = y
+                    self.motion_controller.roi_width = w
+                    self.motion_controller.roi_height = h
+                self.settings.update(
+                    {"roi_x": x, "roi_y": y, "roi_width": w, "roi_height": h}
+                )
+
+        if hasattr(self.webcam_stream, "rotation_select"):
+            self.webcam_stream.rotation_select.value = value
+
+        notify_later(f"Rotation set to {value}°", type="positive")
+
     def set_roi(self):
         """Set region of interest"""
         enabled = self.webcam_stream.roi_checkbox.value
@@ -653,6 +733,52 @@ class SimpleGUIApplication:
             # update recent experiments display
             self.experiment_section.load_recent_experiments()
             notify_later("Experiment stopped", type="info")
+
+    @staticmethod
+    def _clamp_roi(roi, width, height):
+        """Clamp ROI to be within frame dimensions."""
+        if width is None or height is None:
+            return roi
+        x, y, w, h = roi
+        x = max(0, min(int(x), width - 1))
+        y = max(0, min(int(y), height - 1))
+        w = max(0, int(w))
+        h = max(0, int(h))
+        if x + w > width:
+            w = max(0, width - x)
+        if y + h > height:
+            h = max(0, height - y)
+        return x, y, w, h
+
+    @staticmethod
+    def _rot_roi(roi, old_rot, new_rot, width, height):
+        """Rotate ROI from old rotation to new rotation."""
+
+        def _rot(r, rot, w, h):
+            x, y, rw, rh = r
+            if rot == 90:
+                return y, w - x - rw, rh, rw
+            if rot == 180:
+                return w - x - rw, h - y - rh, rw, rh
+            if rot == 270:
+                return h - y - rh, x, rh, rw
+            return x, y, rw, rh
+
+        if old_rot == new_rot:
+            return roi
+
+        # Normalize rotations
+        old_rot = old_rot % 360
+        new_rot = new_rot % 360
+
+        # Rotate back to 0
+        width_old = width if old_rot in {0, 180} else height
+        height_old = height if old_rot in {0, 180} else width
+        r0 = _rot(roi, (360 - old_rot) % 360, width_old, height_old)
+
+        # Rotate to new
+        r1 = _rot(r0, new_rot % 360, width, height)
+        return r1
 
     def _update_experiment_status(self) -> None:
         """Update elapsed time and progress display while running"""
