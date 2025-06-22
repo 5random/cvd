@@ -7,3 +7,10 @@ data/logs/
 !data/logs/.gitkeep
 program/data/logs/
 *.log
+# Ignore generated data directories
+data/experiment_data/*
+!data/experiment_data/.gitkeep
+data/experiments/*
+!data/experiments/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
