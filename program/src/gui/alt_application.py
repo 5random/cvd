@@ -12,18 +12,11 @@ from datetime import datetime
 import sys
 from typing import Any, Dict, Optional, Type, cast
 
-# Allow running this file directly without installing the package
-if __name__ == "__main__" and __package__ is None:
-    sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
-
 import cv2
 import numpy as np
 from fastapi import Request
 from fastapi.responses import StreamingResponse
 from nicegui import app, ui
-
-# Maximum frames per second for the MJPEG video feed
-FPS_CAP = 30
 
 from program.src.controllers import controller_manager as controller_manager_module
 from program.src.controllers.algorithms.motion_detection import (
@@ -67,6 +60,13 @@ from program.src.utils.concurrency.async_utils import install_signal_handlers
 from program.src.utils.config_service import ConfigurationService, set_config_service
 from program.src.utils.ui_helpers import notify_later
 from program.src.utils.log_service import info, error
+
+# Allow running this file directly without installing the package
+if __name__ == "__main__" and __package__ is None:
+    sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
+
+# Maximum frames per second for the MJPEG video feed
+FPS_CAP = 30
 
 
 class SimpleGUIApplication:
@@ -1064,7 +1064,9 @@ class SimpleGUIApplication:
                         with ui.row().classes("items-center justify-between"):
                             with ui.row().classes("items-center gap-3"):
                                 ui.icon("schedule").classes("text-gray-600")
-                                ui.label(entry["time"]).classes("font-mono")
+                                ui.label(entry.get("time", "Unknown")).classes(
+                                    "font-mono"
+                                )
                                 ui.label(entry.get("subject", "Alert")).classes(
                                     "font-medium"
                                 )
