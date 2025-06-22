@@ -19,6 +19,10 @@ def create_service(tmp_path, cfg=None):
 
 @pytest.fixture
 def dummy_ui(monkeypatch):
+    class DummyTimer:
+        def cancel(self):
+            pass
+
     class Dummy:
         def classes(self, *args, **kwargs):
             return self
@@ -37,6 +41,7 @@ def dummy_ui(monkeypatch):
     monkeypatch.setattr(ui, "card", lambda *a, **k: dummy)
     monkeypatch.setattr(ui, "column", lambda *a, **k: dummy)
     monkeypatch.setattr(ui, "label", lambda *a, **k: dummy)
+    monkeypatch.setattr(ui, "timer", lambda *a, **k: DummyTimer())
     try:
         yield dummy
     finally:
