@@ -24,6 +24,7 @@ class MotionStatusSection:
         self.motion_detected = False
         self._last_motion_time: Optional[datetime] = None
         self._detection_count = 0
+        self._refresh_timer: Optional[ui.timer] = None
 
         settings = settings or {
             "motion_detected": False,
@@ -103,7 +104,7 @@ class MotionStatusSection:
                     self.cpu_usage_label = ui.label("CPU Usage: --%").classes("text-sm")
 
             # periodic refresh
-            ui.timer(1.0, self._refresh_status)
+            self._refresh_timer = ui.timer(1.0, self._refresh_status)
 
     def _get_result(self) -> Optional[MotionDetectionResult]:
         """Retrieve the latest MotionDetectionResult from the controller manager"""
@@ -122,7 +123,6 @@ class MotionStatusSection:
         result = self._get_result()
         if not result:
             return
-
 
         # remember previous detection state before updating
         prev = self.motion_detected
@@ -155,3 +155,12 @@ class MotionStatusSection:
 
         if self._update_callback:
             self._update_callback(result.motion_detected)
+
+    def cleanup(self) -> None:
+        """Cancel periodic refresh timer."""
+        if self._refresh_timer:
+            try:
+                self._refresh_timer.cancel()
+            except Exception:
+                pass
+            self._refresh_timer = None
