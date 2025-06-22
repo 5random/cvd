@@ -63,6 +63,10 @@ from program.src.gui.alt_gui import (
     create_email_alert_wizard,
     EmailAlertStatusDisplay,
 )
+from program.src.gui.alt_gui.alt_gui_elements.alert_element_new import (
+    load_alert_configs,
+    save_alert_configs,
+)
 from program.src.gui.alt_gui.alt_gui_elements.webcam_stream_element import UVC_DEFAULTS
 
 
@@ -129,8 +133,10 @@ class SimpleGUIApplication:
             "alert_delay": 5,
         }
 
-        # Initialize email alert configurations with demo data
-        self.alert_configurations = create_demo_configurations()
+        # Load persisted alert configurations or fall back to demo data
+        self.alert_configurations = load_alert_configs(self.config_service)
+        if not self.alert_configurations:
+            self.alert_configurations = create_demo_configurations()
         self.alert_display = EmailAlertStatusDisplay(self.alert_configurations)
         self.alert_display.update_callback = self._on_alert_config_changed
 
@@ -680,6 +686,7 @@ class SimpleGUIApplication:
         def _on_save(config: Dict[str, Any]):
             self.alert_configurations.append(config)
             self.alert_display.alert_configurations = self.alert_configurations
+            save_alert_configs(self.alert_configurations, self.config_service)
             self._update_alerts_status()
             service = email_alert_service.get_email_alert_service()
             if service and config.get("emails"):
