@@ -28,6 +28,8 @@ class WebcamStreamElement:
         callbacks=None,
         on_camera_status_change=None,
         camera_toggle_cb=None,
+        *,
+        available_resolutions=None,
     ):
         self.camera_active = False
         self.recording = False
@@ -39,6 +41,7 @@ class WebcamStreamElement:
         }
         self.settings = settings
         self.callbacks = callbacks or {}
+        self.available_resolutions = available_resolutions or []
         # Store explicit camera toggle callback or look it up in callbacks dict
         self._camera_toggle_cb = camera_toggle_cb or self.callbacks.get(
             "camera_toggle"
@@ -196,21 +199,25 @@ class WebcamStreamElement:
                             ui.label("Resolution").classes(
                                 "text-sm font-medium text-gray-700"
                             )
+                            options = [
+                                f"{w}x{h} ({fps}fps)" for (w, h, fps) in self.available_resolutions
+                            ] or [
+                                "320x240 (30fps)",
+                                "352x288 (30fps)",
+                                "640x480 (30fps)",
+                                "800x600 (30fps)",
+                                "1024x768 (30fps)",
+                                "1280x720 (30fps)",
+                                "1280x960 (30fps)",
+                                "1280x1024 (30fps)",
+                                "1920x1080 (30fps)",
+                            ]
+                            default_value = options[0] if options else "640x480 (30fps)"
                             self.resolution_select = (
                                 ui.select(
-                                    [
-                                        "320x240 (30fps)",
-                                        "352x288 (30fps)",
-                                        "640x480 (30fps)",
-                                        "800x600 (30fps)",
-                                        "1024x768 (30fps)",
-                                        "1280x720 (30fps)",
-                                        "1280x960 (30fps)",
-                                        "1280x1024 (30fps)",
-                                        "1920x1080 (30fps)",
-                                    ],
+                                    options,
                                     label="Resolution",
-                                    value="640x480 (30fps)",
+                                    value=default_value,
                                     on_change=self.callbacks.get(
                                         "update_resolution",
                                         lambda v: None,
