@@ -97,7 +97,7 @@ class ExperimentManagementSection:
                     ).on(
                         "update:model-value",
                         lambda e: self._on_checkbox_change(
-                            "record_motion_data", e.value
+                            "record_motion_data", e.args[0]
                         ),
                     )
                     self.record_timestamps_checkbox = ui.checkbox(
@@ -106,7 +106,7 @@ class ExperimentManagementSection:
                     ).on(
                         "update:model-value",
                         lambda e: self._on_checkbox_change(
-                            "record_timestamps", e.value
+                            "record_timestamps", e.args[0]
                         ),
                     )
                     self.save_alerts_checkbox = ui.checkbox(
@@ -114,7 +114,7 @@ class ExperimentManagementSection:
                         value=self.settings["save_alerts"],
                     ).on(
                         "update:model-value",
-                        lambda e: self._on_checkbox_change("save_alerts", e.value),
+                        lambda e: self._on_checkbox_change("save_alerts", e.args[0]),
                     )
 
             # Control buttons
