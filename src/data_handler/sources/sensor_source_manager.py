@@ -384,6 +384,10 @@ class SensorManager:
         Returns:
             Number of sensors successfully started
         """
+        if self.config_service.disable_sensors():
+            info("Sensor startup disabled via configuration")
+            return 0
+
         sensor_configs = self.config_service.get_sensor_configs()
         started_count = 0
 

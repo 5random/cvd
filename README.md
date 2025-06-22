@@ -141,8 +141,15 @@ OpenCV will choose the default backend for the platform.
 ### External camera capture
 
 The motion detection controller can rely on another controller for camera frames.
+
 Set ``input_controllers`` to the ID of a ``camera_capture`` controller to disable
 its internal capture loop and use the external source instead.
+
+### Disable sensors
+
+The global configuration accepts a ``"disable_sensors"`` flag. When set to
+``true`` no sensors will be initialised at startup. This is handy for camera
+only setups or when running tests without real hardware.
 
 
 ## Running tests
