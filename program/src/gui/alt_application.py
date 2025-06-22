@@ -123,6 +123,12 @@ class SimpleGUIApplication:
             "roi_enabled": False,
             "email": "",
             "alert_delay": 5,
+            "experiment_name": f'Experiment_{datetime.now().strftime("%Y%m%d_%H%M")}',
+            "duration": 60,
+            "record_video": True,
+            "record_motion_data": True,
+            "record_timestamps": True,
+            "save_alerts": False,
         }
 
         # Load persisted alert configurations or fall back to demo data
