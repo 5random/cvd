@@ -22,7 +22,7 @@ To start the application from the command line with a custom configuration
 directory run:
 
 ```bash
-python program/main.py --config-dir program/config
+python src/main.py --config-dir program/config
 ```
 
 You can also set ``CVD_CONFIG_DIR`` instead of passing the argument.

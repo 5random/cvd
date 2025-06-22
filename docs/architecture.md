@@ -22,7 +22,7 @@ Data from sensors and controllers is persisted using utility classes under `src/
 
 The central entry point is `ApplicationContainer` defined in `src/utils/container.py`. It instantiates and connects the services above: configuration, sensors, data utilities, web application and alerting. Background tasks such as sensor polling run inside this container. `ApplicationContainer` exposes `startup`, `shutdown` and `start_gui` methods used by the main script.
 
-The executable in `program/main.py` creates the container via `ApplicationContainer.create_sync()` and launches the NiceGUI application. When the program exits, registered cleanup handlers invoke `container.shutdown_sync()` to stop background services gracefully.
+The executable in `src/main.py` creates the container via `ApplicationContainer.create_sync()` and launches the NiceGUI application. When the program exits, registered cleanup handlers invoke `container.shutdown_sync()` to stop background services gracefully.
 
 ## Component Interaction
 
@@ -31,7 +31,7 @@ The executable in `program/main.py` creates the container via `ApplicationContai
 3. `SensorManager` gathers data from sensor drivers and passes it to a processing pipeline before saving via `DataSaver`.
 4. `ControllerManager` processes sensor readings and controller outputs which can then be shown in the GUI or stored.
 
-For more details see the source files referenced above such as [`src/utils/container.py`](../src/utils/container.py) and [`program/main.py`](../program/main.py).
+For more details see the source files referenced above such as [`src/utils/container.py`](../src/utils/container.py) and [`src/main.py`](../src/main.py).
 
 ## UML Diagram
 
