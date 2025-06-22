@@ -28,6 +28,9 @@ def test_shutdown_sync_stops_polling_tasks(tmp_path):
 
     assert container.sensor_manager.get_active_sensors() == ["sen1"]
 
-    container.shutdown_sync()
+    import warnings
+    with warnings.catch_warnings():
+        warnings.filterwarnings("error", category=RuntimeWarning)
+        container.shutdown_sync()
 
     assert container.sensor_manager.get_active_sensors() == []

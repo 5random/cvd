@@ -17,7 +17,10 @@ def test_data_saver_flush_interval_from_config(tmp_path):
     try:
         assert container.data_saver.flush_interval == 3
     finally:
-        container.shutdown_sync()
+        import warnings
+        with warnings.catch_warnings():
+            warnings.filterwarnings("error", category=RuntimeWarning)
+            container.shutdown_sync()
 
 
 def test_data_saver_flush_interval_defaults_to_one(tmp_path):
@@ -35,4 +38,7 @@ def test_data_saver_flush_interval_defaults_to_one(tmp_path):
     try:
         assert container.data_saver.flush_interval == 1
     finally:
-        container.shutdown_sync()
+        import warnings
+        with warnings.catch_warnings():
+            warnings.filterwarnings("error", category=RuntimeWarning)
+            container.shutdown_sync()
