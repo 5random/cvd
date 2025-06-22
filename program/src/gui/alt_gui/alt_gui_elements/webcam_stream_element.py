@@ -1,5 +1,9 @@
 from nicegui import ui, events
+import asyncio
+import inspect
 from program.src.utils.ui_helpers import notify_later
+import asyncio
+import inspect
 
 
 # Default values for UVC camera controls
@@ -195,7 +199,8 @@ class WebcamStreamElement:
                                 "text-sm font-medium text-gray-700"
                             )
                             options = [
-                                f"{w}x{h} ({fps}fps)" for (w, h, fps) in self.available_resolutions
+                                f"{w}x{h} ({fps}fps)"
+                                for (w, h, fps) in self.available_resolutions
                             ] or [
                                 "320x240 (30fps)",
                                 "352x288 (30fps)",
@@ -690,7 +695,15 @@ class WebcamStreamElement:
             self.start_camera_btn.props("color=negative")
             self.camera_active = True
             if self._camera_toggle_cb:
-                self._camera_toggle_cb()
+
+                if inspect.iscoroutinefunction(self._camera_toggle_cb):
+                    asyncio.create_task(self._camera_toggle_cb())
+                else:
+                    self._camera_toggle_cb()
+
+                result = self._camera_toggle_cb()
+                if inspect.isawaitable(result):
+                    asyncio.create_task(result)
             self._update_status()
         else:
             # Clear the image source to stop streaming
@@ -700,7 +713,14 @@ class WebcamStreamElement:
             self.start_camera_btn.props("color=positive")
             self.camera_active = False
             if self._camera_toggle_cb:
-                self._camera_toggle_cb()
+                if inspect.iscoroutinefunction(self._camera_toggle_cb):
+                    asyncio.create_task(self._camera_toggle_cb())
+                else:
+                    self._camera_toggle_cb()
+                result = self._camera_toggle_cb()
+                if inspect.isawaitable(result):
+                    asyncio.create_task(result)
+
             self._update_status()
 
     def toggle_white_balance_auto(self, value):
@@ -825,3 +845,13 @@ class WebcamStreamElement:
             self.roi_checkbox.value = False
             if self._roi_update_cb:
                 self._roi_update_cb()
+
+    def update_resolutions(self, modes):
+        """Update resolution dropdown options."""
+        self.available_resolutions = list(modes or [])
+        options = [f"{w}x{h} ({fps}fps)" for (w, h, fps) in self.available_resolutions]
+        if hasattr(self, "resolution_select", None):
+            current = getattr(self.resolution_select, "value", None)
+            self.resolution_select.options = options
+            if current not in options and options:
+                self.resolution_select.value = options[0]

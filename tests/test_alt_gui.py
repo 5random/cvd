@@ -277,6 +277,27 @@ class TestSimpleGUIApplicationCameraFunctionality:
         assert ws.video_element.source == ""
         assert ws.camera_active is False
 
+    async def test_motion_header_icon_updates(self, user: User, simple_gui_app):
+        """Header motion icon should change on motion events"""
+
+        @ui.page("/")
+        def main_page():
+            simple_gui_app.create_header()
+
+        await user.open("/")
+
+        assert "text-gray-400" in simple_gui_app.motion_status_icon.classes
+
+        simple_gui_app.update_motion_status(True)
+        assert simple_gui_app.motion_detected is True
+        assert simple_gui_app.motion_status_icon.name == "motion_photos_on"
+        assert "text-orange-300" in simple_gui_app.motion_status_icon.classes
+
+        simple_gui_app.update_motion_status(False)
+        assert simple_gui_app.motion_detected is False
+        assert simple_gui_app.motion_status_icon.name == "motion_photos_off"
+        assert "text-gray-400" in simple_gui_app.motion_status_icon.classes
+
     async def test_camera_settings_update(self, simple_gui_app):
         """Test: Kamera-Einstellungen werden korrekt aktualisiert"""
         # Test sensitivity update
@@ -424,7 +445,7 @@ class TestSimpleGUIApplicationErrorHandling:
 def create_mock_camera_controller():
     """Erstelle einen Mock Camera Controller"""
     controller = Mock()
-    controller.start = AsyncMock()
+    controller.start = AsyncMock(return_value=True)
     controller.stop = AsyncMock()
     controller.cleanup = AsyncMock()
     controller.fps = 30
@@ -458,8 +479,50 @@ class TestSimpleGUIApplicationWithMockControllers:
         # Test toggle on
         await simple_gui_app.toggle_camera()
 
-        # Verify start was called
+        # Verify start was called and state updated
         mock_camera.start.assert_called_once()
+        assert simple_gui_app.camera_active is True
+
+    async def test_camera_toggle_start_failure(self, simple_gui_app, monkeypatch):
+        """Camera remains inactive and user is notified if start fails"""
+
+        mock_camera = create_mock_camera_controller()
+        mock_camera.start = AsyncMock(return_value=False)
+        simple_gui_app.controller_manager.add_mock_controller("camera_capture", mock_camera)
+        simple_gui_app.camera_controller = mock_camera
+
+        notifications = []
+        notifier = lambda msg, **kw: notifications.append(msg)
+        monkeypatch.setattr("program.src.utils.ui_helpers.notify_later", notifier)
+        monkeypatch.setattr("program.src.gui.alt_application.notify_later", notifier)
+
+        await simple_gui_app.toggle_camera()
+
+        assert simple_gui_app.camera_active is False
+        assert notifications
+        assert "Failed to start camera" in notifications[0]
+
+    async def test_camera_toggle_stop_failure(self, simple_gui_app, monkeypatch):
+        """Camera stays active and user is notified if stop fails"""
+
+        mock_camera = create_mock_camera_controller()
+        simple_gui_app.controller_manager.add_mock_controller("camera_capture", mock_camera)
+        simple_gui_app.camera_controller = mock_camera
+
+        await simple_gui_app.toggle_camera()
+        assert simple_gui_app.camera_active is True
+
+        mock_camera.stop = AsyncMock(side_effect=RuntimeError("boom"))
+        notifications = []
+        notifier = lambda msg, **kw: notifications.append(msg)
+        monkeypatch.setattr("program.src.utils.ui_helpers.notify_later", notifier)
+        monkeypatch.setattr("program.src.gui.alt_application.notify_later", notifier)
+
+        await simple_gui_app.toggle_camera()
+
+        assert simple_gui_app.camera_active is True
+        assert notifications
+        assert "Failed to stop camera" in notifications[0]
 
     async def test_motion_detection_settings_with_controller(self, simple_gui_app):
         """Test: Motion Detection Einstellungen mit Mock Controller"""
