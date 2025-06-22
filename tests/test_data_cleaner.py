@@ -6,12 +6,14 @@ from program.src.utils.data_utils import data_cleaner
 def test_clean_file(tmp_path: Path):
     raw = tmp_path / "sample.csv"
     raw.write_text(
-        "timestamp,value,status\n"
-        "1749374721.0,20.0,ok\n"
-        "timestamp,value,status\n"
-        "1749374718.0,10.0,ok\n"
-        "1749374720.0,,error\n"
-        "1749374719.0,15.0,ok\n"
+        (
+            "timestamp,value,status\n"
+            "1749374721.0,20.0,ok\n"
+            "timestamp,value,status\n"
+            "1749374718.0,10.0,ok\n"
+            "1749374720.0,,error\n"
+            "1749374719.0,15.0,ok\n"
+        )
     )
 
     out_path = data_cleaner.clean_file(raw)
