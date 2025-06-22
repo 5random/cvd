@@ -20,6 +20,7 @@ def main() -> None:
         sys.exit(1)
 
     deps = data.get("project", {}).get("dependencies", [])
+    deps = sorted(deps)
     req_file.write_text("\n".join(deps) + "\n")
 
 
