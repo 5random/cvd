@@ -410,41 +410,58 @@ class SimpleGUIApplication:
             self.webcam_stream.adjust_roi()
 
     # Main event handlers - placeholder implementations
-    def toggle_camera(self):
+    async def toggle_camera(self) -> None:
         """Start or stop the camera capture controller."""
 
-        async def _start():
-            if self.camera_controller is None:
-                cfg = ControllerConfig(
-                    controller_id="camera_capture",
-                    controller_type="camera_capture",
-                    parameters={"device_index": 0},
-                )
-                self.camera_controller = CameraCaptureController("camera_capture", cfg)
-            await self.camera_controller.start()
+        async def _start() -> bool:
+            try:
+                if self.camera_controller is None:
+                    cfg = ControllerConfig(
+                        controller_id="camera_capture",
+                        controller_type="camera_capture",
+                        parameters={"device_index": 0},
+                    )
+                    self.camera_controller = CameraCaptureController(
+                        "camera_capture", cfg
+                    )
+                return await self.camera_controller.start()
+            except Exception as exc:  # noqa: BLE001
+                error("Failed to start camera", exc_info=exc)
+                notify_later("Failed to start camera", type="negative")
+                return False
 
-        async def _stop():
-            if self.camera_controller is not None:
-                await self.camera_controller.stop()
-                await self.camera_controller.cleanup()
-                self.camera_controller = None
+        async def _stop() -> bool:
+            try:
+                if self.camera_controller is not None:
+                    await self.camera_controller.stop()
+                    await self.camera_controller.cleanup()
+                    self.camera_controller = None
+                return True
+            except Exception as exc:  # noqa: BLE001
+                error("Failed to stop camera", exc_info=exc)
+                notify_later("Failed to stop camera", type="negative")
+                return False
 
         if not self.camera_active:
-            asyncio.create_task(_start())
-            self.camera_active = True
-            if hasattr(self, "camera_status_icon"):
-                self.camera_status_icon.classes(replace="text-green-300")
-            if getattr(self.webcam_stream, "start_camera_btn", None):
-                self.webcam_stream.start_camera_btn.set_icon("pause")
-                self.webcam_stream.start_camera_btn.set_text("Pause Video")
+            started = await _start()
+            if started:
+                self.camera_active = True
+                if hasattr(self, "camera_status_icon"):
+                    self.camera_status_icon.classes(replace="text-green-300")
+                ws = getattr(self, "webcam_stream", None)
+                if ws and getattr(ws, "start_camera_btn", None):
+                    ws.start_camera_btn.set_icon("pause")
+                    ws.start_camera_btn.set_text("Pause Video")
         else:
-            asyncio.create_task(_stop())
-            self.camera_active = False
-            if hasattr(self, "camera_status_icon"):
-                self.camera_status_icon.classes(replace="text-gray-400")
-            if getattr(self.webcam_stream, "start_camera_btn", None):
-                self.webcam_stream.start_camera_btn.set_icon("play_arrow")
-                self.webcam_stream.start_camera_btn.set_text("Play Video")
+            stopped = await _stop()
+            if stopped:
+                self.camera_active = False
+                if hasattr(self, "camera_status_icon"):
+                    self.camera_status_icon.classes(replace="text-gray-400")
+                ws = getattr(self, "webcam_stream", None)
+                if ws and getattr(ws, "start_camera_btn", None):
+                    ws.start_camera_btn.set_icon("play_arrow")
+                    ws.start_camera_btn.set_text("Play Video")
 
     def update_sensitivity(self, e):
         """Update motion detection sensitivity"""
