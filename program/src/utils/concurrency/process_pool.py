@@ -66,6 +66,7 @@ class ManagedProcessPool:
         self._lock = threading.Lock()
         self._closed = False
         self._telemetry = _Telemetry()
+        self._telemetry_lock = threading.Lock()
 
     # ───────── Submission ─────────
     def submit(self, func: Callable[..., Any], *args: Any, **kwargs: Any) -> Future:
@@ -73,8 +74,9 @@ class ManagedProcessPool:
             raise RuntimeError("Pool closed")
         if self._executor is None:
             self._executor = ProcessPoolExecutor(max_workers=self._max_workers)
-        self._telemetry.inc("submitted")
-        self._telemetry.active += 1
+        with self._telemetry_lock:
+            self._telemetry.inc("submitted")
+            self._telemetry.active += 1
         fut = self._executor.submit(func, *args, **kwargs)
         fut.add_done_callback(self._on_done)
         return fut
@@ -89,7 +91,8 @@ class ManagedProcessPool:
                 return await asyncio.wait_for(wrapped, timeout=self.config.timeout)
             return await wrapped
         except asyncio.TimeoutError:
-            self._telemetry.inc("timed_out")
+            with self._telemetry_lock:
+                self._telemetry.inc("timed_out")
             warning(f"Task {func.__name__!s} timed out after {self.config.timeout}s")
             fut.cancel()
             if self.config.kill_on_timeout:
@@ -97,7 +100,8 @@ class ManagedProcessPool:
                 self._terminate_executor()
             raise
         except asyncio.CancelledError:
-            self._telemetry.inc("cancelled")
+            with self._telemetry_lock:
+                self._telemetry.inc("cancelled")
             fut.cancel()
             # Pool bleibt bestehen
             raise
@@ -121,13 +125,14 @@ class ManagedProcessPool:
 
     # ───────── Helpers / Shutdown ─────────
     def _on_done(self, fut: Future) -> None:
-        self._telemetry.active -= 1
-        if fut.cancelled():
-            self._telemetry.inc("cancelled")
-        elif fut.exception():
-            self._telemetry.inc("failed")
-        else:
-            self._telemetry.inc("finished")
+        with self._telemetry_lock:
+            self._telemetry.active -= 1
+            if fut.cancelled():
+                self._telemetry.inc("cancelled")
+            elif fut.exception():
+                self._telemetry.inc("failed")
+            else:
+                self._telemetry.inc("finished")
 
     def _terminate_executor(self) -> None:
         with self._lock:
