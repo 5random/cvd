@@ -59,3 +59,29 @@ def test_register_new_instance_logs_replacement(monkeypatch):
 
     assert logs == ["Registered component: comp1", "Replaced component: comp1"]
     assert registry.get_component("comp1") is comp2
+
+
+def test_cleanup_all_handles_missing_cleanup():
+    registry = ComponentRegistry()
+
+    class MissingCleanup:
+        def __init__(self, cid: str = "missing"):
+            self.component_id = cid
+
+    registry.register(MissingCleanup())  # type: ignore[arg-type]
+
+    registry.cleanup_all()  # should not raise
+    assert registry.get_all_components() == []
+
+
+def test_cleanup_all_handles_noncallable_cleanup_attribute(monkeypatch):
+    registry = ComponentRegistry()
+
+    class NonCallableCleanup:
+        component_id = "bad"
+        cleanup = True
+
+    registry.register(NonCallableCleanup())  # type: ignore[arg-type]
+
+    registry.cleanup_all()  # should not raise
+    assert registry.get_all_components() == []

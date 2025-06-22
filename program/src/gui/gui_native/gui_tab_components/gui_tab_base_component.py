@@ -142,11 +142,11 @@ class ComponentRegistry:
 
     def cleanup_all(self) -> None:
         """Clean up all components"""
-        for component in list(self._components.values()):
+        for comp in list(self._components.values()):
             # ensure that arbitrary objects used in tests don't raise errors
-            cleanup_method = getattr(component, "cleanup", None)
-            if callable(cleanup_method):
-                cleanup_method()
+            cleanup = getattr(comp, "cleanup", None)
+            if callable(cleanup):
+                cleanup()
         self._components.clear()
         info("Cleaned up all components")
 
