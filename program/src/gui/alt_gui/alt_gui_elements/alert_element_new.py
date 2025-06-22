@@ -9,6 +9,9 @@ from program.src.utils.ui_helpers import notify_later
 from program.src.utils.concurrency import run_network_io, gather_with_concurrency
 from typing import Dict, List, Optional, Any, Callable
 from src.utils.email_alert_service import get_email_alert_service
+from program.src.utils.config_service import get_config_service, ConfigurationService
+from pathlib import Path
+import json
 from datetime import datetime
 import re
 
@@ -634,7 +637,13 @@ class EmailAlertWizard:
             notify_later("Please enable at least one alert type", type="warning")
             return
 
-        # Here you would save the configuration to a file, database, etc.
+        # Persist configuration using the global ConfigurationService
+        service = get_config_service()
+        if service is not None:
+            configs = load_alert_configs(service)
+            configs.append(self.get_configuration())
+            save_alert_configs(configs, service)
+
         notify_later(
             f'Configuration "{self.alert_data["name"]}" saved successfully! '
             f'{len(self.alert_data["emails"])} recipients, {active_count} alert types enabled.',
@@ -950,6 +959,7 @@ class EmailAlertStatusDisplay:
     def add_configuration(self, config: Dict[str, Any]):
         """Add a new alert configuration"""
         self.alert_configurations.append(config)
+        save_alert_configs(self.alert_configurations)
 
     def remove_configuration(
         self,
@@ -959,6 +969,7 @@ class EmailAlertStatusDisplay:
         """Remove an alert configuration"""
         if config in self.alert_configurations:
             self.alert_configurations.remove(config)
+            save_alert_configs(self.alert_configurations)
         cb = callback or self.update_callback
         if cb:
             cb()
@@ -973,6 +984,7 @@ class EmailAlertStatusDisplay:
         try:
             index = self.alert_configurations.index(old_config)
             self.alert_configurations[index] = new_config
+            save_alert_configs(self.alert_configurations)
         except ValueError:
             pass  # Configuration not found
 
@@ -1148,3 +1160,39 @@ def create_demo_configurations() -> List[Dict[str, Any]]:
             },
         },
     ]
+
+
+def _get_alert_config_path(service: ConfigurationService) -> Path:
+    """Return path of the persistent alert configuration file."""
+    return service.config_path.parent / "alert_configs.json"
+
+
+def load_alert_configs(service: Optional[ConfigurationService] = None) -> List[Dict[str, Any]]:
+    """Load alert configurations from disk."""
+    service = service or get_config_service()
+    if service is None:
+        return []
+    path = _get_alert_config_path(service)
+    if not path.exists():
+        return []
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+            if isinstance(data, list):
+                return data
+    except Exception:
+        pass
+    return []
+
+
+def save_alert_configs(
+    configs: List[Dict[str, Any]], service: Optional[ConfigurationService] = None
+) -> None:
+    """Persist alert configurations to disk."""
+    service = service or get_config_service()
+    if service is None:
+        return
+    path = _get_alert_config_path(service)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(configs, f, indent=2, ensure_ascii=False)
