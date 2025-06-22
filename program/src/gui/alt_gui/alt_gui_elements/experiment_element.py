@@ -10,9 +10,9 @@ from program.src.utils.ui_helpers import notify_later
 
 
 class ExperimentManagementSection:
+
     def __init__(self, settings: Optional[dict] = None, callbacks: Optional[dict] = None):
         """Initialize experiment management section with settings
-
         Args:
             settings: optional configuration dictionary
             callbacks: optional callbacks for button actions
@@ -24,6 +24,7 @@ class ExperimentManagementSection:
         self._experiment_timer: Optional[ui.timer] = None
         self._current_experiment_id: Optional[str] = None
         self.experiment_manager = get_experiment_manager()
+
         settings = settings or {
             "experiment_name": f'Experiment_{datetime.now().strftime("%Y%m%d_%H%M")}',
             "duration": 60,  # Default duration in minutes
