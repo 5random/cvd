@@ -92,6 +92,7 @@ class DataSaver:
         self._file_pool = get_thread_pool_manager().get_pool(ThreadPoolType.FILE_IO)
         # Track submitted background tasks for graceful shutdown
         self._tasks: List[Future] = []
+        self._tasks_lock = threading.Lock()
         if self.enable_background_operations:
             fut = self._start_maintenance_thread()
             self._track(fut)
@@ -353,7 +354,9 @@ class DataSaver:
         # Signal shutdown to background loops
         self._shutdown_event.set()
         # Wait for tracked background tasks to finish instead of cancelling
-        for fut in list(self._tasks):
+        with self._tasks_lock:
+            tasks_snapshot = list(self._tasks)
+        for fut in tasks_snapshot:
             try:
                 # give the worker some time to finish gracefully
                 fut.result(timeout=5)
@@ -364,7 +367,8 @@ class DataSaver:
                     pass
             finally:
                 with contextlib.suppress(ValueError):
-                    self._tasks.remove(fut)
+                    with self._tasks_lock:
+                        self._tasks.remove(fut)
 
         # Close all file handles
         for cat_map in self._writers.values():
@@ -402,11 +406,13 @@ class DataSaver:
 
     def _track(self, fut: Future) -> None:
         """Track background Future and remove it from the list once done."""
-        self._tasks.append(fut)
+        with self._tasks_lock:
+            self._tasks.append(fut)
 
         def _remove(f: Future):
             try:
-                self._tasks.remove(f)
+                with self._tasks_lock:
+                    self._tasks.remove(f)
             except ValueError:
                 pass
 
