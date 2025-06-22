@@ -1,7 +1,10 @@
+"""UI elements for configuring and testing basic email alerts."""
+
 from nicegui import ui
 
 
 class EmailAlertsSection:
+    """Section for managing email alert settings within the GUI."""
     def __init__(self, settings, callbacks=None):
         """Initialize email alerts section with settings"""
         self.experiment_running = False
@@ -34,6 +37,7 @@ class EmailAlertsSection:
 
             # Email settings
             with ui.column().classes("gap-3"):
+
                 self.email_input = (
                     ui.input(
                         "Alert Email Address",
@@ -54,6 +58,7 @@ class EmailAlertsSection:
                     .on("update:model-value", self._on_delay_change)
                     .classes("w-full")
                 )
+
 
                 ui.label("Send alert if no motion detected for this duration").classes(
                     "text-xs text-gray-600"
