@@ -456,12 +456,18 @@ class SimpleGUIApplication:
                 self.motion_controller.roi_width = None
                 self.motion_controller.roi_height = None
             else:
-                width = self.motion_controller.width or 640
-                height = self.motion_controller.height or 480
-                self.motion_controller.roi_x = width // 4
-                self.motion_controller.roi_y = height // 4
-                self.motion_controller.roi_width = width // 2
-                self.motion_controller.roi_height = height // 2
+                self.motion_controller.roi_x = self.webcam_stream.roi_x
+                self.motion_controller.roi_y = self.webcam_stream.roi_y
+                self.motion_controller.roi_width = self.webcam_stream.roi_width
+                self.motion_controller.roi_height = self.webcam_stream.roi_height
+                self.settings.update(
+                    {
+                        "roi_x": self.webcam_stream.roi_x,
+                        "roi_y": self.webcam_stream.roi_y,
+                        "roi_width": self.webcam_stream.roi_width,
+                        "roi_height": self.webcam_stream.roi_height,
+                    }
+                )
         notify_later("ROI updated", type="positive")
 
     def apply_uvc_settings(self):

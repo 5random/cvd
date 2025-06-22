@@ -1,4 +1,4 @@
-from nicegui import ui
+from nicegui import ui, events
 from program.src.utils.ui_helpers import notify_later
 
 
@@ -39,6 +39,11 @@ class WebcamStreamElement:
         self._camera_toggle_cb = camera_toggle_cb or self.callbacks.get("camera_toggle")
         # Callback for ROI updates (defaults to callbacks['set_roi'])
         self._roi_update_cb = self.callbacks.get("set_roi")
+        # Store currently selected ROI
+        self.roi_x = 0
+        self.roi_y = 0
+        self.roi_width = 0
+        self.roi_height = 0
         self.camera_settings_expansion = None
 
         @ui.page("/webcam_stream")
@@ -721,14 +726,52 @@ class WebcamStreamElement:
         ui.run_javascript(js)
 
     def adjust_roi(self):
-        """Open a simple ROI adjustment dialog."""
-        with ui.dialog() as dialog, ui.card():
-            ui.label("Adjust ROI - Demo")
-            ui.label("X start")
-            ui.slider(min=0, max=100, value=0).props("dense")
-            ui.label("Width")
-            ui.slider(min=0, max=100, value=100).props("dense")
-            ui.button("Apply", on_click=dialog.close)
+        """Allow the user to graphically select the ROI on the video feed."""
+
+        start = {"x": 0.0, "y": 0.0}
+        layer = None
+
+        def on_mouse(e: events.MouseEventArguments) -> None:
+            nonlocal start, layer
+            if e.type == "mousedown":
+                start = {"x": e.image_x, "y": e.image_y}
+                if layer:
+                    layer.content = ""
+            elif e.type in {"mousemove", "mouseup"}:
+                x1 = min(start["x"], e.image_x)
+                y1 = min(start["y"], e.image_y)
+                x2 = max(start["x"], e.image_x)
+                y2 = max(start["y"], e.image_y)
+                if layer:
+                    layer.content = (
+                        f'<rect x="{x1}" y="{y1}" width="{x2 - x1}" height="{y2 - y1}" '
+                        f'stroke="red" fill="none" stroke-width="2" />'
+                    )
+                if e.type == "mouseup":
+                    self.roi_x = int(x1)
+                    self.roi_y = int(y1)
+                    self.roi_width = int(x2 - x1)
+                    self.roi_height = int(y2 - y1)
+                    if getattr(self, "roi_checkbox", None):
+                        self.roi_checkbox.value = True
+                    if self._roi_update_cb:
+                        self._roi_update_cb()
+                    notify_later(
+                        f"ROI set to ({self.roi_x}, {self.roi_y}, {self.roi_width}, {self.roi_height})",
+                        type="positive",
+                    )
+                    dialog.close()
+
+        with ui.dialog().props("persistent") as dialog:
+            with ui.column().classes("items-center gap-4"):
+                img = ui.interactive_image(
+                    "/video_feed",
+                    events=["mousedown", "mousemove", "mouseup"],
+                    cross=True,
+                ).on_mouse(on_mouse)
+                layer = img.add_layer()
+                ui.label("Drag on the image to select the ROI")
+                ui.button("Cancel", on_click=dialog.close)
         dialog.open()
 
     def show_camera_settings(self):
