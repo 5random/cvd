@@ -12,7 +12,6 @@ import sys
 legacy_sensors = import_module("legacy_stuff")
 data_handler = import_module("legacy_stuff.data_handler")
 
-sys.modules[__name__ + ".legacy_sensors"] = legacy_sensors
 sys.modules[__name__ + ".data_handler"] = data_handler
 
 __all__ = ["legacy_sensors", "data_handler"]

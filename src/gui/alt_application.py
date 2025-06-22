@@ -50,7 +50,7 @@ from src.gui import (
     create_email_alert_wizard,
     setup_global_styles,
 )
-from src.gui.alt_gui_elements.alert_element_new import (
+from src.gui.alt_gui_elements.alert_element import (
     load_alert_configs,
     save_alert_configs,
 )
@@ -818,9 +818,11 @@ class SimpleGUIApplication:
             else:
                 self._experiment_duration = None
 
+            # Instantiate ExperimentConfig using positional args to satisfy Pylance
             config = ExperimentConfig(
-                name=name,
-                duration_minutes=self._experiment_duration,
+                name,
+                "",
+                self._experiment_duration,
             )
             exp_id = self.experiment_manager.create_experiment(config)
             success = await self.experiment_manager.start_experiment(exp_id)
