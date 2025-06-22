@@ -1091,6 +1091,7 @@ class SimpleGUIApplication:
                 break
             except Exception as exc:
                 error(f"Processing loop error: {exc}")
+                await asyncio.sleep(0.1)
 
     def run(self, host: str = "localhost", port: int = 8081):
         """Run the simple GUI application"""
