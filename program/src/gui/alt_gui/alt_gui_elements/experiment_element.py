@@ -1,5 +1,7 @@
 from nicegui import ui
 from datetime import datetime
+from typing import List
+from program.src.experiment_handler.experiment_manager import get_experiment_manager
 
 
 class ExperimentManagementSection:
@@ -94,7 +96,56 @@ class ExperimentManagementSection:
 
             # Recent experiments
             ui.separator().classes("my-3")
-            with ui.expansion("Recent Experiments").classes("w-full"):
-                ui.label("No recent experiments available").classes(
-                    "text-sm text-gray-600"
-                )
+            with ui.expansion("Recent Experiments").classes(
+                "w-full"
+            ) as self.recent_expansion:
+                with ui.column().classes("w-full") as self.recent_list:
+                    self.no_experiments_label = ui.label(
+                        "No recent experiments available"
+                    ).classes("text-sm text-gray-600")
+
+        # populate recent experiments initially
+        self.load_recent_experiments()
+
+    def _format_duration(self, seconds: float) -> str:
+        """Return human readable duration"""
+        if seconds < 60:
+            return f"{int(seconds)}s"
+        if seconds < 3600:
+            return f"{seconds/60:.1f}m"
+        return f"{seconds/3600:.1f}h"
+
+    def load_recent_experiments(self) -> None:
+        """Populate recent experiment list from global ExperimentManager."""
+        if not hasattr(self, "recent_list"):
+            return
+
+        manager = get_experiment_manager()
+        self.recent_list.clear()
+
+        if not manager:
+            if hasattr(self, "no_experiments_label"):
+                self.no_experiments_label.set_visibility(True)
+            return
+
+        exp_ids: List[str] = manager.list_experiments()
+        results = []
+        for exp_id in exp_ids:
+            result = manager.get_experiment_result(exp_id)
+            if result and result.end_time:
+                results.append(result)
+
+        if not results:
+            self.no_experiments_label.set_visibility(True)
+            return
+
+        self.no_experiments_label.set_visibility(False)
+        results.sort(key=lambda r: r.end_time or r.start_time, reverse=True)
+        for res in results:
+            duration = res.duration_seconds or 0
+            with self.recent_list:
+                with ui.row().classes("justify-between w-full"):
+                    ui.label(res.name).classes("font-medium")
+                    ui.label(self._format_duration(duration)).classes(
+                        "text-sm text-gray-600"
+                    )
