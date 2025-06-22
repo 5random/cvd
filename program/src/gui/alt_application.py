@@ -1182,11 +1182,18 @@ class SimpleGUIApplication:
                 self.supported_camera_modes = await probe_camera_modes()
             except Exception:
                 self.supported_camera_modes = []
-            await self.controller_manager.start_all_controllers()
-            self._processing_task = asyncio.create_task(self._processing_loop())
-            # Ensure camera status reflects that controllers started
-            self.camera_active = True
-            self.update_camera_status(True)
+
+            started = False
+            try:
+                started = await self.controller_manager.start_all_controllers()
+            except Exception as exc:
+                error("Failed to start controllers", exc_info=exc)
+
+            if started:
+                self._processing_task = asyncio.create_task(self._processing_loop())
+                # Ensure camera status reflects that controllers started
+                self.camera_active = True
+                self.update_camera_status(True)
 
         @app.on_shutdown
         async def _shutdown() -> None:
