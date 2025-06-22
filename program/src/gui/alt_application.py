@@ -407,7 +407,7 @@ class SimpleGUIApplication:
             self.webcam_stream.adjust_roi()
 
     # Main event handlers - placeholder implementations
-    def toggle_camera(self):
+    async def toggle_camera(self):
         """Start or stop the camera capture controller."""
 
         async def _start():
@@ -427,21 +427,21 @@ class SimpleGUIApplication:
                 self.camera_controller = None
 
         if not self.camera_active:
-            asyncio.create_task(_start())
-            self.camera_active = True
-            if hasattr(self, "camera_status_icon"):
-                self.camera_status_icon.classes(replace="text-green-300")
-            if getattr(self.webcam_stream, "start_camera_btn", None):
-                self.webcam_stream.start_camera_btn.set_icon("pause")
-                self.webcam_stream.start_camera_btn.set_text("Pause Video")
+            try:
+                await _start()
+            except Exception as exc:
+                error("camera_start_failed", exc_info=exc)
+                self.update_camera_status(False)
+                return
+            self.update_camera_status(True)
         else:
-            asyncio.create_task(_stop())
-            self.camera_active = False
-            if hasattr(self, "camera_status_icon"):
-                self.camera_status_icon.classes(replace="text-gray-400")
-            if getattr(self.webcam_stream, "start_camera_btn", None):
-                self.webcam_stream.start_camera_btn.set_icon("play_arrow")
-                self.webcam_stream.start_camera_btn.set_text("Play Video")
+            try:
+                await _stop()
+            except Exception as exc:
+                error("camera_stop_failed", exc_info=exc)
+                self.update_camera_status(True)
+                return
+            self.update_camera_status(False)
 
     def update_sensitivity(self, e):
         """Update motion detection sensitivity"""
@@ -842,9 +842,7 @@ class SimpleGUIApplication:
         def _on_save(config: Dict[str, Any]):
             self.alert_configurations.append(config)
             self.alert_display.alert_configurations = self.alert_configurations
-            save_alert_configs(
-                self.alert_configurations, service=self.config_service
-            )
+            save_alert_configs(self.alert_configurations, service=self.config_service)
             self._on_alert_config_changed()
             self._update_alerts_status()
             service = email_alert_service.get_email_alert_service()
@@ -1076,7 +1074,9 @@ class SimpleGUIApplication:
                                 ui.label(str(entry.get("subject", "Alert"))).classes(
                                     "font-medium"
                                 )
-                                ui.label(str(entry["recipient"])).classes("text-gray-600")
+                                ui.label(str(entry["recipient"])).classes(
+                                    "text-gray-600"
+                                )
 
                             ui.icon("email").classes("text-blue-600")
 
