@@ -676,11 +676,6 @@ class SimpleGUIApplication:
 
         notify_later("UVC settings reset to defaults", type="positive")
 
-    def toggle_alerts(self, value):
-        """Enable or disable alerts based on checkbox value."""
-        value = getattr(value, "value", value)
-        self.alerts_enabled = bool(value)
-        self._update_alerts_status()
 
     async def send_test_alert(self):
         """Send a test email alert"""
