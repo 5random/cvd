@@ -496,12 +496,24 @@ class ControllerManager:
 
 
 def create_cvd_controller_manager() -> ControllerManager:
-    """Create a controller manager configured for CVD tracking"""
+    """Create a controller manager configured for CVD tracking.
+
+    The manager loads all controllers from the active
+    :class:`ConfigurationService` and wires the default pipeline. By
+    convention ``camera_capture`` provides frames to ``motion_detection``.
+    If no configuration service is available a minimal setup with these two
+    controllers is created so the application remains usable.
+    """
+
     manager = ControllerManager("cvd_tracking")
     service = get_config_service()
     if service:
+        # Load all controller definitions from the configuration service
         for _, cfg in service.get_controller_configs():
             manager.add_controller_from_config(cfg)
+        # Wire the standard camera -> motion detection pipeline when both
+        # controllers are present in the configuration. Motion detection
+        # consumes the captured frame as its ``image`` input.
         if (
             "camera_capture" in manager._controllers
             and "motion_detection" in manager._controllers
@@ -514,7 +526,9 @@ def create_cvd_controller_manager() -> ControllerManager:
                 data_mapping={"frame": "image"},
             )
     else:
-        # Fallback to a default camera capture and motion detection pipeline
+        # No configuration service found: create a minimal pipeline with
+        # ``camera_capture`` feeding ``motion_detection`` so the application
+        # can still run with sensible defaults.
         cam_cfg = ControllerConfig(
             controller_id="camera_capture",
             controller_type="camera_capture",
