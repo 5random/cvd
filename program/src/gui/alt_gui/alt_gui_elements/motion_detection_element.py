@@ -123,6 +123,7 @@ class MotionStatusSection:
         if not result:
             return
 
+        prev_detected = self.motion_detected
         self.motion_detected = result.motion_detected
         self.motion_icon.name = (
             "motion_photos_on" if result.motion_detected else "motion_photos_off"
@@ -136,7 +137,7 @@ class MotionStatusSection:
         self.motion_percentage.text = f"Motion Level: {result.motion_percentage:.1f}%"
         self.confidence_label.text = f"Confidence: {result.confidence:.2f}"
 
-        if result.motion_detected:
+        if result.motion_detected and not prev_detected:
             self._last_motion_time = datetime.now()
             self._detection_count += 1
 
