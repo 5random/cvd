@@ -441,19 +441,31 @@ class SimpleGUIApplication:
         if not self.camera_active:
             try:
                 await _start()
-            except Exception as exc:
+            except Exception as exc:  # noqa: BLE001
                 error("camera_start_failed", exc_info=exc)
-                self.update_camera_status(False)
+                notify_later("Failed to start camera", type="negative")
                 return
-            self.update_camera_status(True)
+            self.camera_active = True
+            if hasattr(self, "camera_status_icon"):
+                self.camera_status_icon.classes(replace="text-green-300")
+            ws = getattr(self, "webcam_stream", None)
+            if getattr(ws, "start_camera_btn", None):
+                ws.start_camera_btn.set_icon("pause")
+                ws.start_camera_btn.set_text("Pause Video")
         else:
             try:
                 await _stop()
-            except Exception as exc:
+            except Exception as exc:  # noqa: BLE001
                 error("camera_stop_failed", exc_info=exc)
-                self.update_camera_status(True)
+                notify_later("Failed to stop camera", type="negative")
                 return
-            self.update_camera_status(False)
+            self.camera_active = False
+            if hasattr(self, "camera_status_icon"):
+                self.camera_status_icon.classes(replace="text-gray-400")
+            ws = getattr(self, "webcam_stream", None)
+            if getattr(ws, "start_camera_btn", None):
+                ws.start_camera_btn.set_icon("play_arrow")
+                ws.start_camera_btn.set_text("Play Video")
 
     def update_sensitivity(self, e):
         """Update motion detection sensitivity"""
