@@ -15,8 +15,6 @@ dependencies = [
     "pyserial",
     "opencv-python",
     "Pillow",
-    "pytest",
-    "pytest-asyncio",
     "watchdog",
     "jsonschema",
     "setuptools",
