@@ -1252,6 +1252,8 @@ class SimpleGUIApplication:
             if self._time_timer:
                 self._time_timer.cancel()
                 self._time_timer = None
+            if self.motion_section:
+                self.motion_section.cleanup()
 
         info(f"Starting Simple CVD GUI on http://{host}:{port}")
 
