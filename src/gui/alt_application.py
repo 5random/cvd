@@ -3,6 +3,7 @@
 The module provides a NiceGUI based interface for camera control, motion
 detection, basic experiment management and email alert configuration.
 It is intended for running the application without the full desktop GUI.
+It expects the example configuration from ``program/config/simple_config.json``.
 """
 
 from pathlib import Path
@@ -124,6 +125,7 @@ class SimpleGUIApplication:
         # outside of a page context (e.g. during tests)
         if not ui.context.slot_stack:
             from nicegui import Client
+
             ui.context.slot_stack.append(Client.auto_index_client.layout.default_slot)
         self.dark_mode = ui.dark_mode()
         self._current_experiment_id: Optional[str] = None
@@ -582,7 +584,9 @@ class SimpleGUIApplication:
 
         old_rotation = self.settings.get("rotation", 0)
         if value == old_rotation:
-            if hasattr(self, "webcam_stream") and hasattr(self.webcam_stream, "rotation_select"):
+            if hasattr(self, "webcam_stream") and hasattr(
+                self.webcam_stream, "rotation_select"
+            ):
                 self.webcam_stream.rotation_select.value = value
             return
 
@@ -645,7 +649,9 @@ class SimpleGUIApplication:
                     {"roi_x": x, "roi_y": y, "roi_width": w, "roi_height": h}
                 )
 
-        if hasattr(self, "webcam_stream") and hasattr(self.webcam_stream, "rotation_select"):
+        if hasattr(self, "webcam_stream") and hasattr(
+            self.webcam_stream, "rotation_select"
+        ):
             self.webcam_stream.rotation_select.value = value
 
         notify_later(f"Rotation set to {value}°", type="positive")
@@ -1351,7 +1357,6 @@ class SimpleGUIApplication:
                 )
                 error("Failed to start controllers")
 
-
         @app.on_shutdown
         async def _shutdown() -> None:
             if self._processing_task:
@@ -1394,7 +1399,9 @@ class SimpleGUIApplication:
 def main():
     """Main entry point for the simple GUI application"""
     controller_manager = controller_manager_module.create_cvd_controller_manager()
-    app = SimpleGUIApplication(controller_manager)
+    # Use the example configuration bundled with the program
+    config_dir = Path(__file__).resolve().parents[2] / "program" / "config"
+    app = SimpleGUIApplication(controller_manager, config_dir=config_dir)
 
     # Startup logic is defined in ``SimpleGUIApplication.run``.
     app.run()
@@ -1433,5 +1440,7 @@ if __name__ in {"__main__", "__mp_main__"}:
 #   python src/gui/alt_application.py
 # or
 #   python -m src.gui.alt_application
+#
+# The application uses the configuration in ``program/config/simple_config.json``.
 # The email alert section will show in the bottom-right grid area.
 # Click "Konfigurieren" to set up new alerts or "Verwalten" to view existing ones.
