@@ -17,7 +17,7 @@ class EmailAlertService:
             raise ValueError("Configuration service not available")
         self._load_configuration()
         # store sent alert metadata including attachment flag
-        self._history: List[Dict[str, str | bool]] = []
+        self._history: List[Dict[str, Union[str, bool]]] = []
 
     @property
     def recipient(self) -> Optional[str]:
@@ -30,10 +30,7 @@ class EmailAlertService:
     def _load_configuration(self) -> None:
         assert self._config_service is not None, "Configuration service not available"
         cfg = self._config_service.get('alerting', dict, {}) or {}
-        self.recipient: Optional[str] = cfg.get('email_recipient')
-        self.recipients: Optional[List[str]] = (
-            [self.recipient] if self.recipient else None
-        )
+        self.recipient = cfg.get("email_recipient")
         self.smtp_host: str = cfg.get('smtp_host', 'localhost')
         self.smtp_port: int = cfg.get('smtp_port', 25)
         self.smtp_user: Optional[str] = cfg.get('smtp_user')
