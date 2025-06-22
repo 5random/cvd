@@ -138,12 +138,12 @@ class SimpleGUIApplication:
         # Retrieve and cast controllers to their concrete types
         self.camera_controller = cast(
             Optional[CameraCaptureController],
-            self.controller_manager._controllers.get("camera_capture"),
+            self.controller_manager.get_controller("camera_capture"),
         )
 
         self.motion_controller = cast(
             Optional[MotionDetectionController],
-            self.controller_manager._controllers.get("motion_detection"),
+            self.controller_manager.get_controller("motion_detection"),
         )
 
     def create_header(self):
