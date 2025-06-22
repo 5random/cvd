@@ -6,7 +6,10 @@ import threading
 import pytest
 
 from program.src.utils.data_utils import data_saver as ds_module
-from program.src.data_handler.interface.sensor_interface import SensorReading, SensorStatus
+from program.src.data_handler.interface.sensor_interface import (
+    SensorReading,
+    SensorStatus,
+)
 
 
 class DummyCompressionService:
@@ -137,4 +140,21 @@ def test_data_saver_thread_safety(tmp_path):
     file_path = tmp_path / "raw" / "s1.csv"
     lines = file_path.read_text().splitlines()
     assert len(lines) == 1 + 4 * 50
+    saver.close()
+
+
+def test_data_saver_sanitizes_id(tmp_path):
+    saver = ds_module.DataSaver(
+        base_output_dir=tmp_path,
+        enable_background_operations=False,
+        flush_interval=1,
+    )
+
+    unsafe_id = "../bad/id"
+    reading = create_reading(unsafe_id)
+    saver.save(reading)
+    saver.flush_all()
+
+    safe_name = ds_module.sanitize_id(unsafe_id) + ".csv"
+    assert (tmp_path / "raw" / safe_name).exists()
     saver.close()

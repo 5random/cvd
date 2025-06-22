@@ -11,6 +11,7 @@ import threading
 import time
 from src.utils.data_utils.compression_service import get_compression_service
 from src.utils.data_utils.file_management_service import FileMaintenanceService
+from src.utils.data_utils.id_utils import sanitize_id
 
 
 class DataSaver:
@@ -283,7 +284,8 @@ class DataSaver:
             last_check_time: float
 
             if writer_data is None or writer_data[0] is None:
-                file_path = output_dir / f"{sensor_id}.csv"
+                safe_id = sanitize_id(sensor_id)
+                file_path = output_dir / f"{safe_id}.csv"
                 is_new = not file_path.exists() or file_path.stat().st_size == 0
                 temp_f = open(file_path, "a", newline="", encoding="utf-8")
                 temp_writer = csv.writer(temp_f)

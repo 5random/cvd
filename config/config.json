@@ -94,7 +94,7 @@
   ],
   "webcams": [
     {
-      "Built-in Camera": {
+      "builtin_cam": {
         "name": "Built-in Camera",
         "device_index": 0,
         "capture_backend": null,
@@ -127,7 +127,7 @@
           "Bewegung erkannt"
         ],
         "parameters": {
-          "cam_id": "Built-in Camera",
+          "cam_id": "builtin_cam",
           "sensitivity": 0.5,
           "min_area": 500,
           "background_learning_rate": 0.01,
