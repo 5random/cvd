@@ -1070,13 +1070,13 @@ class SimpleGUIApplication:
                         with ui.row().classes("items-center justify-between"):
                             with ui.row().classes("items-center gap-3"):
                                 ui.icon("schedule").classes("text-gray-600")
-                                ui.label(entry.get("time", "Unknown")).classes(
+                                ui.label(str(entry.get("time", "Unknown"))).classes(
                                     "font-mono"
                                 )
-                                ui.label(entry.get("subject", "Alert")).classes(
+                                ui.label(str(entry.get("subject", "Alert"))).classes(
                                     "font-medium"
                                 )
-                                ui.label(entry["recipient"]).classes("text-gray-600")
+                                ui.label(str(entry["recipient"])).classes("text-gray-600")
 
                             ui.icon("email").classes("text-blue-600")
 

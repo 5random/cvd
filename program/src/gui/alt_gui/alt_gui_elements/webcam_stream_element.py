@@ -730,12 +730,12 @@ class WebcamStreamElement:
         """Start or stop dummy recording."""
         self.recording = not self.recording
         if self.recording:
-            # use NiceGUI's `set_text` method to update the label of the menu item
-            self.record_menu_item.set_text("Stop Recording")
+            # update the label of the menu item
+            self.record_menu_item.props('text="Stop Recording"')
             notify_later("Recording started", type="positive")
         else:
             # reset the label when stopping the recording
-            self.record_menu_item.set_text("Start Recording")
+            self.record_menu_item.props('text="Start Recording"')
             notify_later("Recording stopped", type="warning")
 
     def take_snapshot(self):
