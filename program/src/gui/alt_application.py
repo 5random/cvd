@@ -303,6 +303,10 @@ class SimpleGUIApplication:
                 self._create_enhanced_alerts_section()
             # Event handlers - placeholder implementations
 
+        # Ensure webcam widget reflects current camera state on page load
+        if self.camera_active:
+            self.update_camera_status(True)
+
     def update_time(self):
         """Update the time display in header"""
         self.time_label.text = datetime.now().strftime("%H:%M:%S")
@@ -310,16 +314,31 @@ class SimpleGUIApplication:
     def update_camera_status(self, active: bool):
         """Update camera icon color based on active state."""
         self.camera_active = active
-        if not hasattr(self, "camera_status_icon"):
-            return
-        if active:
-            self.camera_status_icon.classes(
-                add="text-green-300", remove="text-gray-400"
-            )
-        else:
-            self.camera_status_icon.classes(
-                add="text-gray-400", remove="text-green-300"
-            )
+        if hasattr(self, "camera_status_icon"):
+            if active:
+                self.camera_status_icon.classes(
+                    add="text-green-300", remove="text-gray-400"
+                )
+            else:
+                self.camera_status_icon.classes(
+                    add="text-gray-400", remove="text-green-300"
+                )
+
+        # Synchronise webcam stream widget if it exists
+        ws = getattr(self, "webcam_stream", None)
+        if ws and getattr(ws, "video_element", None):
+            if active:
+                ws.video_element.set_source("/video_feed")
+                ws.start_camera_btn.set_text("Pause Video")
+                ws.start_camera_btn.set_icon("pause")
+                ws.start_camera_btn.props("color=negative")
+                ws.camera_active = True
+            else:
+                ws.video_element.set_source("")
+                ws.start_camera_btn.set_text("Play Video")
+                ws.start_camera_btn.set_icon("play_arrow")
+                ws.start_camera_btn.props("color=positive")
+                ws.camera_active = False
 
     # Header button handlers
     def toggle_fullscreen(self):
