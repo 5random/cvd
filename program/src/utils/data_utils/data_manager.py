@@ -191,7 +191,7 @@ class DataManager:
             lambda rid=request_id: self._process_download_request(rid),
             task_id=f"download_{request_id}",
         )
-        self.maintenance_mgr._background_tasks.append((pool, fut))
+        self.maintenance_mgr._track(pool, fut)
         info(f"Created download request {request_id} for {len(valid_paths)} files")
         return request_id
 
