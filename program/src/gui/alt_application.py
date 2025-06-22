@@ -64,7 +64,7 @@ from program.src.utils.concurrency import (
 from program.src.utils.concurrency.async_utils import install_signal_handlers
 from program.src.utils.config_service import ConfigurationService, set_config_service
 from program.src.utils.ui_helpers import notify_later
-from program.src.utils.log_service import info, error
+from program.src.utils.log_service import info, warning, error
 
 # Maximum frames per second for the MJPEG video feed
 FPS_CAP = 30
@@ -292,7 +292,9 @@ class SimpleGUIApplication:
             on_camera_status_change=self.update_camera_status,
         )
         self.motion_section = MotionStatusSection(
-            self.settings, controller_manager=self.controller_manager
+            self.settings,
+            controller_manager=self.controller_manager,
+            update_callback=self.update_motion_status,
         )
         self.experiment_section = ExperimentManagementSection(
             self.settings,
@@ -324,6 +326,8 @@ class SimpleGUIApplication:
         # Ensure webcam widget reflects current camera state on page load
         if self.camera_active:
             self.update_camera_status(True)
+        if self.motion_detected:
+            self.update_motion_status(True)
 
     def update_time(self):
         """Update the time display in header"""
@@ -360,6 +364,22 @@ class SimpleGUIApplication:
                     start_btn.set_icon("play_arrow")
                     start_btn.props("color=positive")
                 ws.camera_active = False
+
+    def update_motion_status(self, detected: bool) -> None:
+        """Update motion icon and state based on detection status."""
+        self.motion_detected = detected
+        if hasattr(self, "motion_status_icon"):
+            self.motion_status_icon.name = (
+                "motion_photos_on" if detected else "motion_photos_off"
+            )
+            if detected:
+                self.motion_status_icon.classes(
+                    add="text-orange-300", remove="text-gray-400"
+                )
+            else:
+                self.motion_status_icon.classes(
+                    add="text-gray-400", remove="text-orange-300"
+                )
 
     # Header button handlers
     def toggle_fullscreen(self):
@@ -418,7 +438,7 @@ class SimpleGUIApplication:
     async def toggle_camera(self):
         """Start or stop the camera capture controller."""
 
-        async def _start():
+        async def _start() -> bool:
             if self.camera_controller is None:
                 cfg = ControllerConfig(
                     controller_id="camera_capture",
@@ -427,33 +447,70 @@ class SimpleGUIApplication:
                 )
                 self.camera_controller = CameraCaptureController("camera_capture", cfg)
 
+            try:
+                result = await self.camera_controller.start()
+            except Exception as exc:  # pragma: no cover - unexpected errors
+                error("Failed to start camera", error=str(exc))
+                notify_later("Failed to start camera", type="negative")
+                return False
+            if not result:
+                notify_later("Failed to start camera", type="negative")
+            return result
+
+        async def _stop() -> bool:
+
             if self.camera_controller.status == ControllerStatus.RUNNING:
                 return
 
             await self.camera_controller.start()
 
         async def _stop():
-            if self.camera_controller is not None:
-                await self.camera_controller.stop()
-                await self.camera_controller.cleanup()
-                self.camera_controller = None
 
+            if self.camera_controller is not None:
+                try:
+                    await self.camera_controller.stop()
+                    await self.camera_controller.cleanup()
+                    self.camera_controller = None
+                    result = True
+                except Exception as exc:  # pragma: no cover - unexpected errors
+                    error("Failed to stop camera", error=str(exc))
+                    notify_later("Failed to stop camera", type="negative")
+                    result = False
+                if not result:
+                    notify_later("Failed to stop camera", type="negative")
+                return result
+            return True
+
+        ws = getattr(self, "webcam_stream", None)
         if not self.camera_active:
+
             try:
                 await _start()
-            except Exception as exc:
+            except Exception as exc:  # noqa: BLE001
                 error("camera_start_failed", exc_info=exc)
-                self.update_camera_status(False)
+                notify_later("Failed to start camera", type="negative")
                 return
-            self.update_camera_status(True)
+            self.camera_active = True
+            if hasattr(self, "camera_status_icon"):
+                self.camera_status_icon.classes(replace="text-green-300")
+            ws = getattr(self, "webcam_stream", None)
+            if getattr(ws, "start_camera_btn", None):
+                ws.start_camera_btn.set_icon("pause")
+                ws.start_camera_btn.set_text("Pause Video")
         else:
             try:
                 await _stop()
-            except Exception as exc:
+            except Exception as exc:  # noqa: BLE001
                 error("camera_stop_failed", exc_info=exc)
-                self.update_camera_status(True)
+                notify_later("Failed to stop camera", type="negative")
                 return
-            self.update_camera_status(False)
+            self.camera_active = False
+            if hasattr(self, "camera_status_icon"):
+                self.camera_status_icon.classes(replace="text-gray-400")
+            ws = getattr(self, "webcam_stream", None)
+            if getattr(ws, "start_camera_btn", None):
+                ws.start_camera_btn.set_icon("play_arrow")
+                ws.start_camera_btn.set_text("Play Video")
 
     def update_sensitivity(self, e):
         """Update motion detection sensitivity"""
@@ -614,7 +671,7 @@ class SimpleGUIApplication:
                 )
         notify_later("ROI updated", type="positive")
 
-    def apply_uvc_settings(self):
+    async def apply_uvc_settings(self):
         """Apply UVC camera settings"""
         settings = {
             "brightness": self.webcam_stream.brightness_number.value,
@@ -632,25 +689,31 @@ class SimpleGUIApplication:
         }
         self.settings.update(settings)
         # Apply UVC settings asynchronously if capture objects are available
+        tasks = []
         if (
             self.camera_controller is not None
             and self.camera_controller._capture is not None
         ):
             capture = self.camera_controller._capture
-            asyncio.create_task(apply_uvc_settings(capture, settings))
+            tasks.append(asyncio.create_task(apply_uvc_settings(capture, settings)))
         if (
             self.motion_controller is not None
             and self.motion_controller._capture is not None
         ):
             capture = self.motion_controller._capture
-            asyncio.create_task(apply_uvc_settings(capture, settings))
+            tasks.append(asyncio.create_task(apply_uvc_settings(capture, settings)))
         if self.camera_controller:
             self.camera_controller.uvc_settings.update(settings)
         if self.motion_controller:
             self.motion_controller.uvc_settings.update(settings)
+        if tasks:
+            results = await asyncio.gather(*tasks, return_exceptions=True)
+            for res in results:
+                if isinstance(res, Exception):
+                    error("apply_uvc_failed", exc_info=res)
         notify_later("UVC settings applied", type="positive")
 
-    def reset_uvc_defaults(self):
+    async def reset_uvc_defaults(self):
         """Reset all UVC controls to their default values."""
         if not self.webcam_stream:
             return
@@ -687,19 +750,30 @@ class SimpleGUIApplication:
 
         self.settings.update(defaults)
 
+        tasks = []
         if self.camera_controller:
             self.camera_controller.uvc_settings.update(defaults)
             if self.camera_controller._capture is not None:
-                asyncio.create_task(
-                    apply_uvc_settings(self.camera_controller._capture, defaults)
+                tasks.append(
+                    asyncio.create_task(
+                        apply_uvc_settings(self.camera_controller._capture, defaults)
+                    )
                 )
 
         if self.motion_controller:
             self.motion_controller.uvc_settings.update(defaults)
             if self.motion_controller._capture is not None:
-                asyncio.create_task(
-                    apply_uvc_settings(self.motion_controller._capture, defaults)
+                tasks.append(
+                    asyncio.create_task(
+                        apply_uvc_settings(self.motion_controller._capture, defaults)
+                    )
                 )
+
+        if tasks:
+            results = await asyncio.gather(*tasks, return_exceptions=True)
+            for res in results:
+                if isinstance(res, Exception):
+                    error("apply_uvc_failed", exc_info=res)
 
         notify_later("UVC settings reset to defaults", type="positive")
 
@@ -1144,7 +1218,7 @@ class SimpleGUIApplication:
             except asyncio.CancelledError:
                 break
             except Exception as exc:
-                error(f"Processing loop error: {exc}")
+                error("Processing loop error", exc_info=exc)
                 await asyncio.sleep(0.1)
 
     def run(self, host: str = "localhost", port: int = 8081):
@@ -1163,61 +1237,69 @@ class SimpleGUIApplication:
                 no_frame_start: Optional[float] = None
                 timeout = 3.0
                 placeholder_bytes: Optional[bytes] = None
-                while True:
-                    try:
-                        if await request.is_disconnected():
+                try:
+                    while True:
+                        try:
+                            if await request.is_disconnected():
+                                break
+                        except asyncio.CancelledError:
                             break
-                    except asyncio.CancelledError:
-                        break
 
-                    frame = None
-                    if self.camera_controller is not None:
-                        output = self.camera_controller.get_output()
-                        if isinstance(output, dict):
-                            frame = output.get("frame") or output.get("image")
-                        elif output is not None:
-                            frame = output
+                        frame = None
+                        if self.camera_controller is not None:
+                            output = self.camera_controller.get_output()
+                            if isinstance(output, dict):
+                                frame = output.get("frame") or output.get("image")
+                            elif output is not None:
+                                frame = output
 
-                    now = asyncio.get_running_loop().time()
-                    if frame is not None:
-                        no_frame_start = None
-                        if interval <= 0 or now - last_sent >= interval:
-                            success, buf = await run_in_executor(
-                                cv2.imencode, ".jpg", frame
-                            )
-                            if success:
-                                jpeg = buf.tobytes()
-                                yield (
-                                    b"--frame\r\nContent-Type: image/jpeg\r\n\r\n"
-                                    + jpeg
-                                    + b"\r\n"
+                        now = asyncio.get_running_loop().time()
+                        if frame is not None:
+                            no_frame_start = None
+                            if interval <= 0 or now - last_sent >= interval:
+                                success, buf = await run_in_executor(
+                                    cv2.imencode, ".jpg", frame
                                 )
-                                last_sent = now
-                    else:
-                        if no_frame_start is None:
-                            no_frame_start = now
-                        if now - no_frame_start >= timeout:
-                            error(
-                                f"Camera failed to provide frames for {timeout} seconds"
-                            )
-                            if placeholder_bytes is None:
-                                placeholder = np.zeros((10, 10, 3), dtype=np.uint8)
-                                success, buf = cv2.imencode(".jpg", placeholder)
                                 if success:
-                                    placeholder_bytes = buf.tobytes()
-                            if placeholder_bytes:
-                                yield (
-                                    b"--frame\r\nContent-Type: image/jpeg\r\n\r\n"
-                                    + placeholder_bytes
-                                    + b"\r\n"
+                                    jpeg = buf.tobytes()
+                                    yield (
+                                        b"--frame\r\nContent-Type: image/jpeg\r\n\r\n"
+                                        + jpeg
+                                        + b"\r\n"
+                                    )
+                                    last_sent = now
+                        else:
+                            if no_frame_start is None:
+                                no_frame_start = now
+                            if now - no_frame_start >= timeout:
+                                error(
+                                    f"Camera failed to provide frames for {timeout} seconds"
                                 )
-                            self.update_camera_status(False)
-                            notify_later("Camera stream lost", type="warning")
-                            break
-                    await asyncio.sleep(max(0.001, interval))
+
+                                if placeholder_bytes is None:
+                                    placeholder = np.zeros((10, 10, 3), dtype=np.uint8)
+                                    success, buf = cv2.imencode(".jpg", placeholder)
+                                    if success:
+                                        placeholder_bytes = buf.tobytes()
+                                if placeholder_bytes:
+                                    yield (
+                                        b"--frame\r\nContent-Type: image/jpeg\r\n\r\n"
+                                        + placeholder_bytes
+                                        + b"\r\n"
+                                    )
+                                break
+                        await asyncio.sleep(max(0.001, interval))
+                finally:
+                    if self.camera_controller is not None:
+                        with contextlib.suppress(Exception):
+                            await self.camera_controller.stop()
+                            await self.camera_controller.cleanup()
+                        self.camera_controller = None
+                        self.update_camera_status(False)
 
             return StreamingResponse(
-                gen(), media_type="multipart/x-mixed-replace; boundary=frame"
+                contextlib.aclosing(gen()),
+                media_type="multipart/x-mixed-replace; boundary=frame",
             )
 
         @app.on_startup
@@ -1227,15 +1309,36 @@ class SimpleGUIApplication:
                 self.supported_camera_modes = await probe_camera_modes()
             except Exception:
                 self.supported_camera_modes = []
-            success = await self.controller_manager.start_all_controllers()
+
+            if getattr(self, "webcam_stream", None):
+                self.webcam_stream.available_resolutions = self.supported_camera_modes
+                self.webcam_stream.update_resolutions(self.supported_camera_modes)
+            await self.controller_manager.start_all_controllers()
             self._processing_task = asyncio.create_task(self._processing_loop())
+
+            # verify camera controller actually started
+            if (
+                self.camera_controller is not None
+                and self.camera_controller.status == ControllerStatus.RUNNING
+            ):
+                self.update_camera_status(True)
+            else:
+                warning("Camera controller failed to start")
+
+            success = await self.controller_manager.start_all_controllers()
+
             if success:
+                self._processing_task = asyncio.create_task(self._processing_loop())
+                # Ensure camera status reflects that controllers started
+                self.camera_active = True
                 self.update_camera_status(True)
             else:
                 ui.notify(
                     "Some controllers failed to start",
                     type="warning",
                 )
+                error("Failed to start controllers")
+
 
         @app.on_shutdown
         async def _shutdown() -> None:
@@ -1244,6 +1347,12 @@ class SimpleGUIApplication:
                 with contextlib.suppress(Exception):
                     await self._processing_task
                 self._processing_task = None
+            if self._experiment_timer:
+                try:
+                    self._experiment_timer.cancel()
+                except Exception:
+                    pass
+                self._experiment_timer = None
             if self._time_timer:
                 try:
                     self._time_timer.cancel()

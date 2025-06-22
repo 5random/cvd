@@ -1,4 +1,6 @@
 from nicegui import ui, events
+import asyncio
+import inspect
 from program.src.utils.ui_helpers import notify_later
 import asyncio
 import inspect
@@ -23,6 +25,9 @@ UVC_DEFAULTS = {
 
 class WebcamStreamElement:
     """Initialize webcam stream element with settings and optional callbacks"""
+
+    # Track whether the /webcam_stream page has been registered
+    _page_registered = False
 
     def __init__(
         self,
@@ -56,10 +61,14 @@ class WebcamStreamElement:
         self.roi_height = 0
         self.camera_settings_expansion = None
 
-        @ui.page("/webcam_stream")
-        def webcam_stream_page():
-            # Create the camera section
-            self.create_camera_section()
+        # Register the page only once for the first created instance
+        if not WebcamStreamElement._page_registered:
+            @ui.page("/webcam_stream")
+            def webcam_stream_page():
+                # Create the camera section
+                self.create_camera_section()
+
+            WebcamStreamElement._page_registered = True
 
     def create_camera_section(self):
         """Create camera feed and controls section"""
@@ -693,6 +702,12 @@ class WebcamStreamElement:
             self.start_camera_btn.props("color=negative")
             self.camera_active = True
             if self._camera_toggle_cb:
+
+                if inspect.iscoroutinefunction(self._camera_toggle_cb):
+                    asyncio.create_task(self._camera_toggle_cb())
+                else:
+                    self._camera_toggle_cb()
+
                 result = self._camera_toggle_cb()
                 if inspect.isawaitable(result):
                     asyncio.create_task(result)
@@ -705,9 +720,14 @@ class WebcamStreamElement:
             self.start_camera_btn.props("color=positive")
             self.camera_active = False
             if self._camera_toggle_cb:
+                if inspect.iscoroutinefunction(self._camera_toggle_cb):
+                    asyncio.create_task(self._camera_toggle_cb())
+                else:
+                    self._camera_toggle_cb()
                 result = self._camera_toggle_cb()
                 if inspect.isawaitable(result):
                     asyncio.create_task(result)
+
             self._update_status()
 
     def toggle_white_balance_auto(self, value):
@@ -738,11 +758,11 @@ class WebcamStreamElement:
         self.recording = not self.recording
         if self.recording:
             # update the label of the menu item
-            self.record_menu_item.props('text="Stop Recording"')
+            self.record_menu_item.set_text("Stop Recording")
             notify_later("Recording started", type="positive")
         else:
             # reset the label when stopping the recording
-            self.record_menu_item.props('text="Start Recording"')
+            self.record_menu_item.set_text("Start Recording")
             notify_later("Recording stopped", type="warning")
 
     def take_snapshot(self):
@@ -832,3 +852,13 @@ class WebcamStreamElement:
             self.roi_checkbox.value = False
             if self._roi_update_cb:
                 self._roi_update_cb()
+
+    def update_resolutions(self, modes):
+        """Update resolution dropdown options."""
+        self.available_resolutions = list(modes or [])
+        options = [f"{w}x{h} ({fps}fps)" for (w, h, fps) in self.available_resolutions]
+        if hasattr(self, "resolution_select", None):
+            current = getattr(self.resolution_select, "value", None)
+            self.resolution_select.options = options
+            if current not in options and options:
+                self.resolution_select.value = options[0]
