@@ -1,6 +1,6 @@
 from nicegui import ui
 from datetime import datetime
-from typing import List, Optional, Callable
+from typing import List, Optional
 
 from program.src.experiment_handler.experiment_manager import (
     ExperimentConfig,
