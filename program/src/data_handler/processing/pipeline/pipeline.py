@@ -94,6 +94,7 @@ class DataPipeline:
         self._total_errors = 0
         for stage in self._stages:
             stage._error_count = 0
+            stage._processing_time = 0.0
 
 # Factory functions for common pipeline configurations
 
