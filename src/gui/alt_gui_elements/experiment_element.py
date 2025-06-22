@@ -6,7 +6,7 @@ from src.experiment_manager import (
     ExperimentConfig,
     get_experiment_manager,
 )
-from src.utils.ui_helpers import notify_later
+from src.gui.ui_helpers import notify_later
 
 
 class ExperimentManagementSection:

@@ -479,16 +479,11 @@ class EmailAlertWizard:
 
     def _is_valid_email(self, email: str) -> bool:
         """Check if email ends with @tuhh.de regardless of local part."""
-        if not email:
+        if "@" not in email:
             return False
 
-        try:
-            local, domain = email.strip().rsplit("@", 1)
-        except ValueError:
-            return False
-
-        return bool(local) and domain == "tuhh.de"
-
+        local, domain = email.rsplit("@", 1)
+        return bool(local) and domain.lower() == "tuhh.de"
 
     def _add_email(
         self, email_input, email_list, step2_feedback, step2_next_btn, email_feedback
@@ -1313,6 +1308,47 @@ def create_compact_alert_widget(
     """Factory function to create a compact alert status widget"""
     display = EmailAlertStatusDisplay(configurations)
     return display.create_compact_status_widget()
+
+
+# Example usage and test data
+def create_demo_configurations() -> List[Dict[str, Any]]:
+    """Create demo alert configurations for testing"""
+    return [
+        {
+            "name": "Labor Überwachung",
+            "emails": [
+                "admin@tuhh.de",
+                "security@tuhh.de",
+                "technician@tuhh.de",
+            ],
+            "settings": {
+                "no_motion_detected": {"enabled": True, "delay_minutes": 10},
+                "camera_offline": {"enabled": True},
+                "system_error": {"enabled": True},
+                "experiment_complete_alert": {"enabled": False},
+            },
+        },
+        {
+            "name": "Experiment Benachrichtigungen",
+            "emails": ["researcher@tuhh.de", "supervisor@tuhh.de"],
+            "settings": {
+                "no_motion_detected": {"enabled": False, "delay_minutes": 5},
+                "camera_offline": {"enabled": False},
+                "system_error": {"enabled": True},
+                "experiment_complete_alert": {"enabled": True},
+            },
+        },
+        {
+            "name": "Inaktive Konfiguration",
+            "emails": ["test@tuhh.de"],
+            "settings": {
+                "no_motion_detected": {"enabled": False, "delay_minutes": 5},
+                "camera_offline": {"enabled": False},
+                "system_error": {"enabled": False},
+                "experiment_complete_alert": {"enabled": False},
+            },
+        },
+    ]
 
 
 def _get_alert_config_path(service: ConfigurationService) -> Path:

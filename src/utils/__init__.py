@@ -17,7 +17,7 @@ from .config_service import (
     get_config_service,
     set_config_service,
 )
-from .ui_helpers import notify_later  # noqa: F401
+from ..gui.ui_helpers import notify_later  # noqa: F401
 
 _BASE_PACKAGE = __name__
 

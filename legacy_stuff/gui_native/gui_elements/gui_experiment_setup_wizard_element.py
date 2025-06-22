@@ -4,7 +4,7 @@ from typing import Any, Optional, Callable, Dict, List
 from datetime import datetime
 from nicegui import ui
 import json
-from src.utils.ui_helpers import notify_later
+from src.gui.ui_helpers import notify_later
 
 from src.gui.gui_tab_components.gui_tab_base_component import (
     BaseComponent,

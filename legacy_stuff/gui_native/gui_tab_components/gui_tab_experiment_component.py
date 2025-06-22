@@ -11,7 +11,7 @@ from dataclasses import dataclass
 
 from nicegui import ui
 from nicegui.element import Element
-from src.utils.ui_helpers import notify_later
+from src.gui.ui_helpers import notify_later
 from nicegui.elements.dialog import Dialog
 from nicegui.elements.label import Label
 from nicegui.elements.button import Button

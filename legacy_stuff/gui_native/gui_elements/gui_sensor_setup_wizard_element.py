@@ -14,7 +14,7 @@ from src.data_handler.sources.sensor_source_manager import (
     SENSOR_REGISTRY,
 )
 from src.data_handler.interface.sensor_interface import SensorStatus
-from src.utils.ui_helpers import notify_later
+from src.gui.ui_helpers import notify_later
 from src.utils.config_service import ConfigurationService
 from src.utils.log_service import info, warning, error
 

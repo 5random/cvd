@@ -63,7 +63,7 @@ from src.utils.concurrency import (
 )
 from src.utils.concurrency.async_utils import install_signal_handlers
 from src.utils.config_service import ConfigurationService, set_config_service
-from src.utils.ui_helpers import notify_later
+from src.gui.ui_helpers import notify_later
 from src.utils.log_service import info, warning, error
 
 # Maximum frames per second for the MJPEG video feed
