@@ -1,6 +1,3 @@
-import types
-from pathlib import Path
-
 from program.src.gui.alt_application import SimpleGUIApplication
 from program.src.utils.config_service import get_config_service
 
