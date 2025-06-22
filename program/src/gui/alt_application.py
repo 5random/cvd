@@ -21,8 +21,13 @@ from fastapi import Request
 from fastapi.responses import StreamingResponse
 from nicegui import app, ui
 
+# Maximum frames per second for the MJPEG video feed
+FPS_CAP = 30
+
 from program.src.controllers import controller_manager as controller_manager_module
-from program.src.controllers.algorithms.motion_detection import MotionDetectionController
+from program.src.controllers.algorithms.motion_detection import (
+    MotionDetectionController,
+)
 from program.src.controllers.controller_base import ControllerConfig
 from program.src.controllers.controller_manager import ControllerManager
 from program.src.controllers.controller_utils.camera_utils import apply_uvc_settings
@@ -119,6 +124,7 @@ class SimpleGUIApplication:
         self.settings = {
             "sensitivity": 50,
             "fps": 30,
+            "fps_cap": self.config_service.get("webapp.fps_cap", int, FPS_CAP),
             "resolution": "640x480 (30fps)",
             "roi_enabled": False,
             "email": "",
@@ -960,6 +966,9 @@ class SimpleGUIApplication:
         @ui.page("/video_feed")
         async def video_feed(request: Request):
             async def gen():
+                last_sent = 0.0
+                fps_cap = float(self.settings.get("fps_cap", FPS_CAP))
+                interval = 1 / fps_cap if fps_cap > 0 else 0.0
                 while True:
                     try:
                         if await request.is_disconnected():
@@ -975,7 +984,10 @@ class SimpleGUIApplication:
                         elif output is not None:
                             frame = output
 
-                    if frame is not None:
+                    now = asyncio.get_running_loop().time()
+                    if frame is not None and (
+                        interval <= 0 or now - last_sent >= interval
+                    ):
                         success, buf = await run_in_executor(
                             cv2.imencode, ".jpg", frame
                         )
@@ -986,6 +998,7 @@ class SimpleGUIApplication:
                                 + jpeg
                                 + b"\r\n"
                             )
+                            last_sent = now
                     await asyncio.sleep(0.03)
 
             return StreamingResponse(
