@@ -218,9 +218,12 @@ class CompressionService:
                 info(f"Compressed {data_type} file: {file_path} -> {output_path}")
                 return output_path
                 
-        except Exception as e:
+        except (OSError, zipfile.BadZipFile, lzma.LZMAError) as e:
             error(f"Failed to compress file {file_path}: {e}")
             return None
+        except Exception as e:
+            error(f"Unexpected error compressing file {file_path}: {e}")
+            raise
     def _compress_standard(self, input_path: Path, output_path: Path) -> None:
         """Compress file using gzip, bz2, or lzma with chunk-based streaming"""
         algorithm_info = self.COMPRESSION_ALGORITHMS[self._compression_settings.algorithm]
@@ -288,8 +291,11 @@ class CompressionService:
                 result = fut.result()
                 if result:
                     compressed_files.append(result)
-            except Exception as e:
+            except (OSError, CompressionError) as e:
                 error(f"Error compressing file in pool: {e}")
+            except Exception as e:
+                error(f"Unexpected error compressing file in pool: {e}")
+                raise
         info(f"Compressed {len(compressed_files)} {data_type} files in {directory_path}")
         return compressed_files
     

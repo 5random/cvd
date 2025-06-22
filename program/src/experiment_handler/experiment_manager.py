@@ -25,11 +25,15 @@ import threading
 from program.src.utils.config_service import (
     get_config_service,
     ConfigurationService,
+    ConfigurationError,
 )
 from src.data_handler.sources.sensor_source_manager import SensorManager
 from src.utils.data_utils.data_saver import DataSaver
 from src.data_handler.interface.sensor_interface import SensorReading, SensorStatus
-from src.utils.data_utils.compression_service import get_compression_service
+from src.utils.data_utils.compression_service import (
+    get_compression_service,
+    CompressionError,
+)
 from src.utils.data_utils.file_management_service import FileMaintenanceService
 from program.src.utils.log_service import info, warning, error, debug
 from src.controllers.controller_manager import ControllerManager
@@ -236,7 +240,7 @@ class ExperimentManager:
             debug(
                 f"Experiment config loaded: base_dir={self.experiments_base_dir}, raw={self.experiments_results_raw}, processed={self.experiments_results_processed}, auto_zip={self.auto_zip}"
             )
-        except Exception as e:
+        except (ConfigurationError, json.JSONDecodeError, OSError) as e:
             error(f"Failed to load experiment configuration: {e}")
             # Fallback defaults
             self.auto_zip = True
@@ -248,6 +252,9 @@ class ExperimentManager:
             self.experiments_base_dir = Path("data/experiments")
             self.experiments_results_raw = "results/raw"
             self.experiments_results_processed = "results/processed"
+        except Exception as e:
+            error(f"Unexpected error loading experiment configuration: {e}")
+            raise
 
     def create_experiment(self, config: ExperimentConfig) -> str:
         """
@@ -379,10 +386,14 @@ class ExperimentManager:
 
             return True
 
-        except Exception as e:
+        except (RuntimeError, OSError) as e:
             error(f"Failed to start experiment {experiment_id}: {e}")
             await self._change_state(ExperimentState.FAILED)
             return False
+        except Exception as e:
+            error(f"Unexpected error starting experiment {experiment_id}: {e}")
+            await self._change_state(ExperimentState.FAILED)
+            raise
 
     async def stop_experiment(self) -> bool:
         """
@@ -411,10 +422,14 @@ class ExperimentManager:
             info(f"Stopped experiment: {self._current_experiment}")
             return True
 
-        except Exception as e:
+        except (RuntimeError, OSError) as e:
             error(f"Failed to stop experiment: {e}")
             await self._change_state(ExperimentState.FAILED)
             return False
+        except Exception as e:
+            error(f"Unexpected error stopping experiment: {e}")
+            await self._change_state(ExperimentState.FAILED)
+            raise
 
     async def pause_experiment(self) -> bool:
         """
@@ -432,9 +447,12 @@ class ExperimentManager:
             info(f"Paused experiment: {self._current_experiment}")
             return True
 
-        except Exception as e:
+        except RuntimeError as e:
             error(f"Failed to pause experiment: {e}")
             return False
+        except Exception as e:
+            error(f"Unexpected error pausing experiment: {e}")
+            raise
 
     async def resume_experiment(self) -> bool:
         """
@@ -452,9 +470,12 @@ class ExperimentManager:
             info(f"Resumed experiment: {self._current_experiment}")
             return True
 
-        except Exception as e:
+        except RuntimeError as e:
             error(f"Failed to resume experiment: {e}")
             return False
+        except Exception as e:
+            error(f"Unexpected error resuming experiment: {e}")
+            raise
 
     async def cancel_experiment(self) -> bool:
         """
@@ -484,9 +505,12 @@ class ExperimentManager:
             info("Cancelled current experiment")
             return True
 
-        except Exception as e:
+        except RuntimeError as e:
             error(f"Failed to cancel experiment: {e}")
             return False
+        except Exception as e:
+            error(f"Unexpected error cancelling experiment: {e}")
+            raise
 
     async def _start_sensors(self, sensor_ids: List[str]) -> None:
         """Start specified sensors or all if empty list"""
@@ -527,11 +551,17 @@ class ExperimentManager:
                     started = await controller.start()
                     if not started:
                         warning(f"Failed to start controller {controller_id}")
-                except Exception as exc:
+                except RuntimeError as exc:
                     error(f"Error starting controller {controller_id}: {exc}")
+                except Exception as exc:
+                    error(f"Unexpected error starting controller {controller_id}: {exc}")
+                    raise
 
-        except Exception as e:
+        except RuntimeError as e:
             error(f"Failed to start controllers: {e}")
+        except Exception as e:
+            error(f"Unexpected error starting controllers: {e}")
+            raise
 
     async def _data_collection_loop(self, config: ExperimentConfig) -> None:
         """Main data collection loop for the experiment"""
@@ -548,9 +578,13 @@ class ExperimentManager:
 
         except asyncio.CancelledError:
             debug("Data collection loop cancelled")
-        except Exception as e:
+        except RuntimeError as e:
             error(f"Error in data collection loop: {e}")
             await self._change_state(ExperimentState.FAILED)
+        except Exception as e:
+            error(f"Unexpected error in data collection loop: {e}")
+            await self._change_state(ExperimentState.FAILED)
+            raise
 
     async def _collect_data_point(self) -> None:
         """Collect a single data point from all sources"""
@@ -597,10 +631,15 @@ class ExperimentManager:
                 result.sensor_readings_count += len(data_point.sensor_readings)
                 result.controller_outputs_count += len(data_point.controller_outputs)
 
-        except Exception as e:
+        except (RuntimeError, OSError) as e:
             error(f"Failed to collect data point: {e}")
             if self._current_experiment in self._experiment_results:
                 self._experiment_results[self._current_experiment].errors_count += 1
+        except Exception as e:
+            error(f"Unexpected error collecting data point: {e}")
+            if self._current_experiment in self._experiment_results:
+                self._experiment_results[self._current_experiment].errors_count += 1
+            raise
 
     async def _save_data_point(self, data_point: ExperimentDataPoint) -> None:
         """Save a data point to storage"""
@@ -627,8 +666,11 @@ class ExperimentManager:
             # Save experiment-specific summary file
             await self._save_experiment_summary(data_point)
 
-        except Exception as e:
+        except OSError as e:
             error(f"Failed to save data point: {e}")
+        except Exception as e:
+            error(f"Unexpected error saving data point: {e}")
+            raise
 
     async def _save_experiment_summary(self, data_point: ExperimentDataPoint) -> None:
         """Save experiment summary data to CSV"""
@@ -684,8 +726,11 @@ class ExperimentManager:
                     ]
                 )
 
-        except Exception as e:
+        except (OSError, csv.Error) as e:
             error(f"Failed to save experiment summary: {e}")
+        except Exception as e:
+            error(f"Unexpected error saving experiment summary: {e}")
+            raise
 
     async def _finalize_experiment(self) -> None:
         """Finalize the current experiment and save results.
@@ -719,9 +764,13 @@ class ExperimentManager:
 
             info(f"Finalized experiment: {result.experiment_id}")
 
-        except Exception as e:
+        except (OSError, RuntimeError, CompressionError) as e:
             error(f"Failed to finalize experiment: {e}")
             await self._change_state(ExperimentState.FAILED)
+        except Exception as e:
+            error(f"Unexpected error finalizing experiment: {e}")
+            await self._change_state(ExperimentState.FAILED)
+            raise
 
     async def _save_experiment_metadata(self, result: ExperimentResult) -> None:
         """Save experiment metadata to JSON file"""
@@ -761,8 +810,11 @@ class ExperimentManager:
 
             debug(f"Saved experiment metadata to {metadata_file}")
 
-        except Exception as e:
+        except (OSError, TypeError, json.JSONDecodeError) as e:
             error(f"Failed to save experiment metadata: {e}")
+        except Exception as e:
+            error(f"Unexpected error saving experiment metadata: {e}")
+            raise
 
     async def _compress_experiment_results(self, result: ExperimentResult) -> None:
         """Compress experiment results directory"""
@@ -782,8 +834,11 @@ class ExperimentManager:
                 result.compressed_archive = compressed_files[0]
                 info(f"Compressed experiment results: {result.compressed_archive}")
 
-        except Exception as e:
+        except (CompressionError, OSError) as e:
             error(f"Failed to compress experiment results: {e}")
+        except Exception as e:
+            error(f"Unexpected error compressing experiment results: {e}")
+            raise
 
     async def _auto_stop_experiment(self, duration_minutes: int) -> None:
         """Automatically stop experiment after specified duration"""
@@ -796,8 +851,11 @@ class ExperimentManager:
 
         except asyncio.CancelledError:
             pass
-        except Exception as e:
+        except RuntimeError as e:
             error(f"Error in auto-stop: {e}")
+        except Exception as e:
+            error(f"Unexpected error in auto-stop: {e}")
+            raise
 
     async def _change_state(self, new_state: ExperimentState) -> None:
         """Change experiment state and notify callbacks"""
@@ -820,6 +878,7 @@ class ExperimentManager:
                 callback(old_state, new_state)
             except Exception as e:
                 warning(f"Error in state change callback: {e}")
+                raise
 
     def add_state_change_callback(
         self, callback: Callable[[ExperimentState, ExperimentState], None]
@@ -880,9 +939,12 @@ class ExperimentManager:
 
             info(f"Deleted experiment {experiment_id}")
             return True
-        except Exception as e:  # pragma: no cover - best effort
+        except (OSError, RuntimeError) as e:  # pragma: no cover - best effort
             error(f"Failed to delete experiment {experiment_id}: {e}")
             return False
+        except Exception as e:
+            error(f"Unexpected error deleting experiment {experiment_id}: {e}")
+            raise
 
     async def cleanup(self) -> None:
         """Cleanup resources and stop any running experiments"""
@@ -898,8 +960,11 @@ class ExperimentManager:
             await self._task_manager.stop_all_tasks()
             info("ExperimentManager cleanup complete")
 
-        except Exception as e:
+        except RuntimeError as e:
             error(f"Error during ExperimentManager cleanup: {e}")
+        except Exception as e:
+            error(f"Unexpected error during ExperimentManager cleanup: {e}")
+            raise
 
 
 # Global experiment manager instance
@@ -960,9 +1025,12 @@ async def create_and_start_experiment(
         else:
             return None
 
-    except Exception as e:
+    except (RuntimeError, OSError) as e:
         error(f"Failed to create and start experiment: {e}")
         return None
+    except Exception as e:
+        error(f"Unexpected error creating experiment: {e}")
+        raise
 
 
 async def stop_current_experiment() -> bool:

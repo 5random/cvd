@@ -16,6 +16,26 @@ from importlib import abc, util
 _SRC_PREFIX = "src."
 _PROG_PREFIX = "program.src."
 
+# Only these subpackages are mirrored between the two namespaces
+_ALIASED_SUBPACKAGES = {
+    "controllers",
+    "data_handler",
+    "experiment_handler",
+    "gui",
+    "utils",
+}
+
+
+def _is_project_module(name: str) -> bool:
+    """Return ``True`` if ``name`` refers to a module inside this project."""
+
+    for pkg in _ALIASED_SUBPACKAGES:
+        if name.startswith(f"{_SRC_PREFIX}{pkg}") or name.startswith(
+            f"{_PROG_PREFIX}{pkg}"
+        ):
+            return True
+    return False
+
 
 def _other_name(name: str) -> str | None:
     """Return the corresponding alias for ``name`` or ``None``."""
@@ -66,7 +86,7 @@ class _AliasFinder(abc.MetaPathFinder):
         self, fullname, path=None, target=None
     ):  # pragma: no cover - thin wrapper
         other = _other_name(fullname)
-        if other is None:
+        if other is None or not _is_project_module(fullname):
             return None
         sys.meta_path.remove(self)
         try:
@@ -96,4 +116,5 @@ sys.modules[__name__] = module
 
 # Mirror any modules that may have been imported before this file executed
 for existing in list(sys.modules):
-    _alias_existing(existing)
+    if _is_project_module(existing):
+        _alias_existing(existing)
