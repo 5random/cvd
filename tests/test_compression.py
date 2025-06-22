@@ -1,4 +1,5 @@
 import os
+import logging
 from pathlib import Path
 import pytest
 
@@ -20,29 +21,38 @@ def _init_services(tmp_path: Path) -> tuple[ConfigurationService, CompressionSer
     return config_service, compression_service, data_saver
 
 
-def test_data_saver_compress_sync(tmp_path: Path):
+def test_data_saver_compress_sync(tmp_path: Path, caplog):
     _, compression_service, data_saver = _init_services(tmp_path)
 
     file_path = tmp_path / 'raw' / 'sample.csv'
     file_path.parent.mkdir(parents=True, exist_ok=True)
     file_path.write_text('a,b\n1,2\n')
 
+    caplog.set_level(logging.WARNING, logger="cvd_tracker.error")
+
     # Should not raise FileNotFoundError even though CompressionService removes the file
-    data_saver._compress_file_sync(file_path)
+    result = data_saver._compress_file_sync(file_path)
+
+    assert result is not None and result.exists()
+    assert not any(r.levelno >= logging.WARNING for r in caplog.records)
 
     compressed = list((file_path.parent / 'compressed').glob('sample*.csv.gz'))
     assert len(compressed) == 1
     assert not file_path.exists()
 
 
-def test_file_maintenance_compress(tmp_path: Path):
+def test_file_maintenance_compress(tmp_path: Path, caplog):
     _, compression_service, _ = _init_services(tmp_path)
     service = FileMaintenanceService(compression_service, compression_threshold_bytes=0, max_file_age_seconds=0)
 
     file_path = tmp_path / 'example.csv'
     file_path.write_text('x,y\n')
 
-    service._compress_file(file_path)
+    caplog.set_level(logging.WARNING, logger="cvd_tracker.error")
+    result = service._compress_file(file_path)
+
+    assert result is not None and result.exists()
+    assert not any(r.levelno >= logging.WARNING for r in caplog.records)
 
     compressed = list((tmp_path / 'compressed').glob('example*.csv.gz'))
     assert len(compressed) == 1
