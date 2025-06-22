@@ -88,3 +88,63 @@ def test_remove_last_recipient_disables_next(dummy_ui):
     wizard._remove_email("user@tuhh.de", email_list, feedback, next_btn)
 
     assert next_btn.disabled
+
+
+def test_validate_step2_invalid_emails(dummy_ui):
+    wizard = EmailAlertWizard()
+    wizard.alert_data["emails"] = ["user@tuhh.de", "bad@example.com"]
+
+    class DummyLabel:
+        def __init__(self):
+            self.text = ""
+
+        def classes(self, *a, **k):
+            return self
+
+    class DummyButton:
+        def __init__(self):
+            self.disabled = False
+
+        def disable(self):
+            self.disabled = True
+
+        def enable(self):
+            self.disabled = False
+
+    feedback = DummyLabel()
+    next_btn = DummyButton()
+
+    wizard._validate_step2(feedback, next_btn)
+
+    assert next_btn.disabled
+    assert "invalid" in feedback.text.lower()
+
+
+def test_validate_step2_all_valid(dummy_ui):
+    wizard = EmailAlertWizard()
+    wizard.alert_data["emails"] = ["one@tuhh.de", "two@tuhh.de"]
+
+    class DummyLabel:
+        def __init__(self):
+            self.text = ""
+
+        def classes(self, *a, **k):
+            return self
+
+    class DummyButton:
+        def __init__(self):
+            self.disabled = False
+
+        def disable(self):
+            self.disabled = True
+
+        def enable(self):
+            self.disabled = False
+
+    feedback = DummyLabel()
+    next_btn = DummyButton()
+
+    wizard._validate_step2(feedback, next_btn)
+
+    assert not next_btn.disabled
+    assert feedback.text.startswith("✓")
