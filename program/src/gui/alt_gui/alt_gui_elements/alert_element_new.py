@@ -17,7 +17,14 @@ import re
 
 
 class EmailAlertWizard:
-    """4-Step Email Alert Service Setup Wizard using NiceGUI Stepper"""
+    """4-Step Email Alert Service Setup Wizard using NiceGUI Stepper.
+
+    Lifecycle of a wizard instance:
+    1. Create :class:`EmailAlertWizard` with an optional ``on_save`` callback.
+    2. Call :meth:`create_wizard` and embed the returned card in a dialog.
+    3. Once the dialog is closed, invoke :meth:`cleanup` or discard the
+       instance to release references to UI elements and callbacks.
+    """
 
     def __init__(self, on_save: Optional[Callable[[Dict[str, Any]], None]] = None):
         """Initialize the Email Alert Wizard
@@ -709,6 +716,11 @@ class EmailAlertWizard:
 
         notify_later("Wizard reset", type="info")
 
+    def cleanup(self) -> None:
+        """Release references to UI elements and callbacks."""
+        self.on_save = None
+        self.stepper = None
+
     def get_configuration(self) -> Dict[str, Any]:
         """Get current configuration data"""
         return self.alert_data.copy()
@@ -1014,11 +1026,13 @@ class EmailAlertStatusDisplay:
             if cb:
                 cb()
             dialog.close()
+        wizard = EmailAlertWizard(on_save=_on_save)
 
         with ui.dialog() as dialog, ui.card().classes("w-full max-w-4xl"):
-            create_email_alert_wizard(on_save=_on_save)
+            wizard.create_wizard()
             with ui.row().classes("w-full justify-end mt-4"):
                 ui.button("Schließen", on_click=dialog.close).props("flat")
+            dialog.on("close", lambda _: wizard.cleanup())
 
         dialog.open()
 
@@ -1040,6 +1054,7 @@ class EmailAlertStatusDisplay:
             wizard.create_wizard()
             with ui.row().classes("w-full justify-end mt-4"):
                 ui.button("Schließen", on_click=dialog.close).props("flat")
+            dialog.on("close", lambda _: wizard.cleanup())
 
         dialog.open()
 
