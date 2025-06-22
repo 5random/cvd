@@ -37,6 +37,7 @@ def test_global_services_set(tmp_path, monkeypatch):
         fromlist=["EmailAlertService"],
     )
     monkeypatch.setattr(email_mod, "EmailAlertService", DummyEmailAlertService)
+
     try:
         other_mod = __import__(
             "src.utils.email_alert_service",
