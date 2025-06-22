@@ -1,7 +1,7 @@
 """Email alerting service for critical controller states."""
 import smtplib
 from email.message import EmailMessage
-from typing import Optional, List, Dict
+from typing import Optional, List, Dict, Iterable, Union
 from datetime import datetime
 
 from program.src.utils.config_service import get_config_service, ConfigurationService, ConfigurationError
@@ -18,10 +18,21 @@ class EmailAlertService:
         self._load_configuration()
         self._history: List[Dict[str, str]] = []
 
+    @property
+    def recipient(self) -> Optional[str]:
+        return self.recipients[0] if self.recipients else None
+
+    @recipient.setter
+    def recipient(self, value: Optional[str]) -> None:
+        self.recipients = [value] if value else None
+
     def _load_configuration(self) -> None:
         assert self._config_service is not None, "Configuration service not available"
         cfg = self._config_service.get('alerting', dict, {}) or {}
         self.recipient: Optional[str] = cfg.get('email_recipient')
+        self.recipients: Optional[List[str]] = (
+            [self.recipient] if self.recipient else None
+        )
         self.smtp_host: str = cfg.get('smtp_host', 'localhost')
         self.smtp_port: int = cfg.get('smtp_port', 25)
         self.smtp_user: Optional[str] = cfg.get('smtp_user')
@@ -41,7 +52,12 @@ class EmailAlertService:
             warning("EmailAlertService: invalid smtp_port; using 25")
             self.smtp_port = 25
 
-    def send_alert(self, subject: str, body: str, recipient: Optional[str] = None) -> bool:
+    def send_alert(
+        self,
+        subject: str,
+        body: str,
+        recipient: Optional[Union[str, Iterable[str]]] = None,
+    ) -> bool:
         """Send an alert e-mail. Returns True on success.
 
         Args:
@@ -49,16 +65,15 @@ class EmailAlertService:
             body: Email body
             recipient: Optional override for the configured recipient
         """
-        target = recipient or self.recipient
-        if not target:
+        target = recipient or self.recipients or ([] if self.recipient is None else [self.recipient])
+        if isinstance(target, str):
+            targets = [target]
+        else:
+            targets = list(target)
+        if not targets:
             warning("EmailAlertService: no recipient configured")
             return False
         try:
-            msg = EmailMessage()
-            msg['Subject'] = subject
-            msg['From'] = self.smtp_user or 'cvd-tracker'
-            msg['To'] = target
-            msg.set_content(body)
             # Establish connection: SSL or plain
             if self.smtp_use_ssl:
                 smtp_conn = smtplib.SMTP_SSL(self.smtp_host, self.smtp_port)
@@ -74,13 +89,19 @@ class EmailAlertService:
                 # Authenticate only if both user and password provided
                 if self.smtp_user and self.smtp_password:
                     smtp.login(self.smtp_user, self.smtp_password)
-                smtp.send_message(msg)
-            info(f"Sent alert email to {target}")
-            self._history.append({
-                "time": datetime.now().strftime("%H:%M:%S"),
-                "recipient": target,
-                "subject": subject,
-            })
+                for addr in targets:
+                    msg = EmailMessage()
+                    msg['Subject'] = subject
+                    msg['From'] = self.smtp_user or 'cvd-tracker'
+                    msg['To'] = addr
+                    msg.set_content(body)
+                    smtp.send_message(msg)
+                    info(f"Sent alert email to {addr}")
+                    self._history.append({
+                        "time": datetime.now().strftime("%H:%M:%S"),
+                        "recipient": addr,
+                        "subject": subject,
+                    })
             return True
         except Exception as exc:
             error(f"Failed to send alert email: {exc}")
