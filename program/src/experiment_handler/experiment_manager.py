@@ -613,6 +613,10 @@ class ExperimentManager:
             with self._collection_lock:
                 self._collected_data.append(data_point)
 
+            # Update statistics before saving so summary reflects this data point
+            if self._current_experiment in self._experiment_results:
+                result = self._experiment_results[self._current_experiment]
+                result.data_points_collected += 1
             # Save to file immediately if data_saver available
             if self.data_saver and self._current_experiment:
                 await self._save_data_point(data_point)
@@ -624,10 +628,9 @@ class ExperimentManager:
                 except Exception as e:
                     warning(f"Error in data callback: {e}")
 
-            # Update statistics
+            # Update remaining statistics
             if self._current_experiment in self._experiment_results:
                 result = self._experiment_results[self._current_experiment]
-                result.data_points_collected += 1
                 result.sensor_readings_count += len(data_point.sensor_readings)
                 result.controller_outputs_count += len(data_point.controller_outputs)
 
