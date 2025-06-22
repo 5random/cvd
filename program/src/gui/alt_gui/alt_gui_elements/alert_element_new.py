@@ -33,7 +33,7 @@ class EmailAlertWizard:
                 "no_motion_detected": {"enabled": False, "delay_minutes": 5},
                 "camera_offline": {"enabled": False},
                 "system_error": {"enabled": False},
-                "experiment_completes": {"enabled": False},
+                "experiment_complete_alert": {"enabled": False},
             },
         }
 
@@ -260,7 +260,7 @@ class EmailAlertWizard:
                         ui.checkbox(
                             "Send alert when experiments complete",
                             value=False,
-                            on_change=lambda e: self._update_experiment_complete_setting(
+                            on_change=lambda e: self._update_experiment_complete_alert_setting(
                                 e.value, summary_container
                             ),
                         )
@@ -338,7 +338,7 @@ class EmailAlertWizard:
                         ),
                         ("camera_offline", "Camera Offline", "videocam_off"),
                         ("system_error", "System Error", "error"),
-                        ("experiment_completes", "Experiment Complete", "check_circle"),
+                        ("experiment_complete_alert", "Experiment Complete", "check_circle"),
                     ]
 
                     active_alerts_count = 0
@@ -575,9 +575,9 @@ class EmailAlertWizard:
         self.alert_data["settings"]["system_error"]["enabled"] = value
         self._update_summary(summary_container)
 
-    def _update_experiment_complete_setting(self, value, summary_container):
+    def _update_experiment_complete_alert_setting(self, value, summary_container):
         """Update experiment complete setting"""
-        self.alert_data["settings"]["experiment_completes"]["enabled"] = value
+        self.alert_data["settings"]["experiment_complete_alert"]["enabled"] = value
         self._update_summary(summary_container)
 
     def _update_summary(self, summary_container):
@@ -611,7 +611,7 @@ class EmailAlertWizard:
                         active_alerts.append("Camera Offline")
                     elif alert_type == "system_error":
                         active_alerts.append("System Errors")
-                    elif alert_type == "experiment_completes":
+                    elif alert_type == "experiment_complete_alert":
                         active_alerts.append("Experiment Complete")
 
             with ui.row().classes("gap-2 items-center"):
@@ -700,7 +700,7 @@ class EmailAlertWizard:
                 "no_motion_detected": {"enabled": False, "delay_minutes": 5},
                 "camera_offline": {"enabled": False},
                 "system_error": {"enabled": False},
-                "experiment_completes": {"enabled": False},
+                "experiment_complete_alert": {"enabled": False},
             },
         }
 
@@ -763,7 +763,7 @@ class EmailAlertStatusDisplay:
             "no_motion_detected": ("Keine Bewegung", "motion_photos_off"),
             "camera_offline": ("Kamera Offline", "videocam_off"),
             "system_error": ("Systemfehler", "error"),
-            "experiment_completes": ("Experiment Abgeschlossen", "science"),
+            "experiment_complete_alert": ("Experiment Abgeschlossen", "science"),
         }
         return alert_display_map.get(
             alert_key, (alert_key.replace("_", " ").title(), "notifications")
@@ -1148,7 +1148,7 @@ def create_demo_configurations() -> List[Dict[str, Any]]:
                 "no_motion_detected": {"enabled": True, "delay_minutes": 10},
                 "camera_offline": {"enabled": True},
                 "system_error": {"enabled": True},
-                "experiment_completes": {"enabled": False},
+                "experiment_complete_alert": {"enabled": False},
             },
         },
         {
@@ -1158,7 +1158,7 @@ def create_demo_configurations() -> List[Dict[str, Any]]:
                 "no_motion_detected": {"enabled": False, "delay_minutes": 5},
                 "camera_offline": {"enabled": False},
                 "system_error": {"enabled": True},
-                "experiment_completes": {"enabled": True},
+                "experiment_complete_alert": {"enabled": True},
             },
         },
         {
@@ -1168,7 +1168,7 @@ def create_demo_configurations() -> List[Dict[str, Any]]:
                 "no_motion_detected": {"enabled": False, "delay_minutes": 5},
                 "camera_offline": {"enabled": False},
                 "system_error": {"enabled": False},
-                "experiment_completes": {"enabled": False},
+                "experiment_complete_alert": {"enabled": False},
             },
         },
     ]
@@ -1193,6 +1193,10 @@ def load_alert_configs(
         with open(path, "r", encoding="utf-8") as f:
             data = json.load(f)
             if isinstance(data, list):
+                for config in data:
+                    settings = config.get("settings", {})
+                    if "experiment_completes" in settings:
+                        settings["experiment_complete_alert"] = settings.pop("experiment_completes")
                 return data
     except Exception:
         pass
@@ -1208,5 +1212,10 @@ def save_alert_configs(
         return
     path = _get_alert_config_path(service)
     path.parent.mkdir(parents=True, exist_ok=True)
+    # ensure consistent key usage when persisting
+    for config in configs:
+        settings = config.get("settings", {})
+        if "experiment_completes" in settings:
+            settings["experiment_complete_alert"] = settings.pop("experiment_completes")
     with open(path, "w", encoding="utf-8") as f:
         json.dump(configs, f, indent=2, ensure_ascii=False)
