@@ -36,13 +36,12 @@ class WebcamStreamElement:
             "sensitivity": 50,
             "fps": 30,
             "roi_enabled": False,
+            "rotation": 0,
         }
         self.settings = settings
         self.callbacks = callbacks or {}
         # Store explicit camera toggle callback or look it up in callbacks dict
-        self._camera_toggle_cb = camera_toggle_cb or self.callbacks.get(
-            "camera_toggle"
-        )
+        self._camera_toggle_cb = camera_toggle_cb or self.callbacks.get("camera_toggle")
         # Callback for ROI updates (defaults to callbacks['set_roi'])
         self._roi_update_cb = self.callbacks.get("set_roi")
         # Store currently selected ROI
@@ -97,15 +96,11 @@ class WebcamStreamElement:
                         ui.separator()
                         ui.menu_item(
                             "Adjust ROI",
-                            on_click=self.callbacks.get(
-                                "adjust_roi", self.adjust_roi
-                            ),
+                            on_click=self.callbacks.get("adjust_roi", self.adjust_roi),
                         )
                         ui.menu_item(
                             "Reset View",
-                            on_click=self.callbacks.get(
-                                "reset_view", lambda: None
-                            ),
+                            on_click=self.callbacks.get("reset_view", lambda: None),
                         )
                         # Recording toggle menu item
                         self.record_menu_item = ui.menu_item(
@@ -172,8 +167,8 @@ class WebcamStreamElement:
                             self.sensitivity_slider, "value"
                         )
 
-                    # Frame Rate & Resolution
-                    with ui.grid(columns=2).classes("gap-4 w-full mb-4"):
+                    # Frame Rate, Resolution & Rotation
+                    with ui.grid(columns=3).classes("gap-4 w-full mb-4"):
                         with ui.column():
                             ui.label("Frame Rate").classes(
                                 "text-sm font-medium text-gray-700"
@@ -213,6 +208,24 @@ class WebcamStreamElement:
                                     value="640x480 (30fps)",
                                     on_change=self.callbacks.get(
                                         "update_resolution",
+                                        lambda v: None,
+                                    ),
+                                )
+                                .classes("w-full")
+                                .props("dense outlined")
+                            )
+
+                        with ui.column():
+                            ui.label("Rotation").classes(
+                                "text-sm font-medium text-gray-700"
+                            )
+                            self.rotation_select = (
+                                ui.select(
+                                    [0, 90, 180, 270],
+                                    label="Rotation",
+                                    value=self.settings.get("rotation", 0),
+                                    on_change=self.callbacks.get(
+                                        "update_rotation",
                                         lambda v: None,
                                     ),
                                 )
@@ -320,12 +333,8 @@ class WebcamStreamElement:
                         )
 
                         # Bind values
-                        self.contrast_slider.bind_value(
-                            self.contrast_number, "value"
-                        )
-                        self.contrast_number.bind_value(
-                            self.contrast_slider, "value"
-                        )
+                        self.contrast_slider.bind_value(self.contrast_number, "value")
+                        self.contrast_number.bind_value(self.contrast_slider, "value")
 
                     # Saturation Control
                     ui.label("Saturation").classes("text-xs text-gray-600")
@@ -433,12 +442,8 @@ class WebcamStreamElement:
                         )
 
                         # Bind values
-                        self.sharpness_slider.bind_value(
-                            self.sharpness_number, "value"
-                        )
-                        self.sharpness_number.bind_value(
-                            self.sharpness_slider, "value"
-                        )
+                        self.sharpness_slider.bind_value(self.sharpness_number, "value")
+                        self.sharpness_number.bind_value(self.sharpness_slider, "value")
                     # Exposure & Advanced Controls
                     ui.label("Exposure & Advanced").classes(
                         "text-sm font-medium text-gray-700 mb-2"
@@ -488,12 +493,8 @@ class WebcamStreamElement:
                         self.wb_manual_slider.disable()
 
                         # Bind values
-                        self.wb_manual_slider.bind_value(
-                            self.wb_manual_number, "value"
-                        )
-                        self.wb_manual_number.bind_value(
-                            self.wb_manual_slider, "value"
-                        )
+                        self.wb_manual_slider.bind_value(self.wb_manual_number, "value")
+                        self.wb_manual_number.bind_value(self.wb_manual_slider, "value")
 
                     # Exposure Control
                     ui.label("Exposure").classes("text-xs text-gray-600")
@@ -614,17 +615,11 @@ class WebcamStreamElement:
                         )
 
                         # Bind values
-                        self.gamma_slider.bind_value(
-                            self.gamma_number, "value"
-                        )
-                        self.gamma_number.bind_value(
-                            self.gamma_slider, "value"
-                        )
+                        self.gamma_slider.bind_value(self.gamma_number, "value")
+                        self.gamma_number.bind_value(self.gamma_slider, "value")
 
                     # Backlight Compensation Control
-                    ui.label("Backlight Compensation").classes(
-                        "text-xs text-gray-600"
-                    )
+                    ui.label("Backlight Compensation").classes("text-xs text-gray-600")
                     with ui.row().classes("gap-3 items-center mb-4 w-full"):
                         self.backlight_comp_number = (
                             ui.number(
