@@ -133,7 +133,7 @@ class SimpleGUIApplication:
         self.settings = {
             "sensitivity": 50,
             "fps": 30,
-            "fps_cap": self.config_service.get("webapp.fps_cap", int, FPS_CAP),
+            "fps_cap": max(self.config_service.get("webapp.fps_cap", int, FPS_CAP), 1),
             "resolution": "640x480 (30fps)",
             "rotation": 0,
             "roi_enabled": False,
@@ -1112,8 +1112,8 @@ class SimpleGUIApplication:
         async def video_feed(request: Request):
             async def gen():
                 last_sent = 0.0
-                fps_cap = float(self.settings.get("fps_cap", FPS_CAP))
-                interval = 1 / fps_cap if fps_cap > 0 else 0.0
+                fps_cap = max(float(self.settings.get("fps_cap", FPS_CAP)), 1.0)
+                interval = 1 / fps_cap
                 no_frame_start: Optional[float] = None
                 timeout = 3.0
                 placeholder_bytes: Optional[bytes] = None
