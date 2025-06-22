@@ -296,7 +296,8 @@ class ApplicationContainer:
                 loop = None
 
             if loop and loop.is_running():
-                loop.create_task(_async_shutdown())
+                loop.run_until_complete(self.sensor_manager.shutdown())
+                loop.run_until_complete(self.web_application.shutdown())
             else:
                 asyncio.run(_async_shutdown())
         except Exception as e:
