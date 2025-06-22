@@ -9,7 +9,6 @@ from __future__ import annotations
 
 import importlib
 from typing import Any
-
 _LAZY_ATTRS = {
     "application": ".application",
     "alt_application": ".alt_application",
