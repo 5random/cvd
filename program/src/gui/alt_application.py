@@ -30,7 +30,10 @@ from program.src.controllers.algorithms.motion_detection import (
 )
 from program.src.controllers.controller_base import ControllerConfig
 from program.src.controllers.controller_manager import ControllerManager
-from program.src.controllers.controller_utils.camera_utils import apply_uvc_settings
+from program.src.controllers.controller_utils.camera_utils import (
+    apply_uvc_settings,
+    probe_camera_modes,
+)
 from program.src.controllers.controller_utils.controller_data_sources.camera_capture_controller import (
     CameraCaptureController,
 )
@@ -119,6 +122,7 @@ class SimpleGUIApplication:
         self._experiment_duration: Optional[int] = None
         self._experiment_timer: Optional[ui.timer] = None
         self._processing_task: Optional[asyncio.Task] = None
+        self.supported_camera_modes: list[tuple[int, int, int]] = []
 
         # Placeholder settings
         self.settings = {
@@ -260,6 +264,7 @@ class SimpleGUIApplication:
         self.create_header()  # Instantiate shared UI sections
         self.webcam_stream = WebcamStreamElement(
             self.settings,
+            available_resolutions=self.supported_camera_modes,
             callbacks={
                 "update_sensitivity": self.update_sensitivity,
                 "update_fps": self.update_fps,
@@ -1132,6 +1137,10 @@ class SimpleGUIApplication:
         @app.on_startup
         async def _startup() -> None:
             install_signal_handlers(self.experiment_manager._task_manager)
+            try:
+                self.supported_camera_modes = await probe_camera_modes()
+            except Exception:
+                self.supported_camera_modes = []
             await self.controller_manager.start_all_controllers()
             self._processing_task = asyncio.create_task(self._processing_loop())
             # Ensure camera status reflects that controllers started
