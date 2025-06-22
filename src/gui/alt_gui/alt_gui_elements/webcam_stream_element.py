@@ -2,8 +2,6 @@ from nicegui import ui, events
 import asyncio
 import inspect
 from src.utils.ui_helpers import notify_later
-import asyncio
-import inspect
 
 
 # Default values for UVC camera controls
@@ -63,6 +61,7 @@ class WebcamStreamElement:
 
         # Register the page only once for the first created instance
         if not WebcamStreamElement._page_registered:
+
             @ui.page("/webcam_stream")
             def webcam_stream_page():
                 # Create the camera section
