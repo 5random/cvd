@@ -27,7 +27,7 @@ from program.src.controllers import controller_manager as controller_manager_mod
 from program.src.controllers.algorithms.motion_detection import (
     MotionDetectionController,
 )
-from program.src.controllers.controller_base import ControllerConfig
+from program.src.controllers.controller_base import ControllerConfig, ControllerStatus
 from program.src.controllers.controller_manager import ControllerManager
 from program.src.controllers.controller_utils.camera_utils import (
     apply_uvc_settings,
@@ -64,7 +64,7 @@ from program.src.utils.concurrency import (
 from program.src.utils.concurrency.async_utils import install_signal_handlers
 from program.src.utils.config_service import ConfigurationService, set_config_service
 from program.src.utils.ui_helpers import notify_later
-from program.src.utils.log_service import info, error
+from program.src.utils.log_service import info, warning, error
 
 # Maximum frames per second for the MJPEG video feed
 FPS_CAP = 30
@@ -1184,9 +1184,15 @@ class SimpleGUIApplication:
                 self.supported_camera_modes = []
             await self.controller_manager.start_all_controllers()
             self._processing_task = asyncio.create_task(self._processing_loop())
-            # Ensure camera status reflects that controllers started
-            self.camera_active = True
-            self.update_camera_status(True)
+
+            # verify camera controller actually started
+            if (
+                self.camera_controller is not None
+                and self.camera_controller.status == ControllerStatus.RUNNING
+            ):
+                self.update_camera_status(True)
+            else:
+                warning("Camera controller failed to start")
 
         @app.on_shutdown
         async def _shutdown() -> None:
