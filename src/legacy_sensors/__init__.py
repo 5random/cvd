@@ -1,0 +1,1 @@
+"""Legacy sensor implementations."""

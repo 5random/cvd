@@ -1,7 +1,7 @@
 import pytest
 
-from src.data_handler.sources.sensors import rs232_sensor
-from src.data_handler.sources.sensors.rs232_sensor import RS232Sensor
+from src.legacy_sensors import rs232_sensor
+from src.legacy_sensors.rs232_sensor import RS232Sensor
 from src.data_handler.sources.mock_hardware.rs232 import MockRS232Serial
 from src.data_handler.interface.sensor_interface import SensorConfig, SensorStatus
 
@@ -11,9 +11,11 @@ class InvalidMockSerial(MockRS232Serial):
     def readline(self) -> bytes:
         return b"invalid-data\n"
 
+
 class BadSerial:
     def readline(self):
         return b"INVALID\n"
+
 
 @pytest.mark.asyncio
 async def test_rs232sensor_read_invalid_data(monkeypatch):
@@ -31,6 +33,7 @@ async def test_rs232sensor_read_invalid_data(monkeypatch):
     reading = await sensor.read()
     assert reading.status == SensorStatus.ERROR
     assert reading.error_message is not None
+
 
 @pytest.mark.asyncio
 async def test_read_returns_error_on_invalid_data():

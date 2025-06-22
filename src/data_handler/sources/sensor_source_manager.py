@@ -4,6 +4,7 @@ Central sensor management service for handling sensor lifecycle and data collect
 
 import asyncio
 import importlib.metadata
+import os
 from typing import Dict, List, Optional, Callable, Any
 from importlib.metadata import EntryPoint
 from concurrent.futures import ThreadPoolExecutor, Executor
@@ -14,8 +15,13 @@ from src.data_handler.interface.sensor_interface import (
     SensorStatus,
 )
 from src.utils.config_service import ConfigurationService, ValidationError
-from src.data_handler.sources.sensors.arduino_tc_sensor import ArduinoTCSensor
-from src.data_handler.sources.sensors.rs232_sensor import RS232Sensor
+
+ArduinoTCSensor = None
+RS232Sensor = None
+if os.getenv("DISABLE_LEGACY_SENSORS") != "1":
+    from src.legacy_sensors.arduino_tc_sensor import ArduinoTCSensor  # type: ignore
+    from src.legacy_sensors.rs232_sensor import RS232Sensor  # type: ignore
+
 from src.data_handler.sources.mock_sensors import (
     MockArduinoTCSensor,
     MockRS232Sensor,
@@ -26,12 +32,19 @@ from src.utils.log_service import info, warning, error
 
 # Registry for sensor implementations
 SensorFactory = Callable[[SensorConfig, Optional[Executor]], SensorInterface]
-SENSOR_REGISTRY: Dict[str, SensorFactory] = {
-    "arduino_tc_board": ArduinoTCSensor,
-    "rs232": RS232Sensor,
-    "mock_arduino_tc_board": MockArduinoTCSensor,
-    "mock_rs232": MockRS232Sensor,
-}
+SENSOR_REGISTRY: Dict[str, SensorFactory] = {}
+
+if ArduinoTCSensor is not None:
+    SENSOR_REGISTRY["arduino_tc_board"] = ArduinoTCSensor
+if RS232Sensor is not None:
+    SENSOR_REGISTRY["rs232"] = RS232Sensor
+
+SENSOR_REGISTRY.update(
+    {
+        "mock_arduino_tc_board": MockArduinoTCSensor,
+        "mock_rs232": MockRS232Sensor,
+    }
+)
 
 
 def load_entry_point_sensors(group: str = "cvd.sensors") -> None:

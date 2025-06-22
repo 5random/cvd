@@ -1,6 +1,6 @@
 from __future__ import annotations
 import asyncio
-from src.data_handler.sources.sensors.arduino_tc_sensor import ArduinoTCSensor
+from src.legacy_sensors.arduino_tc_sensor import ArduinoTCSensor
 from src.data_handler.sources.mock_hardware.arduino_tc_board import (
     MockArduinoTCBoardSerial,
     mock_find_arduino_port,

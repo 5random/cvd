@@ -9,8 +9,8 @@ from src.data_handler.interface.sensor_interface import (
     SensorStatus,
     SensorConfig,
 )
-from .base_sensor import BaseSensor
-from src.utils.log_service import info, warning, error
+from src.data_handler.sources.sensors.base_sensor import BaseSensor
+from src.utils.log_service import info, warning, error, debug
 from src.data_handler.sources.mock_hardware import (
     MockArduinoTCBoardSerial,
     mock_find_arduino_port,
