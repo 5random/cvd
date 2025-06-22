@@ -57,8 +57,7 @@ from .config_service import (
         get_config_service,
         set_config_service,
 )
-from .ui_helpers import *  # pylint: disable=wildcard-import
-from . import ui_helpers  # needed for __all__
+from .ui_helpers import notify_later
 
 # ----------------------------------------------------------------------
 # public API
@@ -87,6 +86,6 @@ __all__ = [
         "timer",
         "context",
 ]
-# add whatever ui_helpers exposes
-__all__ += ui_helpers.__all__  # assumes ui_helpers.py defines its own __all__
+# ui helper utilities
+__all__.append("notify_later")
 
