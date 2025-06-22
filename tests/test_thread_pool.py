@@ -2,7 +2,7 @@ import threading
 import time
 import pytest
 
-from program.src.utils.concurrency.thread_pool import ManagedThreadPool, ThreadPoolConfig
+from src.utils.concurrency.thread_pool import ManagedThreadPool, ThreadPoolConfig
 from src.utils import log_service
 
 

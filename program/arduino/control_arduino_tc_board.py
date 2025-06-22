@@ -2,8 +2,8 @@ import serial
 import serial.tools.list_ports
 import time
 from typing import List, Optional
-from program.src.utils.config_service import get_config_service
-from program.src.utils.log_service import info, warning, error
+from src.utils.config_service import get_config_service
+from src.utils.log_service import info, warning, error
 
 def list_serial_ports():
     ports = serial.tools.list_ports.comports()

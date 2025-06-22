@@ -14,8 +14,8 @@ def mute_logging(monkeypatch: pytest.MonkeyPatch) -> None:
     these functions, so it is patched as well.
     """
 
-    from program.src.utils import log_service
-    from program.src.utils.concurrency import async_utils
+    from src.utils import log_service
+    from src.utils.concurrency import async_utils
 
     for name in ["debug", "info", "warning", "error"]:
         if hasattr(log_service, name):
@@ -28,7 +28,7 @@ def mute_logging(monkeypatch: pytest.MonkeyPatch) -> None:
 
     for mod in list(sys.modules.values()):
         mod_name = getattr(mod, "__name__", "")
-        if not mod or not mod_name.startswith("program.src."):
+        if not mod or not mod_name.startswith("src."):
             continue
         if mod_name.startswith("src.utils.config_service"):
             # Keep real logging for config service so validation warnings are emitted

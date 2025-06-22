@@ -1,9 +1,9 @@
 from datetime import datetime
 
-from program.src.gui.gui_tab_components.gui_tab_experiment_component import (
+from src.gui.gui_tab_components.gui_tab_experiment_component import (
     CurrentExperimentDisplay,
 )
-from program.src.experiment_handler.experiment_manager import (
+from src.experiment_handler.experiment_manager import (
     ExperimentConfig,
     ExperimentResult,
     ExperimentState,

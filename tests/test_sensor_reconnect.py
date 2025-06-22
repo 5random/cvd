@@ -2,8 +2,8 @@ import asyncio
 import json
 import pytest
 
-from program.src.data_handler.sources.sensor_source_manager import SensorManager
-from program.src.data_handler.interface.sensor_interface import (
+from src.data_handler.sources.sensor_source_manager import SensorManager
+from src.data_handler.interface.sensor_interface import (
     SensorInterface,
     SensorReading,
     SensorStatus,
@@ -62,13 +62,13 @@ async def test_sensor_reconnect(tmp_path, monkeypatch):
 
     # silence logging
     monkeypatch.setattr(
-        "program.src.data_handler.sources.sensor_source_manager.info", lambda *a, **k: None
+        "src.data_handler.sources.sensor_source_manager.info", lambda *a, **k: None
     )
     monkeypatch.setattr(
-        "program.src.data_handler.sources.sensor_source_manager.warning", lambda *a, **k: None
+        "src.data_handler.sources.sensor_source_manager.warning", lambda *a, **k: None
     )
     monkeypatch.setattr(
-        "program.src.data_handler.sources.sensor_source_manager.error", lambda *a, **k: None
+        "src.data_handler.sources.sensor_source_manager.error", lambda *a, **k: None
     )
 
     manager = SensorManager(service)

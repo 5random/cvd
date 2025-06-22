@@ -1,5 +1,5 @@
 import pytest
-from program.src.gui.alt_application import SimpleGUIApplication
+from src.gui.alt_application import SimpleGUIApplication
 
 
 @pytest.mark.parametrize(

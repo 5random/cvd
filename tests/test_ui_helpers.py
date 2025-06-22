@@ -1,7 +1,7 @@
 import pytest
 
 from nicegui import ui
-from program.src.utils.ui_helpers import notify_later
+from src.utils.ui_helpers import notify_later
 
 
 class DummyElement:

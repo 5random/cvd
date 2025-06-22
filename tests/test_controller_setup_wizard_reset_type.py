@@ -12,7 +12,7 @@ for name in ["debug", "info", "warning", "error"]:
     setattr(ls, name, lambda *a, **k: None)
 
 from src.utils.config_service import ConfigurationService
-from program.src.gui.gui_elements.gui_controller_setup_wizard_element import (
+from src.gui.gui_elements.gui_controller_setup_wizard_element import (
     ControllerSetupWizardComponent,
 )
 

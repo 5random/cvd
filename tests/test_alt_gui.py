@@ -16,10 +16,10 @@ from nicegui.testing import User
 # Plugin für NiceGUI Testing Framework
 pytest_plugins = ["nicegui.testing.user_plugin"]
 
-from program.src.gui.alt_application import SimpleGUIApplication
-from program.src.controllers.controller_manager import ControllerManager
-from program.src.utils.config_service import ConfigurationService
-from program.src.utils.email_alert_service import EmailAlertService
+from src.gui.alt_application import SimpleGUIApplication
+from src.controllers.controller_manager import ControllerManager
+from src.utils.config_service import ConfigurationService
+from src.utils.email_alert_service import EmailAlertService
 
 
 class MockEmailAlertService(EmailAlertService):
@@ -142,8 +142,8 @@ def mock_experiment_manager(mock_config_service, mock_controller_manager):
 def simple_gui_app(mock_controller_manager, mock_config_service, tmp_path):
     """Erstelle eine SimpleGUIApplication für Tests"""
     # Mock external dependencies
-    import program.src.controllers.controller_manager as cm_module
-    import program.src.experiment_handler.experiment_manager as em_module
+    import src.controllers.controller_manager as cm_module
+    import src.experiment_handler.experiment_manager as em_module
 
     # Patch the module-level functions to return our mocks
     original_create_manager = getattr(cm_module, "create_cvd_controller_manager", None)
@@ -493,8 +493,8 @@ class TestSimpleGUIApplicationWithMockControllers:
 
         notifications = []
         notifier = lambda msg, **kw: notifications.append(msg)
-        monkeypatch.setattr("program.src.utils.ui_helpers.notify_later", notifier)
-        monkeypatch.setattr("program.src.gui.alt_application.notify_later", notifier)
+        monkeypatch.setattr("src.utils.ui_helpers.notify_later", notifier)
+        monkeypatch.setattr("src.gui.alt_application.notify_later", notifier)
 
         await simple_gui_app.toggle_camera()
 
@@ -515,8 +515,8 @@ class TestSimpleGUIApplicationWithMockControllers:
         mock_camera.stop = AsyncMock(side_effect=RuntimeError("boom"))
         notifications = []
         notifier = lambda msg, **kw: notifications.append(msg)
-        monkeypatch.setattr("program.src.utils.ui_helpers.notify_later", notifier)
-        monkeypatch.setattr("program.src.gui.alt_application.notify_later", notifier)
+        monkeypatch.setattr("src.utils.ui_helpers.notify_later", notifier)
+        monkeypatch.setattr("src.gui.alt_application.notify_later", notifier)
 
         await simple_gui_app.toggle_camera()
 

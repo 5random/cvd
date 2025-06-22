@@ -6,8 +6,8 @@ from nicegui import ui
 import os
 
 from src.utils.config_service import ConfigurationService
-from program.src.gui.gui_elements import gui_controller_setup_wizard_element as wizard_mod
-from program.src.gui.gui_elements.gui_controller_setup_wizard_element import (
+from src.gui.gui_elements import gui_controller_setup_wizard_element as wizard_mod
+from src.gui.gui_elements.gui_controller_setup_wizard_element import (
     ControllerSetupWizardComponent,
 )
 

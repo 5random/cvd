@@ -3,8 +3,8 @@ import pytest
 from pathlib import Path
 
 from src.utils.config_service import ConfigurationService, set_config_service
-from program.src.controllers.controller_base import ControllerConfig
-from program.src.controllers.algorithms.motion_detection import MotionDetectionController
+from src.controllers.controller_base import ControllerConfig
+from src.controllers.algorithms.motion_detection import MotionDetectionController
 
 
 @pytest.mark.parametrize(

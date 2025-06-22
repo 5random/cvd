@@ -7,7 +7,7 @@ from src.utils import log_service
 
 pytest_plugins = ['nicegui.testing.user_plugin']
 
-from program.src.utils.container import ApplicationContainer
+from src.utils.container import ApplicationContainer
 
 @pytest.mark.asyncio
 async def test_gui_pages(user):
@@ -79,7 +79,7 @@ async def test_video_feed_creates_temp_camera(monkeypatch):
             pass
 
     monkeypatch.setattr(
-        "program.src.gui.application.CameraStreamComponent",
+        "src.gui.application.CameraStreamComponent",
         DummyCam,
     )
     monkeypatch.setattr(

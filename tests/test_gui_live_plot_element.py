@@ -3,8 +3,8 @@ from types import SimpleNamespace
 
 import pytest
 
-from program.src.gui.gui_elements.gui_live_plot_element import LivePlotComponent, PlotConfig
-from program.src.data_handler.interface.sensor_interface import SensorReading, SensorStatus
+from src.gui.gui_elements.gui_live_plot_element import LivePlotComponent, PlotConfig
+from src.data_handler.interface.sensor_interface import SensorReading, SensorStatus
 
 
 class DummySensorManager:

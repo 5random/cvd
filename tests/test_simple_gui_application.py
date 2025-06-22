@@ -1,9 +1,9 @@
-from program.src.gui.alt_application import SimpleGUIApplication
-from program.src.utils.config_service import (
+from src.gui.alt_application import SimpleGUIApplication
+from src.utils.config_service import (
     get_config_service,
     set_config_service,
 )
-from program.src.utils.email_alert_service import set_email_alert_service
+from src.utils.email_alert_service import set_email_alert_service
 
 
 def test_global_services_set(tmp_path, monkeypatch):
@@ -24,7 +24,7 @@ def test_global_services_set(tmp_path, monkeypatch):
         return DummyManager()
 
     monkeypatch.setattr(
-        "program.src.controllers.controller_manager.create_cvd_controller_manager",
+        "src.controllers.controller_manager.create_cvd_controller_manager",
         dummy_create_manager,
     )
 
@@ -33,7 +33,7 @@ def test_global_services_set(tmp_path, monkeypatch):
             self.service = service
 
     email_mod = __import__(
-        "program.src.utils.email_alert_service",
+        "src.utils.email_alert_service",
         fromlist=["EmailAlertService"],
     )
     monkeypatch.setattr(email_mod, "EmailAlertService", DummyEmailAlertService)

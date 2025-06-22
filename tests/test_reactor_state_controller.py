@@ -2,19 +2,19 @@ import time
 
 import pytest
 
-from program.src.controllers.algorithms.reactor_state import (
+from src.controllers.algorithms.reactor_state import (
     ReactorStateController,
     ReactorState,
     ReactorAlarmType,
 )
-from program.src.controllers.controller_base import ControllerConfig
-from program.src.data_handler.interface.sensor_interface import SensorReading, SensorStatus
+from src.controllers.controller_base import ControllerConfig
+from src.data_handler.interface.sensor_interface import SensorReading, SensorStatus
 
 
 @pytest.mark.asyncio
 async def test_reactor_state_transitions(monkeypatch):
     # suppress logging
-    from program.src.controllers.algorithms import reactor_state as module
+    from src.controllers.algorithms import reactor_state as module
 
     for name in ["info", "warning", "error", "debug"]:
         if hasattr(module, name):
@@ -55,7 +55,7 @@ async def test_reactor_state_transitions(monkeypatch):
 
 @pytest.mark.asyncio
 async def test_motion_metadata_multiple_controllers(monkeypatch):
-    from program.src.controllers.algorithms import reactor_state as module
+    from src.controllers.algorithms import reactor_state as module
 
     monkeypatch.setattr(module, "info", lambda *a, **k: None)
     monkeypatch.setattr(module, "warning", lambda *a, **k: None)
@@ -90,7 +90,7 @@ async def test_motion_metadata_multiple_controllers(monkeypatch):
 
 @pytest.mark.asyncio
 async def test_sensor_thresholds_trigger_alarm(monkeypatch):
-    from program.src.controllers.algorithms import reactor_state as module
+    from src.controllers.algorithms import reactor_state as module
 
     for name in ["info", "warning", "error", "debug"]:
         if hasattr(module, name):
