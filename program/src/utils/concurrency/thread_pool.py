@@ -150,6 +150,7 @@ class ManagedThreadPool:
 
         # Stats and task tracking
         self._stats = _PoolStats()
+        self._stats_lock = Lock()
         self._futures: Dict[str, Future[Any]] = {}
 
         # Circuit-Breaker
@@ -245,7 +246,8 @@ class ManagedThreadPool:
                     + self.config.hysteresis_seconds
                 )
                 self._cb_failures = 0
-                self._stats.cb_open_events += 1
+                with self._stats_lock:
+                    self._stats.cb_open_events += 1
                 warning("circuit_breaker_open", pool=self.pool_type.value)
 
     def _record_success(self) -> None:
@@ -275,7 +277,7 @@ class ManagedThreadPool:
                     attempt += 1
                     if attempt > retries:
                         raise
-                    with self._lock:
+                    with self._stats_lock:
                         stats.retries_performed += 1
                     sleep_for = min(delay, backoff_max)
                     warning(
@@ -307,7 +309,7 @@ class ManagedThreadPool:
         try:
             self._check_callable_security(fn)
         except SecurityError as se:
-            with self._lock:
+            with self._stats_lock:
                 self._stats.sandbox_violations += 1
             error("sandbox_violation", pool=self.pool_type.value, msg=str(se))
             raise
@@ -380,22 +382,26 @@ class ManagedThreadPool:
 
     # ── bookkeeping ──
     def _register_future(self, fut: Future[Any], task_id: str | None) -> None:
-        self._stats.tasks_submitted += 1
-        self._stats.active_tasks += 1
+        with self._stats_lock:
+            self._stats.tasks_submitted += 1
+            self._stats.active_tasks += 1
         if task_id:
             self._futures[task_id] = fut
 
         # callbacks
         def _done(res: Future[Any]):
             exc = res.exception()
-            self._stats.active_tasks -= 1
+            with self._stats_lock:
+                self._stats.active_tasks -= 1
+                if exc:
+                    self._stats.tasks_failed += 1
+                else:
+                    self._stats.tasks_completed += 1
             if exc:
-                self._stats.tasks_failed += 1
                 self._record_failure()
                 if self._metrics_enabled and _M_FAILED:
                     _M_FAILED.labels(pool=self.pool_type.value).inc()
             else:
-                self._stats.tasks_completed += 1
                 self._record_success()
                 if self._metrics_enabled and _M_COMPLETED:
                     _M_COMPLETED.labels(pool=self.pool_type.value).inc()
