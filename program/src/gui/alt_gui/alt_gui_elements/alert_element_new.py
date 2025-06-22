@@ -13,7 +13,6 @@ from program.src.utils.config_service import get_config_service, ConfigurationSe
 from pathlib import Path
 import json
 from datetime import datetime
-import re
 
 
 class EmailAlertWizard:
@@ -463,9 +462,12 @@ class EmailAlertWizard:
             add_email_btn.disable()
 
     def _is_valid_email(self, email: str) -> bool:
-        """Check if email format is valid and ends with @tuhh.de"""
-        pattern = r"^[a-zA-Z0-9._%+-]+@tuhh\.de$"
-        return re.match(pattern, email) is not None
+        """Check if email ends with @tuhh.de regardless of local part."""
+        if "@" not in email:
+            return False
+
+        local, domain = email.rsplit("@", 1)
+        return bool(local) and domain.lower() == "tuhh.de"
 
     def _add_email(
         self, email_input, email_list, step2_feedback, step2_next_btn, email_feedback
@@ -1184,7 +1186,9 @@ def _get_alert_config_path(service: ConfigurationService) -> Path:
     return service.config_path.parent / "alert_configs.json"
 
 
-def load_alert_configs(service: Optional[ConfigurationService] = None) -> List[Dict[str, Any]]:
+def load_alert_configs(
+    service: Optional[ConfigurationService] = None,
+) -> List[Dict[str, Any]]:
     """Load alert configurations from disk."""
     service = service or get_config_service()
     if service is None:
