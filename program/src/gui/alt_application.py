@@ -1163,59 +1163,68 @@ class SimpleGUIApplication:
                 no_frame_start: Optional[float] = None
                 timeout = 3.0
                 placeholder_bytes: Optional[bytes] = None
-                while True:
-                    try:
-                        if await request.is_disconnected():
+                try:
+                    while True:
+                        try:
+                            if await request.is_disconnected():
+                                break
+                        except asyncio.CancelledError:
                             break
-                    except asyncio.CancelledError:
-                        break
 
-                    frame = None
-                    if self.camera_controller is not None:
-                        output = self.camera_controller.get_output()
-                        if isinstance(output, dict):
-                            frame = output.get("frame") or output.get("image")
-                        elif output is not None:
-                            frame = output
+                        frame = None
+                        if self.camera_controller is not None:
+                            output = self.camera_controller.get_output()
+                            if isinstance(output, dict):
+                                frame = output.get("frame") or output.get("image")
+                            elif output is not None:
+                                frame = output
 
-                    now = asyncio.get_running_loop().time()
-                    if frame is not None:
-                        no_frame_start = None
-                        if interval <= 0 or now - last_sent >= interval:
-                            success, buf = await run_in_executor(
-                                cv2.imencode, ".jpg", frame
-                            )
-                            if success:
-                                jpeg = buf.tobytes()
-                                yield (
-                                    b"--frame\r\nContent-Type: image/jpeg\r\n\r\n"
-                                    + jpeg
-                                    + b"\r\n"
+                        now = asyncio.get_running_loop().time()
+                        if frame is not None:
+                            no_frame_start = None
+                            if interval <= 0 or now - last_sent >= interval:
+                                success, buf = await run_in_executor(
+                                    cv2.imencode, ".jpg", frame
                                 )
-                                last_sent = now
-                    else:
-                        if no_frame_start is None:
-                            no_frame_start = now
-                        if now - no_frame_start >= timeout:
-                            error(
-                                f"Camera failed to provide frames for {timeout} seconds"
-                            )
-                            if placeholder_bytes is None:
-                                placeholder = np.zeros((10, 10, 3), dtype=np.uint8)
-                                success, buf = cv2.imencode(".jpg", placeholder)
                                 if success:
-                                    placeholder_bytes = buf.tobytes()
-                            if placeholder_bytes:
-                                yield (
-                                    b"--frame\r\nContent-Type: image/jpeg\r\n\r\n"
-                                    + placeholder_bytes
-                                    + b"\r\n"
+                                    jpeg = buf.tobytes()
+                                    yield (
+                                        b"--frame\r\nContent-Type: image/jpeg\r\n\r\n"
+                                        + jpeg
+                                        + b"\r\n"
+                                    )
+                                    last_sent = now
+                        else:
+                            if no_frame_start is None:
+                                no_frame_start = now
+                            if now - no_frame_start >= timeout:
+                                error(
+                                    f"Camera failed to provide frames for {timeout} seconds"
                                 )
-                            break
-                    await asyncio.sleep(max(0.001, interval))
+                                if placeholder_bytes is None:
+                                    placeholder = np.zeros((10, 10, 3), dtype=np.uint8)
+                                    success, buf = cv2.imencode(".jpg", placeholder)
+                                    if success:
+                                        placeholder_bytes = buf.tobytes()
+                                if placeholder_bytes:
+                                    yield (
+                                        b"--frame\r\nContent-Type: image/jpeg\r\n\r\n"
+                                        + placeholder_bytes
+                                        + b"\r\n"
+                                    )
+                                break
+                        await asyncio.sleep(max(0.001, interval))
+                finally:
+                    if self.camera_controller is not None:
+                        with contextlib.suppress(Exception):
+                            await self.camera_controller.stop()
+                            await self.camera_controller.cleanup()
+                        self.camera_controller = None
+                        self.update_camera_status(False)
 
             return StreamingResponse(
-                gen(), media_type="multipart/x-mixed-replace; boundary=frame"
+                contextlib.aclosing(gen()),
+                media_type="multipart/x-mixed-replace; boundary=frame",
             )
 
         @app.on_startup
