@@ -410,10 +410,10 @@ class SimpleGUIApplication:
             self.webcam_stream.adjust_roi()
 
     # Main event handlers - placeholder implementations
-    def toggle_camera(self):
+    async def toggle_camera(self):
         """Start or stop the camera capture controller."""
 
-        async def _start():
+        async def _start() -> bool:
             if self.camera_controller is None:
                 cfg = ControllerConfig(
                     controller_id="camera_capture",
@@ -421,30 +421,53 @@ class SimpleGUIApplication:
                     parameters={"device_index": 0},
                 )
                 self.camera_controller = CameraCaptureController("camera_capture", cfg)
-            await self.camera_controller.start()
+            try:
+                result = await self.camera_controller.start()
+            except Exception as exc:  # pragma: no cover - unexpected errors
+                error("Failed to start camera", error=str(exc))
+                notify_later("Failed to start camera", type="negative")
+                return False
+            if not result:
+                notify_later("Failed to start camera", type="negative")
+            return result
 
-        async def _stop():
+        async def _stop() -> bool:
             if self.camera_controller is not None:
-                await self.camera_controller.stop()
-                await self.camera_controller.cleanup()
-                self.camera_controller = None
+                try:
+                    await self.camera_controller.stop()
+                    await self.camera_controller.cleanup()
+                    self.camera_controller = None
+                    result = True
+                except Exception as exc:  # pragma: no cover - unexpected errors
+                    error("Failed to stop camera", error=str(exc))
+                    notify_later("Failed to stop camera", type="negative")
+                    result = False
+                if not result:
+                    notify_later("Failed to stop camera", type="negative")
+                return result
+            return True
 
+        ws = getattr(self, "webcam_stream", None)
         if not self.camera_active:
-            asyncio.create_task(_start())
-            self.camera_active = True
-            if hasattr(self, "camera_status_icon"):
-                self.camera_status_icon.classes(replace="text-green-300")
-            if getattr(self.webcam_stream, "start_camera_btn", None):
-                self.webcam_stream.start_camera_btn.set_icon("pause")
-                self.webcam_stream.start_camera_btn.set_text("Pause Video")
+            started = await _start()
+            if started:
+                self.camera_active = True
+                if hasattr(self, "camera_status_icon"):
+                    self.camera_status_icon.classes(replace="text-green-300")
+                if ws and getattr(ws, "start_camera_btn", None):
+                    ws.start_camera_btn.set_icon("pause")
+                    ws.start_camera_btn.set_text("Pause Video")
+            else:
+                self.camera_active = False
         else:
-            asyncio.create_task(_stop())
-            self.camera_active = False
-            if hasattr(self, "camera_status_icon"):
-                self.camera_status_icon.classes(replace="text-gray-400")
-            if getattr(self.webcam_stream, "start_camera_btn", None):
-                self.webcam_stream.start_camera_btn.set_icon("play_arrow")
-                self.webcam_stream.start_camera_btn.set_text("Play Video")
+            stopped = await _stop()
+            if stopped:
+                self.camera_active = False
+                if hasattr(self, "camera_status_icon"):
+                    self.camera_status_icon.classes(replace="text-gray-400")
+                if ws and getattr(ws, "start_camera_btn", None):
+                    ws.start_camera_btn.set_icon("play_arrow")
+                    ws.start_camera_btn.set_text("Play Video")
 
     def update_sensitivity(self, e):
         """Update motion detection sensitivity"""
