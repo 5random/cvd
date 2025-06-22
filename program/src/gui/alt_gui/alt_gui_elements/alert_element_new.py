@@ -156,7 +156,6 @@ class EmailAlertWizard:
                 ui.label("Recipients:").classes("text-sm font-medium mt-4")
                 with ui.card().classes("w-full min-h-24"):
                     email_list = ui.column().classes("gap-2 p-2")
-                    self._update_email_list(email_list)
 
                 # Step validation feedback
                 step2_feedback = ui.label(
@@ -171,6 +170,8 @@ class EmailAlertWizard:
                     "Next", on_click=self._next_to_step3, icon="arrow_forward"
                 ).props("color=primary")
                 step2_next_btn.disable()
+
+            self._update_email_list(email_list, step2_feedback, step2_next_btn)
 
     def _create_step3_alert_settings(self):
         """Step 3: Alert Settings Configuration"""
@@ -481,8 +482,7 @@ class EmailAlertWizard:
         ):
             self.alert_data["emails"].append(email)
             email_input.value = ""
-            self._update_email_list(email_list)
-            self._validate_step2(step2_feedback, step2_next_btn)
+            self._update_email_list(email_list, step2_feedback, step2_next_btn)
             email_feedback.text = ""
 
     def _remove_email(
@@ -494,11 +494,9 @@ class EmailAlertWizard:
 
             emails = cast(List[str], self.alert_data["emails"])
             emails.remove(email)
-            self._update_email_list(email_list)
-            if step2_feedback and step2_next_btn:
-                self._validate_step2(step2_feedback, step2_next_btn)
+            self._update_email_list(email_list, step2_feedback, step2_next_btn)
 
-    def _update_email_list(self, email_list):
+    def _update_email_list(self, email_list, step2_feedback=None, step2_next_btn=None):
         """Update the email list display"""
         email_list.clear()
 
@@ -518,9 +516,12 @@ class EmailAlertWizard:
                         ui.button(
                             icon="delete",
                             on_click=lambda _, e=email: self._remove_email(
-                                e, email_list
+                                e, email_list, step2_feedback, step2_next_btn
                             ),
                         ).props("size=sm flat round color=negative")
+
+        if step2_feedback and step2_next_btn:
+            self._validate_step2(step2_feedback, step2_next_btn)
 
     def _validate_step2(self, step2_feedback, step2_next_btn):
         """Validate Step 2: Email Addresses"""
