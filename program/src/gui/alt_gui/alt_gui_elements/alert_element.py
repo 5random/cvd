@@ -10,6 +10,11 @@ class EmailAlertsSection:
         self.experiment_running = False
         self.alerts_enabled = False
         settings = settings or {"email": "user@example.com", "alert_delay": 5}
+        # ensure keys for all alerts exist with sensible defaults
+        settings.setdefault("no_motion_alert", True)
+        settings.setdefault("camera_offline_alert", True)
+        settings.setdefault("system_error_alert", True)
+        settings.setdefault("experiment_complete_alert", False)
         self.settings = settings
         self.callbacks = callbacks or {}
 
@@ -32,18 +37,28 @@ class EmailAlertsSection:
 
             # Email settings
             with ui.column().classes("gap-3"):
-                self.email_input = ui.input(
-                    "Alert Email Address",
-                    placeholder="user@example.com",
-                    value=self.settings.get("email", "user@example.com"),
-                ).classes("w-full")
 
-                self.alert_delay_input = ui.number(
-                    "Alert Delay (minutes)",
-                    value=self.settings.get("alert_delay", 5),
-                    min=1,
-                    max=60,
-                ).classes("w-full")
+                self.email_input = (
+                    ui.input(
+                        "Alert Email Address",
+                        placeholder="user@example.com",
+                        value=self.settings["email"],
+                    )
+                    .on("update:model-value", self._on_email_change)
+                    .classes("w-full")
+                )
+
+                self.alert_delay_input = (
+                    ui.number(
+                        "Alert Delay (minutes)",
+                        value=self.settings["alert_delay"],
+                        min=1,
+                        max=60,
+                    )
+                    .on("update:model-value", self._on_delay_change)
+                    .classes("w-full")
+                )
+
 
                 ui.label("Send alert if no motion detected for this duration").classes(
                     "text-xs text-gray-600"
@@ -55,14 +70,34 @@ class EmailAlertsSection:
 
             with ui.column().classes("ml-4 gap-1"):
                 self.no_motion_alert = ui.checkbox(
-                    "No motion detected (extended period)", value=True
+                    "No motion detected (extended period)",
+                    value=self.settings.get("no_motion_alert", True),
+                ).on(
+                    "update:model-value",
+                    lambda e: self._on_checkbox_change("no_motion_alert", e.value),
                 )
                 self.camera_offline_alert = ui.checkbox(
-                    "Camera goes offline", value=True
+                    "Camera goes offline",
+                    value=self.settings.get("camera_offline_alert", True),
+                ).on(
+                    "update:model-value",
+                    lambda e: self._on_checkbox_change("camera_offline_alert", e.value),
                 )
-                self.system_error_alert = ui.checkbox("System errors occur", value=True)
+                self.system_error_alert = ui.checkbox(
+                    "System errors occur",
+                    value=self.settings.get("system_error_alert", True),
+                ).on(
+                    "update:model-value",
+                    lambda e: self._on_checkbox_change("system_error_alert", e.value),
+                )
                 self.experiment_complete_alert = ui.checkbox(
-                    "Experiment completes", value=False
+                    "Experiment completes",
+                    value=self.settings.get("experiment_complete_alert", False),
+                ).on(
+                    "update:model-value",
+                    lambda e: self._on_checkbox_change(
+                        "experiment_complete_alert", e.value
+                    ),
                 )
 
             # Test and status
@@ -83,3 +118,31 @@ class EmailAlertsSection:
             self.last_alert_label = ui.label("No alerts sent").classes(
                 "text-xs text-gray-600 mt-2"
             )
+
+    def _on_email_change(self, event) -> None:
+        """Update email setting from input."""
+        value = getattr(event, "value", None)
+        if value is not None:
+            self.settings["email"] = value
+            callback = self.callbacks.get("update_email")
+            if callback:
+                callback(value)
+
+    def _on_delay_change(self, event) -> None:
+        """Update alert delay setting from input."""
+        value = getattr(event, "value", None)
+        if value is not None:
+            try:
+                self.settings["alert_delay"] = int(value)
+            except (TypeError, ValueError):
+                return
+            callback = self.callbacks.get("update_alert_delay")
+            if callback:
+                callback(self.settings["alert_delay"])
+
+    def _on_checkbox_change(self, key: str, value: bool) -> None:
+        """Handle checkbox value changes."""
+        self.settings[key] = bool(value)
+        callback = self.callbacks.get(key)
+        if callback:
+            callback(bool(value))
