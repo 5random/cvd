@@ -8,7 +8,7 @@ from nicegui import ui
 from program.src.utils.ui_helpers import notify_later
 from program.src.utils.concurrency import run_network_io, gather_with_concurrency
 from typing import Dict, List, Optional, Any, Callable
-from src.utils.email_alert_service import get_email_alert_service
+from program.src.utils.email_alert_service import get_email_alert_service
 from program.src.utils.config_service import get_config_service, ConfigurationService
 from pathlib import Path
 import json
@@ -656,17 +656,34 @@ class EmailAlertWizard:
         # Optional: Close wizard or reset
         self._reset_wizard()
 
-    def _test_alerts(self):
+    async def _test_alerts(self):
         """Send test alerts to verify configuration"""
         if not self.alert_data["emails"]:
             notify_later("Please add email addresses before testing", type="warning")
             return
 
-        # Simulate sending test emails
+        service = get_email_alert_service()
+        if service is None:
+            notify_later("EmailAlertService not available", type="warning")
+            return
+
+        subject = "CVD Test Alert"
+        body = "This is a test of the email alert system."
+
+        async def _send(recipient: str) -> bool:
+            return await run_network_io(
+                service.send_alert, subject, body, recipient=recipient
+            )
+
+        tasks = [_send(email) for email in self.alert_data["emails"]]
+        results = await gather_with_concurrency(
+            tasks, label="test_alert", cancel_on_exception=False
+        )
+        sent = sum(1 for ok in results if ok)
+
         notify_later(
-            f'Test alerts sent to {len(self.alert_data["emails"])} recipient(s). '
-            "Check your email for the test message.",
-            type="info",
+            f"Test alerts sent: {sent} of {len(self.alert_data['emails'])}",
+            type="positive" if sent else "warning",
         )
 
     def _reset_wizard(self):
