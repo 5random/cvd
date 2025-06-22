@@ -10,7 +10,7 @@ import sys
 
 # Allow running this file directly without installing the package
 if __name__ == "__main__" and __package__ is None:
-    sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
+    sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 import asyncio
 import contextlib
@@ -462,13 +462,6 @@ class SimpleGUIApplication:
                 notify_later("Failed to start camera", type="negative")
             return result
 
-        async def _stop() -> bool:
-
-            if self.camera_controller.status == ControllerStatus.RUNNING:
-                return
-
-            await self.camera_controller.start()
-
         async def _stop():
 
             if self.camera_controller is not None:
@@ -499,8 +492,10 @@ class SimpleGUIApplication:
                 self.camera_status_icon.classes(replace="text-green-300")
             ws = getattr(self, "webcam_stream", None)
             if getattr(ws, "start_camera_btn", None):
-                ws.start_camera_btn.set_icon("pause")
-                ws.start_camera_btn.set_text("Pause Video")
+                btn = getattr(ws, "start_camera_btn", None)
+                if btn:
+                    btn.set_icon("pause")
+                    btn.set_text("Pause Video")
         else:
             try:
                 stopped = await _stop()
@@ -513,8 +508,10 @@ class SimpleGUIApplication:
                 self.camera_status_icon.classes(replace="text-gray-400")
             ws = getattr(self, "webcam_stream", None)
             if getattr(ws, "start_camera_btn", None):
-                ws.start_camera_btn.set_icon("play_arrow")
-                ws.start_camera_btn.set_text("Play Video")
+                btn = getattr(ws, "start_camera_btn", None)
+                if btn:
+                    btn.set_icon("play_arrow")
+                    btn.set_text("Play Video")
 
     def update_sensitivity(self, e):
         """Update motion detection sensitivity"""
@@ -1313,7 +1310,7 @@ class SimpleGUIApplication:
                         self.update_camera_status(False)
 
             return StreamingResponse(
-                contextlib.aclosing(gen()),
+                gen(),
                 media_type="multipart/x-mixed-replace; boundary=frame",
             )
 
