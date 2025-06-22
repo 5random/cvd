@@ -31,12 +31,37 @@ if __name__ == "__main__" and __package__ is None:
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 
-from program.src.utils.config_service import (
-    ConfigurationService,
-    set_config_service,
-)
 from program.src.utils.email_alert_service import EmailAlertService
 from program.src.utils.log_service import info, warning, error
+
+
+DEFAULT_CONFIG = {
+    "alerting": {
+        "email_recipient": "admin@example.com",
+        "smtp_host": "smtp.example.com",
+        "smtp_port": 587,
+        "smtp_user": "user",
+        "smtp_password": "pass",
+        "smtp_use_ssl": False,
+        "critical_state_timeout_s": 60,
+    }
+}
+
+
+class SimpleConfigService:
+    def __init__(self, cfg: dict) -> None:
+        self._cfg = cfg
+
+    def get(self, path: str, _type=None, default=None):
+        value = self._cfg
+        for key in path.split("."):
+            if isinstance(value, dict) and key in value:
+                value = value[key]
+            else:
+                return default
+        if _type is not None and not isinstance(value, _type):
+            return default
+        return value
 
 
 class ManualEmailAlertService(EmailAlertService):
@@ -44,7 +69,7 @@ class ManualEmailAlertService(EmailAlertService):
 
     def __init__(
         self,
-        config_service: ConfigurationService,
+        config_service,
         *,
         sender_address: str | None = None,
         login_user: str | None = None,
@@ -114,24 +139,8 @@ class ManualEmailAlertService(EmailAlertService):
             return False
 
 
-def load_config(config_dir: Path) -> ConfigurationService:
-    """Initialise ConfigurationService from ``config_dir`` and return it."""
-    cfg = ConfigurationService(
-        config_path=config_dir / "config.json",
-        default_config_path=config_dir / "default_config.json",
-    )
-    set_config_service(cfg)
-    return cfg
-
-
 def main() -> None:
     parser = argparse.ArgumentParser(description="Manual test for EmailAlertService")
-    parser.add_argument(
-        "--config-dir",
-        type=Path,
-        default=Path(__file__).resolve().parents[1] / "program" / "config",
-        help="Directory containing config.json and default_config.json",
-    )
     parser.add_argument(
         "--image",
         type=Path,
@@ -155,9 +164,9 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    cfg = load_config(args.config_dir)
+    cfg_dict = DEFAULT_CONFIG.copy()
     service = ManualEmailAlertService(
-        cfg,
+        SimpleConfigService(cfg_dict),
         sender_address=args.from_address,
         login_user=args.smtp_user,
         login_password=args.smtp_password,
