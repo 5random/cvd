@@ -57,6 +57,9 @@ class EmailAlertService:
         subject: str,
         body: str,
         recipient: Optional[Union[str, Iterable[str]]] = None,
+        *,
+        status_text: Optional[str] = None,
+        image_attachment: Optional[bytes] = None,
     ) -> bool:
         """Send an alert e-mail. Returns True on success.
 
@@ -64,6 +67,8 @@ class EmailAlertService:
             subject: Email subject
             body: Email body
             recipient: Optional override for the configured recipient
+            status_text: Optional additional status text appended to body
+            image_attachment: Optional JPEG image bytes to attach
         """
         target = recipient or self.recipients or ([] if self.recipient is None else [self.recipient])
         if isinstance(target, str):
@@ -94,13 +99,24 @@ class EmailAlertService:
                     msg['Subject'] = subject
                     msg['From'] = self.smtp_user or 'cvd-tracker'
                     msg['To'] = addr
-                    msg.set_content(body)
+                    full_body = body
+                    if status_text:
+                        full_body += f"\n\n{status_text}"
+                    msg.set_content(full_body)
+                    if image_attachment is not None:
+                        msg.add_attachment(
+                            image_attachment,
+                            maintype='image',
+                            subtype='jpeg',
+                            filename='attachment.jpg',
+                        )
                     smtp.send_message(msg)
                     info(f"Sent alert email to {addr}")
                     self._history.append({
                         "time": datetime.now().strftime("%H:%M:%S"),
                         "recipient": addr,
                         "subject": subject,
+                        "attachment": bool(image_attachment),
                     })
             return True
         except Exception as exc:

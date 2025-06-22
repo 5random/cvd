@@ -832,9 +832,39 @@ class SimpleGUIApplication:
             notify_later("EmailAlertService nicht verfügbar", type="warning")
             return
 
+        frame_bytes = None
+        if self.camera_controller is not None:
+            output = self.camera_controller.get_output()
+            frame = None
+            if isinstance(output, dict):
+                frame = output.get("frame") or output.get("image")
+            elif output is not None:
+                frame = output
+            if frame is not None:
+                success, buf = await run_in_executor(cv2.imencode, ".jpg", frame)
+                if success:
+                    frame_bytes = buf.tobytes()
+
+        motion_detected = False
+        if self.motion_controller is not None:
+            m_out = self.motion_controller.get_output()
+            if isinstance(m_out, dict):
+                motion_detected = bool(m_out.get("motion_detected", False))
+            elif m_out is not None:
+                motion_detected = bool(getattr(m_out, "motion_detected", False))
+
+        status_text = (
+            "Motion detected: Yes" if motion_detected else "Motion detected: No"
+        )
+
         async def _send(recipient: str, subject: str, body: str) -> bool:
             return await run_network_io(
-                service.send_alert, subject, body, recipient=recipient
+                service.send_alert,
+                subject,
+                body,
+                recipient=recipient,
+                status_text=status_text,
+                image_attachment=frame_bytes,
             )
 
         tasks = [
