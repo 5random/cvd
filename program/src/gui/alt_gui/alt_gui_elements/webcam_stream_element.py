@@ -845,3 +845,13 @@ class WebcamStreamElement:
             self.roi_checkbox.value = False
             if self._roi_update_cb:
                 self._roi_update_cb()
+
+    def update_resolutions(self, modes):
+        """Update resolution dropdown options."""
+        self.available_resolutions = list(modes or [])
+        options = [f"{w}x{h} ({fps}fps)" for (w, h, fps) in self.available_resolutions]
+        if hasattr(self, "resolution_select", None):
+            current = getattr(self.resolution_select, "value", None)
+            self.resolution_select.options = options
+            if current not in options and options:
+                self.resolution_select.value = options[0]
