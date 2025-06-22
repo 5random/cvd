@@ -418,7 +418,7 @@ class SimpleGUIApplication:
     async def toggle_camera(self):
         """Start or stop the camera capture controller."""
 
-        async def _start():
+        async def _start() -> bool:
             if self.camera_controller is None:
                 cfg = ControllerConfig(
                     controller_id="camera_capture",
@@ -427,18 +427,43 @@ class SimpleGUIApplication:
                 )
                 self.camera_controller = CameraCaptureController("camera_capture", cfg)
 
+            try:
+                result = await self.camera_controller.start()
+            except Exception as exc:  # pragma: no cover - unexpected errors
+                error("Failed to start camera", error=str(exc))
+                notify_later("Failed to start camera", type="negative")
+                return False
+            if not result:
+                notify_later("Failed to start camera", type="negative")
+            return result
+
+        async def _stop() -> bool:
+
             if self.camera_controller.status == ControllerStatus.RUNNING:
                 return
 
             await self.camera_controller.start()
 
         async def _stop():
-            if self.camera_controller is not None:
-                await self.camera_controller.stop()
-                await self.camera_controller.cleanup()
-                self.camera_controller = None
 
+            if self.camera_controller is not None:
+                try:
+                    await self.camera_controller.stop()
+                    await self.camera_controller.cleanup()
+                    self.camera_controller = None
+                    result = True
+                except Exception as exc:  # pragma: no cover - unexpected errors
+                    error("Failed to stop camera", error=str(exc))
+                    notify_later("Failed to stop camera", type="negative")
+                    result = False
+                if not result:
+                    notify_later("Failed to stop camera", type="negative")
+                return result
+            return True
+
+        ws = getattr(self, "webcam_stream", None)
         if not self.camera_active:
+
             try:
                 await _start()
             except Exception as exc:  # noqa: BLE001
