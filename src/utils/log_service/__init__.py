@@ -234,27 +234,30 @@ class LogService:
         """Setup error/warning logger"""
         logger = logging.getLogger("cvd_tracker.error")
         logger.setLevel(logging.WARNING)
-        logger.handlers.clear()
 
-        # Rotating file handler
-        error_file = self.log_dir / "error.log"
-        handler = logging.handlers.RotatingFileHandler(
-            error_file,
-            maxBytes=self.rotation_mb * 1024 * 1024,
-            backupCount=10,
-            encoding="utf-8",
-        )
+        # Preserve handlers added by external code (e.g. pytest caplog) so log
+        # capture continues to work. Only attach our rotating file handler if no
+        # such handler has been registered yet.
+        if not any(isinstance(h, logging.handlers.RotatingFileHandler) for h in logger.handlers):
+            error_file = self.log_dir / "error.log"
+            handler = logging.handlers.RotatingFileHandler(
+                error_file,
+                maxBytes=self.rotation_mb * 1024 * 1024,
+                backupCount=10,
+                encoding="utf-8",
+            )
 
-        # Format with more details for errors
-        formatter = logging.Formatter(
-            "%(asctime)s - %(name)s - %(levelname)s - %(filename)s:%(lineno)d - %(funcName)s - %(message)s",
-            datefmt="%Y-%m-%d %H:%M:%S",
-        )
-        handler.setFormatter(formatter)
+            # Format with more details for errors
+            formatter = logging.Formatter(
+                "%(asctime)s - %(name)s - %(levelname)s - %(filename)s:%(lineno)d - %(funcName)s - %(message)s",
+                datefmt="%Y-%m-%d %H:%M:%S",
+            )
+            handler.setFormatter(formatter)
 
-        logger.addHandler(handler)
+            logger.addHandler(handler)
+            self._handlers["error"] = handler
+
         self._loggers["error"] = logger
-        self._handlers["error"] = handler
 
     def _setup_performance_logger(self) -> None:
         """Setup performance logger"""
