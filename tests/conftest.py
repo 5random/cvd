@@ -2,19 +2,7 @@
 
 from __future__ import annotations
 
-import subprocess
-import sys
-from pathlib import Path
-
 import pytest
-
-
-@pytest.fixture(scope="session", autouse=True)
-def install_requirements() -> None:
-    """Install runtime dependencies before importing the application modules."""
-    req_file = Path(__file__).resolve().parents[1] / "requirements.txt"
-    subprocess.check_call([sys.executable, "-m", "pip", "install", "-r", str(req_file)])
-
 
 @pytest.fixture(autouse=True)
 def mute_logging(monkeypatch: pytest.MonkeyPatch) -> None:

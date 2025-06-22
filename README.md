@@ -151,8 +151,10 @@ pip install -r dev-requirements.txt
 
 ```
 
-The tests rely on the `cv2` module from OpenCV and the `nicegui` package. Ensure
-both packages are installed and importable.
+The tests rely on several runtime packages such as `opencv-python` (for the
+`cv2` module) and `nicegui`. Both are included in `requirements.txt`, so running
+``pip install -e .`` or ``pip install -r requirements.txt`` before invoking
+`pytest` will install them automatically.
 
 ## Code style
 
