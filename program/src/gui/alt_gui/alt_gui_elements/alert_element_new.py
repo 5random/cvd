@@ -13,6 +13,7 @@ from program.src.utils.config_service import get_config_service, ConfigurationSe
 from pathlib import Path
 import json
 from datetime import datetime
+import re
 
 
 class EmailAlertWizard:
@@ -725,44 +726,34 @@ class EmailAlertStatusDisplay:
         self.update_callback: Optional[Callable[[], None]] = None
 
     def anonymize_email(self, email: str) -> str:
-        """
-        Partially anonymize email address for display
-        Example: test.user@example.com -> t***r@e***e.com
+        """Partially anonymize email address for display
+
+        Only the local part before the ``@`` is masked while the domain
+        remains fully visible. For example ``user.name@tuhh.de`` will be
+        displayed as ``u**r.n***e@tuhh.de``.
         """
         if not email or "@" not in email:
             return email
 
         local_part, domain = email.split("@", 1)
 
-        # Anonymize local part
-        if len(local_part) <= 2:
-            local_anonymized = local_part[0] + "*"
-        else:
-            local_anonymized = (
-                local_part[0] + "*" * (len(local_part) - 2) + local_part[-1]
-            )
-
-        # Anonymize domain
-        if "." in domain:
-            domain_parts = domain.split(".")
-            domain_base = domain_parts[0]
-            domain_ext = ".".join(domain_parts[1:])
-
-            if len(domain_base) <= 2:
-                domain_anonymized = domain_base[0] + "*"
+        def _mask_segment(segment: str) -> str:
+            if len(segment) == 1:
+                return "*"
+            if len(segment) == 2:
+                return segment[0] + "*"
+            if len(segment) <= 4:
+                stars = 2
             else:
-                domain_anonymized = (
-                    domain_base[0] + "*" * (len(domain_base) - 2) + domain_base[-1]
-                )
+                stars = len(segment) - 3
+            return segment[0] + "*" * stars + segment[-1]
 
-            domain_anonymized += "." + domain_ext
-        else:
-            if len(domain) <= 2:
-                domain_anonymized = domain[0] + "*"
-            else:
-                domain_anonymized = domain[0] + "*" * (len(domain) - 2) + domain[-1]
+        tokens = re.split(r"([._+-])", local_part)
+        masked_local = "".join(
+            token if token in "._+-" else _mask_segment(token) for token in tokens
+        )
 
-        return f"{local_anonymized}@{domain_anonymized}"
+        return f"{masked_local}@{domain}"
 
     def get_alert_type_display_name(self, alert_key: str) -> tuple:
         """Get display name and icon for alert type"""
