@@ -340,17 +340,20 @@ class SimpleGUIApplication:
         # Synchronise webcam stream widget if it exists
         ws = getattr(self, "webcam_stream", None)
         if ws and getattr(ws, "video_element", None):
+            start_btn = getattr(ws, "start_camera_btn", None)
             if active:
                 ws.video_element.set_source("/video_feed")
-                ws.start_camera_btn.set_text("Pause Video")
-                ws.start_camera_btn.set_icon("pause")
-                ws.start_camera_btn.props("color=negative")
+                if start_btn:
+                    start_btn.set_text("Pause Video")
+                    start_btn.set_icon("pause")
+                    start_btn.props("color=negative")
                 ws.camera_active = True
             else:
                 ws.video_element.set_source("")
-                ws.start_camera_btn.set_text("Play Video")
-                ws.start_camera_btn.set_icon("play_arrow")
-                ws.start_camera_btn.props("color=positive")
+                if start_btn:
+                    start_btn.set_text("Play Video")
+                    start_btn.set_icon("play_arrow")
+                    start_btn.props("color=positive")
                 ws.camera_active = False
 
     # Header button handlers
@@ -842,9 +845,7 @@ class SimpleGUIApplication:
         def _on_save(config: Dict[str, Any]):
             self.alert_configurations.append(config)
             self.alert_display.alert_configurations = self.alert_configurations
-            save_alert_configs(
-                self.alert_configurations, service=self.config_service
-            )
+            save_alert_configs(self.alert_configurations, service=self.config_service)
             self._on_alert_config_changed()
             self._update_alerts_status()
             service = email_alert_service.get_email_alert_service()
