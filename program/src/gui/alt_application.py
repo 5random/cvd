@@ -483,7 +483,6 @@ class SimpleGUIApplication:
 
         ws = getattr(self, "webcam_stream", None)
         if not self.camera_active:
-
             try:
                 await _start()
             except Exception as exc:  # noqa: BLE001
