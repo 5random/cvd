@@ -498,12 +498,7 @@ class EmailAlertWizard:
             emails.remove(email)
             self._update_email_list(email_list, step2_feedback, step2_next_btn)
 
-    def _update_email_list(
-        self,
-        email_list,
-        step2_feedback: Optional[Any] = None,
-        step2_next_btn: Optional[Any] = None,
-    ):
+    def _update_email_list(self, email_list, step2_feedback: Optional[Any] = None, step2_next_btn: Optional[Any] = None):
         """Update the email list display"""
         email_list.clear()
 
@@ -523,10 +518,7 @@ class EmailAlertWizard:
                         ui.button(
                             icon="delete",
                             on_click=lambda _, e=email: self._remove_email(
-                                e,
-                                email_list,
-                                step2_feedback,
-                                step2_next_btn,
+                                e, email_list, step2_feedback, step2_next_btn
                             ),
                         ).props("size=sm flat round color=negative")
 
