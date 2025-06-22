@@ -1,5 +1,6 @@
 import asyncio
 import signal
+import sys
 import time
 
 import pytest
@@ -21,11 +22,21 @@ def hold(duration: float) -> None:
     time.sleep(duration)
 
 
+def noop() -> None:
+    pass
+
+
+_NEEDS_PRESTART = sys.platform == "win32" and sys.version_info >= (3, 13)
+
+
 
 
 @pytest.mark.asyncio
 async def test_pool_executes_tasks():
     pool = ManagedProcessPool(ProcessPoolConfig(max_workers=1, timeout=2))
+
+    if _NEEDS_PRESTART:
+        pool.submit(noop).result(timeout=10)
 
     res = await pool.submit_async(add, 1, 2)
     assert res == 3
@@ -46,6 +57,9 @@ async def test_timeout_kills_pool(monkeypatch, sig):
     cfg = ProcessPoolConfig(max_workers=1, timeout=0.1, kill_on_timeout=True, kill_signal=sig)
     pool = ManagedProcessPool(cfg)
 
+    if _NEEDS_PRESTART:
+        pool.submit(noop).result(timeout=10)
+
     with pytest.raises(asyncio.TimeoutError):
         await pool.submit_async(slow)
 
@@ -60,6 +74,9 @@ async def test_timeout_kills_pool(monkeypatch, sig):
 
 def test_scale_workers_behavior():
     pool = ManagedProcessPool(ProcessPoolConfig(max_workers=2))
+
+    if _NEEDS_PRESTART:
+        pool.submit(noop).result(timeout=10)
 
     fut = pool.submit(hold, 0.2)
     original_exec = pool._executor
