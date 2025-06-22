@@ -17,6 +17,14 @@ Import the configuration service via:
 from src.utils.config_service import ConfigurationService
 ```
 
+### ID format
+
+All sensor, controller, webcam and algorithm entries use an ID string. The
+identifier becomes part of file paths so only alphanumeric characters, dashes,
+underscores and dots are allowed. Valid IDs must match the regular expression
+``[A-Za-z0-9_.-]+``. Configuration loading fails if any ID contains disallowed
+characters.
+
 ## `log_service`
 
 Provides structured logging with rotation and audit features.  A companion

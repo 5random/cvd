@@ -1,6 +1,11 @@
 import logging
+import json
 import pytest
-from src.utils.config_service import ConfigurationService, ValidationError
+from src.utils.config_service import (
+    ConfigurationService,
+    ValidationError,
+    ConfigurationError,
+)
 
 
 @pytest.mark.asyncio
@@ -398,3 +403,26 @@ async def test_capture_backend_optional(tmp_path):
     }
 
     service._validate_webcam_config(webcam_cfg)
+
+
+def test_invalid_id_in_config(tmp_path):
+    cfg_path = tmp_path / "config.json"
+    default_path = tmp_path / "default.json"
+    bad_cfg = {
+        "sensors": [
+            {
+                "bad/id": {
+                    "name": "t",
+                    "type": "temperature",
+                    "interface": "usb",
+                    "source": "x",
+                    "enabled": True,
+                }
+            }
+        ]
+    }
+    cfg_path.write_text(json.dumps(bad_cfg))
+    default_path.write_text("{}")
+
+    with pytest.raises(ConfigurationError):
+        ConfigurationService(cfg_path, default_path)

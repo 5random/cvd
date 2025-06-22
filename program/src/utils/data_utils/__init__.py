@@ -16,11 +16,14 @@ It exposes:
     - ``data_manager``
     - ``maintenance``
 """
+
 from .compression_manager import CompressionManager
 from .data_cleaner import clean_file
 from .data_saver import DataSaver
+from .id_utils import sanitize_id, ID_PATTERN
 from .file_management_service import FileMaintenanceService
 from .maintenance import MaintenanceManager
+
 # Kompressions-Management
 
 # Kompressions-Service
@@ -72,6 +75,8 @@ __all__ = [
     "clean_file",
     # data_saver
     "DataSaver",
+    "sanitize_id",
+    "ID_PATTERN",
     # file_management_service
     "FileMaintenanceService",
     # indexing

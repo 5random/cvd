@@ -22,6 +22,9 @@ from .schemas import (
     ALGORITHM_SCHEMA,
 )
 
+# Allowed characters for sensor/controller/etc IDs
+ID_PATTERN = re.compile(r"^[A-Za-z0-9_.-]+$")
+
 # Use standard logging for configuration service to avoid circular dependencies
 info = logging.info
 warning = logging.warning
@@ -802,6 +805,17 @@ class ConfigurationService:
     def validate_all_configs(self) -> Dict[str, List[str]]:
         """Validate all configurations and return errors by section"""
         validation_errors = {}
+
+        # Validate that all IDs only contain allowed characters
+        id_errors = []
+        for section in ["sensors", "webcams", "controllers", "algorithms"]:
+            for entry_id, _ in self._extract_entries(section):
+                if not ID_PATTERN.fullmatch(entry_id):
+                    id_errors.append(
+                        f"{section}: '{entry_id}' does not match pattern {ID_PATTERN.pattern}"
+                    )
+        if id_errors:
+            validation_errors["ids"] = id_errors
 
         # Validate sensors
         sensor_errors = []
