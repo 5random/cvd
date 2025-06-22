@@ -123,10 +123,10 @@ class MotionStatusSection:
         if not result:
             return
 
+
         # remember previous detection state before updating
         prev = self.motion_detected
 
-        # update stored detection state with the latest result
         self.motion_detected = result.motion_detected
         self.motion_icon.name = (
             "motion_photos_on" if result.motion_detected else "motion_photos_off"
@@ -142,6 +142,7 @@ class MotionStatusSection:
 
         # update last motion time and count only on rising edge
         if result.motion_detected and not prev:
+
             self._last_motion_time = datetime.now()
             self._detection_count += 1
 
