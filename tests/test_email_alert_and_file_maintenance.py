@@ -85,7 +85,13 @@ def test_send_alert_success(monkeypatch):
     service = EmailAlertService(DummyConfigService(cfg))
     monkeypatch.setattr("smtplib.SMTP", DummySMTP)
 
-    result = service.send_alert("sub", "body")
+    img = b"fakejpg"
+    result = service.send_alert(
+        "sub",
+        "body",
+        status_text="stat",
+        image_attachment=img,
+    )
 
     assert result is True
     assert DummySMTP.instances
@@ -98,6 +104,8 @@ def test_send_alert_success(monkeypatch):
     msg = smtp.sent_messages[0]
     assert msg["To"] == "dest@example.com"
     assert msg["From"] == "sender@example.com"
+    assert msg.is_multipart()
+    assert msg.get_payload()[1].get_payload(decode=True) == img
 
 
 def test_send_alert_no_recipient(monkeypatch):
@@ -106,7 +114,7 @@ def test_send_alert_no_recipient(monkeypatch):
     DummySMTP.instances.clear()
     monkeypatch.setattr("smtplib.SMTP", DummySMTP)
 
-    result = service.send_alert("a", "b")
+    result = service.send_alert("a", "b", status_text="s", image_attachment=None)
 
     assert result is False
     assert not DummySMTP.instances
