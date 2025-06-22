@@ -1,4 +1,6 @@
 from nicegui import ui, events
+import asyncio
+import inspect
 from program.src.utils.ui_helpers import notify_later
 
 
@@ -195,7 +197,8 @@ class WebcamStreamElement:
                                 "text-sm font-medium text-gray-700"
                             )
                             options = [
-                                f"{w}x{h} ({fps}fps)" for (w, h, fps) in self.available_resolutions
+                                f"{w}x{h} ({fps}fps)"
+                                for (w, h, fps) in self.available_resolutions
                             ] or [
                                 "320x240 (30fps)",
                                 "352x288 (30fps)",
@@ -690,7 +693,10 @@ class WebcamStreamElement:
             self.start_camera_btn.props("color=negative")
             self.camera_active = True
             if self._camera_toggle_cb:
-                self._camera_toggle_cb()
+                if inspect.iscoroutinefunction(self._camera_toggle_cb):
+                    asyncio.create_task(self._camera_toggle_cb())
+                else:
+                    self._camera_toggle_cb()
             self._update_status()
         else:
             # Clear the image source to stop streaming
@@ -700,7 +706,10 @@ class WebcamStreamElement:
             self.start_camera_btn.props("color=positive")
             self.camera_active = False
             if self._camera_toggle_cb:
-                self._camera_toggle_cb()
+                if inspect.iscoroutinefunction(self._camera_toggle_cb):
+                    asyncio.create_task(self._camera_toggle_cb())
+                else:
+                    self._camera_toggle_cb()
             self._update_status()
 
     def toggle_white_balance_auto(self, value):

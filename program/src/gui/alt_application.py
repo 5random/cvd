@@ -410,7 +410,7 @@ class SimpleGUIApplication:
             self.webcam_stream.adjust_roi()
 
     # Main event handlers - placeholder implementations
-    def toggle_camera(self):
+    async def toggle_camera(self):
         """Start or stop the camera capture controller."""
 
         async def _start():
@@ -430,21 +430,33 @@ class SimpleGUIApplication:
                 self.camera_controller = None
 
         if not self.camera_active:
-            asyncio.create_task(_start())
+            try:
+                await _start()
+            except Exception as exc:  # noqa: BLE001
+                error("camera_start_failed", exc_info=exc)
+                notify_later("Failed to start camera", type="negative")
+                return
             self.camera_active = True
             if hasattr(self, "camera_status_icon"):
                 self.camera_status_icon.classes(replace="text-green-300")
-            if getattr(self.webcam_stream, "start_camera_btn", None):
-                self.webcam_stream.start_camera_btn.set_icon("pause")
-                self.webcam_stream.start_camera_btn.set_text("Pause Video")
+            ws = getattr(self, "webcam_stream", None)
+            if getattr(ws, "start_camera_btn", None):
+                ws.start_camera_btn.set_icon("pause")
+                ws.start_camera_btn.set_text("Pause Video")
         else:
-            asyncio.create_task(_stop())
+            try:
+                await _stop()
+            except Exception as exc:  # noqa: BLE001
+                error("camera_stop_failed", exc_info=exc)
+                notify_later("Failed to stop camera", type="negative")
+                return
             self.camera_active = False
             if hasattr(self, "camera_status_icon"):
                 self.camera_status_icon.classes(replace="text-gray-400")
-            if getattr(self.webcam_stream, "start_camera_btn", None):
-                self.webcam_stream.start_camera_btn.set_icon("play_arrow")
-                self.webcam_stream.start_camera_btn.set_text("Play Video")
+            ws = getattr(self, "webcam_stream", None)
+            if getattr(ws, "start_camera_btn", None):
+                ws.start_camera_btn.set_icon("play_arrow")
+                ws.start_camera_btn.set_text("Play Video")
 
     def update_sensitivity(self, e):
         """Update motion detection sensitivity"""
