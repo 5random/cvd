@@ -18,6 +18,7 @@ from src.utils.concurrency.thread_pool import (
 
 from src.utils.config_service import (
     ConfigurationService,
+    ConfigurationError,
     set_config_service,
 )
 from src.data_handler.sources.sensor_source_manager import SensorManager
@@ -127,8 +128,11 @@ class ApplicationContainer:
             info("Application container created successfully")
             return container
 
-        except Exception as e:
+        except (ConfigurationError, OSError) as e:
             error(f"Failed to create application container: {e}")
+            raise
+        except Exception as e:
+            error(f"Unexpected error creating application container: {e}")
             raise
 
     @classmethod
@@ -167,8 +171,11 @@ class ApplicationContainer:
             # Keep background services running
             while not self._shutdown_requested:
                 await asyncio.sleep(1)
-        except Exception as e:
+        except RuntimeError as e:
             error(f"Error in background services: {e}")
+        except Exception as e:
+            error(f"Unexpected error in background services: {e}")
+            raise
 
     async def startup(self) -> None:
         """Async startup for all services"""
@@ -184,8 +191,11 @@ class ApplicationContainer:
 
             info("All services started successfully")
 
-        except Exception as e:
+        except (RuntimeError, OSError) as e:
             error(f"Failed to start services: {e}")
+            raise
+        except Exception as e:
+            error(f"Unexpected error starting services: {e}")
             raise
 
     def start_gui(self) -> None:
@@ -221,8 +231,11 @@ class ApplicationContainer:
                 port=port,
             )
 
-        except Exception as e:
+        except (RuntimeError, OSError) as e:
             error(f"Failed to start web interface: {e}")
+            raise
+        except Exception as e:
+            error(f"Unexpected error starting web interface: {e}")
             raise
 
     async def shutdown(self) -> None:
@@ -250,8 +263,11 @@ class ApplicationContainer:
 
             info("Shutdown complete")
 
-        except Exception as e:
+        except (RuntimeError, OSError) as e:
             error(f"Error during shutdown: {e}")
+        except Exception as e:
+            error(f"Unexpected error during shutdown: {e}")
+            raise
 
     def shutdown_sync(self) -> None:
         """Synchronous shutdown for cleanup"""
@@ -271,25 +287,37 @@ class ApplicationContainer:
         # Shutdown async services synchronously
         try:
             asyncio.run(self.sensor_manager.shutdown())
-        except Exception as e:
+        except RuntimeError as e:
             error(f"Error shutting down sensor manager: {e}")
+        except Exception as e:
+            error(f"Unexpected error shutting down sensor manager: {e}")
+            raise
 
         try:
             asyncio.run(self.web_application.shutdown())
-        except Exception as e:
+        except RuntimeError as e:
             error(f"Error shutting down web application: {e}")
+        except Exception as e:
+            error(f"Unexpected error shutting down web application: {e}")
+            raise
 
         # Close data saver
         try:
             self.data_saver.close()
-        except Exception as e:
+        except OSError as e:
             error(f"Error closing data saver: {e}")
+        except Exception as e:
+            error(f"Unexpected error closing data saver: {e}")
+            raise
 
         # Clean up UI components to stop timers and other background tasks
         try:
             self.web_application.component_registry.cleanup_all()
-        except Exception as e:
+        except RuntimeError as e:
             error(f"Error cleaning up components: {e}")
+        except Exception as e:
+            error(f"Unexpected error cleaning up components: {e}")
+            raise
 
         info("Synchronous shutdown complete")
 

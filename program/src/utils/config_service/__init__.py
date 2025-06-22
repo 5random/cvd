@@ -86,9 +86,12 @@ class ConfigurationService:
                 )
             info(f"Configuration loaded successfully from {self.config_path}")
 
-        except Exception as e:
+        except (OSError, json.JSONDecodeError) as e:
             error(f"Failed to load configuration: {e}")
             raise ConfigurationError(f"Failed to load configuration: {e}")
+        except Exception as e:
+            error(f"Unexpected error loading configuration: {e}")
+            raise
 
     def _deep_merge(
         self, default: Dict[str, Any], override: Dict[str, Any]
@@ -173,9 +176,12 @@ class ConfigurationService:
             current[keys[-1]] = value
             self._save_config()
 
-        except Exception as e:
+        except (OSError, TypeError, ValueError) as e:
             error(f"Failed to set config value at {path}: {e}")
             raise ConfigurationError(f"Failed to set config value: {e}")
+        except Exception as e:
+            error(f"Unexpected error setting config value at {path}: {e}")
+            raise
 
     def get_ids(self, section_name: str, interface_type: str) -> List[str]:
         """Get all IDs from a config section filtered by interface type."""
@@ -213,9 +219,12 @@ class ConfigurationService:
                 dump_config["sensors"] = sensor_map
             save_config(dump_config, self.config_path)
             debug(f"Configuration saved to {self.config_path}")
-        except Exception as e:
+        except (OSError, json.JSONDecodeError) as e:
             error(f"Failed to save configuration: {e}")
             raise ConfigurationError(f"Failed to save configuration: {e}")
+        except Exception as e:
+            error(f"Unexpected error saving configuration: {e}")
+            raise
 
     def get_section(self, section_name: str) -> Any:
         """Get raw configuration section value (dict, list, or other types)"""
