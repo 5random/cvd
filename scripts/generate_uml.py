@@ -5,7 +5,10 @@ import os
 
 from pathlib import Path
 
-SRC_DIR = Path(__file__).resolve().parents[1] / 'program' / 'src'
+# The UML diagram should be generated from the top-level ``src`` directory
+# so that it includes all project modules. ``parents[1]`` resolves to the
+# repository root when this script is executed from the ``scripts`` folder.
+SRC_DIR = Path(__file__).resolve().parents[1] / 'src'
 
 def extract_comments(source: str) -> dict[int, str]:
     """Return a mapping of line numbers to inline comment text."""
