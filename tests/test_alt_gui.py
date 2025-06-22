@@ -36,12 +36,6 @@ class MockEmailAlertService(EmailAlertService):
         self.smtp_use_ssl = False
         self.critical_timeout = 60
         self._history = []
-        self.smtp_port = 25
-        self.smtp_user = None
-        self.smtp_password = None
-        self.smtp_use_ssl = False
-        self.critical_timeout = 60
-        self._history = []
 
     async def send_test_alert(self, message: str) -> bool:
         # Always return True to simulate a successful alert send in tests,
