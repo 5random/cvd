@@ -175,7 +175,7 @@ pre-commit run --all-files
 
 ## Changelog
 
-- Fixed log viewer error caused by removed `last_args` attribute in NiceGUI ScrollArea.
+- See [CHANGELOG](CHANGELOG.md) for a list of recent updates.
 
 ## License
 
