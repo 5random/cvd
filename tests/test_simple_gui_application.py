@@ -1,5 +1,9 @@
 from program.src.gui.alt_application import SimpleGUIApplication
-from program.src.utils.config_service import get_config_service
+from program.src.utils.config_service import (
+    get_config_service,
+    set_config_service,
+)
+from program.src.utils.email_alert_service import set_email_alert_service
 
 
 def test_global_services_set(tmp_path, monkeypatch):
@@ -28,14 +32,19 @@ def test_global_services_set(tmp_path, monkeypatch):
         def __init__(self, service):
             self.service = service
 
-    monkeypatch.setattr(
-        "program.src.utils.email_alert_service.EmailAlertService",
-        DummyEmailAlertService,
+    email_mod = __import__(
+        "program.src.utils.email_alert_service",
+        fromlist=["EmailAlertService"],
     )
+    monkeypatch.setattr(email_mod, "EmailAlertService", DummyEmailAlertService)
 
-    app = SimpleGUIApplication(config_dir=cfg_dir)
-    assert get_config_service() is app.config_service
-    assert isinstance(app.email_alert_service, DummyEmailAlertService)
-    assert app.email_alert_service.service is app.config_service
-    assert captured['config'] is app.config_service
+    try:
+        app = SimpleGUIApplication(config_dir=cfg_dir)
+        assert get_config_service() is app.config_service
+        assert isinstance(app.email_alert_service, DummyEmailAlertService)
+        assert app.email_alert_service.service is app.config_service
+        assert captured['config'] is app.config_service
+    finally:
+        set_config_service(None)
+        set_email_alert_service(None)
 
