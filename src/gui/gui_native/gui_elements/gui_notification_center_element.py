@@ -21,7 +21,6 @@ Features:
 """
 
 import time
-import asyncio
 import json
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Any, Callable
@@ -34,10 +33,9 @@ from pathlib import Path
 from nicegui import ui
 from src.gui.gui_tab_components.gui_tab_base_component import (
     TimedComponent,
-    BaseComponent,
     ComponentConfig,
 )
-from src.utils.log_service import get_log_service, LogService
+from src.utils.log_service import get_log_service
 from src.utils.config_service import ConfigurationService
 from src.experiment_handler.experiment_manager import ExperimentManager, ExperimentState
 from src.data_handler.sources.sensor_source_manager import SensorManager
@@ -396,7 +394,7 @@ class NotificationCenter(
                             "errors": validation_errors[:5],  # First 5 errors
                         },
                     )
-        except Exception as e:
+        except Exception:
             # Config validation might not be implemented yet
             pass
 
@@ -450,7 +448,7 @@ class NotificationCenter(
 
                     self._last_log_check = mod_time
 
-        except Exception as e:
+        except Exception:
             # Log file checking is best effort
             pass
 

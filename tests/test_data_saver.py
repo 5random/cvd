@@ -4,7 +4,6 @@ from pathlib import Path
 import time
 import threading
 
-import pytest
 
 from src.utils.data_utils import data_saver as ds_module
 from src.data_handler.interface.sensor_interface import (

@@ -1,6 +1,5 @@
 from datetime import datetime, date
 import types
-from nicegui import ui
 
 
 from src.experiment_handler.experiment_manager import (

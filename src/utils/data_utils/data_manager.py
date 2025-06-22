@@ -8,7 +8,7 @@ import uuid
 import zipfile
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Type
+from typing import Any, Dict, List, Optional, Type
 from types import TracebackType
 
 from src.utils.config_service import get_config_service

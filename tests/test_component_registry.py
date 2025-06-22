@@ -1,4 +1,3 @@
-import pytest
 
 from src.gui.gui_tab_components.gui_tab_base_component import (
     BaseComponent,

@@ -10,6 +10,15 @@ from __future__ import annotations
 
 import importlib
 
+from .config_service import (
+    ConfigurationService,
+    ConfigurationError,
+    ValidationError,
+    get_config_service,
+    set_config_service,
+)
+from .ui_helpers import notify_later  # noqa: F401
+
 _BASE_PACKAGE = __name__
 
 # ----------------------------------------------------------------------
@@ -50,15 +59,6 @@ def __getattr__(name: str):  # pragma: no cover - thin wrapper
 # ----------------------------------------------------------------------
 # individual modules
 # ----------------------------------------------------------------------
-from .config_service import (
-        ConfigurationService,
-        ConfigurationError,
-        ValidationError,
-        get_config_service,
-        set_config_service,
-)
-from .ui_helpers import notify_later
-
 # ----------------------------------------------------------------------
 # public API
 # ----------------------------------------------------------------------

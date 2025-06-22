@@ -1,4 +1,3 @@
-import types
 import pytest
 
 from src.gui.alt_gui.alt_gui_elements.webcam_stream_element import WebcamStreamElement

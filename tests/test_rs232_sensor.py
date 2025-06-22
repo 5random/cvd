@@ -1,4 +1,3 @@
-import asyncio
 import pytest
 
 from src.data_handler.sources.sensors import rs232_sensor

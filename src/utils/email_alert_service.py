@@ -2,7 +2,7 @@
 
 import smtplib
 from email.message import EmailMessage
-from typing import Optional, List, Dict, Iterable, Union, Any
+from typing import Optional, List, Dict, Iterable, Union
 from datetime import datetime
 
 from src.utils.config_service import get_config_service, ConfigurationService

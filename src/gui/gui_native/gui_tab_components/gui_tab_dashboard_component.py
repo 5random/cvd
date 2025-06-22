@@ -9,7 +9,7 @@ import time
 import psutil
 
 from src.utils.config_service import ConfigurationService
-from src.utils.log_service import info, warning, error, debug
+from src.utils.log_service import error
 from src.utils import log_service
 
 from src.data_handler.sources.sensor_source_manager import SensorManager

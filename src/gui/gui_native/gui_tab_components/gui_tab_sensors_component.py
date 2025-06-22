@@ -3,11 +3,9 @@ Sensor management component for the CVD Tracker application.
 Provides comprehensive sensor configuration, monitoring, and control capabilities.
 """
 
-import asyncio
 from datetime import datetime
-from typing import Dict, List, Optional, Any, Tuple, TYPE_CHECKING
+from typing import Dict, Optional, Any, TYPE_CHECKING
 from dataclasses import dataclass
-from pathlib import Path
 
 from nicegui import ui
 from nicegui.element import Element
@@ -24,19 +22,15 @@ from src.gui.gui_tab_components.gui_tab_base_component import (
 )
 
 from .dialog_utils import CancelableDialogMixin
-from src.controllers.controller_manager import create_cvd_controller_manager
-from src.data_handler.interface.sensor_interface import SensorStatus, SensorReading
 from src.data_handler.sources.sensor_source_manager import (
     SensorManager,
     SENSOR_REGISTRY,
 )
 from src.utils.config_service import ConfigurationService
-from src.utils.log_service import info, warning, error, debug
+from src.utils.log_service import error
 
 if TYPE_CHECKING:
-    from src.gui.gui_tab_components.gui_setup_wizard_component import (
-        SetupWizardComponent,
-    )
+    pass
 
 
 @dataclass

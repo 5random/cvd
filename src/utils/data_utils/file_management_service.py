@@ -1,6 +1,5 @@
 from pathlib import Path
 from typing import List, Optional
-import threading
 import time
 import os
 

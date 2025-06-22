@@ -3,7 +3,6 @@ import numpy as np
 import pytest
 import types
 from nicegui import ui
-import os
 
 from src.utils.config_service import ConfigurationService
 from src.gui.gui_elements import gui_controller_setup_wizard_element as wizard_mod
@@ -168,7 +167,6 @@ def test_on_webcam_change_updates_index(monkeypatch, tmp_path):
 
 
 def test_test_webcam_uses_device_index(monkeypatch, tmp_path, dummy_ui):
-    messages = dummy_ui
 
     used_index = {}
 
@@ -213,8 +211,7 @@ def test_test_webcam_uses_device_index(monkeypatch, tmp_path, dummy_ui):
 
 
 def test_roi_updates_on_draw(monkeypatch, tmp_path, dummy_ui):
-    messages = dummy_ui
-
+    pass
 
 def test_on_webcam_change_triggers_preview(monkeypatch, tmp_path):
 

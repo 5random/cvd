@@ -5,10 +5,9 @@ Provides comprehensive experiment configuration, monitoring, and control capabil
 
 import asyncio
 import json
-from datetime import datetime, timedelta, date
-from typing import Dict, List, Optional, Any, Callable
+from datetime import datetime, date
+from typing import Dict, List, Optional, Any
 from dataclasses import dataclass
-from pathlib import Path
 
 from nicegui import ui
 from nicegui.element import Element
@@ -27,20 +26,16 @@ from .dialog_utils import CancelableDialogMixin
 from src.experiment_handler.experiment_manager import (
     ExperimentManager,
     ExperimentConfig,
-    ExperimentResult,
     ExperimentState,
     ExperimentPhase,
-    ExperimentDataPoint,
     get_experiment_manager,
-    set_experiment_manager,
 )
 from src.data_handler.sources.sensor_source_manager import SensorManager
 from src.controllers.controller_manager import ControllerManager
 from src.utils.config_service import (
     ConfigurationService,
-    get_config_service,
 )
-from src.utils.log_service import info, warning, error, debug
+from src.utils.log_service import warning, error
 from src.gui.gui_elements.gui_experiment_setup_wizard_element import (
     ExperimentSetupWizardComponent,
 )
@@ -161,7 +156,7 @@ class ExperimentConfigDialog(CancelableDialogMixin):
                     ui.separator()
                     ui.label("Duration Settings").classes("font-semibold text-lg")
 
-                    duration_checkbox = ui.checkbox(
+                    ui.checkbox(
                         "Set maximum duration",
                         value=self._form_data["duration_enabled"],
                     ).bind_value_to(self._form_data, "duration_enabled")
@@ -219,7 +214,7 @@ class ExperimentConfigDialog(CancelableDialogMixin):
                     ).bind_value_to(self._form_data, "auto_start_sensors")
 
                     if self._available_sensors:
-                        sensor_select = (
+                        (
                             ui.select(
                                 self._available_sensors,
                                 multiple=True,
@@ -245,7 +240,7 @@ class ExperimentConfigDialog(CancelableDialogMixin):
                     ).bind_value_to(self._form_data, "auto_start_controllers")
 
                     if self._available_controllers:
-                        controller_select = (
+                        (
                             ui.select(
                                 self._available_controllers,
                                 multiple=True,

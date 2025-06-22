@@ -2,9 +2,10 @@ from __future__ import annotations
 
 import time
 from pathlib import Path
-from typing import Any, Tuple, List, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Tuple, List
+if TYPE_CHECKING:
+    from src.utils.data_utils.data_manager import DataManager
 from concurrent.futures import Future
-
 from src.utils.data_utils.indexing import DataCategory, DirectoryEventHandler
 from src.utils.log_service import info, warning, error, debug
 from src.utils.concurrency.thread_pool import (

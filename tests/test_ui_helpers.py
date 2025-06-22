@@ -1,4 +1,3 @@
-import pytest
 
 from nicegui import ui
 from src.utils.ui_helpers import notify_later

@@ -8,7 +8,7 @@ import os
 from pathlib import Path
 
 from src.utils.container import ApplicationContainer
-from src.utils.log_service import info, error, warning, debug
+from src.utils.log_service import info, error
 import argparse
 
 

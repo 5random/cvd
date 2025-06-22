@@ -1,18 +1,13 @@
 """
 Data processing pipeline for sensor data filtering and transformation.
 """
-import asyncio
-from typing import Dict, List, Any, Callable, Optional, TypeVar, Generic
-from dataclasses import dataclass, field
-from abc import ABC, abstractmethod
-from enum import Enum
-import time
+from typing import Dict, List, Any, Optional
 
 from src.data_handler.processing.processing_base import ProcessingResult, ProcessingStage
 from src.data_handler.processing.filters.simple_moving_avg_filter import MovingAverageFilter
 from src.data_handler.processing.filters.range_validation_filter import RangeValidationFilter
 from src.data_handler.processing.filters.outlier_detection_filter import OutlierDetectionFilter
-from src.utils.log_service import info, warning, error, debug
+from src.utils.log_service import info, warning
 
 class DataPipeline:
     """Data processing pipeline managing multiple stages"""

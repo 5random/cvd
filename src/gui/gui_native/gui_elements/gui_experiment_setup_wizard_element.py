@@ -2,7 +2,6 @@
 
 from typing import Any, Optional, Callable, Dict, List
 from datetime import datetime
-from pathlib import Path
 from nicegui import ui
 import json
 from src.utils.ui_helpers import notify_later
@@ -13,13 +12,12 @@ from src.gui.gui_tab_components.gui_tab_base_component import (
 )
 from .gui_wizard_mixin import WizardMixin
 from src.experiment_handler.experiment_manager import (
-    ExperimentManager, ExperimentConfig, ExperimentState, ExperimentPhase,
-    get_experiment_manager
+    ExperimentManager, ExperimentConfig, get_experiment_manager
 )
 from src.data_handler.sources.sensor_source_manager import SensorManager
 from src.controllers.controller_manager import ControllerManager
 from src.utils.config_service import ConfigurationService
-from src.utils.log_service import info, warning, error, debug
+from src.utils.log_service import info, warning, error
 
 
 class ExperimentSetupWizardComponent(WizardMixin, BaseComponent):

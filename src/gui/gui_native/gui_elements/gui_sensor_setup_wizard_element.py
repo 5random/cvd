@@ -1,6 +1,6 @@
 """Setup wizard component using NiceGUI stepper for comprehensive sensor configuration."""
 
-from typing import Any, Optional, Callable, Dict, List
+from typing import Optional, Callable, List
 from nicegui import ui
 from serial.tools import list_ports
 
@@ -15,9 +15,8 @@ from src.data_handler.sources.sensor_source_manager import (
 )
 from src.data_handler.interface.sensor_interface import SensorStatus
 from src.utils.ui_helpers import notify_later
-from src.controllers.controller_manager import ControllerManager
 from src.utils.config_service import ConfigurationService
-from src.utils.log_service import info, warning, error, debug
+from src.utils.log_service import info, warning, error
 
 
 class SensorSetupWizardComponent(WizardMixin, BaseComponent):

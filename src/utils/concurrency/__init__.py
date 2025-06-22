@@ -1,5 +1,3 @@
-from . import async_utils, process_pool, thread_pool
-
 """
 Concurrency utilities package
 
@@ -8,6 +6,8 @@ This package bundles:
  - thread_pool    : ManagedThreadPool + ThreadPoolManager + convenience runners
  - process_pool   : ManagedProcessPool for CPU-bound workloads
 """
+
+from . import async_utils, process_pool, thread_pool
 
 # expose the three submodules
 

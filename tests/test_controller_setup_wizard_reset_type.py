@@ -1,20 +1,18 @@
 import json
 import pytest
 from nicegui import ui
-import os
 
 # mypy: ignore-errors
 
 
 from src.utils import log_service as ls
-
-for name in ["debug", "info", "warning", "error"]:
-    setattr(ls, name, lambda *a, **k: None)
-
 from src.utils.config_service import ConfigurationService
 from src.gui.gui_elements.gui_controller_setup_wizard_element import (
     ControllerSetupWizardComponent,
 )
+
+for name in ["debug", "info", "warning", "error"]:
+    setattr(ls, name, lambda *a, **k: None)
 
 
 class Dummy:

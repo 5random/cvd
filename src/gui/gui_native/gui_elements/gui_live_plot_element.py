@@ -7,17 +7,14 @@ from dataclasses import dataclass
 import time
 from datetime import datetime
 import plotly.graph_objs as go
-from plotly.subplots import make_subplots
 from nicegui import ui
 
 from src.data_handler.sources.sensor_source_manager import SensorManager
-from src.data_handler.interface.sensor_interface import SensorReading, SensorStatus
 from src.gui.gui_tab_components.gui_tab_base_component import (
     TimedComponent,
-    BaseComponent,
     ComponentConfig,
 )
-from src.utils.log_service import info, warning, error, debug
+from src.utils.log_service import error
 
 @dataclass
 class PlotConfig:

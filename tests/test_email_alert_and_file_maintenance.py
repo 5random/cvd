@@ -3,7 +3,6 @@ import time
 from pathlib import Path
 from types import SimpleNamespace
 
-import pytest
 
 from src.utils.alert_system_utils.email_alert_service import EmailAlertService
 from src.utils.data_utils.file_management_service import FileMaintenanceService

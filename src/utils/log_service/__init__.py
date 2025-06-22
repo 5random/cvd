@@ -18,14 +18,13 @@ Features:
 
 import logging
 import logging.handlers
-import os
 import json
 import time
 import threading
 import sys
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, Optional, Union, List, Iterator
+from typing import Any, Dict, Optional, Iterator
 from contextlib import contextmanager
 from enum import Enum
 

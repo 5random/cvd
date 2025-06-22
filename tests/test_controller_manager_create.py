@@ -4,7 +4,6 @@ from src.controllers.controller_manager import ControllerManager
 from src.controllers.algorithms.motion_detection import MotionDetectionController
 from src.controllers.algorithms.reactor_state import ReactorStateController
 from src.utils.config_service import ConfigurationError
-from src.utils import log_service
 
 
 def test_create_known_controller_types():

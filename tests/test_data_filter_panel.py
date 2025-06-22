@@ -1,6 +1,5 @@
 import types
 
-import pytest
 from nicegui import ui
 
 from src.gui.gui_tab_components.gui_tab_base_component import ComponentConfig

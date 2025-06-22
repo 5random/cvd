@@ -9,7 +9,6 @@ from src.utils.concurrency.process_pool import (
     ManagedProcessPool,
     ProcessPoolConfig,
 )
-from src.utils import log_service
 
 
 def add(x: int, y: int) -> int:

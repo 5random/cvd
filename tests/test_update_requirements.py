@@ -1,4 +1,3 @@
-import builtins
 import pytest
 from scripts import update_requirements
 

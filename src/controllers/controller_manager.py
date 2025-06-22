@@ -3,7 +3,7 @@ Controller manager for orchestrating multiple controllers with dependency manage
 """
 
 import asyncio
-from typing import Dict, List, Any, Optional, Callable, Type
+from typing import Dict, List, Any, Optional, Callable
 from collections import deque
 from dataclasses import dataclass
 import time
@@ -19,20 +19,15 @@ from src.controllers.controller_base import (
     ControllerStatus,
 )
 from src.data_handler.interface.sensor_interface import SensorReading
-from src.utils.log_service import info, warning, error, debug
+from src.utils.log_service import info, error, debug
 
 
-from .algorithms.motion_detection import MotionDetectionController
-from .algorithms.reactor_state import ReactorStateController
-from .controller_utils.controller_data_sources.camera_capture_controller import (
-    CameraCaptureController,
-)
 from src.utils.config_service import (
     get_config_service,
     ConfigurationError,
 )
 
-from .controller_registry import CONTROLLER_CLASS_MAP, register_controller_type
+from .controller_registry import CONTROLLER_CLASS_MAP
 
 
 @dataclass

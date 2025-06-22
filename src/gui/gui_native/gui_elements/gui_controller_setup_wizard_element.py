@@ -6,7 +6,6 @@ from typing import Any, Optional, Callable, Dict, List
 import re
 import copy
 from nicegui import ui
-from nicegui.element import Element
 from nicegui import events
 import cv2
 from PIL import Image
@@ -16,14 +15,13 @@ from src.gui.gui_tab_components.gui_tab_base_component import (
     ComponentConfig,
 )
 from .gui_wizard_mixin import WizardMixin
-from src.gui.gui_tab_components.gui_tab_sensors_component import SensorConfigDialog
 from src.gui.gui_elements.gui_sensor_setup_wizard_element import (
     SensorSetupWizardComponent,
 )
 from src.data_handler.sources.sensor_source_manager import SensorManager
 from src.controllers.controller_manager import ControllerManager
 from src.utils.config_service import ConfigurationService
-from src.utils.log_service import info, warning, error, debug
+from src.utils.log_service import info, warning, error
 
 # Parameter templates for supported controller types
 _PARAM_TEMPLATES: Dict[str, Dict[str, Dict[str, Any]]] = {
@@ -579,7 +577,7 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
         with container:
             for sensor_id, sensor_config in available_sensors:
                 with ui.row().classes("items-center gap-2"):
-                    checkbox = ui.checkbox(
+                    ui.checkbox(
                         f"{sensor_config.get('name', sensor_id)} ({sensor_id})",
                         value=sensor_id in self._wizard_data["selected_sensors"],
                         on_change=lambda e, sid=sensor_id: self._toggle_sensor_selection(
@@ -1030,7 +1028,7 @@ class ControllerSetupWizardComponent(WizardMixin, BaseComponent):
             for i, message in enumerate(self._wizard_data["state_output"]):
                 with ui.row().classes("items-center gap-2"):
                     ui.label(f"State {i+1}:").classes("w-16")
-                    message_input = (
+                    (
                         ui.input(
                             value=message,
                             placeholder=f"Enter message for state {i+1}",

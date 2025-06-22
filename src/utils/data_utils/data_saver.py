@@ -1,5 +1,4 @@
 import csv
-import os
 from pathlib import Path
 from typing import Dict, Tuple, IO, Any, Optional, List
 from types import SimpleNamespace
@@ -7,8 +6,7 @@ import contextlib
 from concurrent.futures import Future
 from src.utils.concurrency.thread_pool import get_thread_pool_manager, ThreadPoolType
 from src.data_handler.interface.sensor_interface import SensorReading
-import logging
-from src.utils.log_service import info, warning, error, debug
+from src.utils.log_service import info, warning, error
 import threading
 import time
 from src.utils.data_utils.compression_service import get_compression_service

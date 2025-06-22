@@ -4,7 +4,7 @@ from typing import List, Any
 
 from nicegui import ui
 
-from src.gui.gui_elements.notifications.models import Notification, NotificationSeverity, NotificationSource
+from src.gui.gui_elements.notifications.models import Notification, NotificationSeverity
 
 class NotificationUIMixin:
     """Mixin providing UI rendering helpers for NotificationCenter."""

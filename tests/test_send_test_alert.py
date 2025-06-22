@@ -1,4 +1,3 @@
-import asyncio
 import contextlib
 import pytest
 
@@ -55,7 +54,10 @@ async def test_send_test_alert_handles_exceptions(tmp_path, monkeypatch):
     ]
 
     notifications = []
-    notifier = lambda msg, **kw: notifications.append((msg, kw))
+
+    def notifier(msg, **kw):
+        notifications.append((msg, kw))
+
     monkeypatch.setattr("src.utils.ui_helpers.notify_later", notifier)
     monkeypatch.setattr("src.gui.alt_application.notify_later", notifier)
 

@@ -25,17 +25,12 @@ import functools
 import logging
 import random
 import signal
-import sys
 import time
 import weakref
 from src.utils.log_service import (
     info,
     warning,
     error,
-    debug,
-    performance,
-    timer,
-    context,
 )
 from dataclasses import dataclass
 from typing import (

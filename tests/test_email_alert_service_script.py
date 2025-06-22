@@ -1,7 +1,6 @@
 import sys
 from email.message import EmailMessage
 
-import pytest
 
 from scripts.email_alert_service_testing import (
     ManualEmailAlertService,

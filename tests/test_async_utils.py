@@ -6,8 +6,6 @@ from src.utils.concurrency.async_utils import (
     gather_with_concurrency,
     run_with_timeout,
 )
-from src.utils import log_service
-from src.utils.concurrency import async_utils
 
 
 @pytest.mark.asyncio
