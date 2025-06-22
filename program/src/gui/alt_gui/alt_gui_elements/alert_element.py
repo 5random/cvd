@@ -100,11 +100,6 @@ class EmailAlertsSection:
                     ),
                 )
 
-                self.system_error_alert = ui.checkbox(
-                    "System errors occur",
-                    value=True,
-                )
-
                 self.experiment_complete_alert = ui.checkbox(
                     "Experiment completes",
                     value=self.settings.get("experiment_complete_alert", False),
