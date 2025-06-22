@@ -1211,6 +1211,8 @@ class SimpleGUIApplication:
                                     + placeholder_bytes
                                     + b"\r\n"
                                 )
+                            self.update_camera_status(False)
+                            notify_later("Camera stream lost", type="warning")
                             break
                     await asyncio.sleep(max(0.001, interval))
 
