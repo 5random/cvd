@@ -1242,6 +1242,12 @@ class SimpleGUIApplication:
                 with contextlib.suppress(Exception):
                     await self._processing_task
                 self._processing_task = None
+            if self._experiment_timer:
+                try:
+                    self._experiment_timer.cancel()
+                except Exception:
+                    pass
+                self._experiment_timer = None
             if self._time_timer:
                 try:
                     self._time_timer.cancel()
