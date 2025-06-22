@@ -36,3 +36,29 @@ def mute_logging(monkeypatch: pytest.MonkeyPatch) -> None:
         for name in ["debug", "info", "warning", "error"]:
             if hasattr(mod, name):
                 monkeypatch.setattr(mod, name, lambda *a, **k: None, raising=False)
+
+
+@pytest.fixture(autouse=True)
+def restore_data_files(tmp_path):
+    """Ensure data files modified during tests are restored."""
+    from pathlib import Path
+    import shutil
+
+    index_file = Path("data/data_index.json")
+    history_file = Path("data/notifications/history.json")
+    experiments_dir = Path("data/experiments")
+
+    index_backup = index_file.read_text() if index_file.exists() else None
+    history_backup = history_file.read_text() if history_file.exists() else None
+
+    yield
+
+    if index_backup is not None:
+        index_file.write_text(index_backup)
+    if history_backup is not None:
+        history_file.write_text(history_backup)
+
+    if experiments_dir.exists():
+        for p in experiments_dir.iterdir():
+            if p.is_dir() and p.name.startswith("exp_"):
+                shutil.rmtree(p, ignore_errors=True)

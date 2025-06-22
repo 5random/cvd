@@ -7,3 +7,9 @@ data/logs/
 !data/logs/.gitkeep
 program/data/logs/
 *.log
+
+# Ignore build metadata
+cvd.egg-info/
+
+# Ignore experiment data
+data/experiments/
