@@ -6,11 +6,6 @@ opencv-python
 plotly
 psutil
 pyserial
-pytest
-pytest-asyncio
-Pillow
-watchdog
-jsonschema
 setuptools
 types-jsonschema
 types-setuptools
