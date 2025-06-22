@@ -29,11 +29,16 @@ class EmailAlertsSection:
             ui.label("Email Alerts").classes("text-lg font-bold mb-2")
 
             # Enable/disable alerts
-            self.alerts_enabled_checkbox = ui.checkbox(
-                "Enable Email Alerts",
-                value=self.alerts_enabled,
-                on_change=self.callbacks.get("toggle_alerts", lambda value: None),
-            ).classes("mb-3")
+            self.alerts_enabled_checkbox = (
+                ui.checkbox(
+                    "Enable Email Alerts",
+                    value=self.alerts_enabled,
+                    on_change=self.callbacks.get(
+                        "toggle_alerts",
+                        lambda value: None,
+                    ),
+                ).classes("mb-3")
+            )
 
             # Email settings
             with ui.column().classes("gap-3"):
@@ -60,7 +65,9 @@ class EmailAlertsSection:
                 )
 
 
-                ui.label("Send alert if no motion detected for this duration").classes(
+                ui.label(
+                    "Send alert if no motion detected for this duration"
+                ).classes(
                     "text-xs text-gray-600"
                 )
 
@@ -90,6 +97,12 @@ class EmailAlertsSection:
                     "update:model-value",
                     lambda e: self._on_checkbox_change("system_error_alert", e.value),
                 )
+
+                self.system_error_alert = ui.checkbox(
+                    "System errors occur",
+                    value=True,
+                )
+
                 self.experiment_complete_alert = ui.checkbox(
                     "Experiment completes",
                     value=self.settings.get("experiment_complete_alert", False),
@@ -106,12 +119,18 @@ class EmailAlertsSection:
                 ui.button(
                     "Send Test Alert",
                     icon="send",
-                    on_click=self.callbacks.get("send_test_alert", lambda: None),
+                    on_click=self.callbacks.get(
+                        "send_test_alert",
+                        lambda: None,
+                    ),
                 ).props("color=warning").classes("flex-1")
                 ui.button(
                     "Alert History",
                     icon="history",
-                    on_click=self.callbacks.get("show_alert_history", lambda: None),
+                    on_click=self.callbacks.get(
+                        "show_alert_history",
+                        lambda: None,
+                    ),
                 ).props("color=secondary outline").classes("flex-1")
 
             # Last alert status
