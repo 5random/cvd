@@ -371,7 +371,8 @@ class AsyncTaskManager:
         for tid, task in list(self._tasks.items()):
             if not task.done():
                 task.cancel()
-        _, pending = await asyncio.wait(self._tasks.values(), timeout=timeout)
+        tasks = list(self._tasks.values())
+        _, pending = await asyncio.wait(tasks, timeout=timeout)
         if pending:
             warning("pending_after_shutdown", count=len(pending))
         self._tasks.clear()
