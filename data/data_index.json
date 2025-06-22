@@ -1,7 +1,7 @@
 {
   "files": {
-    "D:\\Willem\\KV_GitHub\\cvd\\data\\logs\\audit.log": {
-      "file_path": "data\\logs\\audit.log",
+    "data/logs/audit.log": {
+      "file_path": "data/logs/audit.log",
       "category": "logs",
       "status": "active",
       "size_bytes": 0,
@@ -13,8 +13,8 @@
       "checksum": null,
       "tags": null
     },
-    "D:\\Willem\\KV_GitHub\\cvd\\data\\logs\\error.log": {
-      "file_path": "data\\logs\\error.log",
+    "data/logs/error.log": {
+      "file_path": "data/logs/error.log",
       "category": "logs",
       "status": "active",
       "size_bytes": 2787828,
@@ -26,8 +26,8 @@
       "checksum": null,
       "tags": null
     },
-    "D:\\Willem\\KV_GitHub\\cvd\\data\\logs\\info.log": {
-      "file_path": "data\\logs\\info.log",
+    "data/logs/info.log": {
+      "file_path": "data/logs/info.log",
       "category": "logs",
       "status": "active",
       "size_bytes": 260685,
@@ -39,8 +39,8 @@
       "checksum": null,
       "tags": null
     },
-    "D:\\Willem\\KV_GitHub\\cvd\\data\\logs\\performance.log": {
-      "file_path": "data\\logs\\performance.log",
+    "data/logs/performance.log": {
+      "file_path": "data/logs/performance.log",
       "category": "logs",
       "status": "active",
       "size_bytes": 0,
@@ -52,8 +52,8 @@
       "checksum": null,
       "tags": null
     },
-    "D:\\Willem\\KV_GitHub\\cvd\\data\\logs\\structured.log": {
-      "file_path": "data\\logs\\structured.log",
+    "data/logs/structured.log": {
+      "file_path": "data/logs/structured.log",
       "category": "logs",
       "status": "active",
       "size_bytes": 0,
@@ -65,8 +65,8 @@
       "checksum": null,
       "tags": null
     },
-    "D:\\Willem\\KV_GitHub\\cvd\\data\\raw\\sen001.csv": {
-      "file_path": "data\\raw\\sen001.csv",
+    "data/raw/sen001.csv": {
+      "file_path": "data/raw/sen001.csv",
       "category": "raw",
       "status": "active",
       "size_bytes": 2470,
@@ -78,8 +78,8 @@
       "checksum": null,
       "tags": null
     },
-    "D:\\Willem\\KV_GitHub\\cvd\\data\\raw\\sen002.csv": {
-      "file_path": "data\\raw\\sen002.csv",
+    "data/raw/sen002.csv": {
+      "file_path": "data/raw/sen002.csv",
       "category": "raw",
       "status": "active",
       "size_bytes": 2462,
@@ -91,8 +91,8 @@
       "checksum": null,
       "tags": null
     },
-    "D:\\Willem\\KV_GitHub\\cvd\\data\\processed\\sen001.csv": {
-      "file_path": "data\\processed\\sen001.csv",
+    "data/processed/sen001.csv": {
+      "file_path": "data/processed/sen001.csv",
       "category": "processed",
       "status": "active",
       "size_bytes": 2464,
@@ -104,8 +104,8 @@
       "checksum": null,
       "tags": null
     },
-    "D:\\Willem\\KV_GitHub\\cvd\\data\\processed\\sen002.csv": {
-      "file_path": "data\\processed\\sen002.csv",
+    "data/processed/sen002.csv": {
+      "file_path": "data/processed/sen002.csv",
       "category": "processed",
       "status": "active",
       "size_bytes": 2468,
@@ -117,8 +117,8 @@
       "checksum": null,
       "tags": null
     },
-    "D:\\Willem\\KV_GitHub\\cvd\\data\\experiments\\JAJA-Ding DOng_2025-06-08T14-37-10\\metadata\\compressed\\experiment_metadata.json.gz": {
-      "file_path": "data\\experiments\\JAJA-Ding DOng_2025-06-08T14-37-10\\metadata\\compressed\\experiment_metadata.json.gz",
+    "data/experiments/JAJA-Ding DOng_2025-06-08T14-37-10/metadata/compressed/experiment_metadata.json.gz": {
+      "file_path": "data/experiments/JAJA-Ding DOng_2025-06-08T14-37-10/metadata/compressed/experiment_metadata.json.gz",
       "category": "experiments",
       "status": "compressed",
       "size_bytes": 420,
@@ -130,8 +130,8 @@
       "checksum": null,
       "tags": null
     },
-    "D:\\Willem\\KV_GitHub\\cvd\\data\\raw\\compressed\\sen002_1749391048.csv": {
-      "file_path": "data\\raw\\compressed\\sen002_1749391048.csv",
+    "data/raw/compressed/sen002_1749391048.csv": {
+      "file_path": "data/raw/compressed/sen002_1749391048.csv",
       "category": "raw",
       "status": "active",
       "size_bytes": 240689,
@@ -143,8 +143,8 @@
       "checksum": null,
       "tags": null
     },
-    "D:\\Willem\\KV_GitHub\\cvd\\data\\processed\\compressed\\sen002_1749391048.csv": {
-      "file_path": "data\\processed\\compressed\\sen002_1749391048.csv",
+    "data/processed/compressed/sen002_1749391048.csv": {
+      "file_path": "data/processed/compressed/sen002_1749391048.csv",
       "category": "processed",
       "status": "active",
       "size_bytes": 265306,
@@ -156,8 +156,8 @@
       "checksum": null,
       "tags": null
     },
-    "D:\\Willem\\KV_GitHub\\cvd\\data\\raw\\sen003.csv": {
-      "file_path": "data\\raw\\sen003.csv",
+    "data/raw/sen003.csv": {
+      "file_path": "data/raw/sen003.csv",
       "category": "raw",
       "status": "active",
       "size_bytes": 1709,
@@ -169,8 +169,8 @@
       "checksum": null,
       "tags": null
     },
-    "D:\\Willem\\KV_GitHub\\cvd\\data\\processed\\sen003.csv": {
-      "file_path": "data\\processed\\sen003.csv",
+    "data/processed/sen003.csv": {
+      "file_path": "data/processed/sen003.csv",
       "category": "processed",
       "status": "active",
       "size_bytes": 1946,
@@ -182,8 +182,8 @@
       "checksum": null,
       "tags": null
     },
-    "D:\\Willem\\KV_GitHub\\cvd\\data\\experiments\\TESTExperiment_2025-06-08T18-06-03\\metadata\\compressed\\experiment_metadata.json.gz": {
-      "file_path": "data\\experiments\\TESTExperiment_2025-06-08T18-06-03\\metadata\\compressed\\experiment_metadata.json.gz",
+    "data/experiments/TESTExperiment_2025-06-08T18-06-03/metadata/compressed/experiment_metadata.json.gz": {
+      "file_path": "data/experiments/TESTExperiment_2025-06-08T18-06-03/metadata/compressed/experiment_metadata.json.gz",
       "category": "experiments",
       "status": "compressed",
       "size_bytes": 397,
@@ -195,8 +195,8 @@
       "checksum": null,
       "tags": null
     },
-    "D:\\Willem\\KV_GitHub\\cvd\\data\\raw\\sen004.csv": {
-      "file_path": "data\\raw\\sen004.csv",
+    "data/raw/sen004.csv": {
+      "file_path": "data/raw/sen004.csv",
       "category": "raw",
       "status": "active",
       "size_bytes": 6741,
@@ -208,8 +208,8 @@
       "checksum": null,
       "tags": null
     },
-    "D:\\Willem\\KV_GitHub\\cvd\\data\\processed\\sen004.csv": {
-      "file_path": "data\\processed\\sen004.csv",
+    "data/processed/sen004.csv": {
+      "file_path": "data/processed/sen004.csv",
       "category": "processed",
       "status": "active",
       "size_bytes": 6741,
@@ -221,8 +221,8 @@
       "checksum": null,
       "tags": null
     },
-    "D:\\Willem\\KV_GitHub\\cvd\\data\\raw\\sen005.csv": {
-      "file_path": "data\\raw\\sen005.csv",
+    "data/raw/sen005.csv": {
+      "file_path": "data/raw/sen005.csv",
       "category": "raw",
       "status": "active",
       "size_bytes": 2452,
@@ -234,8 +234,8 @@
       "checksum": null,
       "tags": null
     },
-    "D:\\Willem\\KV_GitHub\\cvd\\data\\processed\\sen005.csv": {
-      "file_path": "data\\processed\\sen005.csv",
+    "data/processed/sen005.csv": {
+      "file_path": "data/processed/sen005.csv",
       "category": "processed",
       "status": "active",
       "size_bytes": 2438,
@@ -247,8 +247,8 @@
       "checksum": null,
       "tags": null
     },
-    "D:\\Willem\\KV_GitHub\\cvd\\data\\experiments\\Test_2025-06-09T21-54-28\\metadata\\compressed\\experiment_metadata.json.gz": {
-      "file_path": "data\\experiments\\Test_2025-06-09T21-54-28\\metadata\\compressed\\experiment_metadata.json.gz",
+    "data/experiments/Test_2025-06-09T21-54-28/metadata/compressed/experiment_metadata.json.gz": {
+      "file_path": "data/experiments/Test_2025-06-09T21-54-28/metadata/compressed/experiment_metadata.json.gz",
       "category": "experiments",
       "status": "compressed",
       "size_bytes": 397,
@@ -260,8 +260,8 @@
       "checksum": null,
       "tags": null
     },
-    "D:\\Willem\\KV_GitHub\\cvd\\data\\raw\\compressed\\sen001_1749540281.csv": {
-      "file_path": "data\\raw\\compressed\\sen001_1749540281.csv",
+    "data/raw/compressed/sen001_1749540281.csv": {
+      "file_path": "data/raw/compressed/sen001_1749540281.csv",
       "category": "raw",
       "status": "active",
       "size_bytes": 851204,
@@ -273,8 +273,8 @@
       "checksum": null,
       "tags": null
     },
-    "D:\\Willem\\KV_GitHub\\cvd\\data\\raw\\compressed\\sen002_1749540281.csv": {
-      "file_path": "data\\raw\\compressed\\sen002_1749540281.csv",
+    "data/raw/compressed/sen002_1749540281.csv": {
+      "file_path": "data/raw/compressed/sen002_1749540281.csv",
       "category": "raw",
       "status": "active",
       "size_bytes": 181476,
@@ -286,8 +286,8 @@
       "checksum": null,
       "tags": null
     },
-    "D:\\Willem\\KV_GitHub\\cvd\\data\\raw\\compressed\\sen003_1749540281.csv": {
-      "file_path": "data\\raw\\compressed\\sen003_1749540281.csv",
+    "data/raw/compressed/sen003_1749540281.csv": {
+      "file_path": "data/raw/compressed/sen003_1749540281.csv",
       "category": "raw",
       "status": "active",
       "size_bytes": 55743,
@@ -299,8 +299,8 @@
       "checksum": null,
       "tags": null
     },
-    "D:\\Willem\\KV_GitHub\\cvd\\data\\raw\\compressed\\sen004_1749505469.csv": {
-      "file_path": "data\\raw\\compressed\\sen004_1749505469.csv",
+    "data/raw/compressed/sen004_1749505469.csv": {
+      "file_path": "data/raw/compressed/sen004_1749505469.csv",
       "category": "raw",
       "status": "active",
       "size_bytes": 6741,
@@ -312,8 +312,8 @@
       "checksum": null,
       "tags": null
     },
-    "D:\\Willem\\KV_GitHub\\cvd\\data\\raw\\compressed\\sen005_1749540284.csv": {
-      "file_path": "data\\raw\\compressed\\sen005_1749540284.csv",
+    "data/raw/compressed/sen005_1749540284.csv": {
+      "file_path": "data/raw/compressed/sen005_1749540284.csv",
       "category": "raw",
       "status": "active",
       "size_bytes": 15710,
@@ -325,8 +325,8 @@
       "checksum": null,
       "tags": null
     },
-    "D:\\Willem\\KV_GitHub\\cvd\\data\\processed\\compressed\\sen001_1749540281.csv": {
-      "file_path": "data\\processed\\compressed\\sen001_1749540281.csv",
+    "data/processed/compressed/sen001_1749540281.csv": {
+      "file_path": "data/processed/compressed/sen001_1749540281.csv",
       "category": "processed",
       "status": "active",
       "size_bytes": 849530,
@@ -338,8 +338,8 @@
       "checksum": null,
       "tags": null
     },
-    "D:\\Willem\\KV_GitHub\\cvd\\data\\processed\\compressed\\sen002_1749540281.csv": {
-      "file_path": "data\\processed\\compressed\\sen002_1749540281.csv",
+    "data/processed/compressed/sen002_1749540281.csv": {
+      "file_path": "data/processed/compressed/sen002_1749540281.csv",
       "category": "processed",
       "status": "active",
       "size_bytes": 180927,
@@ -351,8 +351,8 @@
       "checksum": null,
       "tags": null
     },
-    "D:\\Willem\\KV_GitHub\\cvd\\data\\processed\\compressed\\sen003_1749540281.csv": {
-      "file_path": "data\\processed\\compressed\\sen003_1749540281.csv",
+    "data/processed/compressed/sen003_1749540281.csv": {
+      "file_path": "data/processed/compressed/sen003_1749540281.csv",
       "category": "processed",
       "status": "active",
       "size_bytes": 64267,
@@ -364,8 +364,8 @@
       "checksum": null,
       "tags": null
     },
-    "D:\\Willem\\KV_GitHub\\cvd\\data\\processed\\compressed\\sen004_1749505469.csv": {
-      "file_path": "data\\processed\\compressed\\sen004_1749505469.csv",
+    "data/processed/compressed/sen004_1749505469.csv": {
+      "file_path": "data/processed/compressed/sen004_1749505469.csv",
       "category": "processed",
       "status": "active",
       "size_bytes": 6741,
@@ -377,8 +377,8 @@
       "checksum": null,
       "tags": null
     },
-    "D:\\Willem\\KV_GitHub\\cvd\\data\\processed\\compressed\\sen005_1749540284.csv": {
-      "file_path": "data\\processed\\compressed\\sen005_1749540284.csv",
+    "data/processed/compressed/sen005_1749540284.csv": {
+      "file_path": "data/processed/compressed/sen005_1749540284.csv",
       "category": "processed",
       "status": "active",
       "size_bytes": 15651,
@@ -391,12 +391,12 @@
       "tags": null
     }
   },
-  "last_updated": "2025-06-11T09:49:02.836901",
+  "last_updated": "2025-06-22T16:28:58.459757",
   "dir_mtimes": {
-    "D:\\Willem\\KV_GitHub\\cvd\\data\\raw": 1749628139.7117362,
-    "D:\\Willem\\KV_GitHub\\cvd\\data\\processed": 1749628139.7117362,
-    "D:\\Willem\\KV_GitHub\\cvd\\data\\experiments": 1749540052.7895098,
-    "D:\\Willem\\KV_GitHub\\cvd\\data\\logs": 1749532440.2002645
+    "data/raw": 1749628139.7117362,
+    "data/processed": 1749628139.7117362,
+    "data/experiments": 1749540052.7895098,
+    "data/logs": 1749532440.2002645
   },
   "version": "1.0"
 }
