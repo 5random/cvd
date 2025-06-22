@@ -9,7 +9,9 @@ class EmailAlertsSection:
         """Initialize email alerts section with settings"""
         self.experiment_running = False
         self.alerts_enabled = False
-        settings = settings or {"email": "user@example.com", "alert_delay": 5}
+        settings = settings or {}
+        settings.setdefault("email", "user@example.com")
+        settings.setdefault("alert_delay", 5)
         # ensure keys for all alerts exist with sensible defaults
         settings.setdefault("no_motion_alert", True)
         settings.setdefault("camera_offline_alert", True)
