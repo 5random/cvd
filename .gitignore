@@ -1,3 +1,8 @@
 __pycache__/
 *.pyc
 .pytest_cache/
+
+# Ignore log files
+data/logs/
+program/data/logs/
+*.log
