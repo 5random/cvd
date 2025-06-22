@@ -1182,6 +1182,9 @@ class SimpleGUIApplication:
                 self.supported_camera_modes = await probe_camera_modes()
             except Exception:
                 self.supported_camera_modes = []
+            if getattr(self, "webcam_stream", None):
+                self.webcam_stream.available_resolutions = self.supported_camera_modes
+                self.webcam_stream.update_resolutions(self.supported_camera_modes)
             await self.controller_manager.start_all_controllers()
             self._processing_task = asyncio.create_task(self._processing_loop())
             # Ensure camera status reflects that controllers started
