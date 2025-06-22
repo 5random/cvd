@@ -4,7 +4,7 @@ from email.message import EmailMessage
 from typing import Optional, List, Dict, Iterable, Union
 from datetime import datetime
 
-from program.src.utils.config_service import get_config_service, ConfigurationService, ConfigurationError
+from program.src.utils.config_service import get_config_service, ConfigurationService
 from program.src.utils.log_service import info, warning, error
 
 
