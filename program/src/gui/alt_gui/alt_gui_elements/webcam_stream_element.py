@@ -26,6 +26,9 @@ UVC_DEFAULTS = {
 class WebcamStreamElement:
     """Initialize webcam stream element with settings and optional callbacks"""
 
+    # Track whether the /webcam_stream page has been registered
+    _page_registered = False
+
     def __init__(
         self,
         settings,
@@ -58,10 +61,14 @@ class WebcamStreamElement:
         self.roi_height = 0
         self.camera_settings_expansion = None
 
-        @ui.page("/webcam_stream")
-        def webcam_stream_page():
-            # Create the camera section
-            self.create_camera_section()
+        # Register the page only once for the first created instance
+        if not WebcamStreamElement._page_registered:
+            @ui.page("/webcam_stream")
+            def webcam_stream_page():
+                # Create the camera section
+                self.create_camera_section()
+
+            WebcamStreamElement._page_registered = True
 
     def create_camera_section(self):
         """Create camera feed and controls section"""
