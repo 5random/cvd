@@ -1034,10 +1034,15 @@ class SimpleGUIApplication:
         ]
 
         if tasks:
-            results = await gather_with_concurrency(
-                tasks, label="test_alerts", cancel_on_exception=False
-            )
-            total_sent = sum(1 for ok in results if ok)
+            try:
+                results = await gather_with_concurrency(
+                    tasks, label="test_alerts", cancel_on_exception=False
+                )
+            except Exception as exc:  # noqa: BLE001
+                error("test_alerts_failed", exc_info=exc)
+                total_sent = 0
+            else:
+                total_sent = sum(1 for ok in results if ok)
         else:
             total_sent = 0
 
