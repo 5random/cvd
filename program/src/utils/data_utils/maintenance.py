@@ -3,6 +3,7 @@ from __future__ import annotations
 import time
 from pathlib import Path
 from typing import Any, Tuple, List
+from concurrent.futures import Future
 
 from src.utils.data_utils.indexing import DataCategory, DirectoryEventHandler
 from program.src.utils.log_service import info, warning, error, debug
@@ -15,13 +16,26 @@ class MaintenanceManager:
     def __init__(self, manager: "DataManager") -> None:
         self._manager = manager
         self._observer = None
-        self._background_tasks: List[Tuple[ManagedThreadPool, Any]] = []
+        self._background_tasks: List[Tuple[ManagedThreadPool, Future[Any]]] = []
+
+    def _track(self, pool: ManagedThreadPool, fut: Future[Any]) -> None:
+        """Track a background task and remove it from the list when done."""
+
+        self._background_tasks.append((pool, fut))
+
+        def _remove(f: Future[Any]) -> None:
+            try:
+                self._background_tasks.remove((pool, f))
+            except ValueError:  # pragma: no cover - double remove
+                pass
+
+        fut.add_done_callback(_remove)
 
     def start_worker(self) -> None:
         mgr = get_thread_pool_manager()
         pool = mgr.get_pool(ThreadPoolType.FILE_IO)
         fut = pool.submit_task(lambda: self._background_worker(), task_id="data_maintenance")
-        self._background_tasks.append((pool, fut))
+        self._track(pool, fut)
 
     def shutdown(self) -> None:
         for pool, fut in self._background_tasks:
