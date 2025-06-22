@@ -27,7 +27,7 @@ from program.src.controllers import controller_manager as controller_manager_mod
 from program.src.controllers.algorithms.motion_detection import (
     MotionDetectionController,
 )
-from program.src.controllers.controller_base import ControllerConfig
+from program.src.controllers.controller_base import ControllerConfig, ControllerStatus
 from program.src.controllers.controller_manager import ControllerManager
 from program.src.controllers.controller_utils.camera_utils import (
     apply_uvc_settings,
@@ -421,6 +421,10 @@ class SimpleGUIApplication:
                     parameters={"device_index": 0},
                 )
                 self.camera_controller = CameraCaptureController("camera_capture", cfg)
+
+            if self.camera_controller.status == ControllerStatus.RUNNING:
+                return
+
             await self.camera_controller.start()
 
         async def _stop():
