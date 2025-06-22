@@ -161,8 +161,6 @@ class SimpleGUIApplication:
         # Load persisted alert configurations or fall back to demo data
         self.alert_configurations = load_alert_configs(self.config_service)
         self._alert_configs_from_disk = bool(self.alert_configurations)
-        if not self.alert_configurations:
-            self.alert_configurations = create_demo_configurations()
         self.alert_display = EmailAlertStatusDisplay(self.alert_configurations)
         self.alert_display.update_callback = self._on_alert_config_changed
 
