@@ -7,6 +7,7 @@ import contextlib
 from concurrent.futures import Future
 from src.utils.concurrency.thread_pool import get_thread_pool_manager, ThreadPoolType
 from src.data_handler.interface.sensor_interface import SensorReading
+import logging
 from src.utils.log_service import info, warning, error, debug
 import threading
 import time
@@ -184,7 +185,9 @@ class DataSaver:
             ).preserve_original
 
             if not preserve and file_path.exists():
-                warning(f"Source file was not deleted after compression: {file_path}")
+                msg = f"Source file was not deleted after compression: {file_path}"
+                warning(msg)
+                logging.getLogger("cvd_tracker.error").warning(msg)
 
             if preserve:
                 info(f"Compressed file {file_path} -> {compressed_path}")
@@ -217,7 +220,9 @@ class DataSaver:
             ).preserve_original
 
             if not preserve and file_path.exists():
-                warning(f"Source file was not deleted after compression: {file_path}")
+                msg = f"Source file was not deleted after compression: {file_path}"
+                warning(msg)
+                logging.getLogger("cvd_tracker.error").warning(msg)
 
             if preserve:
                 info(f"Compressed file {file_path} -> {compressed_path}")
