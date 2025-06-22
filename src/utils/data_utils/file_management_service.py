@@ -106,7 +106,7 @@ class FileMaintenanceService:
         except Exception as e:
             error(f"Error compressing files: {e}")
 
-    def _compress_file(self, file_path: Path) -> None:
+    def _compress_file(self, file_path: Path) -> Optional[Path]:
         """Helper to compress a single file synchronously."""
         # Ensure compression service is available
         if not self.compression_service:
@@ -118,7 +118,7 @@ class FileMaintenanceService:
             compressed_path = (
                 compressed_dir / f"{file_path.stem}_{int(time.time())}.csv.gz"
             )
-            self.compression_service.compress_file(str(file_path), str(compressed_path))
+            result = self.compression_service.compress_file(str(file_path), str(compressed_path))
 
             preserve = False
             settings = getattr(self.compression_service, "_compression_settings", None)
@@ -130,11 +130,14 @@ class FileMaintenanceService:
                     file_path.unlink()
                 except Exception:
                     pass
+                if file_path.exists():
+                    warning(f"Source file was not deleted after compression: {file_path}")
 
             if preserve:
                 info(f"Compressed file {file_path} -> {compressed_path}")
             else:
                 info(f"Compressed and removed {file_path} -> {compressed_path}")
+            return result
         except Exception as e:
             error(f"Failed to compress {file_path}: {e}")
 

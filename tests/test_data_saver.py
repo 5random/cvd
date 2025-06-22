@@ -1,4 +1,5 @@
 import os
+import logging
 from pathlib import Path
 import time
 import threading
@@ -28,9 +29,11 @@ def create_reading(sensor_id: str = "s1") -> SensorReading:
     return SensorReading(sensor_id, 1.0, time.time(), SensorStatus.OK)
 
 
-def test_data_saver_sync_compression(tmp_path, monkeypatch):
+def test_data_saver_sync_compression(tmp_path, monkeypatch, caplog):
     dummy = DummyCompressionService()
     monkeypatch.setattr(ds_module, "get_compression_service", lambda: dummy)
+
+    caplog.set_level(logging.WARNING, logger="cvd_tracker.error")
 
     saver = ds_module.DataSaver(
         base_output_dir=tmp_path,
@@ -43,6 +46,7 @@ def test_data_saver_sync_compression(tmp_path, monkeypatch):
         saver.save(create_reading())
 
     saver.flush_all()
+    assert any("Source file was not deleted" in r.message for r in caplog.records)
 
     compressed_dir = tmp_path / "raw" / "compressed"
     compressed_files = list(compressed_dir.glob("*.csv.gz"))

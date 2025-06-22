@@ -28,3 +28,26 @@ async def test_pipeline_process_error():
     pipe.add_stage(FailingStage("fail"))
     result = await pipe.process(1)
     assert not result.success
+
+@pytest.mark.asyncio
+async def test_pipeline_clear_stats_resets_stage_stats():
+    pipe = DataPipeline("p3")
+    s1 = AddOneStage("s1")
+    s2 = FailingStage("s2")
+    pipe.add_stage(s1)
+    pipe.add_stage(s2)
+
+    result = await pipe.process(1)
+    assert not result.success
+    assert s1._processing_time > 0
+    assert s2._processing_time > 0
+    assert s2._error_count == 1
+
+    pipe.clear_stats()
+
+    assert pipe.get_pipeline_stats()["total_processed"] == 0
+    assert pipe.get_pipeline_stats()["total_errors"] == 0
+    assert s1._processing_time == 0.0
+    assert s2._processing_time == 0.0
+    assert s1._error_count == 0
+    assert s2._error_count == 0

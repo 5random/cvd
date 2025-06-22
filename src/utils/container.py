@@ -286,8 +286,10 @@ class ApplicationContainer:
 
         # Shutdown async services synchronously
         async def _async_shutdown() -> None:
-            await self.sensor_manager.shutdown()
-            await self.web_application.shutdown()
+            await asyncio.gather(
+                asyncio.create_task(self.sensor_manager.shutdown()),
+                asyncio.create_task(self.web_application.shutdown()),
+            )
 
         try:
             try:
@@ -296,8 +298,8 @@ class ApplicationContainer:
                 loop = None
 
             if loop and loop.is_running():
-                loop.run_until_complete(self.sensor_manager.shutdown())
-                loop.run_until_complete(self.web_application.shutdown())
+                future = asyncio.run_coroutine_threadsafe(_async_shutdown(), loop)
+                future.result()
             else:
                 asyncio.run(_async_shutdown())
         except Exception as e:

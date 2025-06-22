@@ -5,6 +5,8 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "cvd"
 version = "0.1.0"
+description = "Application for collecting sensor data, processing it with controllers and displaying results through a NiceGUI interface"
+license = "MIT"
 requires-python = ">=3.11"
 dependencies = [
     "plotly",
@@ -13,8 +15,6 @@ dependencies = [
     "pyserial",
     "opencv-python",
     "Pillow",
-    "pytest",
-    "pytest-asyncio",
     "watchdog",
     "jsonschema",
     "setuptools",

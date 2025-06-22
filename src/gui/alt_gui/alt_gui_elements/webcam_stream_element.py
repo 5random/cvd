@@ -720,6 +720,7 @@ class WebcamStreamElement:
             self.start_camera_btn.props("color=positive")
             self.camera_active = False
             if self._camera_toggle_cb:
+
                 if inspect.iscoroutinefunction(self._camera_toggle_cb):
                     asyncio.create_task(self._camera_toggle_cb())
                 else:

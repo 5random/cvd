@@ -214,6 +214,8 @@ class CompressionService:
                 if not self._compression_settings.preserve_original:
                     file_path.unlink()
                     debug(f"Removed original file: {file_path}")
+                    if file_path.exists():
+                        warning(f"Source file was not deleted: {file_path}")
                 
                 info(f"Compressed {data_type} file: {file_path} -> {output_path}")
                 return output_path

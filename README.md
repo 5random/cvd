@@ -52,9 +52,10 @@ python scripts/update_requirements.py
 
 
 The installed package includes a `config/` directory containing the default
-configuration file as well as sample data under `data/`.  When installing with
-`pip install .`, these files are placed inside the package directory so the
-application can be started without additional setup.
+configuration file. Directories used for runtime data such as
+`data/experiment_data`, `data/experiments` and `data/processed` are not
+tracked in version control. They will be created automatically the first time
+you run the application or you can create them manually if needed.
 
 The repository also ships with example configurations located in
 `program/config`.  These files illustrate typical setups and can serve as a
@@ -174,7 +175,7 @@ pre-commit run --all-files
 
 ## Changelog
 
-- Fixed log viewer error caused by removed `last_args` attribute in NiceGUI ScrollArea.
+- See [CHANGELOG](CHANGELOG.md) for a list of recent updates.
 
 ## License
 
