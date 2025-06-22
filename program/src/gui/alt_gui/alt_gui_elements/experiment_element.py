@@ -72,8 +72,8 @@ class ExperimentManagementSection:
                         "Experiment Name",
                         placeholder="Enter experiment name",
                         value=self.settings["experiment_name"],
+                        on_change=self._on_name_change,
                     )
-                    .on("update:model-value", self._on_name_change)
                     .classes("w-full")
                 )
 
@@ -83,8 +83,8 @@ class ExperimentManagementSection:
                         value=self.settings["duration"],
                         min=1,
                         max=100000,
+                        on_change=self._on_duration_change,
                     )
-                    .on("update:model-value", self._on_duration_change)
                     .classes("w-full")
                 )
 
@@ -94,27 +94,23 @@ class ExperimentManagementSection:
                     self.record_motion_data_checkbox = ui.checkbox(
                         "Record motion detection data",
                         value=self.settings["record_motion_data"],
-                    ).on(
-                        "update:model-value",
-                        lambda e: self._on_checkbox_change(
+                        on_change=lambda e: self._on_checkbox_change(
                             "record_motion_data", e.value
                         ),
                     )
                     self.record_timestamps_checkbox = ui.checkbox(
                         "Record event timestamps",
                         value=self.settings["record_timestamps"],
-                    ).on(
-                        "update:model-value",
-                        lambda e: self._on_checkbox_change(
+                        on_change=lambda e: self._on_checkbox_change(
                             "record_timestamps", e.value
                         ),
                     )
                     self.save_alerts_checkbox = ui.checkbox(
                         "Save alert events",
                         value=self.settings["save_alerts"],
-                    ).on(
-                        "update:model-value",
-                        lambda e: self._on_checkbox_change("save_alerts", e.value),
+                        on_change=lambda e: self._on_checkbox_change(
+                            "save_alerts", e.value
+                        ),
                     )
 
             # Control buttons
@@ -162,16 +158,14 @@ class ExperimentManagementSection:
 
     def _on_name_change(self, event) -> None:
         """Update experiment name in settings."""
-        value = getattr(event, "value", None)
-        if value is not None:
-            self.settings["experiment_name"] = value
+        if hasattr(event, "value"):
+            self.settings["experiment_name"] = event.value
 
     def _on_duration_change(self, event) -> None:
         """Update experiment duration in settings."""
-        value = getattr(event, "value", None)
-        if value is not None:
+        if hasattr(event, "value"):
             try:
-                self.settings["duration"] = int(value)
+                self.settings["duration"] = int(event.value)
             except (TypeError, ValueError):
                 return
 
