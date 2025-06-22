@@ -32,11 +32,17 @@ class WebcamStreamElement:
         self.camera_active = False
         self.recording = False
         self._on_camera_status_change = on_camera_status_change
-        settings = settings or {"sensitivity": 50, "fps": 30, "roi_enabled": False}
+        settings = settings or {
+            "sensitivity": 50,
+            "fps": 30,
+            "roi_enabled": False,
+        }
         self.settings = settings
         self.callbacks = callbacks or {}
         # Store explicit camera toggle callback or look it up in callbacks dict
-        self._camera_toggle_cb = camera_toggle_cb or self.callbacks.get("camera_toggle")
+        self._camera_toggle_cb = camera_toggle_cb or self.callbacks.get(
+            "camera_toggle"
+        )
         # Callback for ROI updates (defaults to callbacks['set_roi'])
         self._roi_update_cb = self.callbacks.get("set_roi")
         # Store currently selected ROI
@@ -62,8 +68,10 @@ class WebcamStreamElement:
                     ui.card()
                     .classes("border-2 border-dashed border-gray-300")
                     .style(
-                        "width: 640px; height: 480px; background-color: #f5f5f5; "
-                        "display: flex; align-items: center; justify-content: center;"
+                        "width: 640px; height: 480px; "
+                        "background-color: #f5f5f5; "
+                        "display: flex; align-items: center; "
+                        "justify-content: center;"
                     )
                 ):
                     # Image element displaying the MJPEG stream
@@ -89,11 +97,15 @@ class WebcamStreamElement:
                         ui.separator()
                         ui.menu_item(
                             "Adjust ROI",
-                            on_click=self.callbacks.get("adjust_roi", self.adjust_roi),
+                            on_click=self.callbacks.get(
+                                "adjust_roi", self.adjust_roi
+                            ),
                         )
                         ui.menu_item(
                             "Reset View",
-                            on_click=self.callbacks.get("reset_view", lambda: None),
+                            on_click=self.callbacks.get(
+                                "reset_view", lambda: None
+                            ),
                         )
                         # Recording toggle menu item
                         self.record_menu_item = ui.menu_item(
@@ -308,8 +320,12 @@ class WebcamStreamElement:
                         )
 
                         # Bind values
-                        self.contrast_slider.bind_value(self.contrast_number, "value")
-                        self.contrast_number.bind_value(self.contrast_slider, "value")
+                        self.contrast_slider.bind_value(
+                            self.contrast_number, "value"
+                        )
+                        self.contrast_number.bind_value(
+                            self.contrast_slider, "value"
+                        )
 
                     # Saturation Control
                     ui.label("Saturation").classes("text-xs text-gray-600")
@@ -417,8 +433,12 @@ class WebcamStreamElement:
                         )
 
                         # Bind values
-                        self.sharpness_slider.bind_value(self.sharpness_number, "value")
-                        self.sharpness_number.bind_value(self.sharpness_slider, "value")
+                        self.sharpness_slider.bind_value(
+                            self.sharpness_number, "value"
+                        )
+                        self.sharpness_number.bind_value(
+                            self.sharpness_slider, "value"
+                        )
                     # Exposure & Advanced Controls
                     ui.label("Exposure & Advanced").classes(
                         "text-sm font-medium text-gray-700 mb-2"
@@ -463,13 +483,17 @@ class WebcamStreamElement:
                             .style("min-width: 200px; height: 40px;")
                         )
 
-                        # Initially disable manual controls since auto is enabled by default
+                        # Disable manual controls since auto is default
                         self.wb_manual_number.disable()
                         self.wb_manual_slider.disable()
 
                         # Bind values
-                        self.wb_manual_slider.bind_value(self.wb_manual_number, "value")
-                        self.wb_manual_number.bind_value(self.wb_manual_slider, "value")
+                        self.wb_manual_slider.bind_value(
+                            self.wb_manual_number, "value"
+                        )
+                        self.wb_manual_number.bind_value(
+                            self.wb_manual_slider, "value"
+                        )
 
                     # Exposure Control
                     ui.label("Exposure").classes("text-xs text-gray-600")
@@ -487,7 +511,8 @@ class WebcamStreamElement:
                                 max=1000,
                                 step=1,
                                 on_change=self.callbacks.get(
-                                    "update_exposure_manual", lambda value: None
+                                    "update_exposure_manual",
+                                    lambda value: None,
                                 ),
                             )
                             .classes("w-24")
@@ -500,7 +525,8 @@ class WebcamStreamElement:
                                 value=UVC_DEFAULTS["exposure"],
                                 step=1,
                                 on_change=self.callbacks.get(
-                                    "update_exposure_manual", lambda value: None
+                                    "update_exposure_manual",
+                                    lambda value: None,
                                 ),
                             )
                             .props("thumb-label")
@@ -510,7 +536,7 @@ class WebcamStreamElement:
 
                         # note: on_change passed above in constructor
 
-                        # Initially disable manual controls since auto is enabled by default
+                        # Disable manual controls as auto is default
                         self.exposure_manual_number.disable()
                         self.exposure_manual_slider.disable()
                         # Bind values
@@ -588,11 +614,17 @@ class WebcamStreamElement:
                         )
 
                         # Bind values
-                        self.gamma_slider.bind_value(self.gamma_number, "value")
-                        self.gamma_number.bind_value(self.gamma_slider, "value")
+                        self.gamma_slider.bind_value(
+                            self.gamma_number, "value"
+                        )
+                        self.gamma_number.bind_value(
+                            self.gamma_slider, "value"
+                        )
 
                     # Backlight Compensation Control
-                    ui.label("Backlight Compensation").classes("text-xs text-gray-600")
+                    ui.label("Backlight Compensation").classes(
+                        "text-xs text-gray-600"
+                    )
                     with ui.row().classes("gap-3 items-center mb-4 w-full"):
                         self.backlight_comp_number = (
                             ui.number(
@@ -732,7 +764,7 @@ class WebcamStreamElement:
         layer = None
 
         def on_mouse(e: events.MouseEventArguments) -> None:
-            nonlocal start, layer
+            nonlocal start
             if e.type == "mousedown":
                 start = {"x": e.image_x, "y": e.image_y}
                 if layer:
@@ -744,8 +776,9 @@ class WebcamStreamElement:
                 y2 = max(start["y"], e.image_y)
                 if layer:
                     layer.content = (
-                        f'<rect x="{x1}" y="{y1}" width="{x2 - x1}" height="{y2 - y1}" '
-                        f'stroke="red" fill="none" stroke-width="2" />'
+                        f'<rect x="{x1}" y="{y1}" width="{x2 - x1}" '
+                        f'height="{y2 - y1}" stroke="red" fill="none" '
+                        f'stroke-width="2" />'
                     )
                 if e.type == "mouseup":
                     self.roi_x = int(x1)
@@ -757,7 +790,9 @@ class WebcamStreamElement:
                     if self._roi_update_cb:
                         self._roi_update_cb()
                     notify_later(
-                        f"ROI set to ({self.roi_x}, {self.roi_y}, {self.roi_width}, {self.roi_height})",
+                        f"ROI set to ("
+                        f"{self.roi_x}, {self.roi_y}, "
+                        f"{self.roi_width}, {self.roi_height})",
                         type="positive",
                     )
                     dialog.close()

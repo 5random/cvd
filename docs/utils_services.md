@@ -30,6 +30,11 @@ log = get_log_service()
 log.info("message")
 ```
 
+If no :class:`ConfigurationService` has been registered prior to calling
+``get_log_service()``, the logger initialises one automatically using the
+project's ``config`` directory. This mirrors the default used by
+``ApplicationContainer``.
+
 ### Migrating imports
 
 Legacy import paths using the old `config_utils` or `log_utils` packages have been removed. Update any code to import directly from `src.utils.config_service` and `src.utils.log_service`.
