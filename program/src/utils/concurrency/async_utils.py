@@ -355,8 +355,9 @@ class AsyncTaskManager:
         if task is None:
             return False
         if task.done():
+            result = task.exception()
             self._tasks.pop(task_id, None)
-            return True
+            return result is None
         task.cancel()
         try:
             await asyncio.wait_for(task, timeout)
