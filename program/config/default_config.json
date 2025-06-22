@@ -45,7 +45,10 @@
     "thread_pool": {"auto_scale": true, "min_workers": 1, "max_workers": 4},
     "process_pool": {"max_workers": 2, "task_timeout_s": 60},
     "sensor_reconnect_attempts": 3,
+
     "disable_sensors": false,
+    "disable_hardware_sensors": false,
+
     "controller_concurrency_limit": 10,
     "controller_manager": {"processing_interval_ms": 30},
     "monitoring": {

@@ -6,6 +6,8 @@ This project implements the **CVD Tracker** application used to collect
 data from various sensors, process it with controllers and display results
 through a NiceGUI based interface.  A short description of the architecture
 and main modules can be found in [docs/architecture.md](docs/architecture.md).
+For a quick overview of how controllers feed into each other see
+[docs/architecture.md#controller-dependencies](docs/architecture.md#controller-dependencies).
 Example snippets demonstrating typical usage are available in
 [docs/examples.md](docs/examples.md).
 An overview of the configuration and logging utilities lives in
@@ -57,10 +59,23 @@ configuration file. Directories used for runtime data such as
 tracked in version control. They will be created automatically the first time
 you run the application or you can create them manually if needed.
 
+
 The repository also ships with example configurations located in
 `program/config`.  These files illustrate typical setups and can serve as a
 starting point for your own configuration.  The top-level `config/` directory is
 only used by the test suite and should not be modified for normal operation.
+
+## Configuration
+
+Configuration values are loaded from `config.json` and merged with
+`default_config.json`. Set ``CVD_CONFIG_DIR`` or pass ``--config-dir`` to point to
+your configuration folder.
+
+The following option can be used to run the application without physical sensor
+hardware:
+
+* ``disable_hardware_sensors`` – when ``true`` hardware based sensors such as
+  ``ArduinoTCSensor`` and ``RS232Sensor`` will not be registered.
 
 ## Usage
 

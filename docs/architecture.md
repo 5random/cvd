@@ -10,6 +10,15 @@ Sensor implementations live in `src/data_handler/sources` and adhere to the `Sen
 
 Controllers implement processing algorithms that operate on sensor data. They are managed by `ControllerManager` under `src/controllers`. Controllers can depend on the outputs of other controllers. The manager handles creation from configuration, dependency resolution and orchestrated execution when new sensor data arrives.
 
+## Controller Dependencies
+
+Controllers may form pipelines by consuming the outputs of other controllers. The
+default setup connects the `camera_capture` controller to `motion_detection` so
+that video frames feed directly into the motion algorithm. Additional
+dependencies can be defined in configuration, for example feeding
+`motion_detection` results into a `reactor_state` controller. The manager resolves
+these links at startup so each controller receives the appropriate inputs.
+
 ## GUI
 
 The user interface is implemented with NiceGUI in `src/gui`. The `WebApplication` class wires together different tab components for sensors, controllers, experiments and log viewing. It also starts background tasks that periodically process data via `ControllerManager`. Routes and layouts are registered when starting the GUI and the application can be run headless for tests.

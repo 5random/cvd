@@ -34,8 +34,16 @@ SENSOR_REGISTRY: Dict[str, SensorFactory] = {
 }
 
 
-def load_entry_point_sensors(group: str = "cvd.sensors") -> None:
-    """Load sensor implementations from entry points."""
+def load_entry_point_sensors(
+    group: str = "cvd.sensors", disable_hardware: bool = False
+) -> None:
+    """Load sensor implementations from entry points.
+
+    Args:
+        group: Entry point group name
+        disable_hardware: When ``True`` skip registering hardware sensor types
+            such as :class:`ArduinoTCSensor` and :class:`RS232Sensor`.
+    """
     try:
         importlib.invalidate_caches()
         eps = importlib.metadata.entry_points()
@@ -52,6 +60,10 @@ def load_entry_point_sensors(group: str = "cvd.sensors") -> None:
                 "mock_rs232",
             }:
                 SENSOR_REGISTRY.pop(name, None)
+
+        if disable_hardware:
+            SENSOR_REGISTRY.pop("arduino_tc_board", None)
+            SENSOR_REGISTRY.pop("rs232", None)
 
         for ep in selected:
             try:
