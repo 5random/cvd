@@ -7,6 +7,8 @@ from src.controllers.algorithms.motion_detection import MotionDetectionResult
 
 
 class MotionStatusSection:
+    """Class to create a motion detection status section in the UI"""
+
     def __init__(
         self,
         settings: Optional[dict] = None,
@@ -41,8 +43,6 @@ class MotionStatusSection:
         def motion_status_page():
             # Create the motion status section
             self.create_motion_status_section()
-
-    """Class to create a motion detection status section in the UI"""
 
     def create_motion_status_section(self):
         with ui.card().classes("cvd-card w-full"):
