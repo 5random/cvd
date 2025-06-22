@@ -24,8 +24,9 @@ def test_entry_point_registration(monkeypatch):
     from program.src.data_handler.sources import sensor_source_manager as manager
 
     importlib.reload(manager)
-    # Reload may return the existing module due to src/program aliasing,
-    # so ensure entry point sensors are loaded explicitly
+    # Reload may return the existing module due to src/program aliasing.
+    # After applying the monkeypatch and reloading the module, explicitly
+    # load entry point sensors so the dummy factory is registered.
     manager.load_entry_point_sensors()
 
     assert "dummy" in manager.SENSOR_REGISTRY
