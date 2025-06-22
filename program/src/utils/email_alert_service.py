@@ -1,7 +1,7 @@
 """Email alerting service for critical controller states."""
 import smtplib
 from email.message import EmailMessage
-from typing import Optional, List, Dict, Iterable, Union
+from typing import Optional, List, Dict, Iterable, Union, Any
 from datetime import datetime
 
 from program.src.utils.config_service import get_config_service, ConfigurationService
@@ -16,7 +16,8 @@ class EmailAlertService:
         if self._config_service is None:
             raise ValueError("Configuration service not available")
         self._load_configuration()
-        self._history: List[Dict[str, str]] = []
+        # store sent alert metadata including attachment flag
+        self._history: List[Dict[str, str | bool]] = []
 
     @property
     def recipient(self) -> Optional[str]:
@@ -123,7 +124,7 @@ class EmailAlertService:
             error(f"Failed to send alert email: {exc}")
             return False
 
-    def get_history(self, limit: int = 50) -> List[Dict[str, str]]:
+    def get_history(self, limit: int = 50) -> List[Dict[str, str | bool]]:
         """Return a list of recently sent alerts."""
         return self._history[-limit:]
 
