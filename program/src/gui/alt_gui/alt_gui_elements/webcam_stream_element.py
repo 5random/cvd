@@ -732,7 +732,7 @@ class WebcamStreamElement:
         layer = None
 
         def on_mouse(e: events.MouseEventArguments) -> None:
-            nonlocal start, layer
+            nonlocal start
             if e.type == "mousedown":
                 start = {"x": e.image_x, "y": e.image_y}
                 if layer:
