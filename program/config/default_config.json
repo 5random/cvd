@@ -57,7 +57,8 @@
         "smtp_host": "smtp.example.com",
         "smtp_port": 587,
         "smtp_user": "user",
-        "smtp_password": "pass",
+        "smtp_password": "CHANGE_ME",
+        "smtp_password_comment": "Real credentials must be provided via environment variables",
         "critical_state_timeout_s": 60
     },
     "security": {
