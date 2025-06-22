@@ -3,10 +3,7 @@ import numpy as np
 
 import pytest
 
-from src.controllers.controller_utils.controller_data_sources.camera_capture_controller import (
-    CameraCaptureController,
-)
-from src.controllers.algorithms.motion_detection import MotionDetectionController
+from src.controllers.webcam import CameraCaptureController, MotionDetectionController
 from src.controllers.controller_base import ControllerConfig, ControllerInput
 
 
@@ -56,7 +53,7 @@ async def immediate(fn, *args, **kwargs):
 
 @pytest.mark.asyncio
 async def test_camera_capture_recovery(monkeypatch):
-    from src.controllers.controller_utils import controller_data_sources
+    from src.controllers import webcam as controller_data_sources
 
     cap_module = controller_data_sources.camera_capture_controller
 
@@ -110,7 +107,7 @@ async def test_camera_capture_recovery(monkeypatch):
 
 @pytest.mark.asyncio
 async def test_reinitialize_on_none(monkeypatch):
-    from src.controllers.controller_utils import controller_data_sources
+    from src.controllers import webcam as controller_data_sources
 
     cap_module = controller_data_sources.camera_capture_controller
 
@@ -164,7 +161,7 @@ async def test_reinitialize_on_none(monkeypatch):
 
 @pytest.mark.asyncio
 async def test_reopen_after_failures(monkeypatch):
-    from src.controllers.controller_utils import controller_data_sources
+    from src.controllers import webcam as controller_data_sources
 
     cap_module = controller_data_sources.camera_capture_controller
 

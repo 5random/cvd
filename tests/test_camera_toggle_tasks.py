@@ -3,6 +3,12 @@ import types
 
 import pytest
 
+from .test_alt_gui import (
+    simple_gui_app,
+    mock_controller_manager,
+    mock_config_service,
+)
+
 from src.controllers.controller_base import ControllerStatus
 
 class DummyButton:

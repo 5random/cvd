@@ -154,6 +154,8 @@ The motion detection controller can rely on another controller for camera frames
 
 Set ``input_controllers`` to the ID of a ``camera_capture`` controller to disable
 its internal capture loop and use the external source instead.
+Webcam related controllers, including ``camera_capture`` and ``motion_detection``,
+live in the ``src/controllers/webcam`` subpackage.
 
 ### Disable sensors
 

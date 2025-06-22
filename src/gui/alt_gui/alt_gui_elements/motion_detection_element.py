@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import Optional, Callable
 
 from src.controllers.controller_manager import ControllerManager
-from src.controllers.algorithms.motion_detection import MotionDetectionResult
+from src.controllers.webcam import MotionDetectionResult
 
 
 class MotionStatusSection:
