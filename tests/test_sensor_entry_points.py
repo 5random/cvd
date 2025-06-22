@@ -24,6 +24,7 @@ def test_entry_point_registration(monkeypatch):
     from program.src.data_handler.sources import sensor_source_manager as manager
 
     importlib.reload(manager)
+    manager.load_entry_point_sensors()
 
     assert "dummy" in manager.SENSOR_REGISTRY
     assert manager.SENSOR_REGISTRY["dummy"] is dummy_sensor_factory

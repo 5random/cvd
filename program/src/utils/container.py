@@ -270,14 +270,37 @@ class ApplicationContainer:
 
         # Shutdown async services synchronously
         try:
-            asyncio.run(self.sensor_manager.shutdown())
-        except Exception as e:
-            error(f"Error shutting down sensor manager: {e}")
+            loop_running = True
+            try:
+                asyncio.get_running_loop()
+            except RuntimeError:
+                loop_running = False
 
-        try:
-            asyncio.run(self.web_application.shutdown())
+            if loop_running:
+                import threading
+
+                def _shutdown_async():
+                    new_loop = asyncio.new_event_loop()
+                    asyncio.set_event_loop(new_loop)
+                    tasks = [
+                        new_loop.create_task(self.sensor_manager.shutdown()),
+                        new_loop.create_task(self.web_application.shutdown()),
+                    ]
+                    try:
+                        new_loop.run_until_complete(
+                            asyncio.gather(*tasks, return_exceptions=True)
+                        )
+                    finally:
+                        new_loop.close()
+
+                thread = threading.Thread(target=_shutdown_async, daemon=True)
+                thread.start()
+                thread.join()
+            else:
+                asyncio.run(self.sensor_manager.shutdown())
+                asyncio.run(self.web_application.shutdown())
         except Exception as e:
-            error(f"Error shutting down web application: {e}")
+            error(f"Error shutting down async services: {e}")
 
         # Close data saver
         try:
