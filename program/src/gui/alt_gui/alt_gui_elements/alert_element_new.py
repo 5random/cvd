@@ -505,7 +505,12 @@ class EmailAlertWizard:
             emails.remove(email)
             self._update_email_list(email_list, step2_feedback, step2_next_btn)
 
-    def _update_email_list(self, email_list, step2_feedback: Optional[Any] = None, step2_next_btn: Optional[Any] = None):
+    def _update_email_list(
+        self,
+        email_list,
+        step2_feedback: Optional[Any] = None,
+        step2_next_btn: Optional[Any] = None,
+    ):
         """Update the email list display"""
         email_list.clear()
 
@@ -534,10 +539,17 @@ class EmailAlertWizard:
 
     def _validate_step2(self, step2_feedback, step2_next_btn):
         """Validate Step 2: Email Addresses"""
-        if len(self.alert_data["emails"]) > 0:
+        emails = self.alert_data["emails"]
+        invalid = [e for e in emails if not self._is_valid_email(e)]
+
+        if invalid:
             step2_feedback.text = (
-                f'✓ {len(self.alert_data["emails"])} email address(es) configured'
+                "Invalid email address(es) found. Please correct them to continue."
             )
+            step2_feedback.classes("text-sm text-orange-600 mt-2")
+            step2_next_btn.disable()
+        elif emails:
+            step2_feedback.text = f"✓ {len(emails)} email address(es) configured"
             step2_feedback.classes("text-sm mt-2 text-green-600")
             step2_next_btn.enable()
         else:
