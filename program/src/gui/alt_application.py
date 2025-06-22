@@ -1247,14 +1247,18 @@ class SimpleGUIApplication:
             except Exception:
                 self.supported_camera_modes = []
             success = await self.controller_manager.start_all_controllers()
-            self._processing_task = asyncio.create_task(self._processing_loop())
+
             if success:
+                self._processing_task = asyncio.create_task(self._processing_loop())
+                # Ensure camera status reflects that controllers started
+                self.camera_active = True
                 self.update_camera_status(True)
             else:
                 ui.notify(
                     "Some controllers failed to start",
                     type="warning",
                 )
+                error("Failed to start controllers")
 
         @app.on_shutdown
         async def _shutdown() -> None:
