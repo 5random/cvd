@@ -1275,6 +1275,7 @@ class SimpleGUIApplication:
                                 error(
                                     f"Camera failed to provide frames for {timeout} seconds"
                                 )
+
                                 if placeholder_bytes is None:
                                     placeholder = np.zeros((10, 10, 3), dtype=np.uint8)
                                     success, buf = cv2.imencode(".jpg", placeholder)
