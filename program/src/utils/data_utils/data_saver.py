@@ -2,6 +2,7 @@ import csv
 import os
 from pathlib import Path
 from typing import Dict, Tuple, IO, Any, Optional, List
+from types import SimpleNamespace
 import contextlib
 from concurrent.futures import Future
 from src.utils.concurrency.thread_pool import get_thread_pool_manager, ThreadPoolType
@@ -161,7 +162,7 @@ class DataSaver:
 
     def _compress_file_async(
         self, file_path: Path, sensor_id: str, category: str
-    ) -> None:
+    ) -> Optional[Path]:
         """Compress file asynchronously."""
         if not self._compression_available:
             warning(f"Compression not available for {file_path}")
@@ -174,18 +175,27 @@ class DataSaver:
             compressed_path = (
                 compressed_dir / f"{file_path.stem}_{int(time.time())}.csv.gz"
             )
-            self.compression_service.compress_file(str(file_path), str(compressed_path))
+            result = self.compression_service.compress_file(str(file_path), str(compressed_path))
 
-            # CompressionService handles removal when preserve_original is False
-            if self.compression_service._compression_settings.preserve_original:
+            preserve = getattr(
+                self.compression_service,
+                "_compression_settings",
+                SimpleNamespace(preserve_original=False),
+            ).preserve_original
+
+            if not preserve and file_path.exists():
+                warning(f"Source file was not deleted after compression: {file_path}")
+
+            if preserve:
                 info(f"Compressed file {file_path} -> {compressed_path}")
             else:
                 info(f"Compressed and removed {file_path} -> {compressed_path}")
+            return result
 
         except Exception as e:
             error(f"Failed to compress {file_path}: {e}")
 
-    def _compress_file_sync(self, file_path: Path) -> None:
+    def _compress_file_sync(self, file_path: Path) -> Optional[Path]:
         """Compress file synchronously."""
         if not self._compression_available:
             warning(f"Compression not available for {file_path}")
@@ -198,12 +208,22 @@ class DataSaver:
             compressed_path = (
                 compressed_dir / f"{file_path.stem}_{int(time.time())}.csv.gz"
             )
-            self.compression_service.compress_file(str(file_path), str(compressed_path))
+            result = self.compression_service.compress_file(str(file_path), str(compressed_path))
 
-            if self.compression_service._compression_settings.preserve_original:
+            preserve = getattr(
+                self.compression_service,
+                "_compression_settings",
+                SimpleNamespace(preserve_original=False),
+            ).preserve_original
+
+            if not preserve and file_path.exists():
+                warning(f"Source file was not deleted after compression: {file_path}")
+
+            if preserve:
                 info(f"Compressed file {file_path} -> {compressed_path}")
             else:
                 info(f"Compressed and removed {file_path} -> {compressed_path}")
+            return result
 
         except Exception as e:
             error(f"Failed to compress {file_path}: {e}")
