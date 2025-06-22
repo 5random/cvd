@@ -66,27 +66,54 @@ class ExperimentManagementSection:
             ui.label("Quick Experiment Setup").classes("text-sm font-semibold mb-2")
 
             with ui.column().classes("gap-3"):
-                self.experiment_name_input = ui.input(
-                    "Experiment Name",
-                    placeholder="Enter experiment name",
-                    value=f'Experiment_{datetime.now().strftime("%Y%m%d_%H%M")}',
-                ).classes("w-full")
+                self.experiment_name_input = (
+                    ui.input(
+                        "Experiment Name",
+                        placeholder="Enter experiment name",
+                        value=self.settings["experiment_name"],
+                    )
+                    .on("update:model-value", self._on_name_change)
+                    .classes("w-full")
+                )
 
-                self.experiment_duration_input = ui.number(
-                    "Duration (minutes)", value=60, min=1, max=100000
-                ).classes("w-full")
+                self.experiment_duration_input = (
+                    ui.number(
+                        "Duration (minutes)",
+                        value=self.settings["duration"],
+                        min=1,
+                        max=100000,
+                    )
+                    .on("update:model-value", self._on_duration_change)
+                    .classes("w-full")
+                )
 
                 # Experiment options
                 ui.label("Recording Options").classes("text-sm font-semibold")
                 with ui.column().classes("ml-4 gap-1"):
                     self.record_motion_data_checkbox = ui.checkbox(
-                        "Record motion detection data", value=True
+                        "Record motion detection data",
+                        value=self.settings["record_motion_data"],
+                    ).on(
+                        "update:model-value",
+                        lambda e: self._on_checkbox_change(
+                            "record_motion_data", e.value
+                        ),
                     )
                     self.record_timestamps_checkbox = ui.checkbox(
-                        "Record event timestamps", value=True
+                        "Record event timestamps",
+                        value=self.settings["record_timestamps"],
+                    ).on(
+                        "update:model-value",
+                        lambda e: self._on_checkbox_change(
+                            "record_timestamps", e.value
+                        ),
                     )
                     self.save_alerts_checkbox = ui.checkbox(
-                        "Save alert events", value=False
+                        "Save alert events",
+                        value=self.settings["save_alerts"],
+                    ).on(
+                        "update:model-value",
+                        lambda e: self._on_checkbox_change("save_alerts", e.value),
                     )
 
             # Control buttons
@@ -131,6 +158,25 @@ class ExperimentManagementSection:
 
         # populate recent experiments initially
         self.load_recent_experiments()
+
+    def _on_name_change(self, event) -> None:
+        """Update experiment name in settings."""
+        value = getattr(event, "value", None)
+        if value is not None:
+            self.settings["experiment_name"] = value
+
+    def _on_duration_change(self, event) -> None:
+        """Update experiment duration in settings."""
+        value = getattr(event, "value", None)
+        if value is not None:
+            try:
+                self.settings["duration"] = int(value)
+            except (TypeError, ValueError):
+                return
+
+    def _on_checkbox_change(self, key: str, value: bool) -> None:
+        """Handle checkbox value changes."""
+        self.settings[key] = bool(value)
 
     def _format_duration(self, seconds: float) -> str:
         """Return human readable duration"""
