@@ -10,7 +10,7 @@ import asyncio
 import contextlib
 from datetime import datetime
 import sys
-from typing import Any, Dict, Optional, cast
+from typing import Any, Dict, Optional, Type, cast
 
 # Allow running this file directly without installing the package
 if __name__ == "__main__" and __package__ is None:
@@ -76,6 +76,10 @@ class SimpleGUIApplication:
         self,
         controller_manager: Optional[ControllerManager] = None,
         config_dir: Optional[Path] = None,
+        *,
+        email_alert_service_cls: (
+            Type[email_alert_service.EmailAlertService] | None
+        ) = None,
     ):
         self.camera_active = False
         self.motion_detected = False
@@ -101,9 +105,8 @@ class SimpleGUIApplication:
             else controller_manager_module.create_cvd_controller_manager()
         )
 
-        self.email_alert_service = email_alert_service.EmailAlertService(
-            self.config_service
-        )
+        cls = email_alert_service_cls or email_alert_service.EmailAlertService
+        self.email_alert_service = cls(self.config_service)
         email_alert_service.set_email_alert_service(self.email_alert_service)
         # use the already created controller manager for the experiment manager
         self.experiment_manager = ExperimentManager(
