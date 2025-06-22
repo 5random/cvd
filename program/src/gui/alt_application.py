@@ -1169,7 +1169,7 @@ class SimpleGUIApplication:
                                     + b"\r\n"
                                 )
                             break
-                    await asyncio.sleep(0.03)
+                    await asyncio.sleep(max(0.001, interval))
 
             return StreamingResponse(
                 gen(), media_type="multipart/x-mixed-replace; boundary=frame"
