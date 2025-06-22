@@ -97,11 +97,9 @@ class ApplicationContainer:
             )
 
             # Initialize web application
-            from src.gui.alt_application import 
+            from src.gui.alt_application import SimpleGUIApplication as WebApplication
 
-            web_application = WebApplication(
-                config_service=config_service
-            )
+            web_application = WebApplication(config_service=config_service)
 
             container = cls(
                 config_service=config_service,

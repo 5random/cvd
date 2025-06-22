@@ -16,6 +16,20 @@ _LAZY_ATTRS = {
     "alt_gui": ".alt_gui",
     "WebApplication": ".application",
     "SimpleGUIApplication": ".alt_application",
+    # Elements from alt_gui_elements
+    "WebcamStreamElement": ".alt_gui_elements",
+    "EmailAlertsSection": ".alt_gui_elements",
+    "ExperimentManagementSection": ".alt_gui_elements",
+    "MotionStatusSection": ".alt_gui_elements",
+    "create_compact_alert_widget": ".alt_gui_elements",
+    "create_demo_configurations": ".alt_gui_elements",
+    "create_email_alert_status_display": ".alt_gui_elements",
+    "create_email_alert_wizard": ".alt_gui_elements",
+    "EmailAlertStatusDisplay": ".alt_gui_elements",
+    "load_alert_configs": ".alt_gui_elements",
+    "save_alert_configs": ".alt_gui_elements",
+    # styling helpers
+    "setup_global_styles": ".theme",
 }
 
 
@@ -36,4 +50,3 @@ def __getattr__(name: str) -> Any:  # pragma: no cover - simple passthrough
 
 
 __all__ = list(_LAZY_ATTRS.keys())
-
