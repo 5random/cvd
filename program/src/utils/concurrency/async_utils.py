@@ -374,7 +374,8 @@ class AsyncTaskManager:
                 
         # Convert to list to freeze current tasks and avoid iteration issues
         # if callbacks modify ``_tasks`` during ``asyncio.wait``
-        _, pending = await asyncio.wait(list(self._tasks.values()), timeout=timeout)
+        tasks_list = list(self._tasks.values())
+        _, pending = await asyncio.wait(tasks_list, timeout=timeout)
 
         if pending:
             warning("pending_after_shutdown", count=len(pending))
