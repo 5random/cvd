@@ -3,9 +3,10 @@
 The module provides a NiceGUI based interface for camera control, motion
 detection, basic experiment management and email alert configuration.
 It is intended for running the application without the full desktop GUI.
-
+It expects the example configuration from ``program/config/simple_config.json``.
 Set ``"disable_sensors": true`` in the configuration to skip starting sensors
 entirely. This is useful for tests or camera-only setups.
+
 """
 
 from pathlib import Path
@@ -1401,7 +1402,9 @@ class SimpleGUIApplication:
 def main():
     """Main entry point for the simple GUI application"""
     controller_manager = controller_manager_module.create_cvd_controller_manager()
-    app = SimpleGUIApplication(controller_manager)
+    # Use the example configuration bundled with the program
+    config_dir = Path(__file__).resolve().parents[2] / "program" / "config"
+    app = SimpleGUIApplication(controller_manager, config_dir=config_dir)
 
     # Startup logic is defined in ``SimpleGUIApplication.run``.
     app.run()
@@ -1440,5 +1443,7 @@ if __name__ in {"__main__", "__mp_main__"}:
 #   python src/gui/alt_application.py
 # or
 #   python -m src.gui.alt_application
+#
+# The application uses the configuration in ``program/config/simple_config.json``.
 # The email alert section will show in the bottom-right grid area.
 # Click "Konfigurieren" to set up new alerts or "Verwalten" to view existing ones.
