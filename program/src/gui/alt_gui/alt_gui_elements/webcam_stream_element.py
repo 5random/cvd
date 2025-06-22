@@ -790,9 +790,7 @@ class WebcamStreamElement:
                     if self._roi_update_cb:
                         self._roi_update_cb()
                     notify_later(
-                        f"ROI set to ("
-                        f"{self.roi_x}, {self.roi_y}, "
-                        f"{self.roi_width}, {self.roi_height})",
+                        f"ROI set to ({self.roi_x}, {self.roi_y}, {self.roi_width}, {self.roi_height})",
                         type="positive",
                     )
                     dialog.close()
