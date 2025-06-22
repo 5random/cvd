@@ -838,6 +838,7 @@ class SimpleGUIApplication:
             self.alert_configurations.append(config)
             self.alert_display.alert_configurations = self.alert_configurations
             save_alert_configs(self.alert_configurations, self.config_service)
+            self._on_alert_config_changed()
             self._update_alerts_status()
             service = email_alert_service.get_email_alert_service()
             if service and config.get("emails"):
