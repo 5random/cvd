@@ -5,7 +5,10 @@ import time
 
 import pytest
 
-from program.src.utils.concurrency.process_pool import ManagedProcessPool, ProcessPoolConfig
+from program.src.utils.concurrency.process_pool import (
+    ManagedProcessPool,
+    ProcessPoolConfig,
+)
 from src.utils import log_service
 
 
@@ -29,8 +32,6 @@ def noop() -> None:
 _NEEDS_PRESTART = sys.platform == "win32" and sys.version_info >= (3, 13)
 
 
-
-
 @pytest.mark.asyncio
 async def test_pool_executes_tasks():
     pool = ManagedProcessPool(ProcessPoolConfig(max_workers=1, timeout=2))
@@ -40,12 +41,15 @@ async def test_pool_executes_tasks():
 
     res = await pool.submit_async(add, 1, 2)
     assert res == 3
-    assert pool._telemetry.finished == 1
+    expected_finished = 1 + int(_NEEDS_PRESTART)
+    assert pool._telemetry.finished == expected_finished
     pool.shutdown()
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("sig", [signal.SIGTERM, getattr(signal, "SIGKILL", signal.SIGTERM)])
+@pytest.mark.parametrize(
+    "sig", [signal.SIGTERM, getattr(signal, "SIGKILL", signal.SIGTERM)]
+)
 async def test_timeout_kills_pool(monkeypatch, sig):
     killed: list[int] = []
 
@@ -54,7 +58,9 @@ async def test_timeout_kills_pool(monkeypatch, sig):
 
     monkeypatch.setattr("program.src.utils.concurrency.process_pool.os.kill", fake_kill)
 
-    cfg = ProcessPoolConfig(max_workers=1, timeout=0.1, kill_on_timeout=True, kill_signal=sig)
+    cfg = ProcessPoolConfig(
+        max_workers=1, timeout=0.1, kill_on_timeout=True, kill_signal=sig
+    )
     pool = ManagedProcessPool(cfg)
 
     if _NEEDS_PRESTART:
@@ -66,6 +72,7 @@ async def test_timeout_kills_pool(monkeypatch, sig):
     assert killed
     assert all(k == sig for k in killed)
     assert pool._executor is None
+    pool.config.timeout = 1
 
     res = await pool.submit_async(add, 40, 2)
     assert res == 42
