@@ -215,7 +215,7 @@ class NotificationCenter(
                 pass
 
             self.add_notification(
-                title=f"Experiment State Changed",
+                title="Experiment State Changed",
                 message=f"Experiment '{exp_name}' changed from {old_state.value} to {new_state.value}",
                 severity=severity,
                 source=NotificationSource.EXPERIMENT,

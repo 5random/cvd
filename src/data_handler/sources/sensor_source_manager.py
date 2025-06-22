@@ -205,7 +205,7 @@ class SensorManager:
             sensor_configs = self.config_service.get_sensor_configs()
             # sensor_configs may be a dict or list of (id,config) tuples
             if sensor_configs is None:
-                error(f"No sensor configurations available")
+                error("No sensor configurations available")
                 return False
             try:
                 if isinstance(sensor_configs, dict):
