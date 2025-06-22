@@ -18,7 +18,7 @@ async def test_gui_pages(user):
     await user.should_see('Dashboard')
     await user.open('/sensors')
     await user.should_see('Sensor Management')
-    container.shutdown_sync()
+    await container.shutdown()
 
 
 @pytest.mark.asyncio
@@ -53,7 +53,7 @@ async def test_video_feed_disconnect(monkeypatch):
     gen = response.body_iterator
     with pytest.raises(StopAsyncIteration):
         await gen.__anext__()
-    container.shutdown_sync()
+    await container.shutdown()
 
 
 @pytest.mark.asyncio
@@ -118,4 +118,4 @@ async def test_video_feed_creates_temp_camera(monkeypatch):
         "temp_camera_stream" not in container.web_application.component_registry._components
     )
 
-    container.shutdown_sync()
+    await container.shutdown()
