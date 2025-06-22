@@ -27,7 +27,7 @@ from program.src.controllers import controller_manager as controller_manager_mod
 from program.src.controllers.algorithms.motion_detection import (
     MotionDetectionController,
 )
-from program.src.controllers.controller_base import ControllerConfig
+from program.src.controllers.controller_base import ControllerConfig, ControllerStatus
 from program.src.controllers.controller_manager import ControllerManager
 from program.src.controllers.controller_utils.camera_utils import (
     apply_uvc_settings,
@@ -126,6 +126,7 @@ class SimpleGUIApplication:
         self._experiment_start: Optional[datetime] = None
         self._experiment_duration: Optional[int] = None
         self._experiment_timer: Optional[ui.timer] = None
+        self._time_timer: Optional[ui.timer] = None
         self._processing_task: Optional[asyncio.Task] = None
         self._time_timer: Optional[ui.timer] = None
         self.supported_camera_modes: list[tuple[int, int, int]] = []
@@ -134,7 +135,7 @@ class SimpleGUIApplication:
         self.settings = {
             "sensitivity": 50,
             "fps": 30,
-            "fps_cap": self.config_service.get("webapp.fps_cap", int, FPS_CAP),
+            "fps_cap": max(self.config_service.get("webapp.fps_cap", int, FPS_CAP), 1),
             "resolution": "640x480 (30fps)",
             "rotation": 0,
             "roi_enabled": False,
@@ -259,6 +260,7 @@ class SimpleGUIApplication:
                     # schedule update_time every second
                     if self._time_timer:
                         self._time_timer.cancel()
+
                     self._time_timer = ui.timer(1.0, lambda: self.update_time())
 
     def create_main_layout(self):
@@ -413,7 +415,7 @@ class SimpleGUIApplication:
             self.webcam_stream.adjust_roi()
 
     # Main event handlers - placeholder implementations
-    def toggle_camera(self):
+    async def toggle_camera(self):
         """Start or stop the camera capture controller."""
 
         async def _start():
@@ -424,6 +426,10 @@ class SimpleGUIApplication:
                     parameters={"device_index": 0},
                 )
                 self.camera_controller = CameraCaptureController("camera_capture", cfg)
+
+            if self.camera_controller.status == ControllerStatus.RUNNING:
+                return
+
             await self.camera_controller.start()
 
         async def _stop():
@@ -433,25 +439,30 @@ class SimpleGUIApplication:
                 self.camera_controller = None
 
         if not self.camera_active:
-            asyncio.create_task(_start())
-            self.camera_active = True
-            if hasattr(self, "camera_status_icon"):
-                self.camera_status_icon.classes(replace="text-green-300")
-            if getattr(self.webcam_stream, "start_camera_btn", None):
-                self.webcam_stream.start_camera_btn.set_icon("pause")
-                self.webcam_stream.start_camera_btn.set_text("Pause Video")
+            try:
+                await _start()
+            except Exception as exc:
+                error("camera_start_failed", exc_info=exc)
+                self.update_camera_status(False)
+                return
+            self.update_camera_status(True)
         else:
-            asyncio.create_task(_stop())
-            self.camera_active = False
-            if hasattr(self, "camera_status_icon"):
-                self.camera_status_icon.classes(replace="text-gray-400")
-            if getattr(self.webcam_stream, "start_camera_btn", None):
-                self.webcam_stream.start_camera_btn.set_icon("play_arrow")
-                self.webcam_stream.start_camera_btn.set_text("Play Video")
+            try:
+                await _stop()
+            except Exception as exc:
+                error("camera_stop_failed", exc_info=exc)
+                self.update_camera_status(True)
+                return
+            self.update_camera_status(False)
 
     def update_sensitivity(self, e):
         """Update motion detection sensitivity"""
-        value = int(getattr(e, "value", e))
+        try:
+            value = int(getattr(e, "value", e))
+        except ValueError:
+            notify_later("Invalid sensitivity value", type="warning")
+            return
+
         self.settings["sensitivity"] = value
         if self.motion_controller:
             self.motion_controller.motion_threshold_percentage = value / 100.0
@@ -461,7 +472,12 @@ class SimpleGUIApplication:
 
     def update_fps(self, e):
         """Update camera FPS setting"""
-        value = int(getattr(e, "value", e))
+        try:
+            value = int(getattr(e, "value", e))
+        except ValueError:
+            notify_later("Invalid FPS value", type="warning")
+            return
+
         self.settings["fps"] = value
         if self.camera_controller:
             self.camera_controller.fps = value
@@ -473,12 +489,16 @@ class SimpleGUIApplication:
     def update_resolution(self, e):
         """Update camera resolution setting"""
         res = getattr(e, "value", e)
-        self.settings["resolution"] = res
         try:
             dims = res.split()[0]
-            width, height = map(int, dims.split("x"))
-        except Exception:
-            width = height = None
+            width_str, height_str = dims.split("x")
+            width = int(width_str)
+            height = int(height_str)
+        except ValueError:
+            notify_later("Invalid resolution value", type="warning")
+            return
+
+        self.settings["resolution"] = res
         if width and height:
             if self.camera_controller:
                 self.camera_controller.width = width
@@ -491,7 +511,11 @@ class SimpleGUIApplication:
 
     def update_rotation(self, e):
         """Update camera rotation setting."""
-        value = int(getattr(e, "value", e)) % 360
+        try:
+            value = int(getattr(e, "value", e)) % 360
+        except ValueError:
+            notify_later("Invalid rotation value", type="warning")
+            return
         if value not in {0, 90, 180, 270}:
             value = ((value + 45) // 90 * 90) % 360
 
@@ -699,7 +723,14 @@ class SimpleGUIApplication:
         if not self.experiment_running:
             name = self.experiment_section.experiment_name_input.value
             duration = self.experiment_section.experiment_duration_input.value
-            self._experiment_duration = int(duration) if duration else None
+            if duration:
+                try:
+                    self._experiment_duration = int(duration)
+                except ValueError:
+                    notify_later("Invalid duration value", type="warning")
+                    return
+            else:
+                self._experiment_duration = None
 
             config = ExperimentConfig(
                 name=name,
@@ -760,10 +791,19 @@ class SimpleGUIApplication:
         if width is None or height is None:
             return roi
         x, y, w, h = roi
-        x = max(0, min(int(x), width - 1))
-        y = max(0, min(int(y), height - 1))
-        w = max(0, int(w))
-        h = max(0, int(h))
+        try:
+            ix = int(x)
+            iy = int(y)
+            iw = int(w)
+            ih = int(h)
+        except ValueError:
+            notify_later("Invalid ROI values", type="warning")
+            return roi
+
+        x = max(0, min(ix, width - 1))
+        y = max(0, min(iy, height - 1))
+        w = max(0, iw)
+        h = max(0, ih)
         if x + w > width:
             w = max(0, width - x)
         if y + h > height:
@@ -1118,8 +1158,8 @@ class SimpleGUIApplication:
         async def video_feed(request: Request):
             async def gen():
                 last_sent = 0.0
-                fps_cap = float(self.settings.get("fps_cap", FPS_CAP))
-                interval = 1 / fps_cap if fps_cap > 0 else 0.0
+                fps_cap = max(float(self.settings.get("fps_cap", FPS_CAP)), 1.0)
+                interval = 1 / fps_cap
                 no_frame_start: Optional[float] = None
                 timeout = 3.0
                 placeholder_bytes: Optional[bytes] = None
@@ -1172,7 +1212,7 @@ class SimpleGUIApplication:
                                     + b"\r\n"
                                 )
                             break
-                    await asyncio.sleep(0.03)
+                    await asyncio.sleep(max(0.001, interval))
 
             return StreamingResponse(
                 gen(), media_type="multipart/x-mixed-replace; boundary=frame"
@@ -1185,11 +1225,15 @@ class SimpleGUIApplication:
                 self.supported_camera_modes = await probe_camera_modes()
             except Exception:
                 self.supported_camera_modes = []
-            await self.controller_manager.start_all_controllers()
+            success = await self.controller_manager.start_all_controllers()
             self._processing_task = asyncio.create_task(self._processing_loop())
-            # Ensure camera status reflects that controllers started
-            self.camera_active = True
-            self.update_camera_status(True)
+            if success:
+                self.update_camera_status(True)
+            else:
+                ui.notify(
+                    "Some controllers failed to start",
+                    type="warning",
+                )
 
         @app.on_shutdown
         async def _shutdown() -> None:
@@ -1198,6 +1242,12 @@ class SimpleGUIApplication:
                 with contextlib.suppress(Exception):
                     await self._processing_task
                 self._processing_task = None
+            if self._time_timer:
+                try:
+                    self._time_timer.cancel()
+                except Exception:
+                    pass
+                self._time_timer = None
             await self.controller_manager.stop_all_controllers()
             if self._time_timer:
                 self._time_timer.cancel()

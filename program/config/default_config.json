@@ -65,6 +65,10 @@
         "users": [{"username": "admin", "password_hash": "<bcrypt>"}],
         "csrf_protection": true
     },
+    "webapp": {
+        "fps_cap": 30,
+        "fps_cap_min": 1
+    },
     "webcams": [
         {
             "cam001": {
