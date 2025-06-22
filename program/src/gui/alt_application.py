@@ -120,7 +120,11 @@ class SimpleGUIApplication:
         set_experiment_manager(self.experiment_manager)
 
         # Additional runtime attributes
-        # Global dark mode controller from NiceGUI
+        # Ensure a container slot exists so ``ui.dark_mode`` can be created even
+        # outside of a page context (e.g. during tests)
+        if not ui.context.slot_stack:
+            from nicegui import Client
+            ui.context.slot_stack.append(Client.auto_index_client.layout.default_slot)
         self.dark_mode = ui.dark_mode()
         self._current_experiment_id: Optional[str] = None
         self._experiment_start: Optional[datetime] = None
@@ -151,6 +155,7 @@ class SimpleGUIApplication:
 
         # Load persisted alert configurations or fall back to demo data
         self.alert_configurations = load_alert_configs(self.config_service)
+        self._alert_configs_from_disk = bool(self.alert_configurations)
         if not self.alert_configurations:
             self.alert_configurations = create_demo_configurations()
         self.alert_display = EmailAlertStatusDisplay(self.alert_configurations)
@@ -484,12 +489,12 @@ class SimpleGUIApplication:
         ws = getattr(self, "webcam_stream", None)
         if not self.camera_active:
             try:
-                await _start()
+                started = await _start()
             except Exception as exc:  # noqa: BLE001
                 error("camera_start_failed", exc_info=exc)
                 notify_later("Failed to start camera", type="negative")
                 return
-            self.camera_active = True
+            self.camera_active = bool(started)
             if hasattr(self, "camera_status_icon"):
                 self.camera_status_icon.classes(replace="text-green-300")
             ws = getattr(self, "webcam_stream", None)
@@ -498,12 +503,12 @@ class SimpleGUIApplication:
                 ws.start_camera_btn.set_text("Pause Video")
         else:
             try:
-                await _stop()
+                stopped = await _stop()
             except Exception as exc:  # noqa: BLE001
                 error("camera_stop_failed", exc_info=exc)
                 notify_later("Failed to stop camera", type="negative")
                 return
-            self.camera_active = False
+            self.camera_active = not stopped
             if hasattr(self, "camera_status_icon"):
                 self.camera_status_icon.classes(replace="text-gray-400")
             ws = getattr(self, "webcam_stream", None)
@@ -522,8 +527,9 @@ class SimpleGUIApplication:
         self.settings["sensitivity"] = value
         if self.motion_controller:
             self.motion_controller.motion_threshold_percentage = value / 100.0
-        self.webcam_stream.sensitivity_number.value = value
-        self.webcam_stream.sensitivity_slider.value = value
+        if hasattr(self, "webcam_stream"):
+            self.webcam_stream.sensitivity_number.value = value
+            self.webcam_stream.sensitivity_slider.value = value
         notify_later(f"Sensitivity set to {value}%", type="positive")
 
     def update_fps(self, e):
@@ -539,7 +545,8 @@ class SimpleGUIApplication:
             self.camera_controller.fps = value
         if self.motion_controller:
             self.motion_controller.fps = value
-        self.webcam_stream.fps_select.value = value
+        if hasattr(self, "webcam_stream"):
+            self.webcam_stream.fps_select.value = value
         notify_later(f"FPS set to {value}", type="positive")
 
     def update_resolution(self, e):
@@ -562,7 +569,8 @@ class SimpleGUIApplication:
             if self.motion_controller:
                 self.motion_controller.width = width
                 self.motion_controller.height = height
-        self.webcam_stream.resolution_select.value = res
+        if hasattr(self, "webcam_stream"):
+            self.webcam_stream.resolution_select.value = res
         notify_later(f"Resolution set to {res}", type="positive")
 
     def update_rotation(self, e):
@@ -577,7 +585,7 @@ class SimpleGUIApplication:
 
         old_rotation = self.settings.get("rotation", 0)
         if value == old_rotation:
-            if hasattr(self.webcam_stream, "rotation_select"):
+            if hasattr(self, "webcam_stream") and hasattr(self.webcam_stream, "rotation_select"):
                 self.webcam_stream.rotation_select.value = value
             return
 
@@ -589,7 +597,7 @@ class SimpleGUIApplication:
             self.motion_controller.rotation = value
 
         # Transform existing ROI to maintain orientation
-        if self.settings.get("roi_enabled"):
+        if self.settings.get("roi_enabled") and hasattr(self, "webcam_stream"):
             width = None
             height = None
             if (
@@ -640,13 +648,15 @@ class SimpleGUIApplication:
                     {"roi_x": x, "roi_y": y, "roi_width": w, "roi_height": h}
                 )
 
-        if hasattr(self.webcam_stream, "rotation_select"):
+        if hasattr(self, "webcam_stream") and hasattr(self.webcam_stream, "rotation_select"):
             self.webcam_stream.rotation_select.value = value
 
         notify_later(f"Rotation set to {value}°", type="positive")
 
     def set_roi(self):
         """Set region of interest"""
+        if not hasattr(self, "webcam_stream"):
+            return
         enabled = self.webcam_stream.roi_checkbox.value
         self.settings["roi_enabled"] = enabled
         if self.motion_controller:
@@ -672,6 +682,8 @@ class SimpleGUIApplication:
 
     async def apply_uvc_settings(self):
         """Apply UVC camera settings"""
+        if not hasattr(self, "webcam_stream"):
+            return
         settings = {
             "brightness": self.webcam_stream.brightness_number.value,
             "contrast": self.webcam_stream.contrast_number.value,
@@ -714,7 +726,7 @@ class SimpleGUIApplication:
 
     async def reset_uvc_defaults(self):
         """Reset all UVC controls to their default values."""
-        if not self.webcam_stream:
+        if not hasattr(self, "webcam_stream") or not self.webcam_stream:
             return
 
         defaults = UVC_DEFAULTS.copy()
@@ -929,15 +941,19 @@ class SimpleGUIApplication:
             self.experiment_section.experiment_progress.value = progress
 
     def _update_alerts_status(self):
-        """Update the alerts_enabled status based on current configurations"""
-        # Check if any alert configuration has active alert types
-        self.alerts_enabled = any(
-            any(
-                settings.get("enabled", False)
-                for settings in config.get("settings", {}).values()
+        """Update the alerts_enabled status based on current configurations."""
+        if not getattr(self, "_alert_configs_from_disk", True):
+            # Demo configurations should not enable alerts by default
+            self.alerts_enabled = False
+        else:
+            # Check if any alert configuration has active alert types
+            self.alerts_enabled = any(
+                any(
+                    settings.get("enabled", False)
+                    for settings in config.get("settings", {}).values()
+                )
+                for config in self.alert_configurations
             )
-            for config in self.alert_configurations
-        )
 
         if hasattr(self, "alert_status_icon"):
             cls = "text-yellow-300" if self.alerts_enabled else "text-gray-400"

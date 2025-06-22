@@ -19,6 +19,9 @@ def notify_later(message: str, *, slot: Optional[Element] = None, **kwargs) -> N
         with slot:
             ui.timer(0, lambda: ui.notify(message, **kwargs), once=True)
     else:
+        if not ui.context.slot_stack:
+            from nicegui import Client
+            ui.context.slot_stack.append(Client.auto_index_client.layout.default_slot)
         ui.timer(0, lambda: ui.notify(message, **kwargs), once=True)
 
 
