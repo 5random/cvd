@@ -4,5 +4,6 @@ __pycache__/
 
 # Ignore log files
 data/logs/
+!data/logs/.gitkeep
 program/data/logs/
 *.log
