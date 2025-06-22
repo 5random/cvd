@@ -1,7 +1,10 @@
+"""UI elements for configuring and testing basic email alerts."""
+
 from nicegui import ui
 
 
 class EmailAlertsSection:
+    """Section for managing email alert settings within the GUI."""
     def __init__(self, settings, callbacks=None):
         """Initialize email alerts section with settings"""
         self.experiment_running = False
