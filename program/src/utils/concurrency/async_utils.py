@@ -360,12 +360,10 @@ class AsyncTaskManager:
             return result is None
         task.cancel()
         try:
-            await asyncio.wait_for(task, timeout)
+            await asyncio.wait_for(asyncio.shield(task), timeout)
             return True
         except (asyncio.TimeoutError, Exception):
             return False
-        finally:
-            self._tasks.pop(task_id, None)
 
     async def stop_all_tasks(self, *, timeout: float = 5.0) -> None:
         if not self._tasks:

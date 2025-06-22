@@ -65,8 +65,9 @@ async def test_async_task_manager_stop_task_timeout_removed():
         await started.wait()
         result = await mgr.stop_task("w", timeout=0.05)
         assert result is False
-        assert "w" not in mgr._tasks
+        assert "w" in mgr._tasks
         await mgr.stop_all_tasks(timeout=0.1)
+        assert "w" not in mgr._tasks
     assert len(mgr._tasks) == 0
 
 
