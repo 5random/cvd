@@ -448,7 +448,12 @@ class SimpleGUIApplication:
 
     def update_sensitivity(self, e):
         """Update motion detection sensitivity"""
-        value = int(getattr(e, "value", e))
+        try:
+            value = int(getattr(e, "value", e))
+        except ValueError:
+            notify_later("Invalid sensitivity value", type="warning")
+            return
+
         self.settings["sensitivity"] = value
         if self.motion_controller:
             self.motion_controller.motion_threshold_percentage = value / 100.0
@@ -458,7 +463,12 @@ class SimpleGUIApplication:
 
     def update_fps(self, e):
         """Update camera FPS setting"""
-        value = int(getattr(e, "value", e))
+        try:
+            value = int(getattr(e, "value", e))
+        except ValueError:
+            notify_later("Invalid FPS value", type="warning")
+            return
+
         self.settings["fps"] = value
         if self.camera_controller:
             self.camera_controller.fps = value
@@ -470,12 +480,16 @@ class SimpleGUIApplication:
     def update_resolution(self, e):
         """Update camera resolution setting"""
         res = getattr(e, "value", e)
-        self.settings["resolution"] = res
         try:
             dims = res.split()[0]
-            width, height = map(int, dims.split("x"))
-        except Exception:
-            width = height = None
+            width_str, height_str = dims.split("x")
+            width = int(width_str)
+            height = int(height_str)
+        except ValueError:
+            notify_later("Invalid resolution value", type="warning")
+            return
+
+        self.settings["resolution"] = res
         if width and height:
             if self.camera_controller:
                 self.camera_controller.width = width
@@ -488,7 +502,11 @@ class SimpleGUIApplication:
 
     def update_rotation(self, e):
         """Update camera rotation setting."""
-        value = int(getattr(e, "value", e)) % 360
+        try:
+            value = int(getattr(e, "value", e)) % 360
+        except ValueError:
+            notify_later("Invalid rotation value", type="warning")
+            return
         if value not in {0, 90, 180, 270}:
             value = ((value + 45) // 90 * 90) % 360
 
@@ -696,7 +714,14 @@ class SimpleGUIApplication:
         if not self.experiment_running:
             name = self.experiment_section.experiment_name_input.value
             duration = self.experiment_section.experiment_duration_input.value
-            self._experiment_duration = int(duration) if duration else None
+            if duration:
+                try:
+                    self._experiment_duration = int(duration)
+                except ValueError:
+                    notify_later("Invalid duration value", type="warning")
+                    return
+            else:
+                self._experiment_duration = None
 
             config = ExperimentConfig(
                 name=name,
@@ -757,10 +782,19 @@ class SimpleGUIApplication:
         if width is None or height is None:
             return roi
         x, y, w, h = roi
-        x = max(0, min(int(x), width - 1))
-        y = max(0, min(int(y), height - 1))
-        w = max(0, int(w))
-        h = max(0, int(h))
+        try:
+            ix = int(x)
+            iy = int(y)
+            iw = int(w)
+            ih = int(h)
+        except ValueError:
+            notify_later("Invalid ROI values", type="warning")
+            return roi
+
+        x = max(0, min(ix, width - 1))
+        y = max(0, min(iy, height - 1))
+        w = max(0, iw)
+        h = max(0, ih)
         if x + w > width:
             w = max(0, width - x)
         if y + h > height:
