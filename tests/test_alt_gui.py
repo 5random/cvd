@@ -1,7 +1,8 @@
-"""Tests für die alternative GUI (alt_application.py) mittels NiceGUI Testing Framework.
+"""Tests for the alternative GUI (``alt_application.py``) using the NiceGUI
+testing framework.
 
-Diese Tests verwenden das NiceGUI User-Plugin um verschiedene GUI-Abläufe
-der SimpleGUIApplication zu testen.
+These tests use the NiceGUI user plugin to exercise various GUI flows of the
+``SimpleGUIApplication``.
 """
 
 import pytest
@@ -15,7 +16,7 @@ from src.gui.alt_application import SimpleGUIApplication
 from src.utils.config_service import ConfigurationService
 from src.utils.email_alert_service import EmailAlertService
 
-# Plugin für NiceGUI Testing Framework
+# Plugin for the NiceGUI testing framework
 pytest_plugins = ["nicegui.testing.user_plugin"]
 
 
@@ -56,7 +57,7 @@ class MockEmailAlertService(EmailAlertService):
 
 
 class MockControllerManager:
-    """Mock Controller Manager für Tests"""
+    """Mock Controller Manager for tests"""
 
     def __init__(self):
         self._controllers = {}
@@ -69,7 +70,7 @@ class MockControllerManager:
 
 
 class MockExperimentManager:
-    """Mock Experiment Manager für Tests"""
+    """Mock Experiment Manager for tests"""
 
     def __init__(
         self,
@@ -91,7 +92,7 @@ class MockExperimentManager:
 
 @pytest.fixture
 def mock_config_service(tmp_path):
-    """Erstelle einen Mock Configuration Service"""
+    """Create a mock ``ConfigurationService``"""
     config_path = tmp_path / "config.json"
     default_path = tmp_path / "default_config.json"
 
@@ -112,13 +113,13 @@ def mock_config_service(tmp_path):
 
 @pytest.fixture
 def mock_controller_manager():
-    """Erstelle einen Mock Controller Manager"""
+    """Create a mock ``ControllerManager``"""
     return MockControllerManager()
 
 
 @pytest.fixture
 def mock_experiment_manager(mock_config_service, mock_controller_manager):
-    """Erstelle einen Mock Experiment Manager"""
+    """Create a mock ``ExperimentManager``"""
     return MockExperimentManager(
         config_service=mock_config_service, controller_manager=mock_controller_manager
     )
@@ -126,7 +127,7 @@ def mock_experiment_manager(mock_config_service, mock_controller_manager):
 
 @pytest.fixture
 def simple_gui_app(mock_controller_manager, mock_config_service, tmp_path):
-    """Erstelle eine SimpleGUIApplication für Tests"""
+    """Create a ``SimpleGUIApplication`` instance for tests"""
     # Mock external dependencies
     import src.controllers.controller_manager as cm_module
     import src.experiment_manager as em_module
@@ -154,10 +155,10 @@ def simple_gui_app(mock_controller_manager, mock_config_service, tmp_path):
 
 
 class TestSimpleGUIApplicationBasics:
-    """Tests für grundlegende Funktionalitäten der SimpleGUIApplication"""
+    """Tests for basic functionality of ``SimpleGUIApplication``"""
 
     async def test_application_initialization(self, simple_gui_app):
-        """Test: Anwendung wird korrekt initialisiert"""
+        """Test: application is correctly initialized"""
         assert simple_gui_app is not None
         assert simple_gui_app.camera_active is False
         assert simple_gui_app.motion_detected is False
@@ -165,7 +166,7 @@ class TestSimpleGUIApplicationBasics:
         assert simple_gui_app.alerts_enabled is False
 
     async def test_settings_initialization(self, simple_gui_app):
-        """Test: Standard-Einstellungen werden korrekt gesetzt"""
+        """Test: default settings are correctly set"""
         settings = simple_gui_app.settings
         assert settings["sensitivity"] == 50
         assert settings["fps"] == 30
@@ -177,10 +178,10 @@ class TestSimpleGUIApplicationBasics:
 
 
 class TestSimpleGUIApplicationUI:
-    """Tests für die Benutzeroberfläche der SimpleGUIApplication"""
+    """Tests for the ``SimpleGUIApplication`` user interface"""
 
     async def test_main_page_loads(self, user: User, simple_gui_app):
-        """Test: Hauptseite lädt und zeigt erwartete Inhalte"""
+        """Test: main page loads and shows expected content"""
 
         # Setup the page
         @ui.page("/")
@@ -191,7 +192,7 @@ class TestSimpleGUIApplicationUI:
         await user.should_see("CVD Tracker - Simple Monitor")
 
     async def test_header_elements_present(self, user: User, simple_gui_app):
-        """Test: Header-Elemente sind vorhanden"""
+        """Test: header elements are present"""
 
         @ui.page("/")
         def main_page():
@@ -203,7 +204,7 @@ class TestSimpleGUIApplicationUI:
         # Note: Icons might not have visible text, so we test for the page structure
 
     async def test_dark_mode_toggle(self, user: User, simple_gui_app):
-        """Test: Dark Mode Toggle funktioniert"""
+        """Test: dark mode toggle works"""
 
         @ui.page("/")
         def main_page():
@@ -224,10 +225,10 @@ class TestSimpleGUIApplicationUI:
 
 
 class TestSimpleGUIApplicationCameraFunctionality:
-    """Tests für Kamera-Funktionalitäten"""
+    """Tests for camera functionality"""
 
     async def test_camera_status_update(self, user: User, simple_gui_app):
-        """Test: Kamera-Status wird korrekt aktualisiert"""
+        """Test: camera status updates correctly"""
 
         @ui.page("/")
         def main_page():
@@ -285,7 +286,7 @@ class TestSimpleGUIApplicationCameraFunctionality:
         assert "text-gray-400" in simple_gui_app.motion_status_icon.classes
 
     async def test_camera_settings_update(self, simple_gui_app):
-        """Test: Kamera-Einstellungen werden korrekt aktualisiert"""
+        """Test: camera settings are updated correctly"""
         # Test sensitivity update
         simple_gui_app.update_sensitivity(75)
         assert simple_gui_app.settings["sensitivity"] == 75
@@ -304,10 +305,10 @@ class TestSimpleGUIApplicationCameraFunctionality:
 
 
 class TestSimpleGUIApplicationExperimentManagement:
-    """Tests für Experiment-Management"""
+    """Tests for experiment management"""
 
     async def test_experiment_section_creation(self, user: User, simple_gui_app):
-        """Test: Experiment-Sektion wird korrekt erstellt"""
+        """Test: experiment section is created correctly"""
 
         @ui.page("/")
         def main_page():
@@ -318,7 +319,7 @@ class TestSimpleGUIApplicationExperimentManagement:
         # Note: Specific content depends on ExperimentManagementSection implementation
 
     async def test_experiment_settings_default(self, simple_gui_app):
-        """Test: Standard-Experiment-Einstellungen sind korrekt"""
+        """Test: default experiment settings are correct"""
         settings = simple_gui_app.settings
         assert "experiment_name" in settings
         assert settings["duration"] == 60
@@ -328,10 +329,10 @@ class TestSimpleGUIApplicationExperimentManagement:
 
 
 class TestSimpleGUIApplicationAlertSystem:
-    """Tests für das Alert-System"""
+    """Tests for the alert system"""
 
     async def test_alert_status_update(self, simple_gui_app):
-        """Test: Alert-Status wird korrekt aktualisiert"""
+        """Test: alert status updates correctly"""
         # Initially alerts should be disabled
         assert simple_gui_app.alerts_enabled is False
 
@@ -340,16 +341,16 @@ class TestSimpleGUIApplicationAlertSystem:
         assert simple_gui_app.alert_display is not None
 
     async def test_alert_configuration_loading(self, simple_gui_app):
-        """Test: Alert-Konfigurationen werden geladen"""
+        """Test: alert configurations are loaded"""
         # Should have either loaded configs or demo configs
         assert len(simple_gui_app.alert_configurations) > 0
 
 
 class TestSimpleGUIApplicationNavigation:
-    """Tests für Navigation und Seitenaktionen"""
+    """Tests for navigation and page actions"""
 
     async def test_fullscreen_toggle(self, user: User, simple_gui_app):
-        """Test: Fullscreen Toggle"""
+        """Test: fullscreen toggle"""
 
         @ui.page("/")
         def main_page():
@@ -361,7 +362,7 @@ class TestSimpleGUIApplicationNavigation:
         user.find("Toggle Fullscreen").click()
 
     async def test_page_reload(self, user: User, simple_gui_app):
-        """Test: Seiten-Reload"""
+        """Test: page reload"""
 
         @ui.page("/")
         def main_page():
@@ -373,10 +374,10 @@ class TestSimpleGUIApplicationNavigation:
 
 
 class TestSimpleGUIApplicationIntegration:
-    """Integrationstests für die gesamte Anwendung"""
+    """Integration tests for the entire application"""
 
     async def test_complete_layout_creation(self, user: User, simple_gui_app):
-        """Test: Vollständiges Layout wird erstellt ohne Fehler"""
+        """Test: full layout is created without errors"""
 
         @ui.page("/")
         def main_page():
@@ -390,7 +391,7 @@ class TestSimpleGUIApplicationIntegration:
         await user.should_see("CVD Tracker - Simple Monitor")
 
     async def test_time_display_updates(self, user: User, simple_gui_app):
-        """Test: Zeit-Anzeige wird aktualisiert"""
+        """Test: time display updates"""
 
         @ui.page("/")
         def main_page():
@@ -405,10 +406,10 @@ class TestSimpleGUIApplicationIntegration:
 
 
 class TestSimpleGUIApplicationErrorHandling:
-    """Tests für Fehlerbehandlung"""
+    """Tests for error handling"""
 
     async def test_missing_controller_handling(self, simple_gui_app):
-        """Test: Behandlung fehlender Controller"""
+        """Test: handling missing controllers"""
         # Test accessing non-existent controllers
         assert simple_gui_app.camera_controller is None
         assert simple_gui_app.motion_controller is None
@@ -418,7 +419,7 @@ class TestSimpleGUIApplicationErrorHandling:
         simple_gui_app.update_fps(30)  # Should not crash
 
     async def test_invalid_settings_handling(self, simple_gui_app):
-        """Test: Behandlung ungültiger Einstellungen"""
+        """Test: handling invalid settings"""
         # Test with invalid rotation values
         simple_gui_app.update_rotation(45)  # Should be normalized to valid value
         assert simple_gui_app.settings["rotation"] in [0, 90, 180, 270]
@@ -427,9 +428,9 @@ class TestSimpleGUIApplicationErrorHandling:
         assert simple_gui_app.settings["rotation"] == 0
 
 
-# Hilfsfunktionen für erweiterte Tests
+# Helper functions for advanced tests
 def create_mock_camera_controller():
-    """Erstelle einen Mock Camera Controller"""
+    """Create a mock camera controller"""
     controller = Mock()
     controller.start = AsyncMock(return_value=True)
     controller.stop = AsyncMock()
@@ -441,7 +442,7 @@ def create_mock_camera_controller():
 
 
 def create_mock_motion_controller():
-    """Erstelle einen Mock Motion Detection Controller"""
+    """Create a mock motion detection controller"""
     controller = Mock()
     controller.motion_threshold_percentage = 0.5
     controller.fps = 30
@@ -451,10 +452,10 @@ def create_mock_motion_controller():
 
 
 class TestSimpleGUIApplicationWithMockControllers:
-    """Tests mit Mock-Controllern für erweiterte Funktionalität"""
+    """Tests with mock controllers for extended functionality"""
 
     async def test_camera_toggle_with_controller(self, simple_gui_app):
-        """Test: Kamera-Toggle mit Mock Controller"""
+        """Test: camera toggle with mock controller"""
         # Add mock camera controller
         mock_camera = create_mock_camera_controller()
         simple_gui_app.controller_manager.add_mock_controller(
@@ -517,7 +518,7 @@ class TestSimpleGUIApplicationWithMockControllers:
         assert "Failed to stop camera" in notifications[0]
 
     async def test_motion_detection_settings_with_controller(self, simple_gui_app):
-        """Test: Motion Detection Einstellungen mit Mock Controller"""
+        """Test: motion detection settings with mock controller"""
         # Add mock motion controller
         mock_motion = create_mock_motion_controller()
         simple_gui_app.controller_manager.add_mock_controller(
@@ -536,22 +537,22 @@ class TestSimpleGUIApplicationWithMockControllers:
         assert mock_motion.fps == 60
 
 
-# Zusätzliche Test-Fixtures für spezielle Szenarien
+# Additional test fixtures for special scenarios
 @pytest.fixture
 def gui_app_with_mocked_dependencies(tmp_path):
-    """GUI App mit allen wichtigen Dependencies gemockt"""
-    # Hier können weitere spezifische Mock-Setups für komplexere Tests erstellt werden
+    """GUI app with all important dependencies mocked"""
+    # Additional specific mock setups for more complex tests can be added here
     pass
 
 
-# Performance und Load Tests (optional)
+# Performance and load tests (optional)
 class TestSimpleGUIApplicationPerformance:
     """Performance tests (optional, for larger test suites)."""
 
     # Uncomment the following decorator to mark this test as slow
     # @pytest.mark.slow
     async def test_rapid_setting_updates(self, simple_gui_app):
-        """Test: Schnelle aufeinanderfolgende Einstellungsänderungen"""
+        """Test: rapid consecutive setting changes"""
         # Test rapid updates don't cause issues
         # FPS will be in the range 20-59 (inclusive) due to 20 + (i % 40)
         for i in range(100):
