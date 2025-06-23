@@ -1,5 +1,5 @@
 import pytest
-from src.controllers.roi_utils import clamp_roi, rotate_roi
+from cvd.controllers.roi_utils import clamp_roi, rotate_roi
 
 
 @pytest.mark.parametrize(
@@ -31,3 +31,67 @@ def test_clamp_roi(roi, width, height, expected):
 )
 def test_rot_roi(roi, old_rot, new_rot, width, height, expected):
     assert rotate_roi(roi, old_rot, new_rot, width, height) == expected
+
+
+def test_update_rotation_swaps_container_and_roi(tmp_path, monkeypatch):
+    from types import SimpleNamespace, ModuleType
+    from nicegui import ui
+    import sys
+
+    dummy_module = ModuleType("alert_element_new")
+    dummy_module.create_compact_alert_widget = lambda *a, **k: None
+    dummy_module.create_demo_configurations = lambda *a, **k: []
+    dummy_module.create_email_alert_status_display = lambda *a, **k: None
+    dummy_module.create_email_alert_wizard = lambda *a, **k: None
+    dummy_module.load_alert_configs = lambda *a, **k: []
+    dummy_module.save_alert_configs = lambda *a, **k: None
+    dummy_module.EmailAlertsSection = None
+    dummy_module.EmailAlertStatusDisplay = lambda *a, **k: SimpleNamespace(
+        update_callback=None
+    )
+    sys.modules.setdefault("src.gui.alt_gui_elements.alert_element_new", dummy_module)
+
+    class DummyControllerManager:
+        def get_controller(self, cid):
+            return None
+
+    from src.gui.alt_application import SimpleGUIApplication
+    from src.gui import ui_helpers
+
+    monkeypatch.setattr(ui_helpers, "notify_later", lambda *a, **k: None)
+
+    (tmp_path / "config.json").write_text("{}")
+    (tmp_path / "default_config.json").write_text("{}")
+
+    app = SimpleGUIApplication(
+        controller_manager=DummyControllerManager(), config_dir=tmp_path
+    )
+
+    container = ui.card().style("width: 640px; height: 480px;")
+    ws = SimpleNamespace(
+        video_container=container,
+        roi_x=10,
+        roi_y=20,
+        roi_width=30,
+        roi_height=40,
+    )
+
+    def swap_dims():
+        style = getattr(container, "_style", {})
+        w = style.get("width")
+        h = style.get("height")
+        if w and h:
+            container.style(f"width: {h}; height: {w};")
+
+    ws.swap_video_container_dimensions = swap_dims
+    app.webcam_stream = ws
+    app.settings["roi_enabled"] = True
+    app.settings.update({"roi_x": 10, "roi_y": 20, "roi_width": 30, "roi_height": 40})
+
+    app.update_rotation(90)
+
+    assert ws.video_container._style["width"] == "480px"
+    assert ws.video_container._style["height"] == "640px"
+    expected = rotate_roi((10, 20, 30, 40), 0, 90, 640, 480)
+    expected = clamp_roi(expected, 480, 640)
+    assert (ws.roi_x, ws.roi_y, ws.roi_width, ws.roi_height) == expected

@@ -5,9 +5,9 @@ from nicegui import ui
 # mypy: ignore-errors
 
 
-from src.utils import log_service as ls
-from src.utils.config_service import ConfigurationService
-from src.gui.gui_elements.gui_controller_setup_wizard_element import (
+from cvd.utils import log_service as ls
+from cvd.utils.config_service import ConfigurationService
+from cvd.gui.gui_elements.gui_controller_setup_wizard_element import (
     ControllerSetupWizardComponent,
 )
 

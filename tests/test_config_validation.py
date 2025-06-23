@@ -1,7 +1,7 @@
 import logging
 import json
 import pytest
-from src.utils.config_service import (
+from cvd.utils.config_service import (
     ConfigurationService,
     ValidationError,
     ConfigurationError,
