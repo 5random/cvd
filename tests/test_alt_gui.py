@@ -529,7 +529,7 @@ class TestSimpleGUIApplicationWithMockControllers:
         simple_gui_app.update_sensitivity(80)
 
         # Verify controller was updated
-        assert mock_motion.motion_threshold_percentage == 0.8
+        assert mock_motion.motion_threshold_percentage == 80
 
         # Test FPS update
         simple_gui_app.update_fps(60)
