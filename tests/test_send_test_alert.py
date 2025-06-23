@@ -1,8 +1,9 @@
 import contextlib
 import pytest
 
-from src.gui.alt_application import SimpleGUIApplication
-from src.utils.config_service import set_config_service
+from cvd.gui.alt_application import SimpleGUIApplication
+from cvd.utils.config_service import set_config_service
+from cvd.utils.email_alert_service import set_email_alert_service
 
 
 @pytest.mark.asyncio
@@ -23,7 +24,7 @@ async def test_send_test_alert_handles_exceptions(tmp_path, monkeypatch):
             return self._controllers.get(controller_id)
 
     monkeypatch.setattr(
-        "src.controllers.controller_manager.create_cvd_controller_manager",
+        "cvd.controllers.controller_manager.create_cvd_controller_manager",
         lambda: DummyManager(),
     )
 
@@ -33,7 +34,7 @@ async def test_send_test_alert_handles_exceptions(tmp_path, monkeypatch):
 
     # patch email alert service globally
     email_mod = __import__(
-        "src.utils.email_alert_service",
+        "cvd.utils.email_alert_service",
         fromlist=["EmailAlertService"],
     )
     monkeypatch.setattr(email_mod, "EmailAlertService", DummyEmailAlertService)
@@ -57,8 +58,8 @@ async def test_send_test_alert_handles_exceptions(tmp_path, monkeypatch):
     def notifier(msg, **kw):
         notifications.append((msg, kw))
 
-    monkeypatch.setattr("src.utils.ui_helpers.notify_later", notifier)
-    monkeypatch.setattr("src.gui.alt_application.notify_later", notifier)
+    monkeypatch.setattr("cvd.utils.ui_helpers.notify_later", notifier)
+    monkeypatch.setattr("cvd.gui.alt_application.notify_later", notifier)
 
     async def failing_gather(tasks, *args, **kwargs):
         for t in tasks:
@@ -67,7 +68,7 @@ async def test_send_test_alert_handles_exceptions(tmp_path, monkeypatch):
         raise RuntimeError("boom")
 
     monkeypatch.setattr(
-        "src.gui.alt_application.gather_with_concurrency", failing_gather
+        "cvd.gui.alt_application.gather_with_concurrency", failing_gather
     )
 
     try:
