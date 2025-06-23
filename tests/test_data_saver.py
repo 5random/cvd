@@ -53,6 +53,8 @@ def test_data_saver_sync_compression(tmp_path, monkeypatch, caplog):
     compressed_dir = tmp_path / "raw" / "compressed"
     compressed_files = list(compressed_dir.glob("*.csv.gz"))
     assert compressed_files, "expected compressed file"
+    assert not (tmp_path / "raw" / "s1.csv").exists()
+    assert not any(r.levelno >= logging.WARNING for r in caplog.records)
     assert not saver._tasks, "no background tasks when disabled"
     saver.close()
 
@@ -119,6 +121,8 @@ def test_data_saver_background_tasks(tmp_path, monkeypatch):
     compressed_files = list(compressed_dir.glob("*.csv.gz"))
     rotated_files = list(compressed_dir.glob("old*.csv"))
 
+    assert not (saver.raw_dir / "s1.csv").exists()
+
     assert compressed_files, "expected compressed file"
     assert rotated_files, "expected rotated file"
     assert not saver._tasks, "background tasks should complete"
@@ -164,3 +168,37 @@ def test_data_saver_sanitizes_id(tmp_path):
     safe_name = ds_module.sanitize_id(unsafe_id) + ".csv"
     assert (tmp_path / "raw" / safe_name).exists()
     saver.close()
+
+
+def test_compress_file_sync_removes_source(tmp_path, monkeypatch):
+    dummy = DummyCompressionService()
+    monkeypatch.setattr(ds_module, "get_compression_service", lambda: dummy)
+
+    saver = ds_module.DataSaver(
+        base_output_dir=tmp_path, enable_background_operations=False
+    )
+
+    file_path = tmp_path / "raw" / "sample.csv"
+    file_path.parent.mkdir(parents=True, exist_ok=True)
+    file_path.write_text("a,b\n1,2\n")
+
+    saver._compress_file_sync(file_path)
+
+    assert not file_path.exists()
+
+
+def test_compress_file_async_removes_source(tmp_path, monkeypatch):
+    dummy = DummyCompressionService()
+    monkeypatch.setattr(ds_module, "get_compression_service", lambda: dummy)
+
+    saver = ds_module.DataSaver(
+        base_output_dir=tmp_path, enable_background_operations=False
+    )
+
+    file_path = tmp_path / "raw" / "async.csv"
+    file_path.parent.mkdir(parents=True, exist_ok=True)
+    file_path.write_text("a,b\n1,2\n")
+
+    saver._compress_file_async(file_path, "s1", "raw")
+
+    assert not file_path.exists()

@@ -173,7 +173,9 @@ class DataSaver:
             compressed_path = (
                 compressed_dir / f"{file_path.stem}_{int(time.time())}.csv.gz"
             )
-            result = self.compression_service.compress_file(str(file_path), str(compressed_path))
+            result = self.compression_service.compress_file(
+                str(file_path), str(compressed_path)
+            )
 
             preserve = getattr(
                 self.compression_service,
@@ -182,8 +184,14 @@ class DataSaver:
             ).preserve_original
 
             if not preserve and file_path.exists():
-                msg = f"Source file was not deleted after compression: {file_path}"
-                warning(msg)
+                try:
+                    file_path.unlink(missing_ok=True)
+                except Exception as e:
+                    warning(f"Failed to delete source file {file_path}: {e}")
+                if file_path.exists():
+                    warning(
+                        f"Source file was not deleted after compression: {file_path}"
+                    )
 
             if preserve:
                 info(f"Compressed file {file_path} -> {compressed_path}")
@@ -207,7 +215,9 @@ class DataSaver:
             compressed_path = (
                 compressed_dir / f"{file_path.stem}_{int(time.time())}.csv.gz"
             )
-            result = self.compression_service.compress_file(str(file_path), str(compressed_path))
+            result = self.compression_service.compress_file(
+                str(file_path), str(compressed_path)
+            )
 
             preserve = getattr(
                 self.compression_service,
@@ -216,8 +226,14 @@ class DataSaver:
             ).preserve_original
 
             if not preserve and file_path.exists():
-                msg = f"Source file was not deleted after compression: {file_path}"
-                warning(msg)
+                try:
+                    file_path.unlink(missing_ok=True)
+                except Exception as e:
+                    warning(f"Failed to delete source file {file_path}: {e}")
+                if file_path.exists():
+                    warning(
+                        f"Source file was not deleted after compression: {file_path}"
+                    )
 
             if preserve:
                 info(f"Compressed file {file_path} -> {compressed_path}")
