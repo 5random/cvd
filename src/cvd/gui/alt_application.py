@@ -466,6 +466,30 @@ class SimpleGUIApplication:
 
         ws = getattr(self, "webcam_stream", None)
         streaming = not self.camera_active
+        success = True
+
+        if streaming:
+            try:
+                if self.camera_controller is not None:
+                    started = await self.camera_controller.start()
+                    if started is False:
+                        raise RuntimeError("camera start returned False")
+                if self.motion_controller is not None:
+                    await self.motion_controller.start()
+            except Exception:
+                notify_later("Failed to start camera", type="negative")
+                streaming = False
+                success = False
+        else:
+            try:
+                if self.camera_controller is not None:
+                    await self.camera_controller.stop()
+                if self.motion_controller is not None:
+                    await self.motion_controller.stop()
+            except Exception:
+                notify_later("Failed to stop camera", type="negative")
+                streaming = True
+                success = False
 
         # Update internal state and header icon
         self.update_camera_status(streaming)
@@ -480,7 +504,7 @@ class SimpleGUIApplication:
                 btn.set_icon("play_arrow")
                 btn.set_text("Play Video")
 
-        return True
+        return success
 
     def update_sensitivity(self, e):
         """Update motion detection sensitivity"""
