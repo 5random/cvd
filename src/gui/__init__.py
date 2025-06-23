@@ -13,21 +13,18 @@ _LAZY_ATTRS = {
     "application": ".application",
     "alt_application": ".alt_application",
     "alt_gui": ".alt_gui",
-    "WebApplication": ".application",
     "SimpleGUIApplication": ".alt_application",
-    # Elements from alt_gui_elements
-    "WebcamStreamElement": ".alt_gui_elements",
-    "EmailAlertsSection": ".alt_gui_elements",
-    "ExperimentManagementSection": ".alt_gui_elements",
-    "MotionStatusSection": ".alt_gui_elements",
-    "create_compact_alert_widget": ".alt_gui_elements",
-    "create_demo_configurations": ".alt_gui_elements",
-    "create_email_alert_status_display": ".alt_gui_elements",
-    "create_email_alert_wizard": ".alt_gui_elements",
-    "EmailAlertStatusDisplay": ".alt_gui_elements",
-    "load_alert_configs": ".alt_gui_elements",
-    "save_alert_configs": ".alt_gui_elements",
-    # styling helpers
+    "WebcamStreamElement": ".alt_gui_elements.webcam_stream_element",
+    "EmailAlertsSection": ".alt_gui_elements.alert_element_new",
+    "ExperimentManagementSection": ".alt_gui_elements.experiment_element",
+    "MotionStatusSection": ".alt_gui_elements.motion_detection_element",
+    "create_compact_alert_widget": ".alt_gui_elements.alert_element_new",
+    "create_demo_configurations": ".alt_gui_elements.alert_element_new",
+    "create_email_alert_status_display": ".alt_gui_elements.alert_element_new",
+    "create_email_alert_wizard": ".alt_gui_elements.alert_element_new",
+    "EmailAlertStatusDisplay": ".alt_gui_elements.alert_element_new",
+    "load_alert_configs": ".alt_gui_elements.alert_element_new",
+    "save_alert_configs": ".alt_gui_elements.alert_element_new",
     "setup_global_styles": ".theme",
 }
 
@@ -40,7 +37,8 @@ def __getattr__(name: str) -> Any:  # pragma: no cover - simple passthrough
         raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
     module = importlib.import_module(module_path, __name__)
-    if name in {"WebApplication", "SimpleGUIApplication"}:
+    # return the attribute if present on the module, otherwise the module itself
+    if hasattr(module, name):
         attr = getattr(module, name)
     else:
         attr = module
