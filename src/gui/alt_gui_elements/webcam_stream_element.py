@@ -21,6 +21,40 @@ UVC_DEFAULTS = {
 }
 
 
+def create_uvc_control(label, min_val, max_val, default, callback):
+    """Return bound number and slider widgets for a UVC control."""
+    ui.label(label).classes("text-xs text-gray-600")
+    with ui.row().classes("gap-3 items-center mb-3 w-full"):
+        number = (
+            ui.number(
+                value=default,
+                min=min_val,
+                max=max_val,
+                step=1,
+                on_change=callback,
+            )
+            .classes("w-20")
+            .props("dense outlined")
+        )
+        slider = (
+            ui.slider(
+                min=min_val,
+                max=max_val,
+                value=default,
+                step=1,
+                on_change=callback,
+            )
+            .props("thumb-label")
+            .classes("flex-1")
+            .style("min-width: 200px; height: 40px;")
+        )
+
+        slider.bind_value(number, "value")
+        number.bind_value(slider, "value")
+
+    return number, slider
+
+
 class WebcamStreamElement:
     """Initialize webcam stream element with settings and optional callbacks"""
 
@@ -281,187 +315,64 @@ class WebcamStreamElement:
                     ui.label("Image Quality").classes(
                         "text-sm font-medium text-gray-700 mb-2"
                     )  # Brightness Control
-                    ui.label("Brightness").classes("text-xs text-gray-600")
-                    with ui.row().classes("gap-3 items-center mb-3 w-full"):
-                        self.brightness_number = (
-                            ui.number(
-                                value=UVC_DEFAULTS["brightness"],
-                                min=-100,
-                                max=100,
-                                step=1,
-                                on_change=self.callbacks.get(
-                                    "update_brightness", lambda value: None
-                                ),
-                            )
-                            .classes("w-20")
-                            .props("dense outlined")
-                        )
-                        self.brightness_slider = (
-                            ui.slider(
-                                min=-100,
-                                max=100,
-                                value=UVC_DEFAULTS["brightness"],
-                                step=1,
-                                on_change=self.callbacks.get(
-                                    "update_brightness", lambda value: None
-                                ),
-                            )
-                            .props("thumb-label")
-                            .classes("flex-1")
-                            .style("min-width: 200px; height: 40px;")
-                        )
-
-                        # Bind values
-                        self.brightness_slider.bind_value(
-                            self.brightness_number, "value"
-                        )
-                        self.brightness_number.bind_value(
-                            self.brightness_slider, "value"
-                        )
+                    (
+                        self.brightness_number,
+                        self.brightness_slider,
+                    ) = create_uvc_control(
+                        "Brightness",
+                        -100,
+                        100,
+                        UVC_DEFAULTS["brightness"],
+                        self.callbacks.get("update_brightness", lambda value: None),
+                    )
 
                     # Contrast Control
-                    ui.label("Contrast").classes("text-xs text-gray-600")
-                    with ui.row().classes("gap-3 items-center mb-3 w-full"):
-                        self.contrast_number = (
-                            ui.number(
-                                value=UVC_DEFAULTS["contrast"],
-                                min=0,
-                                max=200,
-                                step=1,
-                                on_change=self.callbacks.get(
-                                    "update_contrast", lambda value: None
-                                ),
-                            )
-                            .classes("w-20")
-                            .props("dense outlined")
-                        )
-                        self.contrast_slider = (
-                            ui.slider(
-                                min=0,
-                                max=200,
-                                value=UVC_DEFAULTS["contrast"],
-                                step=1,
-                                on_change=self.callbacks.get(
-                                    "update_contrast", lambda value: None
-                                ),
-                            )
-                            .props("thumb-label")
-                            .classes("flex-1")
-                            .style("min-width: 200px; height: 40px;")
-                        )
-
-                        # Bind values
-                        self.contrast_slider.bind_value(self.contrast_number, "value")
-                        self.contrast_number.bind_value(self.contrast_slider, "value")
+                    (
+                        self.contrast_number,
+                        self.contrast_slider,
+                    ) = create_uvc_control(
+                        "Contrast",
+                        0,
+                        200,
+                        UVC_DEFAULTS["contrast"],
+                        self.callbacks.get("update_contrast", lambda value: None),
+                    )
 
                     # Saturation Control
-                    ui.label("Saturation").classes("text-xs text-gray-600")
-                    with ui.row().classes("gap-3 items-center mb-3 w-full"):
-                        self.saturation_number = (
-                            ui.number(
-                                value=UVC_DEFAULTS["saturation"],
-                                min=0,
-                                max=200,
-                                step=1,
-                                on_change=self.callbacks.get(
-                                    "update_saturation", lambda value: None
-                                ),
-                            )
-                            .classes("w-20")
-                            .props("dense outlined")
-                        )
-                        self.saturation_slider = (
-                            ui.slider(
-                                min=0,
-                                max=200,
-                                value=UVC_DEFAULTS["saturation"],
-                                step=1,
-                                on_change=self.callbacks.get(
-                                    "update_saturation", lambda value: None
-                                ),
-                            )
-                            .props("thumb-label")
-                            .classes("flex-1")
-                            .style("min-width: 200px; height: 40px;")
-                        )
-
-                        # Bind values
-                        self.saturation_slider.bind_value(
-                            self.saturation_number, "value"
-                        )
-                        self.saturation_number.bind_value(
-                            self.saturation_slider, "value"
-                        )
+                    (
+                        self.saturation_number,
+                        self.saturation_slider,
+                    ) = create_uvc_control(
+                        "Saturation",
+                        0,
+                        200,
+                        UVC_DEFAULTS["saturation"],
+                        self.callbacks.get("update_saturation", lambda value: None),
+                    )
 
                     # Hue Control
-                    ui.label("Hue").classes("text-xs text-gray-600")
-                    with ui.row().classes("gap-3 items-center mb-3 w-full"):
-                        self.hue_number = (
-                            ui.number(
-                                value=UVC_DEFAULTS["hue"],
-                                min=-180,
-                                max=180,
-                                step=1,
-                                on_change=self.callbacks.get(
-                                    "update_hue", lambda value: None
-                                ),
-                            )
-                            .classes("w-20")
-                            .props("dense outlined")
-                        )
-                        self.hue_slider = (
-                            ui.slider(
-                                min=-180,
-                                max=180,
-                                value=UVC_DEFAULTS["hue"],
-                                step=1,
-                                on_change=self.callbacks.get(
-                                    "update_hue", lambda value: None
-                                ),
-                            )
-                            .props("thumb-label")
-                            .classes("flex-1")
-                            .style("min-width: 200px; height: 40px;")
-                        )
-
-                        # Bind values
-                        self.hue_slider.bind_value(self.hue_number, "value")
-                        self.hue_number.bind_value(self.hue_slider, "value")
+                    (
+                        self.hue_number,
+                        self.hue_slider,
+                    ) = create_uvc_control(
+                        "Hue",
+                        -180,
+                        180,
+                        UVC_DEFAULTS["hue"],
+                        self.callbacks.get("update_hue", lambda value: None),
+                    )
 
                     # Sharpness Control
-                    ui.label("Sharpness").classes("text-xs text-gray-600")
-                    with ui.row().classes("gap-3 items-center mb-4 w-full"):
-                        self.sharpness_number = (
-                            ui.number(
-                                value=UVC_DEFAULTS["sharpness"],
-                                min=0,
-                                max=100,
-                                step=1,
-                                on_change=self.callbacks.get(
-                                    "update_sharpness", lambda value: None
-                                ),
-                            )
-                            .classes("w-20")
-                            .props("dense outlined")
-                        )
-                        self.sharpness_slider = (
-                            ui.slider(
-                                min=0,
-                                max=100,
-                                value=UVC_DEFAULTS["sharpness"],
-                                step=1,
-                                on_change=self.callbacks.get(
-                                    "update_sharpness", lambda value: None
-                                ),
-                            )
-                            .props("thumb-label")
-                            .classes("flex-1")
-                            .style("min-width: 200px; height: 40px;")
-                        )
-
-                        # Bind values
-                        self.sharpness_slider.bind_value(self.sharpness_number, "value")
-                        self.sharpness_number.bind_value(self.sharpness_slider, "value")
+                    (
+                        self.sharpness_number,
+                        self.sharpness_slider,
+                    ) = create_uvc_control(
+                        "Sharpness",
+                        0,
+                        100,
+                        UVC_DEFAULTS["sharpness"],
+                        self.callbacks.get("update_sharpness", lambda value: None),
+                    )
                     # Exposure & Advanced Controls
                     ui.label("Exposure & Advanced").classes(
                         "text-sm font-medium text-gray-700 mb-2"
@@ -567,113 +478,40 @@ class WebcamStreamElement:
                         )
 
                     # Gain Control
-                    ui.label("Gain").classes("text-xs text-gray-600")
-                    with ui.row().classes("gap-3 items-center mb-3 w-full"):
-                        self.gain_number = (
-                            ui.number(
-                                value=UVC_DEFAULTS["gain"],
-                                min=0,
-                                max=100,
-                                step=1,
-                                on_change=self.callbacks.get(
-                                    "update_gain", lambda value: None
-                                ),
-                            )
-                            .classes("w-20")
-                            .props("dense outlined")
-                        )
-                        self.gain_slider = (
-                            ui.slider(
-                                min=0,
-                                max=100,
-                                value=UVC_DEFAULTS["gain"],
-                                step=1,
-                                on_change=self.callbacks.get(
-                                    "update_gain", lambda value: None
-                                ),
-                            )
-                            .props("thumb-label")
-                            .classes("flex-1")
-                            .style("min-width: 200px; height: 40px;")
-                        )
-
-                        # Bind values
-                        self.gain_slider.bind_value(self.gain_number, "value")
-                        self.gain_number.bind_value(self.gain_slider, "value")
+                    (
+                        self.gain_number,
+                        self.gain_slider,
+                    ) = create_uvc_control(
+                        "Gain",
+                        0,
+                        100,
+                        UVC_DEFAULTS["gain"],
+                        self.callbacks.get("update_gain", lambda value: None),
+                    )
 
                     # Gamma Control
-                    ui.label("Gamma").classes("text-xs text-gray-600")
-                    with ui.row().classes("gap-3 items-center mb-3 w-full"):
-                        self.gamma_number = (
-                            ui.number(
-                                value=UVC_DEFAULTS["gamma"],
-                                min=50,
-                                max=300,
-                                step=1,
-                                on_change=self.callbacks.get(
-                                    "update_gamma", lambda value: None
-                                ),
-                            )
-                            .classes("w-20")
-                            .props("dense outlined")
-                        )
-                        self.gamma_slider = (
-                            ui.slider(
-                                min=50,
-                                max=300,
-                                value=UVC_DEFAULTS["gamma"],
-                                step=1,
-                                on_change=self.callbacks.get(
-                                    "update_gamma", lambda value: None
-                                ),
-                            )
-                            .props("thumb-label")
-                            .classes("flex-1")
-                            .style("min-width: 200px; height: 40px;")
-                        )
-
-                        # Bind values
-                        self.gamma_slider.bind_value(self.gamma_number, "value")
-                        self.gamma_number.bind_value(self.gamma_slider, "value")
+                    (
+                        self.gamma_number,
+                        self.gamma_slider,
+                    ) = create_uvc_control(
+                        "Gamma",
+                        50,
+                        300,
+                        UVC_DEFAULTS["gamma"],
+                        self.callbacks.get("update_gamma", lambda value: None),
+                    )
 
                     # Backlight Compensation Control
-                    ui.label("Backlight Compensation").classes("text-xs text-gray-600")
-                    with ui.row().classes("gap-3 items-center mb-4 w-full"):
-                        self.backlight_comp_number = (
-                            ui.number(
-                                value=UVC_DEFAULTS["backlight_compensation"],
-                                min=0,
-                                max=100,
-                                step=1,
-                                on_change=self.callbacks.get(
-                                    "update_backlight_comp", lambda value: None
-                                ),
-                            )
-                            .classes("w-20")
-                            .props("dense outlined")
-                        )
-                        self.backlight_comp_slider = (
-                            ui.slider(
-                                min=0,
-                                max=100,
-                                value=UVC_DEFAULTS["backlight_compensation"],
-                                step=1,
-                                on_change=self.callbacks.get(
-                                    "update_backlight_comp", lambda value: None
-                                ),
-                            )
-                            .props("thumb-label")
-                            .classes("flex-1")
-                            .style("min-width: 200px; height: 40px;")
-                        )
-
-                        # Bind values
-                        self.backlight_comp_slider.bind_value(
-                            self.backlight_comp_number, "value"
-                        )
-                        self.backlight_comp_number.bind_value(
-                            self.backlight_comp_slider, "value"
-                        )
+                    (
+                        self.backlight_comp_number,
+                        self.backlight_comp_slider,
+                    ) = create_uvc_control(
+                        "Backlight Compensation",
+                        0,
+                        100,
+                        UVC_DEFAULTS["backlight_compensation"],
+                        self.callbacks.get("update_backlight_comp", lambda value: None),
+                    )
 
                     # UVC Control Buttons
                     with ui.row().classes("gap-2 mt-4 justify-end"):
