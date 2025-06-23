@@ -37,11 +37,11 @@ from src.utils.log_service import info, warning, error
 
 DEFAULT_CONFIG = {
     "alerting": {
-        "email_recipient": "admin@example.com",
-        "smtp_host": "smtp.example.com",
+        "email_recipient": "willemdittloff@gmail.com",
+        "smtp_host": "smtp.gmail.com",
         "smtp_port": 587,
-        "smtp_user": "user",
-        "smtp_password": "pass",
+        "smtp_user": "willemdittloff@gmail.com",
+        "smtp_password": "pudm jrtu xgqa gsdn",
         "smtp_use_ssl": False,
         "critical_state_timeout_s": 60,
     }
