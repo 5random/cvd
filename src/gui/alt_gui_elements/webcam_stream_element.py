@@ -123,7 +123,9 @@ class WebcamStreamElement:
                     )
                 ):
                     # Image element displaying the MJPEG stream
-                    self.video_element = ui.image("/video_feed").style(
+                    # initialize without an active source; the stream will be
+                    # assigned when playback starts
+                    self.video_element = ui.image("").style(
                         "width: 100%; height: 100%; object-fit: contain;"
                     )
 
@@ -563,7 +565,9 @@ class WebcamStreamElement:
     async def toggle_video_play(self):
         """Toggle video play state"""
         if not self.camera_active:
-            self.video_element.set_source("/video_feed")
+            # assign the stream source only when starting playback
+            if self.video_element.source != "/video_feed":
+                self.video_element.set_source("/video_feed")
             self.start_camera_btn.set_text("Pause Video")
             self.start_camera_btn.set_icon("pause")
             self.start_camera_btn.props("color=negative")
@@ -573,7 +577,8 @@ class WebcamStreamElement:
             self._update_status()
         else:
             # Clear the image source to stop streaming
-            self.video_element.set_source("")
+            if self.video_element.source:
+                self.video_element.set_source("")
             self.start_camera_btn.set_text("Play Video")
             self.start_camera_btn.set_icon("play_arrow")
             self.start_camera_btn.props("color=positive")
