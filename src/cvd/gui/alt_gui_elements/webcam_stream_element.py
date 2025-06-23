@@ -574,30 +574,31 @@ class WebcamStreamElement:
             else:
                 result = await asyncio.to_thread(self._camera_toggle_cb)
 
-        if start_camera:
-            if result:
-                self.video_element.set_source("/video_feed")
-                if hasattr(self, "loading_spinner"):
-                    self.loading_spinner.set_visibility(True)
+        if not result:
+            notify_later(
+                "Failed to start camera" if start_camera else "Failed to stop camera",
+                type="negative",
+            )
+            return
 
-                self.start_camera_btn.set_text("Pause Video")
-                self.start_camera_btn.set_icon("pause")
-                self.start_camera_btn.props("color=negative")
-                self.camera_active = True
-                self._update_status()
-            else:
-                notify_later("Failed to start camera", type="negative")
+        if start_camera:
+            self.video_element.set_source("/video_feed")
+            if hasattr(self, "loading_spinner"):
+                self.loading_spinner.set_visibility(True)
+
+            self.start_camera_btn.set_text("Pause Video")
+            self.start_camera_btn.set_icon("pause")
+            self.start_camera_btn.props("color=negative")
+            self.camera_active = True
+            self._update_status()
         else:
-            if result:
-                if self.video_element.source:
-                    self.video_element.set_source("")
-                self.start_camera_btn.set_text("Play Video")
-                self.start_camera_btn.set_icon("play_arrow")
-                self.start_camera_btn.props("color=positive")
-                self.camera_active = False
-                self._update_status()
-            else:
-                notify_later("Failed to stop camera", type="negative")
+            if self.video_element.source:
+                self.video_element.set_source("")
+            self.start_camera_btn.set_text("Play Video")
+            self.start_camera_btn.set_icon("play_arrow")
+            self.start_camera_btn.props("color=positive")
+            self.camera_active = False
+            self._update_status()
 
     def toggle_white_balance_auto(self, value):
         """Toggle auto/manual white balance"""
