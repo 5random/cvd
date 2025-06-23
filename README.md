@@ -166,12 +166,13 @@ only setups or when running tests without real hardware.
 
 ## Running tests
 
-Before running the tests you must install this package and its dependencies.
-Attempting to execute `pytest` without installation will result in import
-errors.
+Before running the tests you must install this package and all third-party
+dependencies.  Attempting to execute `pytest` without installation will result
+in import errors.  A full list of required packages is available in
+[docs/test_setup.md](docs/test_setup.md).
 
-Install the dependencies and run the tests in a single sequence. You can
-either install the package in editable mode or use the requirements files:
+Install the dependencies and run the tests in a single sequence. You can either
+install the package in editable mode or use the requirements files:
 
 ```bash
 pip install -e .
