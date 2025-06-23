@@ -96,7 +96,11 @@ async def probe_camera_modes(
     *,
     capture_backend: Optional[int] = None,
 ) -> List[Tuple[int, int, int]]:
-    """Probe camera for supported (width, height, fps) combinations."""
+    """Probe camera for supported (width, height, fps) combinations.
+
+    Stops iterating fps values for a resolution once a working combination
+    has been found to reduce the probing time.
+    """
     resolutions = [
         (320, 240),
         (352, 288),
@@ -112,6 +116,7 @@ async def probe_camera_modes(
 
     modes: List[Tuple[int, int, int]] = []
     for w, h in resolutions:
+        found_for_resolution = False
         for f in fps_values:
             cap = await open_capture(
                 device_index,
@@ -133,7 +138,10 @@ async def probe_camera_modes(
                 mode = (aw, ah, af or f)
                 if mode not in modes:
                     modes.append(mode)
+                found_for_resolution = True
             await run_camera_io(cap.release)
+            if found_for_resolution:
+                break
 
     if not modes:
         modes.append((640, 480, 30))
