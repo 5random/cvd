@@ -29,6 +29,9 @@ rs232 = "src.legacy_sensors.rs232_sensor:RS232Sensor"
 mock_arduino_tc_board = "src.data_handler.sources.mock_sensors:MockArduinoTCSensor"
 mock_rs232 = "src.data_handler.sources.mock_sensors:MockRS232Sensor"
 
+[project.scripts]
+cvd-alt-gui = "src.gui.alt_application:main"
+
 [tool.black]
 line-length = 88
 target-version = ['py311']

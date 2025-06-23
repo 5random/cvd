@@ -18,6 +18,12 @@ setup(
     packages=find_packages(include=["src", "src.*"]),
     package_dir={"src": "src"},
 
+    entry_points={
+        "console_scripts": [
+            "cvd-alt-gui=src.gui.alt_application:main",
+        ]
+    },
+
     data_files=[
         ("cvd/config", glob("config/*.json")),
         ("cvd/data", ["data/data_index.json"]),

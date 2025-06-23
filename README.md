@@ -113,12 +113,12 @@ Use the fullscreen button in the header to toggle between windowed and fullscree
 
 ### Simplified GUI
 
-For a minimal webcam demo you can run the alternative GUI located in
-``src/gui/alt_application.py``. It loads the example configuration from
+For a minimal webcam demo you can run the alternative GUI via the
+``cvd-alt-gui`` command. It loads the example configuration from
 ``src/config/simple_config.json``:
 
 ```bash
-python src/gui/alt_application.py
+cvd-alt-gui
 ```
 
 ### Camera stream endpoints
