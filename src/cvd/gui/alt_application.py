@@ -209,7 +209,11 @@ class SimpleGUIApplication:
 
                     # Motion detection status
                     self.motion_status_icon = (
-                        ui.icon("motion_photos_on")
+                        ui.icon(
+                            "motion_photos_on"
+                            if self.motion_detected
+                            else "motion_photos_off"
+                        )
                         .classes(
                             "text-orange-300"
                             if self.motion_detected

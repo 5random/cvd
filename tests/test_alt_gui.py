@@ -274,6 +274,7 @@ class TestSimpleGUIApplicationCameraFunctionality:
         await user.open("/")
 
         assert "text-gray-400" in simple_gui_app.motion_status_icon.classes
+        assert simple_gui_app.motion_status_icon.name == "motion_photos_off"
 
         simple_gui_app.update_motion_status(True)
         assert simple_gui_app.motion_detected is True
