@@ -16,7 +16,7 @@ from contextlib import contextmanager
 import inspect
 import os
 import time
-from concurrent.futures import Future, ThreadPoolExecutor
+from concurrent.futures import Future, ThreadPoolExecutor, CancelledError
 from dataclasses import dataclass
 from enum import Enum
 from threading import BoundedSemaphore, Lock
@@ -390,7 +390,11 @@ class ManagedThreadPool:
 
         # callbacks
         def _done(res: Future[Any]):
-            exc = res.exception()
+            try:
+                exc = res.exception()
+            except CancelledError:
+                # Future was cancelled, treat as no exception
+                exc = None
             with self._stats_lock:
                 self._stats.active_tasks -= 1
                 if exc:
