@@ -21,7 +21,7 @@ if __name__ == "__main__" and __package__ is None:
 
 import asyncio
 import contextlib
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Any, Dict, Optional, Type, cast
 import re
 
@@ -148,7 +148,9 @@ class SimpleGUIApplication:
         self._experiment_timer: Optional[ui.timer] = None
         self._time_timer: Optional[ui.timer] = None
         self._processing_task: Optional[asyncio.Task] = None
+        self._alert_task: Optional[asyncio.Task] = None
         self.supported_camera_modes: list[tuple[int, int, int]] = []
+        self._last_motion_time: datetime = datetime.now()
 
         # Placeholder settings
         self.settings = {
@@ -172,7 +174,10 @@ class SimpleGUIApplication:
         self.alert_configurations = load_alert_configs(self.config_service)
         self._alert_configs_from_disk = bool(self.alert_configurations)
         if not self.alert_configurations:
-            self.alert_configurations = create_demo_configurations()
+            if callable(create_demo_configurations):
+                self.alert_configurations = create_demo_configurations()
+            else:
+                self.alert_configurations = []
         self.alert_display = EmailAlertStatusDisplay(self.alert_configurations)
         self.alert_display.update_callback = self._on_alert_config_changed
 
@@ -402,6 +407,8 @@ class SimpleGUIApplication:
     def update_motion_status(self, detected: bool) -> None:
         """Update motion icon and state based on detection status."""
         self.motion_detected = detected
+        if detected:
+            self._last_motion_time = datetime.now()
         if hasattr(self, "motion_status_icon"):
             self.motion_status_icon.name = (
                 "motion_photos_on" if detected else "motion_photos_off"
@@ -1217,6 +1224,35 @@ class SimpleGUIApplication:
             type="positive" if total_sent else "warning",
         )
 
+    async def _send_alerts_for_condition(self, condition: str, message: str) -> None:
+        """Send an alert for the given condition to all matching configurations."""
+        service = self.email_alert_service
+        if service is None:
+            return
+
+        active_configs = [
+            cfg
+            for cfg in self.alert_configurations
+            if cfg.get("settings", {}).get(condition, {}).get("enabled")
+        ]
+
+        tasks = [
+            run_network_io(
+                service.send_alert,
+                f"Alert ({cfg.get('name', 'Alert')})",
+                message,
+                recipient=email,
+            )
+            for cfg in active_configs
+            for email in cfg.get("emails", [])
+        ]
+
+        if tasks:
+            await gather_with_concurrency(tasks, label="alerts", cancel_on_exception=False)
+
+        if hasattr(self.alert_display, "update_callback") and self.alert_display.update_callback:
+            self.alert_display.update_callback()
+
     def _show_alert_history(self):
         """Show alert history dialog"""
         with ui.dialog() as dialog, ui.card().classes("w-full max-w-4xl"):
@@ -1250,6 +1286,48 @@ class SimpleGUIApplication:
 
         dialog.open()
 
+    async def _evaluate_alert_conditions(self) -> None:
+        """Check configured alert conditions and send alerts if triggered."""
+        if not self.alerts_enabled:
+            return
+
+        now = datetime.now()
+
+        # No motion detected for configured delay
+        if not self.motion_detected:
+            for cfg in self.alert_configurations:
+                settings = cfg.get("settings", {}).get("no_motion_detected", {})
+                if not settings.get("enabled"):
+                    continue
+                delay = int(settings.get("delay_minutes", 5))
+                if now - self._last_motion_time >= timedelta(minutes=delay):
+                    await self._send_alerts_for_condition(
+                        "no_motion_detected",
+                        f"No motion detected for {delay} minute(s)",
+                    )
+                    break
+
+        # Camera offline
+        if (
+            self.camera_controller is None
+            or self.camera_controller.status != ControllerStatus.RUNNING
+        ):
+            await self._send_alerts_for_condition(
+                "camera_offline",
+                "Camera is offline",
+            )
+
+    async def _alert_check_loop(self) -> None:
+        """Periodically evaluate alert conditions."""
+        while True:
+            try:
+                await asyncio.sleep(60)
+                await self._evaluate_alert_conditions()
+            except asyncio.CancelledError:
+                break
+            except Exception as exc:  # pragma: no cover - logging only
+                error("alert_check_failed", exc_info=exc)
+
     async def _processing_loop(self) -> None:
         """Continuously process controller data."""
         while True:
@@ -1273,6 +1351,13 @@ class SimpleGUIApplication:
 
         if not self.experiment_running:
             return
+
+        if new_state == ExperimentState.COMPLETED:
+            asyncio.create_task(
+                self._send_alerts_for_condition(
+                    "experiment_complete_alert", "Experiment completed"
+                )
+            )
 
         if new_state in {
             ExperimentState.COMPLETED,
@@ -1363,6 +1448,7 @@ class SimpleGUIApplication:
 
         if success:
             self._processing_task = asyncio.create_task(self._processing_loop())
+            self._alert_task = asyncio.create_task(self._alert_check_loop())
 
             if (
                 self.camera_controller is not None
@@ -1385,6 +1471,11 @@ class SimpleGUIApplication:
             with contextlib.suppress(Exception):
                 await self._processing_task
             self._processing_task = None
+        if self._alert_task:
+            self._alert_task.cancel()
+            with contextlib.suppress(Exception):
+                await self._alert_task
+            self._alert_task = None
         if self._experiment_timer:
             try:
                 self._experiment_timer.cancel()
