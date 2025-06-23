@@ -219,9 +219,10 @@ async def gather_with_concurrency(
         raise
 
     if errors and not cancel_on_exception:
-        group = ExceptionGroup(f"{label} collected errors", errors)
-        error("gather_errors", label=label, exc_info=group)
-        raise group
+        exc_group = ExceptionGroup(f"{label} collected errors", errors)
+        error("gather_errors", label=label, exc_info=exc_group)
+        raise exc_group
+
 
     return cast(List[T], results)
 
@@ -401,10 +402,9 @@ def install_signal_handlers(manager: AsyncTaskManager) -> None:
 
     for sig in (signal.SIGINT, signal.SIGTERM):
         try:
-
             def _async_handler(s: signal.Signals = sig) -> None:
                 asyncio.create_task(_shutdown(s.name))
-
+                
             loop.add_signal_handler(sig, _async_handler)
         except NotImplementedError:  # Windows
 

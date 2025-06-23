@@ -51,7 +51,6 @@ class MotionDetectionResult:
 
 def analyze_motion(
     mask: np.ndarray,
-    frame: np.ndarray,
     *,
     min_contour_area: int,
     roundness_enabled: bool,
@@ -102,7 +101,11 @@ def analyze_motion(
         motion_bbox = (x, y, w, h)
 
     # Calculate confidence based on motion characteristics
-    confidence = min(motion_percentage / motion_threshold_percentage, 1.0)
+    confidence = (
+        min(motion_percentage / motion_threshold_percentage, 1.0)
+        if motion_threshold_percentage > 0
+        else 0.0
+    )
     if confidence < confidence_threshold:
         motion_detected = False
 
@@ -175,6 +178,13 @@ class MotionDetectionController(ImageController):
         self.motion_threshold_percentage = params.get(
             "motion_threshold_percentage", 1.0
         )
+        if self.motion_threshold_percentage <= 0:
+            warning(
+                "motion_threshold_percentage must be > 0, using default",
+                controller_id=self.controller_id,
+                value=self.motion_threshold_percentage,
+            )
+            self.motion_threshold_percentage = 1.0
         self.gaussian_blur_kernel = params.get("gaussian_blur_kernel", (5, 5))
         self.morphology_kernel_size = params.get("morphology_kernel_size", 5)
         self.confidence_threshold = params.get("confidence_threshold", 0.5)
@@ -202,6 +212,10 @@ class MotionDetectionController(ImageController):
         self._warmup_counter = 0
 
         # Optional region of interest for motion analysis
+        self._roi_x: int = 0
+        self._roi_y: int = 0
+        self._roi_width: Optional[int] = None
+        self._roi_height: Optional[int] = None
         self.roi_x = params.get("roi_x", 0)
         self.roi_y = params.get("roi_y", 0)
         self.roi_width = params.get("roi_width")
@@ -219,6 +233,49 @@ class MotionDetectionController(ImageController):
 
         # Lock to protect shared state in async processing
         self._state_lock = asyncio.Lock()
+
+    # ------------------------------------------------------------------
+    # ROI properties
+
+    @property
+    def roi_x(self) -> int:
+        return self._roi_x
+
+    @roi_x.setter
+    def roi_x(self, value: int) -> None:
+        if getattr(self, "_roi_x", None) != value:
+            self._frame_size = None
+        self._roi_x = value
+
+    @property
+    def roi_y(self) -> int:
+        return self._roi_y
+
+    @roi_y.setter
+    def roi_y(self, value: int) -> None:
+        if getattr(self, "_roi_y", None) != value:
+            self._frame_size = None
+        self._roi_y = value
+
+    @property
+    def roi_width(self) -> Optional[int]:
+        return self._roi_width
+
+    @roi_width.setter
+    def roi_width(self, value: Optional[int]) -> None:
+        if getattr(self, "_roi_width", None) != value:
+            self._frame_size = None
+        self._roi_width = value
+
+    @property
+    def roi_height(self) -> Optional[int]:
+        return self._roi_height
+
+    @roi_height.setter
+    def roi_height(self, value: Optional[int]) -> None:
+        if getattr(self, "_roi_height", None) != value:
+            self._frame_size = None
+        self._roi_height = value
 
     async def initialize(self) -> bool:
         """Initialize the motion detection controller"""
@@ -305,8 +362,7 @@ class MotionDetectionController(ImageController):
                         self.roi_height = None
 
             # Store frame size for calculations
-            if self._frame_size is None:
-                self._frame_size = (frame.shape[1], frame.shape[0])
+            self._frame_size = (frame.shape[1], frame.shape[0])
 
             # Ensure background subtractor is initialized
             if self._bg_subtractor is None:
@@ -336,7 +392,6 @@ class MotionDetectionController(ImageController):
             motion_result = await self._motion_pool.submit_async(
                 analyze_motion,
                 processed_mask,
-                frame,
                 min_contour_area=self.min_contour_area,
                 roundness_enabled=self.roundness_enabled,
                 roundness_threshold=self.roundness_threshold,
