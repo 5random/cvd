@@ -1,7 +1,7 @@
-"""
-Email Alert Service Setup Wizard
-Implementiert einen 4-stufigen Wizard für die Konfiguration des
-Email-Alert-Service mit NiceGUI Stepper
+"""Email Alert Service Setup Wizard
+
+Implements a four-step wizard for configuring the Email Alert Service using
+the NiceGUI Stepper.
 """
 
 from nicegui import ui
@@ -815,24 +815,23 @@ class EmailAlertStatusDisplay:
         with ui.card().classes("w-full") as overview_card:
             # Header
             with ui.row().classes("w-full items-center justify-between mb-4"):
-                ui.label("E-Mail Alert Übersicht").classes("text-lg font-semibold")
+                ui.label("Email Alert Overview").classes("text-lg font-semibold")
                 ui.button(
-                    "Neue Konfiguration", icon="add", on_click=self._show_setup_wizard
+                    "New Configuration", icon="add", on_click=self._show_setup_wizard
                 ).props("color=primary")
 
             if not self.alert_configurations:
                 # No configurations available
                 with ui.column().classes("items-center gap-4 p-8"):
                     ui.icon("notifications_off").classes("text-6xl text-gray-400")
-                    ui.label("Keine E-Mail Alerts konfiguriert").classes(
+                    ui.label("No email alerts configured").classes(
                         "text-gray-600 text-center"
                     )
                     ui.label(
-                        "Erstellen Sie eine neue Konfiguration um E-Mail "
-                        "Benachrichtigungen zu erhalten."
+                        "Create a new configuration to receive email notifications."
                     ).classes("text-sm text-gray-500 text-center")
                     ui.button(
-                        "Erste Konfiguration erstellen",
+                        "Create First Configuration",
                         icon="add_circle",
                         on_click=self._show_setup_wizard,
                     ).props("color=primary")
@@ -852,7 +851,7 @@ class EmailAlertStatusDisplay:
                     with ui.row().classes("items-center gap-2"):
                         ui.icon("label").classes("text-blue-600")
                         ui.label(
-                            config.get("name", "Unbenannte Konfiguration")
+                            config.get("name", "Unnamed Configuration")
                         ).classes("font-semibold text-lg")
 
                     # Status badge
@@ -863,9 +862,9 @@ class EmailAlertStatusDisplay:
                     )
                     status_color = "positive" if active_count > 0 else "grey"
                     status_text = (
-                        f"{active_count} Alert(s) aktiv"
+                        f"{active_count} Alert(s) active"
                         if active_count > 0
-                        else "Inaktiv"
+                        else "Inactive"
                     )
                     ui.chip(status_text, color=status_color).props("dense")
 
@@ -873,14 +872,14 @@ class EmailAlertStatusDisplay:
                 emails = config.get("emails", [])
                 with ui.row().classes("items-center gap-2 mb-3"):
                     ui.icon("email").classes("text-gray-600")
-                    ui.label(f"Empfänger ({len(emails)}):").classes("font-medium")
+                    ui.label(f"Recipients ({len(emails)}):").classes("font-medium")
 
                 if emails:
                     with ui.row().classes("gap-2 flex-wrap ml-6"):
                         for email in emails:
                             ui.chip(self.anonymize_email(email)).props("dense outline")
                 else:
-                    ui.label("Keine E-Mail Adressen konfiguriert").classes(
+                    ui.label("No email addresses configured").classes(
                         "text-orange-600 text-sm ml-6"
                     )
 
@@ -907,7 +906,7 @@ class EmailAlertStatusDisplay:
                 if active_alerts:
                     with ui.row().classes("items-center gap-2 mb-2"):
                         ui.icon("notifications_active").classes("text-green-600")
-                        ui.label("Aktive Alerts:").classes("font-medium")
+                        ui.label("Active Alerts:").classes("font-medium")
 
                     with ui.column().classes("gap-2 ml-6"):
                         for alert in active_alerts:
@@ -919,13 +918,13 @@ class EmailAlertStatusDisplay:
                                 if alert["key"] == "no_motion_detected":
                                     delay = alert["settings"].get("delay_minutes", 5)
                                     ui.chip(
-                                        f"{delay} Min Verzögerung", color="blue"
+                                        f"{delay} min delay", color="blue"
                                     ).props("dense outline")
 
                 # Inactive alerts (if any active alerts exist, show inactive ones collapsed)
                 if inactive_alerts and active_alerts:
                     with ui.expansion(
-                        "Inaktive Alerts", icon="notifications_off"
+                        "Inactive Alerts", icon="notifications_off"
                     ).classes("w-full mt-2"):
                         with ui.column().classes("gap-1 p-2"):
                             for alert in inactive_alerts:
@@ -937,19 +936,19 @@ class EmailAlertStatusDisplay:
                 # Action buttons
                 with ui.row().classes("gap-2 mt-4"):
                     ui.button(
-                        "Bearbeiten",
+                        "Edit",
                         icon="edit",
                         on_click=lambda e, c=config: self._edit_configuration(c),
                     ).props("size=sm color=primary")
 
                     ui.button(
-                        "Test senden",
+                        "Send Test",
                         icon="send",
                         on_click=lambda e, c=config: self._send_test_alert(c),
                     ).props("size=sm color=warning")
 
                     ui.button(
-                        "Löschen",
+                        "Delete",
                         icon="delete",
                         on_click=lambda e, c=config: self._delete_configuration(c),
                     ).props("size=sm color=negative")
@@ -962,7 +961,7 @@ class EmailAlertStatusDisplay:
                 with ui.row().classes("items-center justify-between mb-3"):
                     with ui.row().classes("items-center gap-2"):
                         ui.icon("notifications").classes("text-blue-600")
-                        ui.label("E-Mail Alerts").classes("font-semibold")
+                        ui.label("Email Alerts").classes("font-semibold")
 
                     # Quick status indicator
                     total_configs = len(self.alert_configurations)
@@ -979,30 +978,30 @@ class EmailAlertStatusDisplay:
 
                     if active_configs > 0:
                         ui.icon("check_circle").classes("text-green-600").tooltip(
-                            f"{active_configs} von {total_configs} Konfigurationen aktiv"
+                            f"{active_configs} of {total_configs} configurations active"
                         )
                     else:
                         ui.icon("warning").classes("text-orange-600").tooltip(
-                            "Keine aktiven Alert-Konfigurationen"
+                            "No active alert configurations"
                         )
 
                 # Quick summary
                 if total_configs == 0:
-                    ui.label("Keine Konfigurationen").classes("text-gray-600 text-sm")
+                    ui.label("No configurations").classes("text-gray-600 text-sm")
                 else:
-                    ui.label(f"{total_configs} Konfiguration(en)").classes("text-sm")
+                    ui.label(f"{total_configs} configuration(s)").classes("text-sm")
                     if active_configs > 0:
                         total_recipients = sum(
                             len(config.get("emails", []))
                             for config in self.alert_configurations
                         )
-                        ui.label(f"{total_recipients} Empfänger insgesamt").classes(
+                        ui.label(f"{total_recipients} total recipients").classes(
                             "text-xs text-gray-600"
                         )
 
                 # Quick action button
                 ui.button(
-                    "Verwalten" if total_configs > 0 else "Einrichten",
+                    "Manage" if total_configs > 0 else "Set Up",
                     icon="settings" if total_configs > 0 else "add",
                     on_click=self._show_management_dialog,
                 ).props("size=sm color=primary outline").classes("w-full mt-2")
@@ -1061,7 +1060,7 @@ class EmailAlertStatusDisplay:
         with ui.dialog() as dialog, ui.card().classes("w-full max-w-4xl"):
             wizard.create_wizard()
             with ui.row().classes("w-full justify-end mt-4"):
-                ui.button("Schließen", on_click=dialog.close).props("flat")
+                ui.button("Close", on_click=dialog.close).props("flat")
             dialog.on("close", lambda _: wizard.cleanup())
 
         dialog.open()
@@ -1083,7 +1082,7 @@ class EmailAlertStatusDisplay:
         with ui.dialog() as dialog, ui.card().classes("w-full max-w-4xl"):
             wizard.create_wizard()
             with ui.row().classes("w-full justify-end mt-4"):
-                ui.button("Schließen", on_click=dialog.close).props("flat")
+                ui.button("Close", on_click=dialog.close).props("flat")
             dialog.on("close", lambda _: wizard.cleanup())
 
         dialog.open()
@@ -1092,11 +1091,11 @@ class EmailAlertStatusDisplay:
         """Send a test alert for the configuration"""
         service = get_email_alert_service()
         if service is None:
-            notify_later("EmailAlertService nicht verfügbar", type="warning")
+            notify_later("EmailAlertService unavailable", type="warning")
             return
 
-        subject = f"Test-Alert ({config.get('name', 'Alert')})"
-        body = "Dies ist ein Test des E-Mail-Alert-Systems."
+        subject = f"Test Alert ({config.get('name', 'Alert')})"
+        body = "This is a test of the email alert system."
 
         failed: List[str] = []
 
@@ -1119,9 +1118,9 @@ class EmailAlertStatusDisplay:
         else:
             sent = 0
 
-        message = f"Test-Alert an {sent} Empfänger gesendet"
+        message = f"Test alert sent to {sent} recipient(s)"
         if failed:
-            message += f" (Fehler bei: {', '.join(failed)})"
+            message += f" (failed for: {', '.join(failed)})"
 
         notify_later(
             message,
@@ -1134,33 +1133,33 @@ class EmailAlertStatusDisplay:
         callback: Optional[Callable[[], None]] = None,
     ):
         """Delete a configuration with confirmation"""
-        config_name = config.get("name", "Unbenannte Konfiguration")
+        config_name = config.get("name", "Unnamed Configuration")
 
         with ui.dialog() as dialog:
             with ui.card():
-                ui.label("Konfiguration löschen").classes("text-lg font-bold")
-                ui.label(f'Möchten Sie "{config_name}" wirklich löschen?').classes(
+                ui.label("Delete Configuration").classes("text-lg font-bold")
+                ui.label(f'Do you really want to delete "{config_name}"?').classes(
                     "mt-2"
                 )
 
                 with ui.row().classes("gap-2 justify-end mt-4"):
-                    ui.button("Abbrechen", on_click=dialog.close).props("flat")
+                    ui.button("Cancel", on_click=dialog.close).props("flat")
 
                     def _confirm():
                         self.remove_configuration(config, callback)
                         dialog.close()
 
-                    ui.button("Löschen", on_click=_confirm).props("color=negative")
+                    ui.button("Delete", on_click=_confirm).props("color=negative")
 
         dialog.open()
 
     def _show_management_dialog(self):
         """Show the alert management dialog"""
         with ui.dialog() as dialog, ui.card().classes("w-full max-w-6xl"):
-            ui.label("E-Mail Alert Verwaltung").classes("text-xl font-bold mb-4")
+            ui.label("Email Alert Management").classes("text-xl font-bold mb-4")
             self.create_alert_overview()
             with ui.row().classes("w-full justify-end mt-4"):
-                ui.button("Schließen", on_click=dialog.close).props("flat")
+                ui.button("Close", on_click=dialog.close).props("flat")
 
         dialog.open()
 
@@ -1315,7 +1314,7 @@ def create_demo_configurations() -> List[Dict[str, Any]]:
     """Create demo alert configurations for testing"""
     return [
         {
-            "name": "Labor Überwachung",
+            "name": "Lab Monitoring",
             "emails": [
                 "admin@tuhh.de",
                 "security@tuhh.de",
@@ -1329,7 +1328,7 @@ def create_demo_configurations() -> List[Dict[str, Any]]:
             },
         },
         {
-            "name": "Experiment Benachrichtigungen",
+            "name": "Experiment Notifications",
             "emails": ["researcher@tuhh.de", "supervisor@tuhh.de"],
             "settings": {
                 "no_motion_detected": {"enabled": False, "delay_minutes": 5},
@@ -1339,7 +1338,7 @@ def create_demo_configurations() -> List[Dict[str, Any]]:
             },
         },
         {
-            "name": "Inaktive Konfiguration",
+            "name": "Inactive Configuration",
             "emails": ["test@tuhh.de"],
             "settings": {
                 "no_motion_detected": {"enabled": False, "delay_minutes": 5},
