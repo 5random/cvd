@@ -44,12 +44,16 @@ class ControllerManager:
     """Manages multiple controllers with dependency resolution and execution orchestration"""
 
     def __init__(
-        self, manager_id: str = "default", max_concurrency: Optional[int] = None
+        self,
+        manager_id: str = "default",
+        max_concurrency: Optional[int] = None,
+        enable_parallel_execution: Optional[bool] = None,
     ):
         self.manager_id = manager_id
         self._controllers: Dict[str, ControllerStage] = {}
         self._dependencies: List[ControllerDependency] = []
         self._execution_order: List[str] = []
+        self._execution_stages: List[List[str]] = []
         self._running = False
         self._processing_stats: Dict[str, Any] = {}
         self._error_handlers: Dict[str, Callable[..., Any]] = {}
@@ -64,10 +68,21 @@ class ControllerManager:
                 limit = service.get("controller_concurrency_limit", int, None)
         if limit is None:
             limit = int(os.getenv("CONTROLLER_MANAGER_CONCURRENCY_LIMIT", "10"))
-        self._execution_semaphore = asyncio.Semaphore(
-            limit
-        )  # Limit concurrent executions
+        self._execution_semaphore = asyncio.Semaphore(limit)
         self._max_concurrency = limit
+
+        # Determine whether parallel execution is enabled
+        par = enable_parallel_execution
+        if par is None:
+            service = get_config_service()
+            if service is not None:
+                par = service.get(
+                    "controller_manager.parallel_execution", bool, False
+                )
+        if par is None:
+            env = os.getenv("CONTROLLER_MANAGER_PARALLEL_EXECUTION")
+            par = str(env).lower() in {"1", "true", "yes"} if env is not None else False
+        self._parallel_execution = bool(par)
 
     def register_controller(self, controller: ControllerStage) -> None:
         """Register a controller with the manager"""
@@ -196,18 +211,23 @@ class ControllerManager:
             graph[dep.source_controller_id].append(dep.target_controller_id)
             in_degree[dep.target_controller_id] += 1
 
-        # Topological sort
+        # Topological sort + stage building
         queue = deque(cid for cid, degree in in_degree.items() if degree == 0)
-        execution_order = []
+        execution_order: List[str] = []
+        stages: List[List[str]] = []
 
         while queue:
-            current = queue.popleft()
-            execution_order.append(current)
-
-            for neighbor in graph[current]:
-                in_degree[neighbor] -= 1
-                if in_degree[neighbor] == 0:
-                    queue.append(neighbor)
+            stage: List[str] = list(queue)
+            stages.append(stage)
+            next_queue: deque[str] = deque()
+            while queue:
+                current = queue.popleft()
+                execution_order.append(current)
+                for neighbor in graph[current]:
+                    in_degree[neighbor] -= 1
+                    if in_degree[neighbor] == 0:
+                        next_queue.append(neighbor)
+            queue = next_queue
 
         # Check for cycles
         if len(execution_order) != len(self._controllers):
@@ -217,10 +237,12 @@ class ControllerManager:
             )
 
         self._execution_order = execution_order
+        self._execution_stages = stages
         debug(
             "Execution order updated",
             manager_id=self.manager_id,
             order=self._execution_order,
+            stages=self._execution_stages,
         )
 
     async def start_all_controllers(self) -> bool:
@@ -276,26 +298,41 @@ class ControllerManager:
         start_time = time.time()
 
         try:
-            async with self._execution_semaphore:
-                for controller_id in self._execution_order:
-                    controller = self._controllers[controller_id]
+            if not self._parallel_execution:
+                async with self._execution_semaphore:
+                    for controller_id in self._execution_order:
+                        controller = self._controllers[controller_id]
 
-                    if controller.status != ControllerStatus.RUNNING:
-                        continue
+                        if controller.status != ControllerStatus.RUNNING:
+                            continue
 
-                    # Prepare input data for this controller
-                    input_data = self._prepare_controller_input(
-                        controller_id, sensor_data, controller_outputs, metadata
-                    )
+                        input_data = self._prepare_controller_input(
+                            controller_id, sensor_data, controller_outputs, metadata
+                        )
 
-                    # Execute controller with lock
-                    async with self._controller_locks[controller_id]:
-                        result = await controller.process_with_timing(input_data)
+                        async with self._controller_locks[controller_id]:
+                            result = await controller.process_with_timing(input_data)
                         results[controller_id] = result
 
-                        # Store output for dependent controllers
                         if result.success and result.data is not None:
                             controller_outputs[controller_id] = result.data
+            else:
+                for stage in self._execution_stages:
+                    async with asyncio.TaskGroup() as tg:
+                        for controller_id in stage:
+                            controller = self._controllers[controller_id]
+                            if controller.status != ControllerStatus.RUNNING:
+                                continue
+
+                            tg.create_task(
+                                self._run_controller(
+                                    controller_id,
+                                    sensor_data,
+                                    metadata,
+                                    controller_outputs,
+                                    results,
+                                )
+                            )
 
         except Exception as e:
             error(
@@ -365,6 +402,29 @@ class ControllerManager:
             timestamp=time.time(),
             metadata=metadata,
         )
+
+    async def _run_controller(
+        self,
+        controller_id: str,
+        sensor_data: Dict[str, Any],
+        metadata: Dict[str, Any],
+        controller_outputs: Dict[str, Any],
+        results: Dict[str, ControllerResult],
+    ) -> None:
+        """Execute a single controller respecting locks and concurrency limits."""
+        input_data = self._prepare_controller_input(
+            controller_id, sensor_data, controller_outputs, metadata
+        )
+
+        async with self._execution_semaphore:
+            async with self._controller_locks[controller_id]:
+                result = await self._controllers[controller_id].process_with_timing(
+                    input_data
+                )
+
+        results[controller_id] = result
+        if result.success and result.data is not None:
+            controller_outputs[controller_id] = result.data
 
     def _update_processing_stats(
         self, total_time_ms: float, results: Dict[str, ControllerResult]

@@ -142,6 +142,7 @@ The controller manager controls how many controllers may execute in parallel.
 Set the ``CONTROLLER_MANAGER_CONCURRENCY_LIMIT`` environment variable to adjust
 this number. If unset, it defaults to ``10``. You can also provide the same
 value on startup using the ``--controller-concurrency-limit`` option of
+
 ``main.py`` which simply sets this environment variable for you.
 
 ### Webcam UVC settings
