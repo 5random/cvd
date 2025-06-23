@@ -281,6 +281,28 @@ def test_convert_to_cv_frame_bgr_passthrough():
     assert np.array_equal(converted, bgr)
 
 
+def test_convert_to_cv_frame_grayscale_2d():
+    config = ControllerConfig(controller_id="md", controller_type="motion_detection")
+    ctrl = MotionDetectionController("md", config)
+    gray = np.full((5, 5), 128, dtype=np.uint8)
+
+    converted = ctrl._convert_to_cv_frame(gray)
+    assert converted.shape == (5, 5, 3)
+    expected = np.stack([gray] * 3, axis=-1)
+    assert np.array_equal(converted, expected)
+
+
+def test_convert_to_cv_frame_grayscale_single_channel():
+    config = ControllerConfig(controller_id="md", controller_type="motion_detection")
+    ctrl = MotionDetectionController("md", config)
+    gray = np.full((5, 5, 1), 64, dtype=np.uint8)
+
+    converted = ctrl._convert_to_cv_frame(gray)
+    assert converted.shape == (5, 5, 3)
+    expected = np.full((5, 5, 3), 64, dtype=np.uint8)
+    assert np.array_equal(converted, expected)
+
+
 @pytest.mark.asyncio
 async def test_stop_event_initialized_and_persistent():
     cfg = ControllerConfig(controller_id="md", controller_type="motion_detection")
@@ -396,6 +418,7 @@ async def test_roi_out_of_bounds_skip_crop(monkeypatch):
     assert warnings
     assert result.data.frame.shape == frame.shape
 
+
 def test_invalid_gaussian_blur_kernel_defaults(monkeypatch):
     import cvd.controllers.webcam.motion_detection as md
 
@@ -427,6 +450,7 @@ def test_invalid_morphology_kernel_size_defaults(monkeypatch):
     assert ctrl.morphology_kernel_size == 5
     assert warnings
 
+
 @pytest.mark.asyncio
 async def test_frame_size_updates_on_roi_change(monkeypatch):
     cfg = ControllerConfig(controller_id="md", controller_type="motion_detection")
@@ -452,6 +476,7 @@ async def test_frame_size_updates_on_roi_change(monkeypatch):
 
     assert result2.metadata["frame_size"] == (10, 10)
     assert ctrl._frame_size == (10, 10)
+
 
 async def test_roi_bbox_and_center_adjustment(monkeypatch):
     cfg = ControllerConfig(
