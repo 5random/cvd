@@ -132,31 +132,6 @@ class ApplicationContainer:
         container = cls.create(config_dir)
         return container
 
-    def _start_background_services(self) -> None:
-        """Start async services via ManagedThreadPool"""
-        import threading
-
-        # Spawn a daemon thread for async startup
-        # and keep a reference for shutdown
-        self._bg_thread = threading.Thread(
-            target=lambda: asyncio.run(self._async_startup()),
-            name="bg_services",
-            daemon=True,
-        )
-        self._bg_thread.start()
-        info("Background services started on dedicated daemon thread")
-
-    async def _async_startup(self) -> None:
-        """Async startup for background services"""
-        try:
-            # Keep background services running
-            while not self._shutdown_requested:
-                await asyncio.sleep(1)
-        except RuntimeError as e:
-            error(f"Error in background services: {e}")
-        except Exception as e:
-            error(f"Unexpected error in background services: {e}")
-            raise
 
     async def startup(self) -> None:
         """Async startup for all services"""
@@ -219,9 +194,7 @@ class ApplicationContainer:
         try:
             # Signal background services to stop
             self._shutdown_requested = True
-            # Wait for background startup thread to finish
-            if hasattr(self, "_bg_thread"):
-                await asyncio.to_thread(self._bg_thread.join, 5)
+            # No background service thread to wait for
             # Shutdown web application
             await self.web_application.shutdown()
 
@@ -245,9 +218,7 @@ class ApplicationContainer:
     def shutdown_sync(self) -> None:
         """Synchronous shutdown for cleanup"""
         self._shutdown_requested = True
-        # Wait for background startup thread to finish
-        if hasattr(self, "_bg_thread"):
-            self._bg_thread.join(timeout=5)
+        # No background service thread to wait for
         # Shutdown background tasks
         for pool, future in self._background_tasks:
             if not future.done():
