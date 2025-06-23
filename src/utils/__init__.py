@@ -17,7 +17,6 @@ from .config_service import (
     get_config_service,
     set_config_service,
 )
-from ..gui.ui_helpers import notify_later  # noqa: F401
 
 _BASE_PACKAGE = __name__
 
@@ -38,7 +37,9 @@ _lazy_modules = {
     "performance": ".log_service",
     "timer": ".log_service",
     "context": ".log_service",
+    "notify_later": "..gui.ui_helpers",
 }
+
 
 def __getattr__(name: str):  # pragma: no cover - thin wrapper
     """Dynamically import attributes on first access."""
@@ -52,6 +53,7 @@ def __getattr__(name: str):  # pragma: no cover - thin wrapper
     globals()[name] = attr
     return attr
 
+
 # ----------------------------------------------------------------------
 # subpackages
 # ----------------------------------------------------------------------
@@ -63,29 +65,28 @@ def __getattr__(name: str):  # pragma: no cover - thin wrapper
 # public API
 # ----------------------------------------------------------------------
 __all__ = [
-        # subpackages
-        "concurrency",
-        "data_utils",
-        # config_service
-        "ConfigurationService",
-        "ConfigurationError",
-        "ValidationError",
-        "get_config_service",
-        "set_config_service",
-        # container
-        "ApplicationContainer",
-        # email_alert_service
-        "EmailAlertService",
-        "set_email_alert_service",
-        # log_service
-        "info",
-        "warning",
-        "error",
-        "debug",
-        "performance",
-        "timer",
-        "context",
+    # subpackages
+    "concurrency",
+    "data_utils",
+    # config_service
+    "ConfigurationService",
+    "ConfigurationError",
+    "ValidationError",
+    "get_config_service",
+    "set_config_service",
+    # container
+    "ApplicationContainer",
+    # email_alert_service
+    "EmailAlertService",
+    "set_email_alert_service",
+    # log_service
+    "info",
+    "warning",
+    "error",
+    "debug",
+    "performance",
+    "timer",
+    "context",
 ]
 # ui helper utilities
 __all__.append("notify_later")
-

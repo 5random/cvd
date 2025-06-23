@@ -44,7 +44,6 @@ async def test_toggle_no_duplicate_capture_tasks(simple_gui_app):
     simple_gui_app.camera_controller = cam
 
     simple_gui_app.camera_active = False
-    simple_gui_app.toggle_camera()
-    await asyncio.sleep(0)
+    await simple_gui_app.toggle_camera()
 
     assert cam.start_calls == 0
