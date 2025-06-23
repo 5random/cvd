@@ -20,7 +20,7 @@ setup(
 
     entry_points={
         "console_scripts": [
-            "cvd-alt-gui=src.gui.alt_application:main",
+            "cvd-alt-gui=cvd.gui.alt_application:main",
         ]
     },
 

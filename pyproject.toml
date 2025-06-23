@@ -30,7 +30,7 @@ mock_arduino_tc_board = "cvd.data_handler.sources.mock_sensors:MockArduinoTCSens
 mock_rs232 = "cvd.data_handler.sources.mock_sensors:MockRS232Sensor"
 
 [project.scripts]
-cvd-alt-gui = "src.gui.alt_application:main"
+cvd-alt-gui = "cvd.gui.alt_application:main"
 
 [tool.black]
 line-length = 88
