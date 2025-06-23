@@ -8,6 +8,7 @@ import zipfile
 import bz2
 import lzma
 import shutil
+import concurrent.futures
 from datetime import datetime
 from pathlib import Path
 from typing import Optional, Dict, Any, List, Union
@@ -328,16 +329,13 @@ class CompressionService:
         )
         # Parallelize compression on FILE_IO pool
         pool = get_thread_pool_manager().get_pool(ThreadPoolType.FILE_IO)
-        futures = []
-        for file_path in files:
-            if file_path.is_file() and not self._is_already_compressed(file_path):
-                futures.append(
-                    pool.submit_task(
-                        lambda p=file_path: self.compress_file(p, None, data_type)
-                    )
-                )
-        # Collect results
-        for fut in futures:
+        futures = [
+            pool.submit_task(lambda p=fp: self.compress_file(p, None, data_type))
+            for fp in files
+            if fp.is_file() and not self._is_already_compressed(fp)
+        ]
+        # Collect results as tasks complete
+        for fut in concurrent.futures.as_completed(futures):
             try:
                 result = fut.result()
                 if result:
