@@ -42,12 +42,26 @@ def dummy_ui(monkeypatch):
 
 def test_is_valid_email_tuhh_domain_only():
     wizard = EmailAlertWizard()
-    assert wizard._is_valid_email("user@tuhh.de")
-    assert wizard._is_valid_email("test.user@tuhh.de")
-    assert wizard._is_valid_email("foo+bar-baz@tuhh.de")
-    assert not wizard._is_valid_email("user@example.com")
-    assert not wizard._is_valid_email("user@tuhh.com")
-    assert not wizard._is_valid_email("invalid")
+    valid_emails = [
+        "user@tuhh.de",
+        "test.user@tuhh.de",
+        "foo+bar-baz@tuhh.de",
+        "a_b-c.d+e@tuhh.de",
+        "123@tuhh.de",
+    ]
+    invalid_emails = [
+        "user@example.com",
+        "user@tuhh.com",
+        "invalid",
+        "bad!char@tuhh.de",
+        "user@tuhh.de ",
+        " user@tuhh.de",
+    ]
+
+    for addr in valid_emails:
+        assert wizard._is_valid_email(addr)
+    for addr in invalid_emails:
+        assert not wizard._is_valid_email(addr)
 
 
 def test_remove_last_recipient_disables_next(dummy_ui):

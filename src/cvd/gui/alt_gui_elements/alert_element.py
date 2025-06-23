@@ -16,6 +16,9 @@ import json
 from datetime import datetime
 import re
 
+# Pattern allowing common characters in local part and enforcing @tuhh.de domain
+TUHH_EMAIL_PATTERN = re.compile(r"^[A-Za-z0-9._+-]+@tuhh\.de$")
+
 
 class EmailAlertWizard:
     """4-Step Email Alert Service Setup Wizard using NiceGUI Stepper.
@@ -485,16 +488,11 @@ class EmailAlertWizard:
             add_email_btn.disable()
 
     def _is_valid_email(self, email: str) -> bool:
-        """Check if email ends with @tuhh.de regardless of local part."""
+        """Return ``True`` if the email matches :data:`TUHH_EMAIL_PATTERN`."""
         if not email:
             return False
 
-        try:
-            local, domain = email.strip().rsplit("@", 1)
-        except ValueError:
-            return False
-
-        return bool(local) and domain == "tuhh.de"
+        return TUHH_EMAIL_PATTERN.fullmatch(email) is not None
 
 
     def _add_email(
