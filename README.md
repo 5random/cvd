@@ -166,30 +166,31 @@ only setups or when running tests without real hardware.
 
 ## Running tests
 
-Before running the tests you must install this package and its dependencies.
-Attempting to execute `pytest` without installation will result in import
-errors.
+Before running the tests you must install this package together with all
+runtime and development dependencies. The test suite depends on the packages
+listed in `dev-requirements.txt` (which includes `pytest`) in addition to the
+runtime libraries from `requirements.txt`. Dependencies such as `numpy`,
+`opencv-python`/`cv2`, `nicegui`, and `jsonschema` must be installed before
+executing `pytest`.
 
 Install the dependencies and run the tests in a single sequence. You can
 either install the package in editable mode or use the requirements files:
 
 ```bash
+pip install -r dev-requirements.txt
 pip install -e .
 pytest          # or: make test
 
 # or install from the requirements files
+pip install -r dev-requirements.txt
 pip install -r requirements.txt
 pytest
-
-# for development utilities (linters, pre-commit hook)
-pip install -r dev-requirements.txt
 
 ```
 
 The tests rely on several runtime packages such as `opencv-python` (for the
-`cv2` module) and `nicegui`. Both are included in `requirements.txt`, so running
-``pip install -e .`` or ``pip install -r requirements.txt`` before invoking
-`pytest` will install them automatically.
+`cv2` module) and `nicegui`. Running the installation commands above ensures
+these dependencies are available when invoking `pytest`.
 
 ## Code style
 
