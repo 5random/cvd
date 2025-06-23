@@ -3,7 +3,7 @@
 import cv2
 import asyncio
 import contextlib
-from typing import Optional
+from typing import Optional, Any
 
 from src.utils.concurrency.thread_pool import run_camera_io
 from src.utils.config_service import get_config_service
@@ -15,13 +15,10 @@ from src.controllers.controller_base import (
     ControllerResult,
 )
 from src.utils.log_service import info, warning, error
-from src.controllers.camera_utils import (
-    apply_uvc_settings,
-    rotate_frame,
-)
+from .base_camera_capture import BaseCameraCapture
 
 
-class CameraCaptureController(ControllerStage):
+class CameraCaptureController(BaseCameraCapture, ControllerStage):
     """Controller that captures frames from a camera using cv2.VideoCapture."""
 
     def __init__(
@@ -65,172 +62,37 @@ class CameraCaptureController(ControllerStage):
                     self.uvc_settings.update(cam_cfg.get("uvc", {}))
                     self.uvc_settings.update(cam_cfg.get("uvc_settings", {}))
 
-        self._capture: Optional[cv2.VideoCapture] = None
-        self._capture_task: Optional[asyncio.Task] = None
-        self._stop_event = asyncio.Event()
 
     async def initialize(self) -> bool:
         """Initialize camera capture using the camera I/O thread pool."""
-        try:
-            if self.capture_backend is not None:
-                self._capture = await run_camera_io(
-                    cv2.VideoCapture, self.device_index, self.capture_backend
-                )
-            else:
-                self._capture = await run_camera_io(cv2.VideoCapture, self.device_index)
-            if not self._capture or not self._capture.isOpened():
-                error(
-                    "Unable to open camera",
-                    controller_id=self.controller_id,
-                    device_index=self.device_index,
-                )
-                if self._capture is not None:
-                    await run_camera_io(self._capture.release)
-                self._capture = None
-                return False
-
-            if self.width:
-                await run_camera_io(
-                    self._capture.set, cv2.CAP_PROP_FRAME_WIDTH, int(self.width)
-                )
-            if self.height:
-                await run_camera_io(
-                    self._capture.set, cv2.CAP_PROP_FRAME_HEIGHT, int(self.height)
-                )
-            if self.fps:
-                await run_camera_io(self._capture.set, cv2.CAP_PROP_FPS, int(self.fps))
-            await apply_uvc_settings(
-                self._capture,
-                self.uvc_settings,
-                controller_id=self.controller_id,
-            )
-            return True
-        except Exception as e:
+        opened = await self._open_capture()
+        if not opened:
             error(
-                "Failed to initialize camera",
+                "Unable to open camera",
                 controller_id=self.controller_id,
                 device_index=self.device_index,
-                error=str(e),
             )
-            return False
+        return opened
 
-    async def _capture_loop(self) -> None:
-        base_delay = 1.0 / self.fps if self.fps else 0.03
-        failure_delay = 0.1
-        reopen_delay = 5.0
-        failure_count = 0
-        max_failures = 5
-        delay = base_delay
+    async def handle_frame(self, frame: Any) -> None:
+        """Store the latest captured frame."""
+        self._output_cache[self.controller_id] = frame
 
-        while not self._stop_event.is_set():
-            try:
-                if self._capture is None:
-                    warning(
-                        "Camera capture missing, attempting reinitialization",
-                        controller_id=self.controller_id,
-                        device_index=self.device_index,
-                    )
-                    try:
-                        if self.capture_backend is not None:
-                            self._capture = await run_camera_io(
-                                cv2.VideoCapture,
-                                self.device_index,
-                                self.capture_backend,
-                            )
-                        else:
-                            self._capture = await run_camera_io(
-                                cv2.VideoCapture, self.device_index
-                            )
-                        if self._capture and self._capture.isOpened():
-                            await apply_uvc_settings(
-                                self._capture,
-                                self.uvc_settings,
-                                controller_id=self.controller_id,
-                            )
-                            failure_count = 0
-                            delay = base_delay
-                        else:
-                            raise RuntimeError("capture not opened")
-                    except Exception as exc:
-                        error(
-                            "Failed to reinitialize camera",
-                            controller_id=self.controller_id,
-                            device_index=self.device_index,
-                            error=str(exc),
-                        )
-                        self._capture = None
-                        failure_count += 1
-                        if failure_count >= max_failures:
-                            error(
-                                "Camera unavailable, retrying later",
-                                controller_id=self.controller_id,
-                                device_index=self.device_index,
-                            )
-                            delay = reopen_delay
-                            failure_count = 0
-                        else:
-                            delay = min(failure_delay * 2**failure_count, 2.0)
-                    await asyncio.sleep(delay)
-                    continue
-                ret, frame = await run_camera_io(self._capture.read)
-                if ret:
-                    if self.rotation:
-                        frame = rotate_frame(frame, self.rotation)
-                    self._output_cache[self.controller_id] = frame
-                    failure_count = 0
-                    delay = base_delay
-                else:
-                    failure_count += 1
-                    delay = min(failure_delay * 2**failure_count, 2.0)
-                    if failure_count > max_failures:
-                        opened = await run_camera_io(self._capture.isOpened)
-                        if not opened:
-                            warning(
-                                "Camera not opened, reinitializing",
-                                controller_id=self.controller_id,
-                                device_index=self.device_index,
-                            )
-                            await run_camera_io(self._capture.release)
-                            self._capture = None
-                            continue
-            except Exception as e:
-                error(
-                    "Camera capture error",
-                    controller_id=self.controller_id,
-                    device_index=self.device_index,
-                    error=str(e),
-                )
-                failure_count += 1
-                delay = min(failure_delay * 2**failure_count, 2.0)
-            await asyncio.sleep(delay)
 
     async def start(self) -> bool:
         """Start capturing frames."""
         if not await super().start():
             return False
-        self._stop_event.clear()
-        self._capture_task = asyncio.create_task(self._capture_loop())
-        info(
-            "Camera capture started",
-            controller_id=self.controller_id,
-            device_index=self.device_index,
-        )
+        self.start_capture()
         return True
 
     async def stop(self) -> None:
         """Stop capturing frames and release resources."""
-        self._stop_event.set()
-        if self._capture_task:
-            self._capture_task.cancel()
-            with contextlib.suppress(Exception):
-                await self._capture_task
-            self._capture_task = None
+        await self.stop_capture()
         await super().stop()
 
     async def cleanup(self) -> None:
-        if self._capture is not None:
-            await run_camera_io(self._capture.release)
-            self._capture = None
+        await self.cleanup_capture()
         await super().cleanup()
 
     async def process(self, input_data: ControllerInput) -> ControllerResult:

@@ -27,10 +27,7 @@ from src.utils.concurrency.process_pool import (
 )
 from src.utils.log_service import info, warning, error
 from src.utils.concurrency.thread_pool import run_camera_io
-from src.controllers.camera_utils import (
-    apply_uvc_settings,
-    rotate_frame,
-)
+from .base_camera_capture import BaseCameraCapture
 
 
 @dataclass
@@ -51,6 +48,7 @@ class MotionDetectionResult:
 
 def analyze_motion(
     mask: np.ndarray,
+    frame: Optional[np.ndarray] = None,
     *,
     min_contour_area: int,
     roundness_enabled: bool,
@@ -122,7 +120,7 @@ def analyze_motion(
     )
 
 
-class MotionDetectionController(ImageController):
+class MotionDetectionController(BaseCameraCapture, ImageController):
     """Controller for detecting motion in camera images using background subtraction"""
 
     def __init__(self, controller_id: str, config: ControllerConfig):
@@ -132,10 +130,7 @@ class MotionDetectionController(ImageController):
             ProcessPoolConfig(), pool_type=ProcessPoolType.CPU
         )
 
-        # Runtime state
-        self._capture: Optional[cv2.VideoCapture] = None
-        self._capture_task: Optional[asyncio.Task] = None
-        self._stop_event = asyncio.Event()
+
 
         # Parameters from config
         params = config.parameters
@@ -631,15 +626,8 @@ class MotionDetectionController(ImageController):
     async def cleanup(self) -> None:
         """Cleanup motion detection resources"""
         # Stop capture loop and release camera resources
-        self._stop_event.set()
-        if self._capture_task:
-            self._capture_task.cancel()
-            with contextlib.suppress(asyncio.CancelledError, Exception):
-                await self._capture_task
-            self._capture_task = None
-        if self._capture is not None:
-            await run_camera_io(self._capture.release)
-            self._capture = None
+        await self.stop_capture()
+        await self.cleanup_capture()
         # Ensure no pending tasks remain before shutting down the process pool
         start_time = time.monotonic()
         while getattr(self._motion_pool, "_telemetry").active:
@@ -663,10 +651,9 @@ class MotionDetectionController(ImageController):
     async def start(self) -> bool:
         if not await super().start():
             return False
-        self._stop_event.clear()
         self._warmup_counter = self.warmup_frames
         if not self.config.input_controllers:
-            self._capture_task = asyncio.create_task(self._capture_loop())
+            self.start_capture()
         else:
             info(
                 "Using external capture controller, skipping internal loop",
@@ -676,13 +663,26 @@ class MotionDetectionController(ImageController):
         return True
 
     async def stop(self) -> None:
-        self._stop_event.set()
-        if self._capture_task:
-            self._capture_task.cancel()
-            with contextlib.suppress(asyncio.CancelledError, Exception):
-                await self._capture_task
-            self._capture_task = None
+        await self.stop_capture()
         await super().stop()
+
+    async def on_capture_opened(self) -> None:
+        self._bg_subtractor = None
+        self._warmup_counter = self.warmup_frames
+
+    async def handle_frame(self, frame: Any) -> None:
+        if self._warmup_counter > 0:
+            self._warmup_counter -= 1
+            return
+        result = await self.process_image(
+            frame,
+            {
+                "source_sensor": self.webcam_id or "camera",
+                "timestamp": time.time(),
+            },
+        )
+        if result.success:
+            self._output_cache[self.controller_id] = result.data
 
     async def process(self, input_data: ControllerInput) -> ControllerResult:
         output = self._output_cache.get(self.controller_id)
@@ -690,123 +690,3 @@ class MotionDetectionController(ImageController):
             return ControllerResult.success_result(None)
         return ControllerResult.success_result(output)
 
-    async def _capture_loop(self) -> None:
-        base_delay = 1.0 / self.fps if self.fps else 0.03
-        failure_delay = 0.1
-        reopen_delay = 5.0
-        failure_count = 0
-        max_failures = 5
-        delay = base_delay
-
-        while not self._stop_event.is_set():
-            try:
-                if self._capture is None:
-                    warning(
-                        "Camera capture missing, attempting reinitialization",
-                        controller_id=self.controller_id,
-                        device_index=self.device_index,
-                    )
-                    try:
-                        if self.capture_backend is not None:
-                            self._capture = await run_camera_io(
-                                cv2.VideoCapture,
-                                self.device_index,
-                                self.capture_backend,
-                            )
-                        else:
-                            self._capture = await run_camera_io(
-                                cv2.VideoCapture, self.device_index
-                            )
-                        if self._capture and self._capture.isOpened():
-                            if self.width:
-                                await run_camera_io(
-                                    self._capture.set,
-                                    cv2.CAP_PROP_FRAME_WIDTH,
-                                    int(self.width),
-                                )
-                            if self.height:
-                                await run_camera_io(
-                                    self._capture.set,
-                                    cv2.CAP_PROP_FRAME_HEIGHT,
-                                    int(self.height),
-                                )
-                            if self.fps:
-                                await run_camera_io(
-                                    self._capture.set, cv2.CAP_PROP_FPS, int(self.fps)
-                                )
-                            await apply_uvc_settings(
-                                self._capture,
-                                self.uvc_settings,
-                                controller_id=self.controller_id,
-                            )
-                            self._bg_subtractor = None
-                            self._warmup_counter = self.warmup_frames
-                            failure_count = 0
-                            delay = base_delay
-                        else:
-                            raise RuntimeError("capture not opened")
-                    except Exception as exc:
-                        error(
-                            "Failed to reinitialize camera",
-                            controller_id=self.controller_id,
-                            device_index=self.device_index,
-                            error=str(exc),
-                        )
-                        self._capture = None
-                        failure_count += 1
-                        if failure_count >= max_failures:
-                            error(
-                                "Camera unavailable, retrying later",
-                                controller_id=self.controller_id,
-                                device_index=self.device_index,
-                            )
-                            delay = reopen_delay
-                            failure_count = 0
-                        else:
-                            delay = min(failure_delay * 2**failure_count, 2.0)
-                    await asyncio.sleep(delay)
-                    continue
-
-                ret, frame = await run_camera_io(self._capture.read)
-                if ret:
-                    if self.rotation:
-                        frame = rotate_frame(frame, self.rotation)
-                    if self._warmup_counter > 0:
-                        self._warmup_counter -= 1
-                        failure_count = 0
-                        delay = base_delay
-                        continue
-                    result = await self.process_image(
-                        frame,
-                        {
-                            "source_sensor": self.webcam_id or "camera",
-                            "timestamp": time.time(),
-                        },
-                    )
-                    if result.success:
-                        self._output_cache[self.controller_id] = result.data
-                    failure_count = 0
-                    delay = base_delay
-                else:
-                    failure_count += 1
-                    delay = min(failure_delay * 2**failure_count, 2.0)
-                    if failure_count > max_failures:
-                        opened = await run_camera_io(self._capture.isOpened)
-                        if not opened:
-                            warning(
-                                "Camera not opened, reinitializing",
-                                controller_id=self.controller_id,
-                                device_index=self.device_index,
-                            )
-                            await run_camera_io(self._capture.release)
-                            self._capture = None
-                            continue
-            except Exception as e:
-                error(
-                    "Camera capture error",
-                    controller_id=self.controller_id,
-                    device_index=self.device_index,
-                    error=str(e),
-                )
-
-            await asyncio.sleep(delay)
