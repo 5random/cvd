@@ -910,6 +910,8 @@ class SimpleGUIApplication:
             total = self._experiment_duration * 60
             progress = min(elapsed / total, 1.0)
             self.experiment_section.experiment_progress.value = progress
+            if elapsed >= total:
+                asyncio.create_task(self.toggle_experiment())
 
     def _update_alerts_status(self):
         """Update the alerts_enabled status based on current configurations."""
