@@ -121,7 +121,16 @@ class MotionStatusSection:
     def _refresh_status(self) -> None:
         """Update display labels with current motion detection results"""
         result = self._get_result()
-        if not result:
+        if result is None:
+            # Clear status when no result is available
+            self.motion_detected = False
+            self.motion_icon.name = "motion_photos_off"
+            self.motion_icon.classes(replace="text-gray-500")
+            self.motion_label.text = "No Motion Detected"
+            self.motion_percentage.text = "Motion Level: 0%"
+            self.confidence_label.text = "Confidence: --"
+            if self._update_callback:
+                self._update_callback(False)
             return
 
         # remember previous detection state before updating
@@ -142,7 +151,6 @@ class MotionStatusSection:
 
         # update last motion time and count only on rising edge
         if result.motion_detected and not prev:
-
             self._last_motion_time = datetime.now()
             self._detection_count += 1
 
