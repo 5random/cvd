@@ -15,10 +15,22 @@ from cvd.utils.log_service import info, warning, error
 
 
 class BaseCameraCapture(ABC):
+    # declared attributes for subclass and Pylance type checking, 
+    # shall be set in simple_config.json
+    #TODO: get values from simple_config.json
+    controller_id: str
+    config: Any
+    device_index: int
+    capture_backend: Any
+    width: Any
+    height: Any
+    fps: Any
+    rotation: Any
+    uvc_settings: Any
     """Mixin providing a reusable camera capture loop."""
 
     def __init__(self, controller_id: str, config):
-        super().__init__(controller_id, config)
+        super().__init__()
         self.controller_id = controller_id
         self.config = config
         self._capture: Optional[cv2.VideoCapture] = None
@@ -81,10 +93,10 @@ class BaseCameraCapture(ABC):
     # ------------------------------------------------------------------
     async def _capture_loop(self) -> None:
         base_delay = 1.0 / self.fps if getattr(self, "fps", None) else 0.03
-        failure_delay = 0.1
-        reopen_delay = 5.0
+        failure_delay = 0.5
+        reopen_delay = 4.0
         failure_count = 0
-        max_failures = 5
+        max_failures = 10
         delay = base_delay
 
         while not self._stop_event.is_set():
@@ -148,8 +160,8 @@ class BaseCameraCapture(ABC):
 
     # Public helpers ---------------------------------------------------
     def start_capture(self) -> None:
+        """Start the asynchronous capture loop if not already running."""
         if self._capture_task and not self._capture_task.done():
-            # Capture loop already running
             return
 
         self._stop_event.clear()
