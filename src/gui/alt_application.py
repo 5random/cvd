@@ -466,7 +466,6 @@ class SimpleGUIApplication:
             return result
 
         async def _stop():
-
             if self.camera_controller is not None:
                 try:
                     await self.camera_controller.stop()
@@ -1376,9 +1375,6 @@ class SimpleGUIApplication:
                 pass
             self._time_timer = None
         await self.controller_manager.stop_all_controllers()
-        if self._time_timer:
-            self._time_timer.cancel()
-            self._time_timer = None
         if self.motion_section:
             self.motion_section.cleanup()
 
