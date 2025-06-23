@@ -4,7 +4,11 @@ import asyncio
 from PIL import Image
 import cv2
 
-from src.controllers.webcam import MotionDetectionController, MotionDetectionResult
+from src.controllers.webcam import (
+    MotionDetectionController,
+    MotionDetectionResult,
+)
+from src.controllers.webcam.motion_detection import analyze_motion
 from src.controllers.controller_base import ControllerConfig
 
 messages: list[str] = []
@@ -300,6 +304,32 @@ def test_multi_frame_window_defaults_to_one_on_negative():
     )
     ctrl = MotionDetectionController("md", cfg)
     assert ctrl.multi_frame_window == 1
+
+
+def test_motion_threshold_percentage_defaults_to_positive():
+    cfg = ControllerConfig(
+        controller_id="md",
+        controller_type="motion_detection",
+        parameters={"motion_threshold_percentage": 0},
+    )
+    ctrl = MotionDetectionController("md", cfg)
+    assert ctrl.motion_threshold_percentage == 1.0
+
+
+def test_analyze_motion_zero_threshold_confidence_zero():
+    mask = np.zeros((10, 10), dtype=np.uint8)
+    frame = np.zeros((10, 10, 3), dtype=np.uint8)
+    result = analyze_motion(
+        mask,
+        frame,
+        min_contour_area=1,
+        roundness_enabled=False,
+        roundness_threshold=0.0,
+        motion_threshold_percentage=0.0,
+        confidence_threshold=0.5,
+    )
+    assert result.confidence == 0.0
+    assert result.motion_detected is False
 
 
 @pytest.mark.asyncio
