@@ -119,24 +119,87 @@ class CameraCaptureController(BaseCameraCapture, ControllerStage):
             )
 
     async def test_camera_access(self) -> bool:
-        """Quickly check if the configured camera can be accessed."""
-        cap = None
-        try:
-            if self.capture_backend is not None:
-                cap = await run_camera_io(
-                    cv2.VideoCapture, self.device_index, self.capture_backend
-                )
-            else:
-                cap = await run_camera_io(cv2.VideoCapture, self.device_index)
-            if not cap or not await run_camera_io(cap.isOpened):
-                if cap is not None:
+        """Check if the configured camera can be accessed.
+
+        Tries the configured backend first and falls back to alternative
+        backends and lower resolutions when opening the camera fails.  The
+        chosen backend is logged and the result is reported to the user via
+        :func:`notify_later`.
+        """
+        from cvd.gui.ui_helpers import notify_later
+
+        # Build list of backends to test
+        backends = []
+        if self.capture_backend is not None:
+            backends.append(self.capture_backend)
+        else:
+            backends.append(None)
+        if self.capture_backend_fallbacks:
+            backends.extend(self.capture_backend_fallbacks)
+        else:
+            fallback = cv2.CAP_DSHOW if hasattr(cv2, "CAP_DSHOW") else cv2.CAP_V4L2
+            if fallback not in backends:
+                backends.append(fallback)
+
+        # Candidate resolutions starting with configured one
+        resolutions = []
+        if self.width and self.height:
+            resolutions.append((int(self.width), int(self.height)))
+        resolutions.extend([(640, 480), (320, 240)])
+
+        for backend in backends:
+            for w, h in resolutions:
+                cap = None
+                try:
+                    info(
+                        "camera_access_test_attempt",
+                        controller_id=self.controller_id,
+                        device_index=self.device_index,
+                        backend=backend,
+                        width=w,
+                        height=h,
+                    )
+                    if backend is not None:
+                        cap = await run_camera_io(
+                            cv2.VideoCapture, self.device_index, backend
+                        )
+                    else:
+                        cap = await run_camera_io(cv2.VideoCapture, self.device_index)
+                    if not cap or not await run_camera_io(cap.isOpened):
+                        if cap is not None:
+                            await run_camera_io(cap.release)
+                        continue
+                    await run_camera_io(cap.set, cv2.CAP_PROP_FRAME_WIDTH, w)
+                    await run_camera_io(cap.set, cv2.CAP_PROP_FRAME_HEIGHT, h)
+                    ret, _ = await run_camera_io(cap.read)
                     await run_camera_io(cap.release)
-                return False
-            ret, _ = await run_camera_io(cap.read)
-            await run_camera_io(cap.release)
-            return bool(ret)
-        except Exception:
-            if cap is not None:
-                with contextlib.suppress(Exception):
-                    await run_camera_io(cap.release)
-            return False
+                    if ret:
+                        info(
+                            "camera_access_test_success",
+                            controller_id=self.controller_id,
+                            device_index=self.device_index,
+                            backend=backend,
+                            width=w,
+                            height=h,
+                        )
+                        notify_later(
+                            f"Camera accessible via backend {backend} at {w}x{h}",
+                            type="positive",
+                        )
+                        return True
+                except Exception as exc:
+                    warning(
+                        "camera_access_test_failed",
+                        controller_id=self.controller_id,
+                        device_index=self.device_index,
+                        backend=backend,
+                        width=w,
+                        height=h,
+                        error=str(exc),
+                    )
+                    if cap is not None:
+                        with contextlib.suppress(Exception):
+                            await run_camera_io(cap.release)
+
+        notify_later("Camera access failed", type="negative")
+        return False

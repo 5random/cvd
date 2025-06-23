@@ -310,3 +310,49 @@ async def test_backend_fallback(monkeypatch):
     except asyncio.CancelledError:
         pass
     await controller.cleanup()
+
+
+@pytest.mark.asyncio
+async def test_camera_access_diagnostics(monkeypatch):
+    from cvd.controllers import webcam as controller_data_sources
+
+    cap_module = controller_data_sources.camera_capture_controller
+
+    monkeypatch.setattr(cap_module, "run_camera_io", immediate)
+
+    backend_calls = []
+
+    class DummySuccess(DummyCapture):
+        def read(self):
+            frame = np.zeros((1, 1, 3), dtype=np.uint8)
+            return True, frame
+
+    def video_capture(idx, backend=None):
+        backend_calls.append(backend)
+        if backend in (None, 0):
+            return DummyClosed(idx)
+        return DummySuccess(idx)
+
+    monkeypatch.setattr(cap_module.cv2, "VideoCapture", video_capture)
+
+    infos = []
+    monkeypatch.setattr(cap_module, "info", lambda msg, **kw: infos.append((msg, kw)))
+    monkeypatch.setattr(cap_module, "warning", lambda *a, **k: None)
+    monkeypatch.setattr(cap_module, "error", lambda *a, **k: None)
+
+    notifications = []
+    monkeypatch.setattr("cvd.gui.ui_helpers.notify_later", lambda msg, **kw: notifications.append(msg))
+
+    cfg = ControllerConfig(
+        controller_id="cam",
+        controller_type="camera_capture",
+        parameters={"device_index": 0, "capture_backend": 0, "capture_backend_fallbacks": [1]},
+    )
+    controller = CameraCaptureController("cam", cfg)
+
+    accessible = await controller.test_camera_access()
+
+    assert accessible
+    assert 1 in backend_calls
+    assert notifications
+    assert any(call[1].get("backend") == 1 for call in infos)
