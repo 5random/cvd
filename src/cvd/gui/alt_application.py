@@ -452,8 +452,14 @@ class SimpleGUIApplication:
             self.webcam_stream.adjust_roi()
 
     # Main event handlers - placeholder implementations
-    async def toggle_camera(self):
-        """Start or stop the camera capture controller."""
+    async def toggle_camera(self) -> bool:
+        """Start or stop the camera capture controller.
+
+        Returns
+        -------
+        bool
+            ``True`` if the action succeeded, ``False`` otherwise.
+        """
 
         async def _start() -> bool:
             if self.camera_controller is None:
@@ -497,8 +503,10 @@ class SimpleGUIApplication:
             except Exception as exc:  # noqa: BLE001
                 error("camera_start_failed", exc_info=exc)
                 notify_later("Failed to start camera", type="negative")
-                return
-            self.camera_active = bool(started)
+                return False
+            if not started:
+                return False
+            self.camera_active = True
             if hasattr(self, "camera_status_icon"):
                 self.camera_status_icon.classes(replace="text-green-300")
             ws = getattr(self, "webcam_stream", None)
@@ -513,8 +521,10 @@ class SimpleGUIApplication:
             except Exception as exc:  # noqa: BLE001
                 error("camera_stop_failed", exc_info=exc)
                 notify_later("Failed to stop camera", type="negative")
-                return
-            self.camera_active = not stopped
+                return False
+            if not stopped:
+                return False
+            self.camera_active = False
             if hasattr(self, "camera_status_icon"):
                 self.camera_status_icon.classes(replace="text-gray-400")
             ws = getattr(self, "webcam_stream", None)
@@ -523,6 +533,8 @@ class SimpleGUIApplication:
                 if btn:
                     btn.set_icon("play_arrow")
                     btn.set_text("Play Video")
+
+        return True
 
     def update_sensitivity(self, e):
         """Update motion detection sensitivity"""

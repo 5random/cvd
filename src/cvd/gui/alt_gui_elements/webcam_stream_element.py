@@ -563,25 +563,38 @@ class WebcamStreamElement:
     async def toggle_video_play(self):
         """Toggle video play state"""
         if not self.camera_active:
-            self.video_element.set_source("/video_feed")
-            self.start_camera_btn.set_text("Pause Video")
-            self.start_camera_btn.set_icon("pause")
-            self.start_camera_btn.props("color=negative")
-            self.camera_active = True
+            result = True
             if self._camera_toggle_cb:
-                await self._camera_toggle_cb()
-            self._update_status()
+                if inspect.iscoroutinefunction(self._camera_toggle_cb):
+                    result = await self._camera_toggle_cb()
+                else:
+                    result = await asyncio.to_thread(self._camera_toggle_cb)
+            if result:
+                self.video_element.set_source("/video_feed")
+                self.start_camera_btn.set_text("Pause Video")
+                self.start_camera_btn.set_icon("pause")
+                self.start_camera_btn.props("color=negative")
+                self.camera_active = True
+                self._update_status()
+            else:
+                notify_later("Failed to start camera", type="negative")
         else:
-            # Clear the image source to stop streaming
-            self.video_element.set_source("")
-            self.start_camera_btn.set_text("Play Video")
-            self.start_camera_btn.set_icon("play_arrow")
-            self.start_camera_btn.props("color=positive")
-            self.camera_active = False
+            result = True
             if self._camera_toggle_cb:
-                await self._camera_toggle_cb()
-
-            self._update_status()
+                if inspect.iscoroutinefunction(self._camera_toggle_cb):
+                    result = await self._camera_toggle_cb()
+                else:
+                    result = await asyncio.to_thread(self._camera_toggle_cb)
+            if result:
+                # Clear the image source to stop streaming
+                self.video_element.set_source("")
+                self.start_camera_btn.set_text("Play Video")
+                self.start_camera_btn.set_icon("play_arrow")
+                self.start_camera_btn.props("color=positive")
+                self.camera_active = False
+                self._update_status()
+            else:
+                notify_later("Failed to stop camera", type="negative")
 
     def toggle_white_balance_auto(self, value):
         """Toggle auto/manual white balance"""
