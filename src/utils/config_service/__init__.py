@@ -94,12 +94,6 @@ class ConfigurationService:
             error(f"Unexpected error loading configuration: {e}")
             raise
 
-    def _deep_merge(
-        self, default: Dict[str, Any], override: Dict[str, Any]
-    ) -> Dict[str, Any]:
-        """Deep merge two dictionaries"""
-        return deep_merge(default, override)
-
     def _validate_config(
         self, config: Dict[str, Any], schema: Dict[str, Any], config_type: str
     ) -> List[str]:
