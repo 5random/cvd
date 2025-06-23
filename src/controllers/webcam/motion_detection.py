@@ -507,6 +507,11 @@ class MotionDetectionController(BaseCameraCapture, ImageController):
             if isinstance(image_data, np.ndarray):
                 # Already an OpenCV frame (assumed BGR/BGRA)
                 frame = image_data
+                if len(frame.shape) == 2 or (
+                    len(frame.shape) == 3 and frame.shape[2] == 1
+                ):
+                    # Grayscale frame, convert to BGR
+                    frame = cv2.cvtColor(frame, cv2.COLOR_GRAY2BGR)
 
             elif isinstance(image_data, bytes):
                 # Raw image bytes decoded with OpenCV (already BGR)
