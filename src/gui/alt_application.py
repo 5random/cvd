@@ -31,10 +31,7 @@ from src.controllers import controller_manager as controller_manager_module
 from src.controllers.webcam import MotionDetectionController
 from src.controllers.controller_base import ControllerConfig, ControllerStatus
 from src.controllers.controller_manager import ControllerManager
-from src.controllers.camera_utils import (
-    apply_uvc_settings,
-    probe_camera_modes,
-)
+from src.controllers.camera_utils import probe_camera_modes
 from src.controllers.webcam import CameraCaptureController
 from src.experiment_manager import (
     ExperimentConfig,
@@ -529,7 +526,6 @@ class SimpleGUIApplication:
 
         self.settings["sensitivity"] = value
         if self.motion_controller:
-
             # ``motion_threshold_percentage`` expects a value in the same
             # 0-100 range as provided by the UI widgets
 
@@ -710,24 +706,16 @@ class SimpleGUIApplication:
             "exposure": self.webcam_stream.exposure_manual_number.value,
         }
         self.settings.update(settings)
-        # Apply UVC settings asynchronously if capture objects are available
+        # Apply UVC settings asynchronously using controller helpers
         tasks = []
-        if (
-            self.camera_controller is not None
-            and self.camera_controller._capture is not None
-        ):
-            capture = self.camera_controller._capture
-            tasks.append(asyncio.create_task(apply_uvc_settings(capture, settings)))
-        if (
-            self.motion_controller is not None
-            and self.motion_controller._capture is not None
-        ):
-            capture = self.motion_controller._capture
-            tasks.append(asyncio.create_task(apply_uvc_settings(capture, settings)))
-        if self.camera_controller:
-            self.camera_controller.uvc_settings.update(settings)
-        if self.motion_controller:
-            self.motion_controller.uvc_settings.update(settings)
+        if self.camera_controller is not None:
+            tasks.append(
+                asyncio.create_task(self.camera_controller.apply_uvc_settings(settings))
+            )
+        if self.motion_controller is not None:
+            tasks.append(
+                asyncio.create_task(self.motion_controller.apply_uvc_settings(settings))
+            )
         if tasks:
             results = await asyncio.gather(*tasks, return_exceptions=True)
             for res in results:
@@ -774,22 +762,14 @@ class SimpleGUIApplication:
 
         tasks = []
         if self.camera_controller:
-            self.camera_controller.uvc_settings.update(defaults)
-            if self.camera_controller._capture is not None:
-                tasks.append(
-                    asyncio.create_task(
-                        apply_uvc_settings(self.camera_controller._capture, defaults)
-                    )
-                )
+            tasks.append(
+                asyncio.create_task(self.camera_controller.apply_uvc_settings(defaults))
+            )
 
         if self.motion_controller:
-            self.motion_controller.uvc_settings.update(defaults)
-            if self.motion_controller._capture is not None:
-                tasks.append(
-                    asyncio.create_task(
-                        apply_uvc_settings(self.motion_controller._capture, defaults)
-                    )
-                )
+            tasks.append(
+                asyncio.create_task(self.motion_controller.apply_uvc_settings(defaults))
+            )
 
         if tasks:
             results = await asyncio.gather(*tasks, return_exceptions=True)
@@ -1147,9 +1127,7 @@ class SimpleGUIApplication:
         ]
 
         if not active_configs:
-            notify_later(
-                "No active alert configurations available", type="warning"
-            )
+            notify_later("No active alert configurations available", type="warning")
             return
 
         service = email_alert_service.get_email_alert_service()
