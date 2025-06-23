@@ -344,6 +344,27 @@ class MotionDetectionController(ImageController):
                 confidence_threshold=self.confidence_threshold,
             )
 
+            # Adjust bbox and center to original frame coordinates when ROI is active
+            if (
+                self.roi_width is not None
+                and self.roi_height is not None
+                and (self.roi_x or self.roi_y)
+            ):
+                if motion_result.motion_bbox is not None:
+                    x, y, w_box, h_box = motion_result.motion_bbox
+                    motion_result.motion_bbox = (
+                        x + int(self.roi_x),
+                        y + int(self.roi_y),
+                        w_box,
+                        h_box,
+                    )
+                if motion_result.motion_center is not None:
+                    cx, cy = motion_result.motion_center
+                    motion_result.motion_center = (
+                        cx + int(self.roi_x),
+                        cy + int(self.roi_y),
+                    )
+
             # Update shared state atomically
             async with self._state_lock:
                 # Update raw detection history
@@ -353,7 +374,9 @@ class MotionDetectionController(ImageController):
                     probability = motion_result.confidence
                     if self.multi_frame_method == "threshold":
                         if len(self._motion_history) >= self.multi_frame_window:
-                            recent = list(self._motion_history)[-self.multi_frame_window :]
+                            recent = list(self._motion_history)[
+                                -self.multi_frame_window :
+                            ]
                             count = sum(1 for h in recent if h["motion_detected"])
                             probability = count / self.multi_frame_window
                         if probability < self.multi_frame_threshold:
