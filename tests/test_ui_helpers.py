@@ -1,6 +1,6 @@
 
 from nicegui import ui
-from src.gui.ui_helpers import notify_later
+from cvd.gui.ui_helpers import notify_later
 
 
 class DummyElement:

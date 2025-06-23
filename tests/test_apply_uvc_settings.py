@@ -1,9 +1,9 @@
 import cv2
 import pytest
 
-from src.controllers.camera_utils import apply_uvc_settings
-from src.controllers.webcam import CameraCaptureController, MotionDetectionController
-from src.controllers.controller_base import ControllerConfig
+from cvd.controllers.camera_utils import apply_uvc_settings
+from cvd.controllers.webcam import CameraCaptureController, MotionDetectionController
+from cvd.controllers.controller_base import ControllerConfig
 
 
 class DummyCapture:
@@ -22,7 +22,7 @@ async def immediate(fn, *args, **kwargs):
 @pytest.mark.asyncio
 async def test_apply_backlight_compensation(monkeypatch):
     cap = DummyCapture()
-    monkeypatch.setattr("src.controllers.camera_utils.run_camera_io", immediate)
+    monkeypatch.setattr("cvd.controllers.camera_utils.run_camera_io", immediate)
     await apply_uvc_settings(cap, {"backlight_compensation": 3})
     assert (cv2.CAP_PROP_BACKLIGHT, 3.0) in cap.calls
 
@@ -38,7 +38,7 @@ async def test_camera_controller_apply_uvc(monkeypatch):
         applied["controller_id"] = controller_id
 
     monkeypatch.setattr(
-        "src.controllers.webcam.camera_capture_controller.apply_uvc_settings",
+        "cvd.controllers.webcam.camera_capture_controller.apply_uvc_settings",
         dummy_apply,
     )
     ctrl = CameraCaptureController(
@@ -63,7 +63,7 @@ async def test_motion_controller_apply_uvc_defaults(monkeypatch):
         applied["controller_id"] = controller_id
 
     monkeypatch.setattr(
-        "src.controllers.webcam.motion_detection.apply_uvc_settings",
+        "cvd.controllers.webcam.motion_detection.apply_uvc_settings",
         dummy_apply,
     )
     cfg = ControllerConfig(controller_id="md", controller_type="motion_detection")
