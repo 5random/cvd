@@ -20,6 +20,7 @@ from cvd.utils.concurrency.thread_pool import get_thread_pool_manager, ThreadPoo
 
 
 
+
 @dataclass
 class CompressionSettings:
     """Configuration for compression operations"""
@@ -105,17 +106,18 @@ class CompressionService:
             f"Compression service initialized with algorithm: {self._compression_settings.algorithm}"
         )
 
+
     @property
     def compression_settings(self) -> CompressionSettings:
         """Return the active compression settings."""
         return self._compression_settings
+
 
     def _load_configuration(self) -> None:
         """Load compression and rotation settings from configuration"""
         try:
             if self._config_service is None:
                 raise ConfigurationError("Configuration service not available")
-
             # Load compression settings
             compression_config = self._config_service.get(
                 "data_storage.compression", dict, {}
@@ -334,6 +336,7 @@ class CompressionService:
         for file_path in files:
             if file_path.is_file() and not self._is_already_compressed(file_path):
                 futures.append(
+
                     pool.submit_task(
                         lambda p=file_path: self.compress_file(p, None, data_type)
                     )
