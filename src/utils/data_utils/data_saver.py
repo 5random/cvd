@@ -173,7 +173,9 @@ class DataSaver:
             compressed_path = (
                 compressed_dir / f"{file_path.stem}_{int(time.time())}.csv.gz"
             )
-            result = self.compression_service.compress_file(str(file_path), str(compressed_path))
+            result = self.compression_service.compress_file(
+                str(file_path), str(compressed_path)
+            )
 
             preserve = getattr(
                 self.compression_service,
@@ -207,7 +209,9 @@ class DataSaver:
             compressed_path = (
                 compressed_dir / f"{file_path.stem}_{int(time.time())}.csv.gz"
             )
-            result = self.compression_service.compress_file(str(file_path), str(compressed_path))
+            result = self.compression_service.compress_file(
+                str(file_path), str(compressed_path)
+            )
 
             preserve = getattr(
                 self.compression_service,
@@ -244,14 +248,15 @@ class DataSaver:
         try:
             for directory in [self.raw_dir, self.proc_dir]:
                 for file_path in directory.glob("*.csv"):
-                    file_age = current_time - file_path.stat().st_mtime
+                    stat_result = file_path.stat()
+                    file_age = current_time - stat_result.st_mtime
 
                     if file_age > self.max_file_age_seconds:
                         # Move to compressed directory with timestamp
                         compressed_dir = directory / "compressed"
                         compressed_dir.mkdir(exist_ok=True)
 
-                        timestamp = int(file_path.stat().st_mtime)
+                        timestamp = int(stat_result.st_mtime)
                         new_name = f"{file_path.stem}_{timestamp}.csv"
                         rotated_path = compressed_dir / new_name
 
@@ -274,8 +279,9 @@ class DataSaver:
                     )
 
                     if not file_in_use:
-                        file_age = current_time - file_path.stat().st_atime
-                        file_size = file_path.stat().st_size
+                        stat_result = file_path.stat()
+                        file_age = current_time - stat_result.st_atime
+                        file_size = stat_result.st_size
 
                         # Compress if file is large and hasn't been accessed in a while
                         if (
