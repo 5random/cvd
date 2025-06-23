@@ -1,8 +1,8 @@
 import numpy as np
 import pytest
 
-from src.controllers.webcam import MotionDetectionController
-from src.controllers.controller_base import ControllerConfig, ControllerInput
+from cvd.controllers.webcam import MotionDetectionController
+from cvd.controllers.controller_base import ControllerConfig, ControllerInput
 
 async def immediate(fn, *args, **kwargs):
     return fn(*args, **kwargs)
