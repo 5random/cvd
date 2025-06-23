@@ -4,9 +4,9 @@ from pathlib import Path
 from types import SimpleNamespace
 
 
-from src.utils.alert_system_utils.email_alert_service import EmailAlertService
-from src.utils.data_utils.file_management_service import FileMaintenanceService
-from src.utils.data_utils.compression_service import CompressionService
+from cvd.utils.alert_system_utils.email_alert_service import EmailAlertService
+from cvd.utils.data_utils.file_management_service import FileMaintenanceService
+from cvd.utils.data_utils.compression_service import CompressionService
 from typing import cast
 
 
@@ -132,7 +132,7 @@ def test_rotate_old_files(tmp_path: Path, monkeypatch):
         return SimpleNamespace(get_pool=lambda t: DummyPool())
 
     monkeypatch.setattr(
-        "src.utils.data_utils.file_management_service.get_thread_pool_manager", get_mgr
+        "cvd.utils.data_utils.file_management_service.get_thread_pool_manager", get_mgr
     )
 
     service = FileMaintenanceService(
@@ -166,7 +166,7 @@ def test_rotate_path_permission_error(tmp_path: Path, monkeypatch):
     )
 
     src = tmp_path / "data.csv"
-    src.write_text("x")
+    cvd.write_text("x")
     dest = tmp_path / "compressed" / "data.csv"
     dest.parent.mkdir()
 
@@ -182,7 +182,7 @@ def test_rotate_path_permission_error(tmp_path: Path, monkeypatch):
     result = service._rotate_path(src, dest)
 
     assert result is None
-    assert src.exists()
+    assert cvd.exists()
 
 
 def test_compress_directory_delegates(tmp_path: Path):
