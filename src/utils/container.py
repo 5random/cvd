@@ -28,10 +28,7 @@ from src.utils.data_utils.compression_service import (
     CompressionService,
     set_compression_service,
 )
-from src.utils.email_alert_service import (
-    EmailAlertService,
-    set_email_alert_service,
-)
+from src.utils.email_alert_service import EmailAlertService
 
 if TYPE_CHECKING:
     from src.gui.alt_application import WebApplication
@@ -77,7 +74,6 @@ class ApplicationContainer:
 
             # Initialize email alert service
             email_alert_service = EmailAlertService()
-            set_email_alert_service(email_alert_service)
             info("Email alert service initialized")
             # Get thread pool configuration
             max_workers = config_service.get("thread_pool.max_workers", int, 4)

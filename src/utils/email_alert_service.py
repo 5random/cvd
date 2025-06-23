@@ -143,22 +143,7 @@ class EmailAlertService:
         return self._history[-limit:]
 
 
-_email_alert_service_instance: Optional[EmailAlertService] = None
-
-
-def get_email_alert_service() -> Optional[EmailAlertService]:
-    """Return the global :class:`EmailAlertService` instance."""
-    global _email_alert_service_instance
-    if _email_alert_service_instance is None:
-        try:
-            _email_alert_service_instance = EmailAlertService()
-        except Exception as exc:
-            error(f"Failed to create email alert service: {exc}")
-            return None
-    return _email_alert_service_instance
-
-
-def set_email_alert_service(service: EmailAlertService) -> None:
-    """Set the global :class:`EmailAlertService` instance."""
-    global _email_alert_service_instance
-    _email_alert_service_instance = service
+# The previous implementation exposed a module level instance via
+# ``get_email_alert_service`` / ``set_email_alert_service``.  The service
+# is now provided explicitly by the calling code.  These helpers were
+# removed to avoid hidden dependencies.

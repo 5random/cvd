@@ -3,7 +3,6 @@ import pytest
 
 from src.gui.alt_application import SimpleGUIApplication
 from src.utils.config_service import set_config_service
-from src.utils.email_alert_service import set_email_alert_service
 
 
 @pytest.mark.asyncio
@@ -75,8 +74,9 @@ async def test_send_test_alert_handles_exceptions(tmp_path, monkeypatch):
         await app._send_test_to_all_configs()
     finally:
         set_config_service(None)
-        set_email_alert_service(None)
 
     assert notifications
-    assert notifications[0][0].startswith("Test-Alerts an 0")
+    assert notifications[0][0].startswith(
+        "Test alerts sent to 0 recipients"
+    )
 

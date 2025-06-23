@@ -5,7 +5,7 @@ from typing import Any, Dict, Optional
 
 from nicegui import ui
 
-from src.utils.email_alert_service import get_email_alert_service
+from src.utils.email_alert_service import EmailAlertService
 from src.controllers.controller_base import ControllerStatus
 from src.gui.gui_elements.notifications.models import NotificationSeverity, NotificationSource
 
@@ -162,8 +162,8 @@ class NotificationMonitoringMixin:
                         source=NotificationSource.CONTROLLER,
                         metadata={"controller_id": cid, "status": status},
                     )
-                    service = get_email_alert_service()
-                    if service:
+                    service = getattr(self, "email_alert_service", None)
+                    if isinstance(service, EmailAlertService):
                         subject = f"Controller {cid} critical"
                         body = f"Controller {cid} has reported an error for {timeout} seconds."
                         service.send_alert(subject, body)

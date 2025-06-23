@@ -3,7 +3,6 @@ from src.utils.config_service import (
     get_config_service,
     set_config_service,
 )
-from src.utils.email_alert_service import set_email_alert_service
 
 
 def test_global_services_set(tmp_path, monkeypatch):
@@ -58,4 +57,3 @@ def test_global_services_set(tmp_path, monkeypatch):
         assert captured["config"] is app.config_service
     finally:
         set_config_service(None)
-        set_email_alert_service(None)
