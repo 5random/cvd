@@ -21,3 +21,9 @@ data/experiments/*
 !data/experiments/.gitkeep
 data/processed/*
 !data/processed/.gitkeep
+
+# Ignore raw, downloads, and notifications data
+data/raw/
+data/downloads/
+data/notifications/
+data/data_index.json
