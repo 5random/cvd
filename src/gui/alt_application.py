@@ -20,6 +20,7 @@ import asyncio
 import contextlib
 from datetime import datetime
 from typing import Any, Dict, Optional, Type, cast
+import re
 
 import cv2
 import numpy as np
@@ -60,6 +61,7 @@ from src.utils.concurrency import (
     gather_with_concurrency,
     run_in_executor,
     run_network_io,
+    run_camera_io,
 )
 from src.utils.concurrency.async_utils import install_signal_handlers
 from src.utils.config_service import ConfigurationService, set_config_service
@@ -287,6 +289,7 @@ class SimpleGUIApplication:
         self.webcam_stream = WebcamStreamElement(
             self.settings,
             available_resolutions=self.supported_camera_modes,
+            available_devices=[],
             callbacks={
                 "update_sensitivity": self.update_sensitivity,
                 "update_fps": self.update_fps,
@@ -300,6 +303,8 @@ class SimpleGUIApplication:
                 "show_camera_settings": self.show_camera_settings_context,
                 "reset_view": self.reset_view_context,
                 "camera_toggle": self.toggle_camera,
+                "scan_cameras": self.scan_cameras,
+                "select_camera": self.select_camera,
             },
             on_camera_status_change=self.update_camera_status,
         )
@@ -529,7 +534,6 @@ class SimpleGUIApplication:
 
         self.settings["sensitivity"] = value
         if self.motion_controller:
-
             # ``motion_threshold_percentage`` expects a value in the same
             # 0-100 range as provided by the UI widgets
 
@@ -663,6 +667,39 @@ class SimpleGUIApplication:
             self.webcam_stream.rotation_select.value = value
 
         notify_later(f"Rotation set to {value}°", type="positive")
+
+    async def scan_cameras(self):
+        """Scan for connected camera devices."""
+        devices: list[str] = []
+        for idx in range(6):
+            try:
+                cap = await run_camera_io(cv2.VideoCapture, idx)
+                if cap is not None and await run_camera_io(cap.isOpened):
+                    devices.append(f"Camera {idx}")
+                if cap is not None:
+                    await run_camera_io(cap.release)
+            except Exception:
+                continue
+
+        if self.webcam_stream:
+            self.webcam_stream.update_devices(devices)
+
+        notify_later(f"Found {len(devices)} camera(s)", type="positive")
+
+    def select_camera(self, e):
+        """Select the active camera device."""
+        value = getattr(e, "value", e)
+        match = re.search(r"\d+", str(value))
+        if not match:
+            notify_later("Invalid camera selection", type="warning")
+            return
+        index = int(match.group())
+        self.settings["device_index"] = index
+        if self.camera_controller:
+            self.camera_controller.device_index = index
+        if self.motion_controller:
+            self.motion_controller.device_index = index
+        notify_later(f"Camera device set to {index}", type="positive")
 
     def set_roi(self):
         """Set region of interest"""
@@ -1147,9 +1184,7 @@ class SimpleGUIApplication:
         ]
 
         if not active_configs:
-            notify_later(
-                "No active alert configurations available", type="warning"
-            )
+            notify_later("No active alert configurations available", type="warning")
             return
 
         service = email_alert_service.get_email_alert_service()
@@ -1350,6 +1385,7 @@ class SimpleGUIApplication:
         if getattr(self, "webcam_stream", None):
             self.webcam_stream.available_resolutions = self.supported_camera_modes
             self.webcam_stream.update_resolutions(self.supported_camera_modes)
+            await self.scan_cameras()
 
         success = await self.controller_manager.start_all_controllers()
 

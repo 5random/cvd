@@ -69,6 +69,7 @@ class WebcamStreamElement:
         camera_toggle_cb=None,
         *,
         available_resolutions=None,
+        available_devices=None,
     ):
         self.camera_active = False
         self.recording = False
@@ -82,6 +83,7 @@ class WebcamStreamElement:
         self.settings = settings
         self.callbacks = callbacks or {}
         self.available_resolutions = available_resolutions or []
+        self.available_devices = available_devices or []
         # Store explicit camera toggle callback or look it up in callbacks dict
         self._camera_toggle_cb = camera_toggle_cb or self.callbacks.get("camera_toggle")
         # Callback for ROI updates (defaults to callbacks['set_roi'])
@@ -171,6 +173,34 @@ class WebcamStreamElement:
                     ui.label("Basic Settings").classes(
                         "text-base font-semibold text-blue-600"
                     )
+
+                    # Camera device selection
+                    ui.label("Camera Device").classes(
+                        "text-sm font-medium text-gray-700"
+                    )
+                    with ui.row().classes("gap-2 items-center mb-2"):
+                        ui.button(
+                            "Scan Cameras",
+                            icon="search",
+                            on_click=self.callbacks.get("scan_cameras", lambda: None),
+                        ).props("size=sm")
+                        self.device_select = (
+                            ui.select(
+                                self.available_devices,
+                                label="Device",
+                                value=(
+                                    self.available_devices[0]
+                                    if self.available_devices
+                                    else None
+                                ),
+                                on_change=self.callbacks.get(
+                                    "select_camera", lambda e: None
+                                ),
+                            )
+                            .classes("w-full")
+                            .props("dense outlined")
+                        )
+
                     # Motion Sensitivity
                     ui.label("Motion Sensitivity").classes(
                         "text-sm font-medium text-gray-700"
@@ -685,3 +715,12 @@ class WebcamStreamElement:
             self.resolution_select.options = options
             if current not in options and options:
                 self.resolution_select.value = options[0]
+
+    def update_devices(self, devices):
+        """Update available camera device dropdown options."""
+        self.available_devices = list(devices or [])
+        if hasattr(self, "device_select", None):
+            current = getattr(self.device_select, "value", None)
+            self.device_select.options = self.available_devices
+            if current not in self.available_devices and self.available_devices:
+                self.device_select.value = self.available_devices[0]
