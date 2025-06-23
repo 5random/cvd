@@ -711,15 +711,33 @@ class SimpleGUIApplication:
     async def scan_cameras(self):
         """Scan for connected camera devices."""
         devices: list[str] = []
-        for idx in range(6):
+
+        async def _check(path_or_idx: str | int) -> str | None:
+            cap = None
             try:
-                cap = await run_camera_io(cv2.VideoCapture, idx)
+                cap = await run_camera_io(cv2.VideoCapture, path_or_idx)
                 if cap is not None and await run_camera_io(cap.isOpened):
-                    devices.append(f"Camera {idx}")
+                    return str(path_or_idx)
+                return None
+            finally:
                 if cap is not None:
-                    await run_camera_io(cap.release)
-            except Exception:
-                continue
+                    with contextlib.suppress(Exception):
+                        await run_camera_io(cap.release)
+
+        if sys.platform.startswith("linux"):
+            import glob
+
+            video_devices = sorted(glob.glob("/dev/video*"))
+            results = await gather_with_concurrency(
+                [_check(dev) for dev in video_devices], label="scan_cameras"
+            )
+            devices.extend([r for r in results if r])
+        else:
+            indices = range(6)
+            results = await gather_with_concurrency(
+                [_check(idx) for idx in indices], label="scan_cameras"
+            )
+            devices.extend([r for r in results if r])
 
         if self.webcam_stream:
             self.webcam_stream.update_devices(devices)
