@@ -3,12 +3,12 @@ from datetime import datetime
 import asyncio
 import pytest
 
-from src.data_handler.interface.sensor_interface import (
+from cvd.data_handler.interface.sensor_interface import (
     SensorReading,
     SensorStatus,
 )
-from src import experiment_manager as em_module
-from src.experiment_manager import (
+from cvd import experiment_manager as em_module
+from cvd.experiment_manager import (
     ExperimentManager,
     ExperimentResult,
     ExperimentPhase,
