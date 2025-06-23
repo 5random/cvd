@@ -17,9 +17,9 @@
                     "gamma": 100,
                     "white_balance_auto": true,
                     "gain": 0,
-                    "backlight_comp": 0,
-                    "exposure_auto": true
-                }
+                    "backlight_compensation": 0,
+                    "exposure_auto": true,
+                },
             }
         }
     ]

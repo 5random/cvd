@@ -144,7 +144,7 @@ WEBCAM_SCHEMA = {
                 "white_balance": {"type": "number"},
                 "white_balance_auto": {"type": "boolean"},
                 "gain": {"type": "number"},
-                "backlight_comp": {"type": "number"},
+                "backlight_compensation": {"type": "number"},
                 "exposure": {"type": "number"},
                 "exposure_auto": {"type": "boolean"},
             },
