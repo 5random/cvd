@@ -263,3 +263,50 @@ async def test_reopen_after_failures(monkeypatch):
     except asyncio.CancelledError:
         pass
     await controller.cleanup()
+
+
+@pytest.mark.asyncio
+async def test_backend_fallback(monkeypatch):
+    from cvd.controllers import webcam as controller_data_sources
+
+    cap_module = controller_data_sources.camera_capture_controller
+
+    monkeypatch.setattr(cap_module, "run_camera_io", immediate)
+
+    primary = DummyClosed(0)
+    secondary = DummyCapture(0)
+
+    def video_capture(idx, backend=None):
+        if backend in (None, 0):
+            return primary
+        return secondary
+
+    monkeypatch.setattr(cap_module.cv2, "VideoCapture", video_capture)
+    for name in ["info", "warning", "error", "debug"]:
+        if hasattr(cap_module, name):
+            monkeypatch.setattr(cap_module, name, lambda *a, **k: None)
+    import cvd.controllers.controller_base as controller_base
+
+    for name in ["info", "warning", "error", "debug"]:
+        if hasattr(controller_base, name):
+            monkeypatch.setattr(controller_base, name, lambda *a, **k: None)
+
+    cfg = ControllerConfig(
+        controller_id="cam",
+        controller_type="camera_capture",
+        parameters={
+            "device_index": 0,
+            "fps": 10,
+            "capture_backend": 0,
+            "capture_backend_fallbacks": [1],
+        },
+    )
+    controller = CameraCaptureController("cam", cfg)
+    started = await controller.start()
+    assert started
+    assert controller._capture is secondary
+    try:
+        await controller.stop()
+    except asyncio.CancelledError:
+        pass
+    await controller.cleanup()

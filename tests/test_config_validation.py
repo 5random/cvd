@@ -391,6 +391,7 @@ async def test_capture_backend_optional(tmp_path):
         "type": "motion_detection",
         "enabled": True,
         "capture_backend": None,
+        "capture_backend_fallbacks": [],
     }
 
     service._validate_controller_config(controller_cfg)
@@ -400,6 +401,7 @@ async def test_capture_backend_optional(tmp_path):
         "name": "cam1",
         "device_index": 0,
         "capture_backend": None,
+        "capture_backend_fallbacks": [],
     }
 
     service._validate_webcam_config(webcam_cfg)

@@ -141,6 +141,7 @@ class MotionDetectionController(BaseCameraCapture, ImageController):
         self.height = params.get("height")
         self.fps = params.get("fps")
         self.capture_backend = params.get("capture_backend")
+        self.capture_backend_fallbacks = params.get("capture_backend_fallbacks", [])
         self.rotation = params.get("rotation", 0)
         self.uvc_settings = {}
         self.uvc_settings.update(params.get("uvc", {}))
@@ -159,6 +160,9 @@ class MotionDetectionController(BaseCameraCapture, ImageController):
                     self.rotation = cam_cfg.get("rotation", self.rotation)
                     self.capture_backend = cam_cfg.get(
                         "capture_backend", self.capture_backend
+                    )
+                    self.capture_backend_fallbacks = cam_cfg.get(
+                        "capture_backend_fallbacks", self.capture_backend_fallbacks
                     )
                     self.uvc_settings.update(cam_cfg.get("uvc", {}))
                     self.uvc_settings.update(cam_cfg.get("uvc_settings", {}))
