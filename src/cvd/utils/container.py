@@ -50,6 +50,7 @@ class ApplicationContainer:
         default_factory=list
     )
     _shutdown_requested: bool = field(default=False)
+    _started: bool = field(default=False)
 
     @classmethod
     def create(cls, config_dir: Path) -> "ApplicationContainer":
@@ -140,6 +141,9 @@ class ApplicationContainer:
     async def startup(self) -> None:
         """Async startup for all services"""
         try:
+            if self._started:
+                return
+            self._started = True
             info("Starting CVD Tracker services...")
 
             # Initialize web application
@@ -172,7 +176,7 @@ class ApplicationContainer:
 
             @app.on_startup
             async def _startup() -> None:
-                await self.web_application.startup()
+                await self.startup()
 
             @app.on_shutdown
             async def _shutdown() -> None:
