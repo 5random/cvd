@@ -802,6 +802,16 @@ class WebcamStreamElement:
         )
         self.video_container.style(style)
 
+    def swap_video_container_dimensions(self):
+        """Swap the width and height of the video container."""
+        if not hasattr(self, "video_container"):
+            return
+        style = getattr(self.video_container, "_style", {})
+        width = style.get("width")
+        height = style.get("height")
+        if width and height:
+            self.video_container.style(f"width: {height}; height: {width};")
+
     def update_resolutions(self, modes):
         """Update resolution dropdown options."""
         self.available_resolutions = list(modes or [])

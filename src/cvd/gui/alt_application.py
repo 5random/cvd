@@ -636,6 +636,19 @@ class SimpleGUIApplication:
         self.settings["rotation"] = value
         self._set_camera_params(rotation=value)
 
+        # Swap video container dimensions when switching between portrait and
+        # landscape orientations
+        if hasattr(self, "webcam_stream") and hasattr(
+            self.webcam_stream, "video_container"
+        ):
+            old_portrait = old_rotation in {90, 270}
+            new_portrait = value in {90, 270}
+            if old_portrait != new_portrait:
+                try:
+                    self.webcam_stream.swap_video_container_dimensions()
+                except Exception:
+                    pass
+
         # Transform existing ROI to maintain orientation
         if self.settings.get("roi_enabled") and hasattr(self, "webcam_stream"):
             width = None
