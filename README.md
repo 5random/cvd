@@ -6,8 +6,7 @@ This project implements the **CVD Tracker** application used to collect
 data from various sensors, process it with controllers and display results
 through a NiceGUI based interface.  A short description of the architecture
 and main modules can be found in [docs/architecture.md](docs/architecture.md).
-For a quick overview of how controllers feed into each other see
-[docs/architecture.md#controller-dependencies](docs/architecture.md#controller-dependencies).
+For a quick overview of how controllers feed into each other see [docs/architecture.md#controller-dependencies](docs/architecture.md#controller-dependencies).
 Example snippets demonstrating typical usage are available in
 [docs/examples.md](docs/examples.md).
 An overview of the configuration and logging utilities lives in
@@ -43,13 +42,22 @@ pip install -r dev-requirements.txt
 This installs all Python dependencies including `psutil`, which the dashboard
 uses to display CPU and memory usage.
 
-All dependencies are defined in `pyproject.toml`. Both `setup.py` and
-`requirements.txt` read from this file so there is a single authoritative list.
-Run the helper script whenever you change the dependency list to keep
-`requirements.txt` up to date:
+All runtime dependencies are declared under ``[project.dependencies]`` in
+``pyproject.toml``.  The ``setup.py`` and ``requirements.txt`` files both read
+from this section so there is a single authoritative list.  Whenever you edit
+``pyproject.toml`` to add or remove a package you must regenerate
+``requirements.txt``.  Use the helper script to update the file:
 
 ```bash
 python scripts/update_requirements.py
+```
+
+This extracts the dependencies from ``pyproject.toml`` and writes them sorted to
+``requirements.txt``.  You can also run the convenience target below which wraps
+the same command:
+
+```bash
+make update-requirements
 ```
 
 
@@ -137,9 +145,8 @@ value on startup using the ``--controller-concurrency-limit`` option of
 
 ### Webcam UVC settings
 
-Webcam properties under ``uvc_settings`` follow OpenCV naming. The property
-``"backlight_compensation"`` can also be provided as ``"backlight_comp"`` and
-will be interpreted the same way.
+Webcam properties under ``uvc_settings`` follow OpenCV naming. Use
+``"backlight_compensation"`` for adjusting backlight compensation.
 
 ### Video capture backend
 
@@ -166,12 +173,13 @@ only setups or when running tests without real hardware.
 
 ## Running tests
 
-Before running the tests you must install this package and its dependencies.
-Attempting to execute `pytest` without installation will result in import
-errors.
+Before running the tests you must install this package and all third-party
+dependencies.  Attempting to execute `pytest` without installation will result
+in import errors.  A full list of required packages is available in
+[docs/test_setup.md](docs/test_setup.md).
 
-Install the dependencies and run the tests in a single sequence. You can
-either install the package in editable mode or use the requirements files:
+Install the dependencies and run the tests in a single sequence. You can either
+install the package in editable mode or use the requirements files:
 
 ```bash
 pip install -e .

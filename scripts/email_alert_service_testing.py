@@ -26,7 +26,7 @@ from email.message import EmailMessage
 from typing import Iterable
 import sys
 
-# Ensure `program` package is importable when running script directly
+# Only adjust ``sys.path`` when executed directly so that ``src`` is importable
 if __name__ == "__main__" and __package__ is None:
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
@@ -89,7 +89,11 @@ class ManualEmailAlertService(EmailAlertService):
         status_text: str | None = None,
         image_attachment: bytes | None = None,
     ) -> bool:
-        targets = recipient or self.recipients or ([] if self.recipient is None else [self.recipient])
+        targets = (
+            recipient
+            or self.recipients
+            or ([] if self.recipient is None else [self.recipient])
+        )
         if isinstance(targets, str):
             targets = [targets]
         else:
@@ -99,7 +103,11 @@ class ManualEmailAlertService(EmailAlertService):
             return False
 
         try:
-            smtp_conn = smtplib.SMTP_SSL(self.smtp_host, self.smtp_port) if self.smtp_use_ssl else smtplib.SMTP(self.smtp_host, self.smtp_port)
+            smtp_conn = (
+                smtplib.SMTP_SSL(self.smtp_host, self.smtp_port)
+                if self.smtp_use_ssl
+                else smtplib.SMTP(self.smtp_host, self.smtp_port)
+            )
             with smtp_conn as smtp:
                 if hasattr(smtp, "ehlo"):
                     smtp.ehlo()
@@ -127,12 +135,14 @@ class ManualEmailAlertService(EmailAlertService):
                         )
                     smtp.send_message(msg)
                     info(f"Sent alert email to {addr}")
-                    self._history.append({
-                        "time": datetime.now().strftime("%H:%M:%S"),
-                        "recipient": addr,
-                        "subject": subject,
-                        "attachment": bool(image_attachment),
-                    })
+                    self._history.append(
+                        {
+                            "time": datetime.now().strftime("%H:%M:%S"),
+                            "recipient": addr,
+                            "subject": subject,
+                            "attachment": bool(image_attachment),
+                        }
+                    )
             return True
         except Exception as exc:
             error(f"Failed to send alert email: {exc}")

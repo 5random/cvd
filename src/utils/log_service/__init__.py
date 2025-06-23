@@ -141,7 +141,7 @@ class LogService:
         if service is None:
             # Lazily create a configuration service so that ``get_log_service``
             # works even when the caller has not initialised one explicitly.
-            repo_root = Path(__file__).resolve().parents[4]
+            repo_root = Path(__file__).resolve().parents[3]
             config_path = repo_root / "config" / "config.json"
             default_config_path = repo_root / "config" / "default_config.json"
             try:
@@ -236,7 +236,9 @@ class LogService:
         # Preserve handlers added by external code (e.g. pytest caplog) so log
         # capture continues to work. Only attach our rotating file handler if no
         # such handler has been registered yet.
-        if not any(isinstance(h, logging.handlers.RotatingFileHandler) for h in logger.handlers):
+        if not any(
+            isinstance(h, logging.handlers.RotatingFileHandler) for h in logger.handlers
+        ):
             error_file = self.log_dir / "error.log"
             handler = logging.handlers.RotatingFileHandler(
                 error_file,
