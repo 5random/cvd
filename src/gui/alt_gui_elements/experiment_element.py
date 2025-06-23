@@ -4,6 +4,7 @@ from typing import List, Optional
 
 from src.experiment_manager import (
     ExperimentConfig,
+    ExperimentState,
     get_experiment_manager,
 )
 from src.gui.ui_helpers import notify_later
@@ -260,6 +261,24 @@ class ExperimentManagementSection:
             self._experiment_timer = ui.timer(1.0, self._update_experiment_status)
             notify_later(f'Started experiment "{name}"', type="positive")
         else:
+            if manager.get_current_state() not in (
+                ExperimentState.RUNNING,
+                ExperimentState.PAUSED,
+            ):
+                # Experiment already finished, nothing to stop
+                self.experiment_running = False
+                self._current_experiment_id = None
+                self.start_experiment_btn.enable()
+                self.stop_experiment_btn.disable()
+                self.experiment_icon.classes("text-gray-500")
+                self.experiment_status_label.text = "No experiment running"
+                self.experiment_details.set_visibility(False)
+                if self._experiment_timer:
+                    self._experiment_timer.cancel()
+                    self._experiment_timer = None
+                self.load_recent_experiments()
+                return
+
             success = await manager.stop_experiment()
             if not success:
                 notify_later("Failed to stop experiment", type="negative")
