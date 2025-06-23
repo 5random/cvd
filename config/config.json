@@ -5,7 +5,7 @@
     "dark_mode": false
   },
   "sensor_reconnect_attempts": 3,
-  "disable_sensors": false,
+  "disable_sensors": true,
   "sensors": [
     {
       "sen001": {

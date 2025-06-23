@@ -557,3 +557,17 @@ def thread_pool_context(
 ):
     pool = get_thread_pool_manager().get_pool(pool_type, config=config)
     yield pool  # ownership remains with manager
+
+
+__all__ = [
+    "ThreadPoolType",
+    "ThreadPoolConfig",
+    "ManagedThreadPool",
+    "ThreadPoolManager",
+    "get_thread_pool_manager",
+    "run_sensor_io",
+    "run_camera_io",
+    "run_file_io",
+    "run_network_io",
+    "thread_pool_context",
+]

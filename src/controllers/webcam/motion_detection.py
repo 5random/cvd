@@ -51,7 +51,6 @@ class MotionDetectionResult:
 
 def analyze_motion(
     mask: np.ndarray,
-    frame: np.ndarray,
     *,
     min_contour_area: int,
     roundness_enabled: bool,
@@ -102,7 +101,11 @@ def analyze_motion(
         motion_bbox = (x, y, w, h)
 
     # Calculate confidence based on motion characteristics
-    confidence = min(motion_percentage / motion_threshold_percentage, 1.0)
+    confidence = (
+        min(motion_percentage / motion_threshold_percentage, 1.0)
+        if motion_threshold_percentage > 0
+        else 0.0
+    )
     if confidence < confidence_threshold:
         motion_detected = False
 
@@ -175,6 +178,13 @@ class MotionDetectionController(ImageController):
         self.motion_threshold_percentage = params.get(
             "motion_threshold_percentage", 1.0
         )
+        if self.motion_threshold_percentage <= 0:
+            warning(
+                "motion_threshold_percentage must be > 0, using default",
+                controller_id=self.controller_id,
+                value=self.motion_threshold_percentage,
+            )
+            self.motion_threshold_percentage = 1.0
         self.gaussian_blur_kernel = params.get("gaussian_blur_kernel", (5, 5))
         self.morphology_kernel_size = params.get("morphology_kernel_size", 5)
         self.confidence_threshold = params.get("confidence_threshold", 0.5)
@@ -382,13 +392,33 @@ class MotionDetectionController(ImageController):
             motion_result = await self._motion_pool.submit_async(
                 analyze_motion,
                 processed_mask,
-                frame,
                 min_contour_area=self.min_contour_area,
                 roundness_enabled=self.roundness_enabled,
                 roundness_threshold=self.roundness_threshold,
                 motion_threshold_percentage=self.motion_threshold_percentage,
                 confidence_threshold=self.confidence_threshold,
             )
+
+            # Adjust bbox and center to original frame coordinates when ROI is active
+            if (
+                self.roi_width is not None
+                and self.roi_height is not None
+                and (self.roi_x or self.roi_y)
+            ):
+                if motion_result.motion_bbox is not None:
+                    x, y, w_box, h_box = motion_result.motion_bbox
+                    motion_result.motion_bbox = (
+                        x + int(self.roi_x),
+                        y + int(self.roi_y),
+                        w_box,
+                        h_box,
+                    )
+                if motion_result.motion_center is not None:
+                    cx, cy = motion_result.motion_center
+                    motion_result.motion_center = (
+                        cx + int(self.roi_x),
+                        cy + int(self.roi_y),
+                    )
 
             # Update shared state atomically
             async with self._state_lock:

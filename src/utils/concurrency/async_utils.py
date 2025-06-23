@@ -214,14 +214,15 @@ async def gather_with_concurrency(
         async with asyncio.TaskGroup() as tg:
             for i, coro in enumerate(coro_list):
                 tg.create_task(_worker(i, coro))
-    except* Exception as eg:
-        error("gather_failed", label=label, exc_info=eg)
+    except* Exception as exc_group:
+        error("gather_failed", label=label, exc_info=exc_group)
         raise
 
     if errors and not cancel_on_exception:
         exc_group = ExceptionGroup(f"{label} collected errors", errors)
         error("gather_errors", label=label, exc_info=exc_group)
         raise exc_group
+
 
     return cast(List[T], results)
 
@@ -299,6 +300,8 @@ class AsyncTaskManager:
         """Schedule *coro* and return a :class:`TaskHandle`."""
         if task_id is None:
             task_id = f"task-{len(self._tasks) + 1}"
+        assert task_id is not None
+        task_id_val = task_id
         if task_id in self._tasks:
             raise KeyError(f"Task id {task_id!r} already exists")
 
@@ -341,9 +344,11 @@ class AsyncTaskManager:
         task = asyncio.create_task(_runner(), name=f"{self._name}:{task_id}")
         self._tasks[task_id] = task
         info("task_registered", task_id=task_id, manager=self._name)
-        task.add_done_callback(
-            lambda t, tid=task_id: self._tasks.pop(tid, None)  # type: ignore[misc]
-        )
+
+        def _remove_task(t: asyncio.Task[Any], tid: str = task_id_val) -> None:
+            self._tasks.pop(tid, None)
+
+        task.add_done_callback(_remove_task)
         return TaskHandle(task)
 
     # -------- stop helpers -----------------------------------------
@@ -397,13 +402,16 @@ def install_signal_handlers(manager: AsyncTaskManager) -> None:
 
     for sig in (signal.SIGINT, signal.SIGTERM):
         try:
-            loop.add_signal_handler(
-                sig, lambda s=sig: asyncio.create_task(_shutdown(s.name))  # type: ignore[misc]
-            )
+            def _async_handler(s: signal.Signals = sig) -> None:
+                asyncio.create_task(_shutdown(s.name))
+                
+            loop.add_signal_handler(sig, _async_handler)
         except NotImplementedError:  # Windows
-            signal.signal(
-                sig, lambda *_: asyncio.create_task(_shutdown(sig.name))  # type: ignore[misc]
-            )
+
+            def _sync_handler(*_: Any) -> None:
+                asyncio.create_task(_shutdown(sig.name))
+
+            signal.signal(sig, _sync_handler)
 
 
 __all__ = [
