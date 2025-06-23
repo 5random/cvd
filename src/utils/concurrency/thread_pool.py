@@ -480,6 +480,13 @@ class ThreadPoolManager:
         self._pools: Dict[ThreadPoolType, ManagedThreadPool] = {}
         self._lock = Lock()
 
+    def set_default_max_workers(self, workers: int) -> None:
+        """Set ``max_workers`` for all default configs without one."""
+        workers = max(1, workers)
+        for cfg in self._defaults.values():
+            if cfg.max_workers is None:
+                cfg.max_workers = workers
+
     def get_pool(
         self, pool_type: ThreadPoolType, *, config: ThreadPoolConfig | None = None
     ) -> ManagedThreadPool:
@@ -511,16 +518,20 @@ class ThreadPoolManager:
 
 
 # ───────────────────── global singleton & convenience helpers ────────────────
+
 _global_mgr: ThreadPoolManager | None = None
 _mgr_lock = Lock()
 
 
-def get_thread_pool_manager() -> ThreadPoolManager:
+def get_thread_pool_manager(default_max_workers: int | None = None) -> ThreadPoolManager:
+    """Return global :class:`ThreadPoolManager` and apply defaults."""
     global _global_mgr
     if _global_mgr is None:
         with _mgr_lock:
             if _global_mgr is None:
                 _global_mgr = ThreadPoolManager()
+    if default_max_workers is not None:
+        _global_mgr.set_default_max_workers(default_max_workers)
     return _global_mgr
 
 
@@ -557,3 +568,17 @@ def thread_pool_context(
 ):
     pool = get_thread_pool_manager().get_pool(pool_type, config=config)
     yield pool  # ownership remains with manager
+
+
+__all__ = [
+    "ThreadPoolType",
+    "ThreadPoolConfig",
+    "ManagedThreadPool",
+    "ThreadPoolManager",
+    "get_thread_pool_manager",
+    "run_sensor_io",
+    "run_camera_io",
+    "run_file_io",
+    "run_network_io",
+    "thread_pool_context",
+]

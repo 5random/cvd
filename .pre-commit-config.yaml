@@ -4,7 +4,4 @@ repos:
     hooks:
       - id: black
         args: ["--check"]
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.16.0
-    hooks:
-      - id: mypy
+

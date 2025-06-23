@@ -56,8 +56,8 @@ class DataSaver:
             flush_interval = 1
         self.flush_interval = flush_interval
 
-        # mapping: category -> sensor_id -> (writer, file, row_count, last_check_time)
-        self._writers: Dict[str, Dict[str, Tuple[Any, Optional[IO], int, float]]] = {
+        # mapping: category -> sensor_id -> (writer, file, row_count)
+        self._writers: Dict[str, Dict[str, Tuple[Any, Optional[IO], int]]] = {
             "raw": {},
             "processed": {},
         }
@@ -270,7 +270,7 @@ class DataSaver:
                     file_in_use = any(
                         file_handle is not None and file_handle.name == str(file_path)
                         for writers in self._writers.values()
-                        for _, file_handle, _, _ in writers.values()
+                        for _, file_handle, _ in writers.values()
                     )
 
                     if not file_in_use:
@@ -302,7 +302,6 @@ class DataSaver:
             writer: Any
             f: Optional[IO[Any]]
             row_count: int
-            last_check_time: float
 
             if writer_data is None or writer_data[0] is None:
                 safe_id = sanitize_id(sensor_id)
@@ -311,7 +310,6 @@ class DataSaver:
                 temp_f = open(file_path, "a", newline="", encoding="utf-8")
                 temp_writer = csv.writer(temp_f)
                 row_count = 0
-                last_check_time = time.time()
                 existing = sensor_map.get(sensor_id)
                 if existing is None or existing[0] is None:
                     if is_new:
@@ -328,14 +326,13 @@ class DataSaver:
                         temp_writer,
                         temp_f,
                         row_count,
-                        last_check_time,
                     )
                     writer, f = temp_writer, temp_f
                 else:
-                    writer, f, row_count, last_check_time = existing
+                    writer, f, row_count = existing
                     temp_f.close()
             else:
-                writer, f, row_count, last_check_time = writer_data
+                writer, f, row_count = writer_data
 
             try:
                 writer.writerow(
@@ -349,7 +346,7 @@ class DataSaver:
                 if f is not None and row_count % self.flush_interval == 0:
                     f.flush()
 
-                sensor_map[sensor_id] = (writer, f, row_count, last_check_time)
+                sensor_map[sensor_id] = (writer, f, row_count)
             except Exception as e:
                 error(f"Failed to write {category} data for {sensor_id}: {e}")
                 return
@@ -362,7 +359,7 @@ class DataSaver:
     def flush_all(self) -> None:
         """Flush all open buffers."""
         for cat_map in self._writers.values():
-            for writer, f, row_count, last_check_time in cat_map.values():
+            for writer, f, row_count in cat_map.values():
                 if f:
                     try:
                         f.flush()
@@ -392,7 +389,7 @@ class DataSaver:
 
         # Close all file handles
         for cat_map in self._writers.values():
-            for writer, f, row_count, last_check_time in cat_map.values():
+            for writer, f, row_count in cat_map.values():
                 if f:
                     try:
                         f.close()
