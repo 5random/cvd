@@ -8,7 +8,7 @@ Application container for dependency injection and service orchestration.
 import asyncio
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import List, Tuple
+from typing import List, Tuple, TYPE_CHECKING
 from concurrent.futures import Future
 from src.utils.log_service import info, error
 from src.utils.concurrency.thread_pool import (
@@ -31,6 +31,9 @@ from src.utils.email_alert_service import (
     EmailAlertService,
     set_email_alert_service,
 )
+
+if TYPE_CHECKING:
+    from src.gui.alt_application import WebApplication
 
 
 @dataclass
