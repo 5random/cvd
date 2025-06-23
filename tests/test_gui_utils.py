@@ -16,11 +16,26 @@ async def test_generate_mjpeg_stream(monkeypatch):
     async def frame_source():
         return frames.pop(0) if frames else None
 
-    gen = generate_mjpeg_stream(frame_source, fps_cap=1000, timeout=0.01)
+    class DummyRequest:
+        def __init__(self) -> None:
+            self.disconnected = False
+
+        async def is_disconnected(self):
+            return self.disconnected
+
+    req = DummyRequest()
+    gen = generate_mjpeg_stream(frame_source, fps_cap=1000, timeout=0.01, request=req)
+
     chunk1 = await gen.__anext__()
     assert chunk1.startswith(b"--frame")
+
     chunk2 = await gen.__anext__()
     assert chunk2.startswith(b"--frame")
+
+    chunk3 = await gen.__anext__()
+    assert chunk3.startswith(b"--frame")
+
+    req.disconnected = True
     with pytest.raises(StopAsyncIteration):
         await gen.__anext__()
 

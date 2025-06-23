@@ -1,5 +1,4 @@
 import asyncio
-import contextlib
 from typing import Any, Awaitable, Callable, AsyncIterator, Optional
 
 import cv2
@@ -24,6 +23,7 @@ async def generate_mjpeg_stream(
     interval = 1 / fps_cap
     no_frame_start: Optional[float] = None
     placeholder_bytes: Optional[bytes] = None
+    placeholder_mode = False
 
     while True:
         if request is not None:
@@ -37,6 +37,7 @@ async def generate_mjpeg_stream(
         now = asyncio.get_running_loop().time()
         if frame is not None:
             no_frame_start = None
+            placeholder_mode = False
             if interval <= 0 or now - last_sent >= interval:
                 success, buf = await run_in_executor(cv2.imencode, ".jpg", frame)
                 if success:
@@ -51,18 +52,22 @@ async def generate_mjpeg_stream(
             if no_frame_start is None:
                 no_frame_start = now
             if now - no_frame_start >= timeout:
-                error(f"Camera failed to provide frames for {timeout} seconds")
-                if placeholder_bytes is None:
-                    placeholder = np.zeros((10, 10, 3), dtype=np.uint8)
-                    success, buf = cv2.imencode(".jpg", placeholder)
-                    if success:
-                        placeholder_bytes = buf.tobytes()
-                if placeholder_bytes:
-                    yield (
-                        b"--frame\r\nContent-Type: image/jpeg\r\n\r\n"
-                        + placeholder_bytes
-                        + b"\r\n"
-                    )
-                break
+                if not placeholder_mode:
+                    error(f"Camera failed to provide frames for {timeout} seconds")
+                    placeholder_mode = True
+                    if placeholder_bytes is None:
+                        placeholder = np.zeros((10, 10, 3), dtype=np.uint8)
+                        success, buf = cv2.imencode(".jpg", placeholder)
+                        if success:
+                            placeholder_bytes = buf.tobytes()
+            if placeholder_mode and placeholder_bytes and (
+                interval <= 0 or now - last_sent >= interval
+            ):
+                yield (
+                    b"--frame\r\nContent-Type: image/jpeg\r\n\r\n"
+                    + placeholder_bytes
+                    + b"\r\n"
+                )
+                last_sent = now
         await asyncio.sleep(max(0.001, interval))
 
