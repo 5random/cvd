@@ -565,7 +565,6 @@ class WebcamStreamElement:
     async def toggle_video_play(self):
         """Toggle video play state"""
         if not self.camera_active:
-
             # assign the stream source only when starting playback
             if self.video_element.source != "/video_feed":
                 self.video_element.set_source("/video_feed")
@@ -591,7 +590,6 @@ class WebcamStreamElement:
             else:
                 notify_later("Failed to start camera", type="negative")
         else:
-
             # Clear the image source to stop streaming
             if self.video_element.source:
                 self.video_element.set_source("")
@@ -700,18 +698,26 @@ class WebcamStreamElement:
                         f'stroke-width="2" />'
                     )
                 if e.type == "mouseup":
-                    self.roi_x = int(x1)
-                    self.roi_y = int(y1)
-                    self.roi_width = int(x2 - x1)
-                    self.roi_height = int(y2 - y1)
-                    if getattr(self, "roi_checkbox", None):
-                        self.roi_checkbox.value = True
-                    if self._roi_update_cb:
-                        self._roi_update_cb()
-                    notify_later(
-                        f"ROI set to ({self.roi_x}, {self.roi_y}, {self.roi_width}, {self.roi_height})",
-                        type="positive",
-                    )
+                    roi_width = int(x2 - x1)
+                    roi_height = int(y2 - y1)
+                    if roi_width == 0 or roi_height == 0:
+                        notify_later(
+                            "Cannot set ROI with zero width or height; keeping previous ROI.",
+                            type="negative",
+                        )
+                    else:
+                        self.roi_x = int(x1)
+                        self.roi_y = int(y1)
+                        self.roi_width = roi_width
+                        self.roi_height = roi_height
+                        if getattr(self, "roi_checkbox", None):
+                            self.roi_checkbox.value = True
+                        if self._roi_update_cb:
+                            self._roi_update_cb()
+                        notify_later(
+                            f"ROI set to ({self.roi_x}, {self.roi_y}, {self.roi_width}, {self.roi_height})",
+                            type="positive",
+                        )
                     dialog.close()
 
         with ui.dialog().props("persistent") as dialog:
