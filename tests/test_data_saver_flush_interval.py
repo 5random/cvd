@@ -2,8 +2,26 @@ from src.utils.container import ApplicationContainer
 from src import gui
 from src.gui.alt_gui_elements.alert_element_new import EmailAlertStatusDisplay
 
+class DummyWebApp:
+    def __init__(self, *a, **k):
+        from types import SimpleNamespace
+        
+        self.component_registry = SimpleNamespace(cleanup_all=lambda: None)
+
+    async def startup(self):
+        pass
+
+    async def shutdown(self):
+        pass
+
+    def register_components(self):
+        pass
+
 
 def test_data_saver_flush_interval_from_config(tmp_path, monkeypatch):
+    monkeypatch.setattr(
+        "src.gui.alt_application.SimpleGUIApplication", DummyWebApp
+    )
     config_dir = tmp_path
     cfg = {
         "data_storage": {
@@ -26,6 +44,9 @@ def test_data_saver_flush_interval_from_config(tmp_path, monkeypatch):
 
 
 def test_data_saver_flush_interval_defaults_to_one(tmp_path, monkeypatch):
+    monkeypatch.setattr(
+        "src.gui.alt_application.SimpleGUIApplication", DummyWebApp
+    )
     config_dir = tmp_path
     cfg = {
         "data_storage": {

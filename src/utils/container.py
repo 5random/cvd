@@ -14,6 +14,7 @@ from src.utils.log_service import info, error
 from src.utils.concurrency.thread_pool import (
     ManagedThreadPool,
     ThreadPoolType,
+    get_thread_pool_manager,
 )
 
 from src.utils.config_service import (
@@ -80,6 +81,7 @@ class ApplicationContainer:
             info("Email alert service initialized")
             # Get thread pool configuration
             max_workers = config_service.get("thread_pool.max_workers", int, 4)
+            get_thread_pool_manager(default_max_workers=max_workers)
 
             # Initialize unified data saver using configured storage paths
             storage_paths = (
