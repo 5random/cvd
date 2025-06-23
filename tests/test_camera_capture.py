@@ -3,8 +3,8 @@ import numpy as np
 
 import pytest
 
-from src.controllers.webcam import CameraCaptureController, MotionDetectionController
-from src.controllers.controller_base import ControllerConfig, ControllerInput
+from cvd.controllers.webcam import CameraCaptureController, MotionDetectionController
+from cvd.controllers.controller_base import ControllerConfig, ControllerInput
 
 
 class DummyCapture:
@@ -53,7 +53,7 @@ async def immediate(fn, *args, **kwargs):
 
 @pytest.mark.asyncio
 async def test_camera_capture_recovery(monkeypatch):
-    from src.controllers import webcam as controller_data_sources
+    from cvd.controllers import webcam as controller_data_sources
 
     cap_module = controller_data_sources.camera_capture_controller
 
@@ -68,7 +68,7 @@ async def test_camera_capture_recovery(monkeypatch):
         monkeypatch.setattr(cap_module, "debug", lambda *a, **k: None)
 
     # also suppress logging in controller_base
-    import src.controllers.controller_base as controller_base
+    import cvd.controllers.controller_base as controller_base
 
     for name in ["info", "warning", "error", "debug"]:
         if hasattr(controller_base, name):
@@ -107,7 +107,7 @@ async def test_camera_capture_recovery(monkeypatch):
 
 @pytest.mark.asyncio
 async def test_reinitialize_on_none(monkeypatch):
-    from src.controllers import webcam as controller_data_sources
+    from cvd.controllers import webcam as controller_data_sources
 
     cap_module = controller_data_sources.camera_capture_controller
 
@@ -118,7 +118,7 @@ async def test_reinitialize_on_none(monkeypatch):
     for name in ["info", "warning", "error", "debug"]:
         if hasattr(cap_module, name):
             monkeypatch.setattr(cap_module, name, lambda *a, **k: None)
-    import src.controllers.controller_base as controller_base
+    import cvd.controllers.controller_base as controller_base
 
     for name in ["info", "warning", "error", "debug"]:
         if hasattr(controller_base, name):
@@ -161,7 +161,7 @@ async def test_reinitialize_on_none(monkeypatch):
 
 @pytest.mark.asyncio
 async def test_reopen_after_failures(monkeypatch):
-    from src.controllers import webcam as controller_data_sources
+    from cvd.controllers import webcam as controller_data_sources
 
     cap_module = controller_data_sources.camera_capture_controller
 
@@ -181,7 +181,7 @@ async def test_reopen_after_failures(monkeypatch):
     for name in ["info", "warning", "error", "debug"]:
         if hasattr(cap_module, name):
             monkeypatch.setattr(cap_module, name, lambda *a, **k: None)
-    import src.controllers.controller_base as controller_base
+    import cvd.controllers.controller_base as controller_base
 
     for name in ["info", "warning", "error", "debug"]:
         if hasattr(controller_base, name):

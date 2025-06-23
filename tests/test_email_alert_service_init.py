@@ -1,6 +1,6 @@
 import pytest
 
-from src.utils.alert_system_utils.email_alert_service import EmailAlertService
+from cvd.utils.alert_system_utils.email_alert_service import EmailAlertService
 
 
 class DummyConfigService:
