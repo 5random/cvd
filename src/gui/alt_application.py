@@ -46,7 +46,6 @@ from src.gui import (
     ExperimentManagementSection,
     MotionStatusSection,
     WebcamStreamElement,
-    create_demo_configurations,
     create_email_alert_wizard,
     setup_global_styles,
 )
