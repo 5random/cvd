@@ -8,7 +8,7 @@ from src.utils.data_utils.file_management_service import FileMaintenanceService
 
 
 def _init_services(tmp_path: Path) -> tuple[ConfigurationService, CompressionService, DataSaver]:
-    cfg_dir = Path('program/config')
+    cfg_dir = Path('src/config')
     config_service = ConfigurationService(cfg_dir / 'config.json', cfg_dir / 'default_config.json')
     set_config_service(config_service)
 
