@@ -6,9 +6,9 @@ import zipfile
 
 import pytest
 
-from src.utils.data_utils.data_manager import DataManager
-from src.utils.data_utils.maintenance import MaintenanceManager
-from src.utils.data_utils.indexing import FileStatus
+from cvd.utils.data_utils.data_manager import DataManager
+from cvd.utils.data_utils.maintenance import MaintenanceManager
+from cvd.utils.data_utils.indexing import FileStatus
 
 
 class DummyCompressionSettings:

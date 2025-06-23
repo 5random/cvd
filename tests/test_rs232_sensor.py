@@ -1,9 +1,9 @@
 import pytest
 
-from src.legacy_sensors import rs232_sensor
-from src.legacy_sensors.rs232_sensor import RS232Sensor
-from src.data_handler.sources.mock_hardware.rs232 import MockRS232Serial
-from src.data_handler.interface.sensor_interface import SensorConfig, SensorStatus
+from cvd.legacy_sensors import rs232_sensor
+from cvd.legacy_sensors.rs232_sensor import RS232Sensor
+from cvd.data_handler.sources.mock_hardware.rs232 import MockRS232Serial
+from cvd.data_handler.interface.sensor_interface import SensorConfig, SensorStatus
 
 
 class InvalidMockSerial(MockRS232Serial):
