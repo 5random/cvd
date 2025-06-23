@@ -745,7 +745,7 @@ class WebcamStreamElement:
         """Update resolution dropdown options."""
         self.available_resolutions = list(modes or [])
         options = [f"{w}x{h} ({fps}fps)" for (w, h, fps) in self.available_resolutions]
-        if hasattr(self, "resolution_select", None):
+        if hasattr(self, "resolution_select"):
             current = getattr(self.resolution_select, "value", None)
             self.resolution_select.options = options
             if current not in options and options:
@@ -754,7 +754,7 @@ class WebcamStreamElement:
     def update_devices(self, devices):
         """Update available camera device dropdown options."""
         self.available_devices = list(devices or [])
-        if hasattr(self, "device_select", None):
+        if hasattr(self, "device_select"):
             current = getattr(self.device_select, "value", None)
             self.device_select.options = self.available_devices
             if current not in self.available_devices and self.available_devices:
