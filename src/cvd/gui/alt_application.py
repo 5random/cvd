@@ -545,6 +545,8 @@ class SimpleGUIApplication:
         if hasattr(self, "webcam_stream"):
             self.webcam_stream.sensitivity_number.value = value
             self.webcam_stream.sensitivity_slider.value = value
+        if hasattr(self, "motion_section"):
+            self.motion_section.update_threshold_label(value)
         notify_later(f"Sensitivity set to {value}%", type="positive")
 
     def _set_camera_params(
@@ -751,6 +753,14 @@ class SimpleGUIApplication:
                     }
                 )
         self.webcam_stream.refresh_roi_overlay()
+        if hasattr(self, "motion_section"):
+            self.motion_section.update_roi_status_label(
+                enabled,
+                self.webcam_stream.roi_x,
+                self.webcam_stream.roi_y,
+                self.webcam_stream.roi_width,
+                self.webcam_stream.roi_height,
+            )
         notify_later("ROI updated", type="positive")
 
     async def apply_uvc_settings(self):
