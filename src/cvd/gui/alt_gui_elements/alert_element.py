@@ -769,7 +769,7 @@ class EmailAlertWizard:
 class EmailAlertStatusDisplay:
     """Display current email alert configurations with overview and partially anonymized emails"""
 
-    def __init__(self, alert_configurations: Optional[List[Dict[str, Any]]] = None):
+    def __init__(self, alert_configurations: Optional[List[Dict[str, Any]]] = None, *, service=get_email_alert_service()):
         """
         Initialize the alert status display
 
@@ -778,6 +778,7 @@ class EmailAlertStatusDisplay:
         """
         self.alert_configurations = alert_configurations or []
         self.update_callback: Optional[Callable[[], None]] = None
+        self.service = service
 
     def anonymize_email(self, email: str) -> str:
         """Partially anonymize email address for display
@@ -1178,7 +1179,7 @@ class EmailAlertStatusDisplay:
 class EmailAlertsSection:
     """Section for managing basic email alerts within the GUI."""
 
-    def __init__(self, settings, callbacks=None, *, service: Optional[EmailAlertService] = None):
+    def __init__(self, settings, callbacks=None, *, service = get_email_alert_service()):
         self.experiment_running = False
         self.alerts_enabled = False
         settings = settings or {}
@@ -1301,7 +1302,7 @@ class EmailAlertsSection:
 def create_email_alert_wizard(
     on_save: Optional[Callable[[Dict[str, Any]], None]] = None,
     *,
-    service: Optional[EmailAlertService] = None,
+    service = get_email_alert_service(),
 ) -> ui.card:
     """Factory function to create an Email Alert Setup Wizard"""
     wizard = EmailAlertWizard(on_save=on_save, service=service)
