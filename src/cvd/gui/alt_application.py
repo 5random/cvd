@@ -611,6 +611,8 @@ class SimpleGUIApplication:
             self._set_camera_params(width=width, height=height)
         if hasattr(self, "webcam_stream"):
             self.webcam_stream.resolution_select.value = res
+            if hasattr(self.webcam_stream, "update_video_aspect"):
+                self.webcam_stream.update_video_aspect(width, height)
         notify_later(f"Resolution set to {res}", type="positive")
 
     def update_rotation(self, e):

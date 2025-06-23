@@ -112,17 +112,25 @@ class WebcamStreamElement:
 
             # Live camera stream from the /video_feed endpoint
             with ui.row().classes("justify-center mb-4"):
+                # Determine initial aspect ratio from available resolutions
+                if self.available_resolutions:
+                    init_w, init_h = self.available_resolutions[0][:2]
+                else:
+                    init_w, init_h = 640, 480
+
+                style = (
+                    "width: 100%; "
+                    f"aspect-ratio: {init_w}/{init_h}; "
+                    "background-color: #f5f5f5; "
+                    "display: flex; align-items: center; justify-content: center;"
+                )
+
                 with (
                     ui.card()
                     .classes("border-2 border-dashed border-gray-300")
-                    .style(
-                        "width: 640px; height: 480px; "
-                        "background-color: #f5f5f5; "
-                        "display: flex; align-items: center; "
-                        "justify-content: center; "
-                        "position: relative;"
-                    )
-                ):
+                    .style(style)
+                ) as container:
+                    self.video_container = container
                     # Image element displaying the MJPEG stream
                     # initialize without an active source; the stream will be
                     # assigned when playback starts
@@ -769,6 +777,20 @@ class WebcamStreamElement:
             self.roi_checkbox.value = False
             if self._roi_update_cb:
                 self._roi_update_cb()
+
+    def update_video_aspect(self, width: int, height: int) -> None:
+        """Update video container aspect ratio."""
+        if not getattr(self, "video_container", None):
+            return
+        if width <= 0 or height <= 0:
+            return
+        style = (
+            "width: 100%; "
+            f"aspect-ratio: {width}/{height}; "
+            "background-color: #f5f5f5; "
+            "display: flex; align-items: center; justify-content: center;"
+        )
+        self.video_container.style(style)
 
     def update_resolutions(self, modes):
         """Update resolution dropdown options."""
