@@ -13,8 +13,8 @@ can be specified on the command line using ``--config-dir`` or via the
 from pathlib import Path
 from src.utils.container import ApplicationContainer
 
-# Load configuration from the ``program/config`` directory
-container = ApplicationContainer.create_sync(Path("program/config"))
+# Load configuration from the ``src/config`` directory
+container = ApplicationContainer.create_sync(Path("src/config"))
 container.start_gui()
 ```
 
@@ -22,7 +22,7 @@ To start the application from the command line with a custom configuration
 directory run:
 
 ```bash
-python src/main.py --config-dir program/config
+python src/main.py --config-dir src/config
 ```
 
 You can also set ``CVD_CONFIG_DIR`` instead of passing the argument.
@@ -57,7 +57,7 @@ dashboard.
 ```python
 from src.utils.config_service import ConfigurationService
 
-service = ConfigurationService(Path("program/config/config.json"), Path("program/config/default_config.json"))
+service = ConfigurationService(Path("src/config/config.json"), Path("src/config/default_config.json"))
 service.add_sensor_config({
     "sensor_id": "mock1",
     "name": "Example",

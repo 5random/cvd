@@ -61,7 +61,7 @@ you run the application or you can create them manually if needed.
 
 
 The repository also ships with example configurations located in
-`program/config`.  These files illustrate typical setups and can serve as a
+`src/config`.  These files illustrate typical setups and can serve as a
 starting point for your own configuration.  The top-level `config/` directory is
 only used by the test suite and should not be modified for normal operation.
 
@@ -82,7 +82,7 @@ hardware:
 Launch the GUI application specifying the configuration directory:
 
 ```bash
-python src/main.py --config-dir program/config
+python src/main.py --config-dir src/config
 ```
 
 To run the application with your own configuration directory simply point
@@ -107,7 +107,7 @@ Use the fullscreen button in the header to toggle between windowed and fullscree
 
 For a minimal webcam demo you can run the alternative GUI located in
 ``src/gui/alt_application.py``. It loads the example configuration from
-``program/config/simple_config.json``:
+``src/config/simple_config.json``:
 
 ```bash
 python src/gui/alt_application.py
