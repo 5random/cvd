@@ -4,12 +4,12 @@ import asyncio
 from PIL import Image
 import cv2
 
-from src.controllers.webcam import (
+from cvd.controllers.webcam import (
     MotionDetectionController,
     MotionDetectionResult,
 )
-from src.controllers.webcam.motion_detection import analyze_motion
-from src.controllers.controller_base import ControllerConfig
+from cvd.controllers.webcam.motion_detection import analyze_motion
+from cvd.controllers.controller_base import ControllerConfig
 
 messages: list[str] = []
 
@@ -76,7 +76,7 @@ async def test_initialize_logs_algorithm(monkeypatch):
     config = ControllerConfig(controller_id="md", controller_type="motion_detection")
     ctrl = MotionDetectionController("md", config)
 
-    import src.controllers.webcam.motion_detection as md
+    import cvd.controllers.webcam.motion_detection as md
 
     monkeypatch.setattr(md, "info", lambda msg, **kwargs: messages.append(msg))
 
@@ -281,6 +281,28 @@ def test_convert_to_cv_frame_bgr_passthrough():
     assert np.array_equal(converted, bgr)
 
 
+def test_convert_to_cv_frame_grayscale_2d():
+    config = ControllerConfig(controller_id="md", controller_type="motion_detection")
+    ctrl = MotionDetectionController("md", config)
+    gray = np.full((5, 5), 128, dtype=np.uint8)
+
+    converted = ctrl._convert_to_cv_frame(gray)
+    assert converted.shape == (5, 5, 3)
+    expected = np.stack([gray] * 3, axis=-1)
+    assert np.array_equal(converted, expected)
+
+
+def test_convert_to_cv_frame_grayscale_single_channel():
+    config = ControllerConfig(controller_id="md", controller_type="motion_detection")
+    ctrl = MotionDetectionController("md", config)
+    gray = np.full((5, 5, 1), 64, dtype=np.uint8)
+
+    converted = ctrl._convert_to_cv_frame(gray)
+    assert converted.shape == (5, 5, 3)
+    expected = np.full((5, 5, 3), 64, dtype=np.uint8)
+    assert np.array_equal(converted, expected)
+
+
 @pytest.mark.asyncio
 async def test_stop_event_initialized_and_persistent():
     cfg = ControllerConfig(controller_id="md", controller_type="motion_detection")
@@ -352,7 +374,7 @@ async def test_invalid_roi_dimensions_skip_crop(monkeypatch):
 
     monkeypatch.setattr(ctrl._motion_pool, "submit_async", direct)
 
-    import src.controllers.webcam.motion_detection as md
+    import cvd.controllers.webcam.motion_detection as md
 
     warnings: list[str] = []
     monkeypatch.setattr(md, "warning", lambda msg, **kw: warnings.append(msg))
@@ -382,7 +404,7 @@ async def test_roi_out_of_bounds_skip_crop(monkeypatch):
 
     monkeypatch.setattr(ctrl._motion_pool, "submit_async", direct)
 
-    import src.controllers.webcam.motion_detection as md
+    import cvd.controllers.webcam.motion_detection as md
 
     warnings: list[str] = []
     monkeypatch.setattr(md, "warning", lambda msg, **kw: warnings.append(msg))
@@ -396,8 +418,9 @@ async def test_roi_out_of_bounds_skip_crop(monkeypatch):
     assert warnings
     assert result.data.frame.shape == frame.shape
 
+
 def test_invalid_gaussian_blur_kernel_defaults(monkeypatch):
-    import src.controllers.webcam.motion_detection as md
+    import cvd.controllers.webcam.motion_detection as md
 
     warnings: list[str] = []
     monkeypatch.setattr(md, "warning", lambda msg, **kw: warnings.append(msg))
@@ -413,7 +436,7 @@ def test_invalid_gaussian_blur_kernel_defaults(monkeypatch):
 
 
 def test_invalid_morphology_kernel_size_defaults(monkeypatch):
-    import src.controllers.webcam.motion_detection as md
+    import cvd.controllers.webcam.motion_detection as md
 
     warnings: list[str] = []
     monkeypatch.setattr(md, "warning", lambda msg, **kw: warnings.append(msg))
@@ -426,6 +449,7 @@ def test_invalid_morphology_kernel_size_defaults(monkeypatch):
     ctrl = MotionDetectionController("md", cfg)
     assert ctrl.morphology_kernel_size == 5
     assert warnings
+
 
 @pytest.mark.asyncio
 async def test_frame_size_updates_on_roi_change(monkeypatch):
@@ -452,6 +476,7 @@ async def test_frame_size_updates_on_roi_change(monkeypatch):
 
     assert result2.metadata["frame_size"] == (10, 10)
     assert ctrl._frame_size == (10, 10)
+
 
 async def test_roi_bbox_and_center_adjustment(monkeypatch):
     cfg = ControllerConfig(

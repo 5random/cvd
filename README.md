@@ -69,7 +69,7 @@ you run the application or you can create them manually if needed.
 
 
 The repository also ships with example configurations located in
-`src/config`.  These files illustrate typical setups and can serve as a
+`src/cvd/config`.  These files illustrate typical setups and can serve as a
 starting point for your own configuration.  The top-level `config/` directory is
 only used by the test suite and should not be modified for normal operation.
 
@@ -90,14 +90,14 @@ hardware:
 Launch the GUI application specifying the configuration directory:
 
 ```bash
-python src/main.py --config-dir src/config
+python main.py --config-dir src/cvd/config
 ```
 
 To run the application with your own configuration directory simply point
 `--config-dir` to the folder containing your files:
 
 ```bash
-python src/main.py --config-dir path/to/my_config
+python main.py --config-dir path/to/my_config
 ```
 
 You may also set the ``CVD_CONFIG_DIR`` environment variable instead of passing
@@ -106,19 +106,20 @@ You may also set the ``CVD_CONFIG_DIR`` environment variable instead of passing
 When creating a custom ``SimpleGUIApplication`` make sure to call
 ``set_config_service`` after instantiating the
 ``ConfigurationService``. This allows helper functions such as
-``create_cvd_controller_manager`` and ``get_email_alert_service`` to read from
-the same configuration instance.
+``create_cvd_controller_manager`` to read from the same configuration
+instance while still letting you pass the ``EmailAlertService`` explicitly
+where needed.
 
 Use the fullscreen button in the header to toggle between windowed and fullscreen mode.
 
 ### Simplified GUI
 
 For a minimal webcam demo you can run the alternative GUI located in
-``src/gui/alt_application.py``. It loads the example configuration from
-``src/config/simple_config.json``:
+``src/cvd/gui/alt_application.py``. It loads the example configuration from
+``src/cvd/config/simple_config.json``:
 
 ```bash
-python src/gui/alt_application.py
+python src/cvd/gui/alt_application.py
 ```
 
 ### Camera stream endpoints
@@ -141,7 +142,8 @@ The controller manager controls how many controllers may execute in parallel.
 Set the ``CONTROLLER_MANAGER_CONCURRENCY_LIMIT`` environment variable to adjust
 this number. If unset, it defaults to ``10``. You can also provide the same
 value on startup using the ``--controller-concurrency-limit`` option of
-``src/main.py`` which simply sets this environment variable for you.
+
+``main.py`` which simply sets this environment variable for you.
 
 ### Webcam UVC settings
 
@@ -155,6 +157,14 @@ providing ``"capture_backend"`` in a webcam or controller configuration. Common
 values include ``cv2.CAP_DSHOW`` and ``cv2.CAP_MSMF`` on Windows. If omitted,
 OpenCV will choose the default backend for the platform.
 
+### Enumerating supported camera modes
+
+``probe_camera_modes()`` tests a set of common resolution/FPS pairs to
+discover what the connected camera supports.  The function now reuses a single
+``cv2.VideoCapture`` instance while cycling through the options instead of
+reopening the device for every combination.  This speeds up probing on systems
+where camera initialization is slow.
+
 ### External camera capture
 
 The motion detection controller can rely on another controller for camera frames.
@@ -162,7 +172,7 @@ The motion detection controller can rely on another controller for camera frames
 Set ``input_controllers`` to the ID of a ``camera_capture`` controller to disable
 its internal capture loop and use the external source instead.
 Webcam related controllers, including ``camera_capture`` and ``motion_detection``,
-live in the ``src/controllers/webcam`` subpackage.
+live in the ``src/cvd/controllers/webcam`` subpackage.
 
 ### Disable sensors
 
@@ -173,37 +183,24 @@ only setups or when running tests without real hardware.
 
 ## Running tests
 
-Before running the tests you must install this package together with all
-runtime and development dependencies. The test suite depends on the packages
-listed in `dev-requirements.txt` (which includes `pytest`) in addition to the
-runtime libraries from `requirements.txt`. Dependencies such as `numpy`,
-`opencv-python`/`cv2`, `nicegui`, and `jsonschema` must be installed before
-executing `pytest`.
-
-Before running the tests you must install this package and all third-party
-dependencies.  Attempting to execute `pytest` without installation will result
-in import errors.  A full list of required packages is available in
-[docs/test_setup.md](docs/test_setup.md).
-
-
-Install the dependencies and run the tests in a single sequence. You can either
-install the package in editable mode or use the requirements files:
+Install **all** runtime and development dependencies before executing the test
+suite. The easiest method is to install both requirement files together:
 
 ```bash
-pip install -r dev-requirements.txt
-pip install -e .
-pytest          # or: make test
-
-# or install from the requirements files
-pip install -r dev-requirements.txt
-pip install -r requirements.txt
-pytest
-
+pip install -r requirements.txt -r dev-requirements.txt
 ```
 
-The tests rely on several runtime packages such as `opencv-python` (for the
-`cv2` module) and `nicegui`. Running the installation commands above ensures
-these dependencies are available when invoking `pytest`.
+These packages include critical libraries such as `opencv-python` (for the
+`cv2` module), `nicegui` and `jsonschema` which are required by many tests.
+A more detailed list is available in
+[docs/test_setup.md](docs/test_setup.md).
+
+After installation run the tests:
+
+```bash
+pytest          # or: make test
+```
+
 
 ## Code style
 

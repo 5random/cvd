@@ -1,7 +1,7 @@
 import json
 
-from src.utils.config_service import ConfigurationService
-import src.gui.gui_tab_components.gui_tab_experiment_component as exp_mod
+from cvd.utils.config_service import ConfigurationService
+import cvd.gui.gui_tab_components.gui_tab_experiment_component as exp_mod
 
 
 def create_service(tmp_path, cfg=None):

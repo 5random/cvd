@@ -1,7 +1,7 @@
 import asyncio
 import pytest
 
-from src.utils.concurrency.async_utils import (
+from cvd.utils.concurrency.async_utils import (
     AsyncTaskManager,
     gather_with_concurrency,
     run_with_timeout,
