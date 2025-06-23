@@ -1420,7 +1420,7 @@ class SimpleGUIApplication:
         if self.motion_section:
             self.motion_section.cleanup()
 
-    def run(self, host: str = "localhost", port: int = 8081):
+    def run(self, host: str = "localhost", port: int = 8080):
         """Run the simple GUI application."""
 
         self.register_components()
