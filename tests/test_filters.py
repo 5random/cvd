@@ -1,10 +1,10 @@
 import time
 import pytest
 
-from src.data_handler.processing.filters.range_validation_filter import RangeValidationFilter
-from src.data_handler.processing.filters.simple_moving_avg_filter import MovingAverageFilter
-from src.data_handler.processing.filters.outlier_detection_filter import OutlierDetectionFilter
-from src.data_handler.interface.sensor_interface import SensorReading, SensorStatus
+from cvd.data_handler.processing.filters.range_validation_filter import RangeValidationFilter
+from cvd.data_handler.processing.filters.simple_moving_avg_filter import MovingAverageFilter
+from cvd.data_handler.processing.filters.outlier_detection_filter import OutlierDetectionFilter
+from cvd.data_handler.interface.sensor_interface import SensorReading, SensorStatus
 
 
 @pytest.mark.asyncio

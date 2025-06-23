@@ -90,7 +90,7 @@ pytest tests/test_alt_gui.py -v -s
 
 ### With coverage:
 ```bash
-pytest tests/test_alt_gui.py --cov=src.gui.alt_application
+pytest tests/test_alt_gui.py --cov=cvd.gui.alt_application
 ```
 
 ## Fixtures
