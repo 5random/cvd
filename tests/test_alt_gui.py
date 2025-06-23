@@ -480,6 +480,8 @@ def create_mock_camera_controller():
 def create_mock_motion_controller():
     """Create a mock motion detection controller"""
     controller = Mock()
+    controller.start = AsyncMock(return_value=True)
+    controller.stop = AsyncMock()
     controller.motion_threshold_percentage = 50
     controller.fps = 30
     controller.width = 640
@@ -505,6 +507,30 @@ class TestSimpleGUIApplicationWithMockControllers:
         # Verify start was called and state updated
         mock_camera.start.assert_called_once()
         assert simple_gui_app.camera_active is True
+
+    async def test_camera_toggle_with_motion_controller(self, simple_gui_app):
+        """Camera and motion controllers should start and stop together"""
+
+        mock_camera = create_mock_camera_controller()
+        mock_motion = create_mock_motion_controller()
+        simple_gui_app.controller_manager.add_mock_controller("camera_capture", mock_camera)
+        simple_gui_app.controller_manager.add_mock_controller("motion_detection", mock_motion)
+        simple_gui_app.camera_controller = mock_camera
+        simple_gui_app.motion_controller = mock_motion
+
+        # Start streaming
+        await simple_gui_app.toggle_camera()
+
+        mock_camera.start.assert_called_once()
+        mock_motion.start.assert_called_once()
+        assert simple_gui_app.camera_active is True
+
+        # Stop streaming
+        await simple_gui_app.toggle_camera()
+
+        mock_camera.stop.assert_called_once()
+        mock_motion.stop.assert_called_once()
+        assert simple_gui_app.camera_active is False
 
     async def test_camera_toggle_start_failure(self, simple_gui_app, monkeypatch):
         """Camera remains inactive and user is notified if start fails"""
