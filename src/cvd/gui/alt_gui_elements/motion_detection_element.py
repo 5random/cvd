@@ -156,6 +156,29 @@ class MotionStatusSection:
         if self._update_callback:
             self._update_callback(result.motion_detected)
 
+    def update_threshold_label(self, threshold: int | float) -> None:
+        """Update the displayed motion threshold percentage."""
+        if hasattr(self, "threshold_label"):
+            self.threshold_label.text = f"Threshold: {threshold}%"
+
+    def update_roi_status_label(
+        self,
+        enabled: bool,
+        x: int = 0,
+        y: int = 0,
+        width: int | None = None,
+        height: int | None = None,
+    ) -> None:
+        """Update the displayed ROI status."""
+        if not hasattr(self, "roi_status_label"):
+            return
+        if enabled and width and height:
+            self.roi_status_label.text = (
+                f"ROI: {width}x{height} ({x},{y})"
+            )
+        else:
+            self.roi_status_label.text = "ROI: Full Frame"
+
     def cleanup(self) -> None:
         """Cancel periodic refresh timer."""
         if self._refresh_timer:
