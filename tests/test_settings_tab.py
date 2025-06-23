@@ -2,8 +2,8 @@ import json
 import pytest
 from nicegui import ui
 
-from src.gui.application import WebApplication
-from src.utils.config_service import ConfigurationService
+from cvd.gui.application import WebApplication
+from cvd.utils.config_service import ConfigurationService
 
 
 class DummySensorManager:
@@ -81,11 +81,11 @@ def dummy_ui(monkeypatch):
 
 def create_app(service, monkeypatch):
     monkeypatch.setattr(
-        "src.gui.application.create_notification_center",
+        "cvd.gui.application.create_notification_center",
         lambda *a, **k: DummyNotificationCenter(),
     )
     monkeypatch.setattr(
-        "src.gui.application.create_cvd_controller_manager",
+        "cvd.gui.application.create_cvd_controller_manager",
         lambda: DummyControllerManager(),
     )
     return WebApplication(service, DummySensorManager())
