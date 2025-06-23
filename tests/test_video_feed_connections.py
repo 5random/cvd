@@ -4,6 +4,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 from nicegui import Client, app
+from cvd.controllers.controller_base import ControllerStatus
 
 
 class DummyConfigService:
@@ -37,20 +38,20 @@ async def test_video_feed_multiple_connections(monkeypatch):
             self.update_callback = None
 
     fake_alert_mod.EmailAlertStatusDisplay = EmailAlertStatusDisplay
-    sys.modules["src.gui.alt_gui_elements.alert_element_new"] = fake_alert_mod
+    sys.modules["cvd.gui.alt_gui_elements.alert_element_new"] = fake_alert_mod
 
     SimpleGUIApplication = importlib.import_module(
-        "src.gui.alt_application"
+        "cvd.gui.alt_application"
     ).SimpleGUIApplication
 
     monkeypatch.setattr(
-        "src.gui.alt_application.load_alert_configs", lambda *a, **k: []
+        "cvd.gui.alt_application.load_alert_configs", lambda *a, **k: []
     )
     monkeypatch.setattr(
-        "src.gui.alt_application.create_demo_configurations", lambda: []
+        "cvd.gui.alt_application.create_demo_configurations", lambda: []
     )
     monkeypatch.setattr(
-        "src.gui.alt_application.EmailAlertStatusDisplay",
+        "cvd.gui.alt_application.EmailAlertStatusDisplay",
         lambda *a, **k: types.SimpleNamespace(update_callback=None),
     )
 
@@ -60,7 +61,7 @@ async def test_video_feed_multiple_connections(monkeypatch):
                 break
             yield b"x"
 
-    monkeypatch.setattr("src.gui.alt_application.generate_mjpeg_stream", fake_generate)
+    monkeypatch.setattr("cvd.gui.alt_application.generate_mjpeg_stream", fake_generate)
 
     app_instance = SimpleGUIApplication(
         controller_manager=DummyControllerManager(),
@@ -71,14 +72,22 @@ async def test_video_feed_multiple_connections(monkeypatch):
 
     class DummyCam:
         def __init__(self) -> None:
+            self.started = 0
             self.stopped = 0
             self.cleaned = 0
+            self.status = ControllerStatus.STOPPED
+
+        async def start(self) -> bool:
+            self.started += 1
+            self.status = ControllerStatus.RUNNING
+            return True
 
         def get_output(self):
             return np.zeros((10, 10, 3), dtype=np.uint8)
 
         async def stop(self):
             self.stopped += 1
+            self.status = ControllerStatus.STOPPED
 
         async def cleanup(self):
             self.cleaned += 1
@@ -115,17 +124,22 @@ async def test_video_feed_multiple_connections(monkeypatch):
 
     await gen1.__anext__()
     await gen2.__anext__()
+    assert cam.started == 1
 
     req1.disconnect = True
     with pytest.raises(StopAsyncIteration):
         await gen1.__anext__()
+    assert cam.stopped == 0
+    assert cam.cleaned == 0
     assert app_instance.camera_controller is cam
 
     req2.disconnect = True
     with pytest.raises(StopAsyncIteration):
         await gen2.__anext__()
+    assert cam.stopped == 1
+    assert cam.cleaned == 1
     assert app_instance.camera_controller is None
-    assert calls == [False]
+    assert calls == [True, False]
 
 
 @pytest.mark.asyncio
