@@ -1,10 +1,10 @@
 import pytest
 
-from src.legacy_sensors import arduino_tc_sensor
-from src.data_handler.sources.mock_hardware.arduino_tc_board import (
+from cvd.legacy_sensors import arduino_tc_sensor
+from cvd.data_handler.sources.mock_hardware.arduino_tc_board import (
     MockArduinoTCBoardSerial,
 )
-from src.data_handler.interface.sensor_interface import SensorConfig
+from cvd.data_handler.interface.sensor_interface import SensorConfig
 
 # Disable logging during tests
 arduino_tc_sensor.info = lambda *a, **k: None

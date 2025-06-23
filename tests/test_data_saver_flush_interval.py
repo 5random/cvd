@@ -1,6 +1,6 @@
-from src.utils.container import ApplicationContainer
-from src import gui
-from src.gui.alt_gui_elements.alert_element_new import EmailAlertStatusDisplay
+from cvd.utils.container import ApplicationContainer
+from cvd import gui
+from cvd.gui.alt_gui_elements.alert_element_new import EmailAlertStatusDisplay
 
 class DummyWebApp:
     def __init__(self, *a, **k):
@@ -20,7 +20,7 @@ class DummyWebApp:
 
 def test_data_saver_flush_interval_from_config(tmp_path, monkeypatch):
     monkeypatch.setattr(
-        "src.gui.alt_application.SimpleGUIApplication", DummyWebApp
+        "cvd.gui.alt_application.SimpleGUIApplication", DummyWebApp
     )
     config_dir = tmp_path
     cfg = {
@@ -45,7 +45,7 @@ def test_data_saver_flush_interval_from_config(tmp_path, monkeypatch):
 
 def test_data_saver_flush_interval_defaults_to_one(tmp_path, monkeypatch):
     monkeypatch.setattr(
-        "src.gui.alt_application.SimpleGUIApplication", DummyWebApp
+        "cvd.gui.alt_application.SimpleGUIApplication", DummyWebApp
     )
     config_dir = tmp_path
     cfg = {
