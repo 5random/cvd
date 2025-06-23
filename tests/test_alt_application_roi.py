@@ -25,9 +25,22 @@ def test_clamp_roi(roi, width, height, expected):
         ((10, 20, 30, 40), 0, 90, 100, 80, (20, 60, 40, 30)),
         ((10, 20, 30, 40), 90, 0, 100, 80, (40, 10, 40, 30)),
         ((-5, 10, 20, 30), 270, 180, 100, 80, (60, -5, 30, 20)),
-        ((0, 10, 10, 10), -90, 450, 100, 80, (70, 80, 10, 10)),
         ((5, 5, 10, 10), 180, 180, 100, 80, (5, 5, 10, 10)),  # no rotation change
     ],
 )
 def test_rot_roi(roi, old_rot, new_rot, width, height, expected):
     assert rotate_roi(roi, old_rot, new_rot, width, height) == expected
+
+
+@pytest.mark.parametrize(
+    "old_rot,new_rot",
+    [
+        (-90, 0),
+        (0, 450),
+        (45, 90),
+        (90, 91),
+    ],
+)
+def test_rot_roi_invalid_angles(old_rot, new_rot):
+    with pytest.raises(ValueError):
+        rotate_roi((0, 0, 10, 10), old_rot, new_rot, 100, 80)

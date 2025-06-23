@@ -33,6 +33,13 @@ def clamp_roi(roi, width, height):
 def rotate_roi(roi, old_rot, new_rot, width, height):
     """Rotate ROI from old rotation to new rotation."""
 
+    valid_angles = {0, 90, 180, 270}
+    if old_rot not in valid_angles or new_rot not in valid_angles:
+        raise ValueError(
+            f"Unsupported rotation angles: {old_rot}, {new_rot}."
+            " Allowed values are 0, 90, 180 and 270."
+        )
+
     def _rot(r, rot, w, h):
         x, y, rw, rh = r
         if rot == 90:
@@ -46,15 +53,11 @@ def rotate_roi(roi, old_rot, new_rot, width, height):
     if old_rot == new_rot:
         return roi
 
-    # Normalize rotations
-    old_rot = old_rot % 360
-    new_rot = new_rot % 360
-
     # Rotate back to 0
     width_old = width if old_rot in {0, 180} else height
     height_old = height if old_rot in {0, 180} else width
     r0 = _rot(roi, (360 - old_rot) % 360, width_old, height_old)
 
     # Rotate to new
-    r1 = _rot(r0, new_rot % 360, width, height)
+    r1 = _rot(r0, new_rot, width, height)
     return r1
