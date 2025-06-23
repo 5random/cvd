@@ -101,7 +101,11 @@ def analyze_motion(
         motion_bbox = (x, y, w, h)
 
     # Calculate confidence based on motion characteristics
-    confidence = min(motion_percentage / motion_threshold_percentage, 1.0)
+    confidence = (
+        min(motion_percentage / motion_threshold_percentage, 1.0)
+        if motion_threshold_percentage > 0
+        else 0.0
+    )
     if confidence < confidence_threshold:
         motion_detected = False
 
@@ -174,6 +178,13 @@ class MotionDetectionController(ImageController):
         self.motion_threshold_percentage = params.get(
             "motion_threshold_percentage", 1.0
         )
+        if self.motion_threshold_percentage <= 0:
+            warning(
+                "motion_threshold_percentage must be > 0, using default",
+                controller_id=self.controller_id,
+                value=self.motion_threshold_percentage,
+            )
+            self.motion_threshold_percentage = 1.0
         self.gaussian_blur_kernel = params.get("gaussian_blur_kernel", (5, 5))
         self.morphology_kernel_size = params.get("morphology_kernel_size", 5)
         self.confidence_threshold = params.get("confidence_threshold", 0.5)
