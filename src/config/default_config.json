@@ -50,7 +50,7 @@
     "disable_hardware_sensors": false,
 
     "controller_concurrency_limit": 10,
-    "controller_manager": {"processing_interval_ms": 30},
+    "controller_manager": {"processing_interval_ms": 30, "parallel_execution": false},
     "monitoring": {
         "prometheus_exporter": true,
         "heartbeat_interval_ms": 1000,
