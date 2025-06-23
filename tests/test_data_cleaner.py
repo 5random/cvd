@@ -18,15 +18,14 @@ def test_clean_file(tmp_path: Path):
 
     out_path = data_cleaner.clean_file(raw)
     with open(out_path, newline="", encoding="utf-8") as f:
-        reader = list(csv.reader(f))
+        rows = list(csv.reader(f))
 
-    header = reader[0]
-    assert header == ["datetime", "timestamp", "value", "status"]
+    expected = [
+        ["datetime", "timestamp", "value", "status"],
+        ["2025-06-08 09:25:18", "1749374718.000000", "10.00", "ok"],
+        ["2025-06-08 09:25:19", "1749374719.000000", "15.00", "ok"],
+        ["2025-06-08 09:25:20", "1749374720.000000", "NaN", "error"],
+        ["2025-06-08 09:25:21", "1749374721.000000", "20.00", "ok"],
+    ]
 
-    # rows should be sorted by timestamp
-    timestamps = [float(r[1]) for r in reader[1:]]
-    assert timestamps == sorted(timestamps)
-
-    # value for missing reading should be marked as NaN
-    values = [row[2] for row in reader[1:]]
-    assert "NaN" in values
+    assert rows == expected

@@ -3,42 +3,40 @@ from __future__ import annotations
 import csv
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Iterable, Optional, Any
+from typing import Dict, Iterable, Iterator, Optional, Any
 from src.utils.log_service import warning
 
-def _read_rows(path: Path) -> List[Dict[str, str]]:
-    """Read CSV rows skipping duplicated headers."""
+
+def _read_rows(path: Path) -> Iterator[Dict[str, str]]:
+    """Yield CSV rows skipping duplicated headers."""
     with open(path, newline="", encoding="utf-8") as f:
         reader = csv.DictReader(f)
-        rows: List[Dict[str, str]] = []
         for row in reader:
             if row.get("timestamp") == "timestamp":
                 continue  # skip internal header lines
-            rows.append(row)
-    return rows
+            yield row
 
 
-def _normalize_rows(rows: Iterable[Dict[str, str]]) -> List[Dict[str, Any]]:
-    """Convert timestamp to datetime and sort rows."""
-    cleaned: List[Dict[str, Any]] = []
+def _normalize_rows(rows: Iterable[Dict[str, str]]) -> Iterator[Dict[str, Any]]:
+    """Yield rows with parsed timestamps and numeric values."""
     for row in rows:
         # Parse timestamp, skip row if malformed
         try:
             ts = float(row["timestamp"])
         except (ValueError, KeyError) as e:
-            warning(f"Skipping row with invalid timestamp '{row.get('timestamp',None)}': {e}")
+            warning(
+                f"Skipping row with invalid timestamp '{row.get('timestamp', None)}': {e}"
+            )
             continue
         dt = datetime.fromtimestamp(ts)
         value = row.get("value", "")
         value_float = float(value) if value else float("nan")
-        cleaned.append({
+        yield {
             "timestamp": ts,
             "datetime": dt,
             "value": value_float,
-            "status": row.get("status", "")
-        })
-    cleaned.sort(key=lambda r: r["timestamp"])  # type: ignore  
-    return cleaned
+            "status": row.get("status", ""),
+        }
 
 
 def _write_rows(rows: Iterable[Dict[str, Any]], path: Path) -> None:
@@ -56,13 +54,18 @@ def _write_rows(rows: Iterable[Dict[str, Any]], path: Path) -> None:
             writer.writerow([dt_str, ts_str, value_str, row["status"]])
 
 
-def clean_file(input_path: Path | str, output_path: Optional[Path | str] = None) -> Path:
+def clean_file(
+    input_path: Path | str, output_path: Optional[Path | str] = None
+) -> Path:
     """Clean a sensor CSV file and write the result."""
     input_path = Path(input_path)
-    output_path = Path(output_path) if output_path else input_path.with_name(f"{input_path.stem}_cleaned.csv")
-    rows = _read_rows(input_path)
-    normalized = _normalize_rows(rows)
-    _write_rows(normalized, output_path)
+    output_path = (
+        Path(output_path)
+        if output_path
+        else input_path.with_name(f"{input_path.stem}_cleaned.csv")
+    )
+    rows = sorted(_normalize_rows(_read_rows(input_path)), key=lambda r: r["timestamp"])
+    _write_rows(rows, output_path)
     return output_path
 
 
