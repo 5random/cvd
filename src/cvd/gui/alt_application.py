@@ -149,6 +149,7 @@ class SimpleGUIApplication:
         self._time_timer: Optional[ui.timer] = None
         self._processing_task: Optional[asyncio.Task] = None
         self._alert_task: Optional[asyncio.Task] = None
+        self._motion_task: Optional[asyncio.Task] = None
         self.supported_camera_modes: list[tuple[int, int, int]] = []
         self._last_motion_time: datetime = datetime.now()
 
@@ -1346,6 +1347,25 @@ class SimpleGUIApplication:
                 error("Processing loop error", exc_info=exc)
                 await asyncio.sleep(0.1)
 
+    async def _motion_detection_loop(self) -> None:
+        """Periodically poll motion detection results."""
+        while True:
+            try:
+                await asyncio.sleep(0.1)
+                detected = False
+                if self.motion_controller is not None:
+                    output = self.motion_controller.get_output()
+                    if isinstance(output, dict):
+                        detected = bool(output.get("motion_detected", False))
+                    elif output is not None:
+                        detected = bool(getattr(output, "motion_detected", False))
+                self.update_motion_status(detected)
+            except asyncio.CancelledError:
+                break
+            except Exception as exc:
+                error("motion_detection_loop_error", exc_info=exc)
+                await asyncio.sleep(0.1)
+
     def _on_experiment_state_change(
         self, old_state: ExperimentState, new_state: ExperimentState
     ) -> None:
@@ -1451,6 +1471,7 @@ class SimpleGUIApplication:
         if success:
             self._processing_task = asyncio.create_task(self._processing_loop())
             self._alert_task = asyncio.create_task(self._alert_check_loop())
+            self._motion_task = asyncio.create_task(self._motion_detection_loop())
 
             if (
                 self.camera_controller is not None
@@ -1478,6 +1499,11 @@ class SimpleGUIApplication:
             with contextlib.suppress(Exception):
                 await self._alert_task
             self._alert_task = None
+        if self._motion_task:
+            self._motion_task.cancel()
+            with contextlib.suppress(Exception):
+                await self._motion_task
+            self._motion_task = None
         if self._experiment_timer:
             try:
                 self._experiment_timer.cancel()
