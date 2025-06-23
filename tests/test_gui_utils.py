@@ -1,15 +1,15 @@
 import numpy as np
 import pytest
 
-from src.gui.utils import generate_mjpeg_stream
+from cvd.gui.utils import generate_mjpeg_stream
 
 async def immediate(func, *args, **kwargs):
     return func(*args, **kwargs)
 
 @pytest.mark.asyncio
 async def test_generate_mjpeg_stream(monkeypatch):
-    monkeypatch.setattr('src.gui.utils.run_in_executor', immediate)
-    monkeypatch.setattr('src.gui.utils.cv2.imencode', lambda ext, frame: (True, np.array([1], dtype=np.uint8)))
+    monkeypatch.setattr('cvd.gui.utils.run_in_executor', immediate)
+    monkeypatch.setattr('cvd.gui.utils.cv2.imencode', lambda ext, frame: (True, np.array([1], dtype=np.uint8)))
 
     frames = [np.zeros((10, 10, 3), dtype=np.uint8)]
 

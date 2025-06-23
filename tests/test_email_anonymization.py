@@ -1,4 +1,4 @@
-from src.gui.alt_gui.alt_gui_elements.alert_element_new import (
+from cvd.gui.alt_gui.alt_gui_elements.alert_element_new import (
     EmailAlertStatusDisplay,
 )
 

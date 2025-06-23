@@ -69,7 +69,7 @@ you run the application or you can create them manually if needed.
 
 
 The repository also ships with example configurations located in
-`src/config`.  These files illustrate typical setups and can serve as a
+`src/cvd/config`.  These files illustrate typical setups and can serve as a
 starting point for your own configuration.  The top-level `config/` directory is
 only used by the test suite and should not be modified for normal operation.
 
@@ -90,14 +90,14 @@ hardware:
 Launch the GUI application specifying the configuration directory:
 
 ```bash
-python src/main.py --config-dir src/config
+python main.py --config-dir src/cvd/config
 ```
 
 To run the application with your own configuration directory simply point
 `--config-dir` to the folder containing your files:
 
 ```bash
-python src/main.py --config-dir path/to/my_config
+python main.py --config-dir path/to/my_config
 ```
 
 You may also set the ``CVD_CONFIG_DIR`` environment variable instead of passing
@@ -113,12 +113,12 @@ Use the fullscreen button in the header to toggle between windowed and fullscree
 
 ### Simplified GUI
 
-For a minimal webcam demo you can run the alternative GUI via the
-``cvd-alt-gui`` command. It loads the example configuration from
-``src/config/simple_config.json``:
+For a minimal webcam demo you can run the alternative GUI located in
+``src/cvd/gui/alt_application.py``. It loads the example configuration from
+``src/cvd/config/simple_config.json``:
 
 ```bash
-cvd-alt-gui
+python src/cvd/gui/alt_application.py
 ```
 
 ### Camera stream endpoints
@@ -141,7 +141,7 @@ The controller manager controls how many controllers may execute in parallel.
 Set the ``CONTROLLER_MANAGER_CONCURRENCY_LIMIT`` environment variable to adjust
 this number. If unset, it defaults to ``10``. You can also provide the same
 value on startup using the ``--controller-concurrency-limit`` option of
-``src/main.py`` which simply sets this environment variable for you.
+``main.py`` which simply sets this environment variable for you.
 
 ### Webcam UVC settings
 
@@ -162,7 +162,7 @@ The motion detection controller can rely on another controller for camera frames
 Set ``input_controllers`` to the ID of a ``camera_capture`` controller to disable
 its internal capture loop and use the external source instead.
 Webcam related controllers, including ``camera_capture`` and ``motion_detection``,
-live in the ``src/controllers/webcam`` subpackage.
+live in the ``src/cvd/controllers/webcam`` subpackage.
 
 ### Disable sensors
 

@@ -15,8 +15,8 @@ setup(
     name='cvd',
     version='0.1.0',
     install_requires=read_dependencies(),
-    packages=find_packages(include=["src", "src.*"]),
-    package_dir={"src": "src"},
+    packages=find_packages(where="src"),
+    package_dir={"": "src"},
 
     entry_points={
         "console_scripts": [
