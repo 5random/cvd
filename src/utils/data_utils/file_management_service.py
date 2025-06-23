@@ -100,8 +100,8 @@ class FileMaintenanceService:
             for directory in directories:
                 try:
                     os.utime(directory, (now, now))
-                except Exception:
-                    pass
+                except Exception as e:
+                    warning(f"Failed to update timestamp for {directory}: {e}")
         except Exception as e:
             error(f"Error compressing files: {e}")
 
@@ -127,8 +127,8 @@ class FileMaintenanceService:
             if not preserve and file_path.exists():
                 try:
                     file_path.unlink()
-                except Exception:
-                    pass
+                except Exception as e:
+                    warning(f"Failed to delete original file {file_path}: {e}")
                 if file_path.exists():
                     warning(f"Source file was not deleted after compression: {file_path}")
 

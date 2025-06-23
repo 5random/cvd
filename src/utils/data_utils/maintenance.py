@@ -33,6 +33,7 @@ class MaintenanceManager:
             try:
                 self._background_tasks.remove((pool, f))
             except ValueError:  # pragma: no cover - double remove
+                # Ignore if task was already removed
                 pass
 
         fut.add_done_callback(_remove)
