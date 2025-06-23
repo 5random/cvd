@@ -304,10 +304,7 @@ class SimpleGUIApplication:
                 "set_roi": self.set_roi,
                 "apply_uvc_settings": self.apply_uvc_settings,
                 "reset_uvc_defaults": self.reset_uvc_defaults,
-                "take_snapshot": self.take_snapshot_context,
-                "adjust_roi": self.adjust_roi_context,
                 "show_camera_settings": self.show_camera_settings_context,
-                "reset_view": self.reset_view_context,
                 "camera_toggle": self.toggle_camera,
                 "scan_cameras": self.scan_cameras,
                 "select_camera": self.select_camera,
@@ -432,20 +429,6 @@ class SimpleGUIApplication:
         if self.webcam_stream:
             self.webcam_stream.toggle_recording()
 
-    def take_snapshot_context(self):
-        """Take snapshot from context menu"""
-        if self.webcam_stream:
-            self.webcam_stream.take_snapshot()
-
-    def adjust_roi_context(self):
-        """Adjust ROI from context menu"""
-        if self.webcam_stream:
-            self.webcam_stream.adjust_roi()
-
-    def reset_view_context(self):
-        """Reset view from context menu"""
-        if self.webcam_stream:
-            self.webcam_stream.reset_view()
 
     def take_snapshot(self):
         """Trigger snapshot on the webcam element."""
