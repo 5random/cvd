@@ -1275,9 +1275,14 @@ class SimpleGUIApplication:
         ]
 
         if tasks:
-            await gather_with_concurrency(tasks, label="alerts", cancel_on_exception=False)
+            await gather_with_concurrency(
+                tasks, label="alerts", cancel_on_exception=False
+            )
 
-        if hasattr(self.alert_display, "update_callback") and self.alert_display.update_callback:
+        if (
+            hasattr(self.alert_display, "update_callback")
+            and self.alert_display.update_callback
+        ):
             self.alert_display.update_callback()
 
     def _show_alert_history(self):
@@ -1436,7 +1441,39 @@ class SimpleGUIApplication:
 
         @ui.page("/video_feed")
         async def video_feed(request: Request):
+            first_connection = self._video_feed_connections == 0
             self._video_feed_connections += 1
+
+            if first_connection:
+                if self.camera_controller is None:
+                    self.camera_controller = cast(
+                        Optional[CameraCaptureController],
+                        self.controller_manager.get_controller("camera_capture"),
+                    )
+
+                if (
+                    self.camera_controller is not None
+                    and self.camera_controller.status != ControllerStatus.RUNNING
+                ):
+                    try:
+                        started = await self.camera_controller.start()
+                    except Exception as exc:  # pragma: no cover - defensive
+                        self._video_feed_connections -= 1
+                        error("camera_start_failed", exc_info=exc)
+                        self.update_camera_status(False)
+                        return JSONResponse(
+                            {"detail": "Failed to start video feed"},
+                            status_code=500,
+                        )
+                    if not started:
+                        self._video_feed_connections -= 1
+                        error("camera_start_failed")
+                        self.update_camera_status(False)
+                        return JSONResponse(
+                            {"detail": "Failed to start video feed"},
+                            status_code=500,
+                        )
+                    self.update_camera_status(True)
 
             async def frame_source() -> Optional[np.ndarray]:
                 frame = None
@@ -1470,6 +1507,17 @@ class SimpleGUIApplication:
                 finally:
                     self._video_feed_connections -= 1
                     if self._video_feed_connections == 0:
+                        if (
+                            self.camera_controller is not None
+                            and self.camera_controller.status
+                            == ControllerStatus.RUNNING
+                        ):
+                            try:
+                                await self.camera_controller.stop()
+                                await self.camera_controller.cleanup()
+                            except Exception as exc:  # pragma: no cover - defensive
+                                error("camera_stop_failed", exc_info=exc)
+                            self.camera_controller = None
                         self.update_camera_status(False)
 
             return StreamingResponse(
