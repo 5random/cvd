@@ -14,6 +14,7 @@ from unittest.mock import Mock, AsyncMock
 from nicegui import ui
 from nicegui.testing import User
 from cvd.gui.alt_application import SimpleGUIApplication
+from cvd.gui.alt_gui_elements.motion_detection_element import MotionStatusSection
 from cvd.utils.config_service import ConfigurationService
 from cvd.utils.email_alert_service import EmailAlertService
 
@@ -284,6 +285,40 @@ class TestSimpleGUIApplicationCameraFunctionality:
         assert simple_gui_app.motion_detected is False
         assert simple_gui_app.motion_status_icon.name == "motion_photos_off"
         assert "text-gray-400" in simple_gui_app.motion_status_icon.classes
+
+    def test_motion_status_cleared_when_no_result(self, simple_gui_app, monkeypatch):
+        """_refresh_status should reset motion indicators when no result is returned"""
+
+        class DummyElem:
+            def __init__(self):
+                self.name = ""
+                self.text = ""
+
+            def classes(self, **kwargs):
+                pass
+
+        # prepare header icon
+        simple_gui_app.motion_status_icon = DummyElem()
+        simple_gui_app.motion_detected = True
+
+        section = MotionStatusSection.__new__(MotionStatusSection)
+        section.motion_icon = DummyElem()
+        section.motion_label = DummyElem()
+        section.motion_percentage = DummyElem()
+        section.confidence_label = DummyElem()
+        section.last_motion_label = DummyElem()
+        section.detection_count_label = DummyElem()
+        section.motion_detected = True
+        section._update_callback = simple_gui_app.update_motion_status
+
+        monkeypatch.setattr(section, "_get_result", lambda: None)
+
+        section._refresh_status()
+
+        assert section.motion_detected is False
+        assert section.motion_icon.name == "motion_photos_off"
+        assert section.motion_label.text == "No Motion Detected"
+        assert simple_gui_app.motion_status_icon.name == "motion_photos_off"
 
     async def test_camera_settings_update(self, simple_gui_app):
         """Test: camera settings are updated correctly"""
