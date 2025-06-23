@@ -129,6 +129,10 @@ default stream remains available under ``/video_feed``.  Individual cameras can
 be accessed at ``/video_feed/{cid}`` where ``cid`` is the controller ID used on
 the dashboard.
 
+Toggling the camera view in the dashboard only enables or disables streaming of
+the MJPEG feed. The capture process continues in the background so motion
+detection remains active even when no video is displayed.
+
 ### Dashboard visibility
 
 Sensors and controllers defined in the configuration will only appear on the
