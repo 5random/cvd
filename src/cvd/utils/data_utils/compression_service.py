@@ -19,8 +19,6 @@ from cvd.utils.log_service import debug, info, warning, error
 from cvd.utils.concurrency.thread_pool import get_thread_pool_manager, ThreadPoolType
 
 
-
-
 @dataclass
 class CompressionSettings:
     """Configuration for compression operations"""
@@ -106,12 +104,10 @@ class CompressionService:
             f"Compression service initialized with algorithm: {self._compression_settings.algorithm}"
         )
 
-
     @property
     def compression_settings(self) -> CompressionSettings:
         """Return the active compression settings."""
         return self._compression_settings
-
 
     def _load_configuration(self) -> None:
         """Load compression and rotation settings from configuration"""
@@ -336,7 +332,6 @@ class CompressionService:
         for file_path in files:
             if file_path.is_file() and not self._is_already_compressed(file_path):
                 futures.append(
-
                     pool.submit_task(
                         lambda p=file_path: self.compress_file(p, None, data_type)
                     )
@@ -569,17 +564,28 @@ class CompressionService:
                     dest_file.write(chunk)
 
     def _decompress_zip(self, compressed_path: Path, output_path: Path) -> None:
-        """Decompress ZIP file"""
+        """Decompress ZIP file with path validation"""
         with zipfile.ZipFile(compressed_path, "r") as zf:
-            # If output_path is a directory, extract all files
             if output_path.is_dir():
-                zf.extractall(output_path)
+                dest_root = output_path.resolve()
+                for member in zf.infolist():
+                    member_path = Path(member.filename)
+                    target_path = (dest_root / member_path).resolve()
+                    if not target_path.is_relative_to(dest_root):
+                        raise CompressionError(
+                            f"Unsafe path in zip archive: {member.filename}"
+                        )
+                    if member.is_dir():
+                        target_path.mkdir(parents=True, exist_ok=True)
+                        continue
+                    target_path.parent.mkdir(parents=True, exist_ok=True)
+                    with zf.open(member) as source:
+                        target_path.write_bytes(source.read())
             else:
-                # Extract first file to specified path
                 names = zf.namelist()
                 if names:
-                    with zf.open(names[0]) as source, open(output_path, "wb") as target:
-                        shutil.copyfileobj(source, target)
+                    with zf.open(names[0]) as source:
+                        Path(output_path).write_bytes(source.read())
 
     def get_compression_stats(self) -> Dict[str, Any]:
         """Get statistics about compressed files"""
