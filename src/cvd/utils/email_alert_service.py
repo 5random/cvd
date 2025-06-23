@@ -2,7 +2,8 @@
 
 import smtplib
 from email.message import EmailMessage
-from typing import Optional, List, Dict, Iterable, Union
+from typing import Optional, List, Dict, Iterable, Union, Deque
+from collections import deque
 from datetime import datetime
 
 import sys
@@ -20,7 +21,8 @@ class EmailAlertService:
             raise ValueError("Configuration service not available")
         self._load_configuration()
         # store sent alert metadata including attachment flag
-        self._history: List[Dict[str, Union[str, bool]]] = []
+        # use a deque with limited length to automatically discard old entries
+        self._history: Deque[Dict[str, Union[str, bool]]] = deque(maxlen=100)
 
     @property
     def recipient(self) -> Optional[str]:
@@ -141,7 +143,7 @@ class EmailAlertService:
 
     def get_history(self, limit: int = 50) -> List[Dict[str, str | bool]]:
         """Return a list of recently sent alerts."""
-        return self._history[-limit:]
+        return list(self._history)[-limit:]
 
 
 _email_alert_service_instance: Optional[EmailAlertService] = None
