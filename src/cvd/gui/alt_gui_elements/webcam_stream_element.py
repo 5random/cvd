@@ -159,42 +159,7 @@ class WebcamStreamElement:
                     )
                     self.loading_spinner.set_visibility(True)
 
-                    # Transparent ROI overlay layer
-                    self.roi_overlay = ui.html("").style(
-                        "position:absolute;top:0;left:0;width:100%;"
-                        "height:100%;pointer-events:none;"
-                    )
-                    self.refresh_roi_overlay()
 
-                    # Right-click context menu for camera
-                    with ui.context_menu():
-                        ui.menu_item(
-                            "Camera Settings",
-                            on_click=self.callbacks.get(
-                                "show_camera_settings", lambda: None
-                            ),
-                        )
-                        ui.separator()
-                        ui.menu_item(
-                            "Take Snapshot",
-                            on_click=self.callbacks.get(
-                                "take_snapshot", self.take_snapshot
-                            ),
-                        )
-                        ui.separator()
-                        ui.menu_item(
-                            "Adjust ROI",
-                            on_click=self.callbacks.get("adjust_roi", self.adjust_roi),
-                        )
-                        ui.menu_item(
-                            "Reset View",
-                            on_click=self.callbacks.get("reset_view", lambda: None),
-                        )
-                        # Recording toggle menu item
-                        self.record_menu_item = ui.menu_item(
-                            "Start Recording",
-                            on_click=self.toggle_recording,
-                        )
 
             # Camera controls
             with ui.row().classes("gap-2 justify-center mb-4"):
@@ -678,97 +643,16 @@ class WebcamStreamElement:
             self._on_camera_status_change(self.camera_active)
 
     def toggle_recording(self):
-        """Start or stop dummy recording."""
-        self.recording = not self.recording
-        if self.recording:
-            # update the label of the menu item
-            self.record_menu_item.props(f'label="Stop Recording"')
-            notify_later("Recording started", type="positive")
-        else:
-            # reset the label when stopping the recording
-            self.record_menu_item.props(f'label="Start Recording"')
-            notify_later("Recording stopped", type="warning")
+        """Stub method for compatibility."""
+        pass
 
     def take_snapshot(self):
-        """Capture a snapshot of the current video frame."""
-        js = f"""
-        const v = document.getElementById('{self.video_element.id}');
-        const c = Object.assign(
-            document.createElement('canvas'),
-            {{width: v.naturalWidth, height: v.naturalHeight}}
-        );
-        c.getContext('2d').drawImage(v, 0, 0);
-        c.toBlob(b => {{
-            const url = URL.createObjectURL(b);
-            const a = Object.assign(
-                document.createElement('a'),
-                {{href: url, download: 'snapshot.png'}}
-            );
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        }}, 'image/png');
-        """
-        ui.run_javascript(js)
+        """Stub method for compatibility."""
+        pass
 
     def adjust_roi(self):
-        """Allow the user to graphically select the ROI on the video feed."""
-
-        start = {"x": 0.0, "y": 0.0}
-        layer = None
-
-        def on_mouse(e: events.MouseEventArguments) -> None:
-            nonlocal start
-            if e.type == "mousedown":
-                start = {"x": e.image_x, "y": e.image_y}
-                if layer:
-                    layer.content = ""
-            elif e.type in {"mousemove", "mouseup"}:
-                x1 = min(start["x"], e.image_x)
-                y1 = min(start["y"], e.image_y)
-                x2 = max(start["x"], e.image_x)
-                y2 = max(start["y"], e.image_y)
-                if layer:
-                    layer.content = (
-                        f'<rect x="{x1}" y="{y1}" width="{x2 - x1}" '
-                        f'height="{y2 - y1}" stroke="red" fill="none" '
-                        f'stroke-width="2" />'
-                    )
-                if e.type == "mouseup":
-                    roi_width = int(x2 - x1)
-                    roi_height = int(y2 - y1)
-                    if roi_width == 0 or roi_height == 0:
-                        notify_later(
-                            "Cannot set ROI with zero width or height; keeping previous ROI.",
-                            type="negative",
-                        )
-                    else:
-                        self.roi_x = int(x1)
-                        self.roi_y = int(y1)
-                        self.roi_width = roi_width
-                        self.roi_height = roi_height
-                        if getattr(self, "roi_checkbox", None):
-                            self.roi_checkbox.value = True
-                        if self._roi_update_cb:
-                            self._roi_update_cb()
-                        notify_later(
-                            f"ROI set to ({self.roi_x}, {self.roi_y}, {self.roi_width}, {self.roi_height})",
-                            type="positive",
-                        )
-                    dialog.close()
-
-        with ui.dialog().props("persistent") as dialog:
-            with ui.column().classes("items-center gap-4"):
-                img = ui.interactive_image(
-                    "/video_feed",
-                    events=["mousedown", "mousemove", "mouseup"],
-                    cross=True,
-                ).on_mouse(on_mouse)
-                layer = img.add_layer()
-                ui.label("Drag on the image to select the ROI")
-                ui.button("Cancel", on_click=dialog.close)
-        dialog.open()
+        """Stub method for compatibility."""
+        pass
 
     def show_camera_settings(self):
         """Open the camera settings expansion from the context menu."""
@@ -776,17 +660,8 @@ class WebcamStreamElement:
             self.camera_settings_expansion.open()
 
     def reset_view(self):
-        """Reset the view to its default state."""
-        if hasattr(self, "video_element"):
-            # Reload by resetting the source path instead of using force_reload
-            self.video_element.set_source(self.video_element.source)
-            if hasattr(self, "loading_spinner"):
-                self.loading_spinner.set_visibility(True)
-        if getattr(self, "roi_checkbox", None):
-            self.roi_checkbox.value = False
-            if self._roi_update_cb:
-                self._roi_update_cb()
-        self.refresh_roi_overlay()
+        """Stub method for compatibility."""
+        pass
 
     def update_video_aspect(self, width: int, height: int) -> None:
         """Update video container aspect ratio."""
