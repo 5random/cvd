@@ -74,6 +74,12 @@ class DummyProbeCapture(DummyCapture):
         return 0
 
 
+class DummyPlain(DummyCapture):
+    def read(self):
+        frame = np.zeros((10, 10, 3), dtype=np.uint8)
+        return True, frame
+
+
 async def immediate(fn, *args, **kwargs):
     return fn(*args, **kwargs)
 
@@ -125,6 +131,50 @@ async def test_camera_capture_recovery(monkeypatch):
     assert result.success
     await md.stop()
     await md.cleanup()
+    try:
+        await controller.stop()
+    except asyncio.CancelledError:
+        pass
+    await controller.cleanup()
+
+
+@pytest.mark.asyncio
+async def test_windows_backend_default(monkeypatch):
+    from cvd.controllers import webcam as controller_data_sources
+
+    cap_module = controller_data_sources.camera_capture_controller
+    base_module = controller_data_sources.base_camera_capture
+
+    monkeypatch.setattr(cap_module, "run_camera_io", immediate)
+    monkeypatch.setattr(base_module, "run_camera_io", immediate)
+    monkeypatch.setattr(base_module.platform, "system", lambda: "Windows")
+
+    called = {}
+
+    def video_capture(idx, backend=None):
+        called["backend"] = backend
+        return DummyPlain(idx)
+
+    monkeypatch.setattr(cap_module.cv2, "VideoCapture", video_capture)
+    for name in ["info", "warning", "error", "debug"]:
+        if hasattr(cap_module, name):
+            monkeypatch.setattr(cap_module, name, lambda *a, **k: None)
+    import cvd.controllers.controller_base as controller_base
+
+    for name in ["info", "warning", "error", "debug"]:
+        if hasattr(controller_base, name):
+            monkeypatch.setattr(controller_base, name, lambda *a, **k: None)
+
+    cfg = ControllerConfig(
+        controller_id="cam",
+        controller_type="camera_capture",
+        parameters={"device_index": 0},
+    )
+    controller = CameraCaptureController("cam", cfg)
+    started = await controller.start()
+    assert started
+    assert controller.capture_backend == cap_module.cv2.CAP_DSHOW
+    assert called["backend"] == cap_module.cv2.CAP_DSHOW
     try:
         await controller.stop()
     except asyncio.CancelledError:

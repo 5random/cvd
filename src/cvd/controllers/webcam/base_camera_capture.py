@@ -8,6 +8,7 @@ from abc import ABC, abstractmethod
 from typing import Optional, Any
 
 import cv2
+import platform
 
 from ..camera_utils import apply_uvc_settings, rotate_frame
 from cvd.utils.concurrency.thread_pool import run_camera_io
@@ -52,6 +53,19 @@ class BaseCameraCapture(ABC):
 
     # ------------------------------------------------------------------
     async def _open_capture(self) -> bool:
+        # prefer DirectShow on Windows when no backend was specified
+        if (
+            getattr(self, "capture_backend", None) is None
+            and platform.system() == "Windows"
+            and cv2.__dict__.get("CAP_DSHOW") is not None
+        ):
+            self.capture_backend = cv2.CAP_DSHOW
+            if (
+                cv2.__dict__.get("CAP_MSMF") is not None
+                and cv2.CAP_MSMF not in self.capture_backend_fallbacks
+            ):
+                self.capture_backend_fallbacks.append(cv2.CAP_MSMF)
+
         backends = []
         if getattr(self, "capture_backend", None) is not None:
             backends.append(self.capture_backend)
