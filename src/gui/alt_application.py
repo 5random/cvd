@@ -158,7 +158,7 @@ class SimpleGUIApplication:
             "save_alerts": False,
         }
 
-        # Load persisted alert configurations or fall back to demo data
+        # Load persisted alert configurations; empty list if none found
         self.alert_configurations = load_alert_configs(self.config_service)
         self._alert_configs_from_disk = bool(self.alert_configurations)
         self.alert_display = EmailAlertStatusDisplay(self.alert_configurations)
