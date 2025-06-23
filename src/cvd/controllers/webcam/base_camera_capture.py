@@ -30,7 +30,7 @@ class BaseCameraCapture(ABC):
     """Mixin providing a reusable camera capture loop."""
 
     def __init__(self, controller_id: str, config):
-        super().__init__()
+        super().__init__(controller_id, config)
         self.controller_id = controller_id
         self.config = config
         self._capture: Optional[cv2.VideoCapture] = None
