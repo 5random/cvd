@@ -994,20 +994,20 @@ class SimpleGUIApplication:
         with ui.dialog() as dialog, ui.card().classes("w-full max-w-4xl"):
             create_email_alert_wizard(on_save=_on_save)
             with ui.row().classes("w-full justify-end mt-4"):
-                ui.button("Schließen", on_click=dialog.close).props("flat")
+                ui.button("Close", on_click=dialog.close).props("flat")
 
         dialog.open()
 
     def show_alert_management(self):
         """Show the alert management interface in a dialog"""
         with ui.dialog() as dialog, ui.card().classes("w-full max-w-6xl"):
-            ui.label("E-Mail Alert Verwaltung").classes("text-xl font-bold mb-4")
+            ui.label("Email Alert Management").classes("text-xl font-bold mb-4")
 
             with ui.column() as self.alert_overview_container:
                 self.alert_display.create_alert_overview()
 
             with ui.row().classes("w-full justify-end mt-4"):
-                ui.button("Schließen", on_click=dialog.close).props("flat")
+                ui.button("Close", on_click=dialog.close).props("flat")
         dialog.open()
 
     def _create_enhanced_alerts_section(self):
@@ -1016,29 +1016,29 @@ class SimpleGUIApplication:
             with ui.card_section():
                 # Header with action buttons
                 with ui.row().classes("w-full items-center justify-between mb-4"):
-                    ui.label("E-Mail Alerts").classes("text-lg font-semibold")
+                    ui.label("Email Alerts").classes("text-lg font-semibold")
 
                     with ui.row().classes("gap-2"):
                         ui.button(
-                            "Konfigurieren",
+                            "Configure",
                             icon="settings",
                             on_click=self.show_alert_setup_wizard,
                         ).props("size=sm color=primary")
 
                         ui.button(
-                            "Verwalten",
+                            "Manage",
                             icon="list",
                             on_click=self.show_alert_management,
                         ).props("size=sm color=secondary")
 
                         ui.button(
-                            "Alert-Verlauf",
+                            "Alert History",
                             icon="history",
                             on_click=self.show_alert_history,
                         ).props("size=sm color=secondary")
 
                         ui.button(
-                            "Test-Alert",
+                            "Test Alert",
                             icon="send",
                             on_click=self.send_test_alert,
                         ).props("size=sm color=warning")
@@ -1061,21 +1061,21 @@ class SimpleGUIApplication:
                     # Status icon
                     if active_configs > 0:
                         ui.icon("check_circle").classes("text-green-600 text-2xl")
-                        status_text = "Aktiv"
+                        status_text = "Active"
                     else:
                         ui.icon("warning").classes("text-orange-600 text-2xl")
-                        status_text = "Inaktiv"
+                        status_text = "Inactive"
 
                     with ui.column().classes("gap-1"):
                         ui.label(f"Status: {status_text}").classes("font-medium")
                         ui.label(
-                            f"{active_configs} von {total_configs} Konfigurationen aktiv"
+                            f"{active_configs} of {total_configs} configurations active"
                         ).classes(
                             "text-sm text-gray-600"
                         )  # Quick summary of active configurations
                 if active_configs > 0:
                     ui.separator().classes("my-3")
-                    ui.label("Aktive Konfigurationen:").classes(
+                    ui.label("Active Configurations:").classes(
                         "text-sm font-medium mb-2"
                     )
 
@@ -1106,7 +1106,7 @@ class SimpleGUIApplication:
                                     email_count = len(config.get("emails", []))
                                     if email_count > 0:
                                         ui.chip(
-                                            f"{email_count} Empfänger", color="blue"
+                                            f"{email_count} recipient(s)", color="blue"
                                         ).props("dense")
 
     async def _send_test_to_all_configs(self):
@@ -1122,13 +1122,13 @@ class SimpleGUIApplication:
 
         if not active_configs:
             notify_later(
-                "Keine aktiven Alert-Konfigurationen vorhanden", type="warning"
+                "No active alert configurations available", type="warning"
             )
             return
 
         service = email_alert_service.get_email_alert_service()
         if service is None:
-            notify_later("EmailAlertService nicht verfügbar", type="warning")
+            notify_later("EmailAlertService unavailable", type="warning")
             return
 
         frame_bytes = None
@@ -1169,8 +1169,8 @@ class SimpleGUIApplication:
         tasks = [
             _send(
                 email,
-                f"Test-Alert ({cfg.get('name', 'Alert')})",
-                "Dies ist ein Test des E-Mail-Alert-Systems.",
+                f"Test Alert ({cfg.get('name', 'Alert')})",
+                "This is a test of the email alert system.",
             )
             for cfg in active_configs
             for email in cfg.get("emails", [])
@@ -1190,20 +1190,20 @@ class SimpleGUIApplication:
             total_sent = 0
 
         notify_later(
-            f"Test-Alerts an {total_sent} Empfänger in {len(active_configs)} Konfigurationen gesendet",
+            f"Test alerts sent to {total_sent} recipients across {len(active_configs)} configurations",
             type="positive" if total_sent else "warning",
         )
 
     def _show_alert_history(self):
         """Show alert history dialog"""
         with ui.dialog() as dialog, ui.card().classes("w-full max-w-4xl"):
-            ui.label("Alert-Verlauf").classes("text-xl font-bold mb-4")
+            ui.label("Alert History").classes("text-xl font-bold mb-4")
 
             service = email_alert_service.get_email_alert_service()
             history_entries = service.get_history() if service else []
 
             with ui.column().classes("gap-3"):
-                ui.label("Letzte gesendete Alerts:").classes("font-medium")
+                ui.label("Recently sent alerts:").classes("font-medium")
 
                 for entry in history_entries:
                     with ui.card().classes("w-full p-3"):
@@ -1223,7 +1223,7 @@ class SimpleGUIApplication:
                             ui.icon("email").classes("text-blue-600")
 
             with ui.row().classes("w-full justify-end mt-4"):
-                ui.button("Schließen", on_click=dialog.close).props("flat")
+                ui.button("Close", on_click=dialog.close).props("flat")
 
         dialog.open()
 
@@ -1428,8 +1428,8 @@ if __name__ in {"__main__", "__mp_main__"}:
 #    - Alert history viewing (with mock data for demonstration)
 #
 # 3. User Interface:
-#    - "Konfigurieren" button opens the 4-step setup wizard
-#    - "Verwalten" button opens the full alert overview
+#    - "Configure" button opens the four-step setup wizard
+#    - "Manage" button opens the full alert overview
 #    - Quick status display shows active configurations
 #    - Header alert icon reflects the current alert status
 #
@@ -1445,4 +1445,4 @@ if __name__ in {"__main__", "__mp_main__"}:
 #
 # The application uses the configuration in ``src/config/simple_config.json``.
 # The email alert section will show in the bottom-right grid area.
-# Click "Konfigurieren" to set up new alerts or "Verwalten" to view existing ones.
+# Click "Configure" to set up new alerts or "Manage" to view existing ones.
