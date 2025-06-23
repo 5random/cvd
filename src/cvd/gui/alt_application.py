@@ -116,6 +116,8 @@ class SimpleGUIApplication:
 
         cls = email_alert_service_cls or email_alert_service.EmailAlertService
         self.email_alert_service = cls(self.config_service)
+        # set global singleton so UI elements use the configured service
+        email_alert_service.set_email_alert_service(self.email_alert_service)
         # use the already created controller manager for the experiment manager
         self.experiment_manager = ExperimentManager(
             config_service=self.config_service,
