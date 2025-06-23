@@ -305,6 +305,16 @@ class SimpleGUIApplication:
                 "update_fps": self.update_fps,
                 "update_resolution": self.update_resolution,
                 "update_rotation": self.update_rotation,
+                "update_brightness": self.update_brightness,
+                "update_contrast": self.update_contrast,
+                "update_saturation": self.update_saturation,
+                "update_hue": self.update_hue,
+                "update_sharpness": self.update_sharpness,
+                "update_gain": self.update_gain,
+                "update_gamma": self.update_gamma,
+                "update_backlight_comp": self.update_backlight_comp,
+                "update_white_balance_manual": self.update_white_balance_manual,
+                "update_exposure_manual": self.update_exposure_manual,
                 "set_roi": self.set_roi,
                 "apply_uvc_settings": self.apply_uvc_settings,
                 "reset_uvc_defaults": self.reset_uvc_defaults,
@@ -635,6 +645,55 @@ class SimpleGUIApplication:
             self.webcam_stream.rotation_select.value = value
 
         notify_later(f"Rotation set to {value}°", type="positive")
+
+    # ------------------------------------------------------------------
+    # UVC property update callbacks
+    # ------------------------------------------------------------------
+
+    def _update_uvc_setting(self, name: str, value: Any) -> None:
+        """Helper to store a UVC value and schedule application."""
+        self.settings[name] = value
+        asyncio.create_task(self.apply_uvc_settings())
+
+    def update_brightness(self, e):
+        value = getattr(e, "value", e)
+        self._update_uvc_setting("brightness", value)
+
+    def update_contrast(self, e):
+        value = getattr(e, "value", e)
+        self._update_uvc_setting("contrast", value)
+
+    def update_saturation(self, e):
+        value = getattr(e, "value", e)
+        self._update_uvc_setting("saturation", value)
+
+    def update_hue(self, e):
+        value = getattr(e, "value", e)
+        self._update_uvc_setting("hue", value)
+
+    def update_sharpness(self, e):
+        value = getattr(e, "value", e)
+        self._update_uvc_setting("sharpness", value)
+
+    def update_gain(self, e):
+        value = getattr(e, "value", e)
+        self._update_uvc_setting("gain", value)
+
+    def update_gamma(self, e):
+        value = getattr(e, "value", e)
+        self._update_uvc_setting("gamma", value)
+
+    def update_backlight_comp(self, e):
+        value = getattr(e, "value", e)
+        self._update_uvc_setting("backlight_compensation", value)
+
+    def update_white_balance_manual(self, e):
+        value = getattr(e, "value", e)
+        self._update_uvc_setting("white_balance", value)
+
+    def update_exposure_manual(self, e):
+        value = getattr(e, "value", e)
+        self._update_uvc_setting("exposure", value)
 
     async def scan_cameras(self):
         """Scan for connected camera devices."""
