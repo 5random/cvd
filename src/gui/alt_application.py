@@ -64,6 +64,7 @@ from src.utils.concurrency import (
 from src.utils.concurrency.async_utils import install_signal_handlers
 from src.utils.config_service import ConfigurationService, set_config_service
 from src.gui.ui_helpers import notify_later
+from src.gui.utils import generate_mjpeg_stream
 from src.utils.log_service import info, warning, error
 
 # Maximum frames per second for the MJPEG video feed
@@ -1273,65 +1274,24 @@ class SimpleGUIApplication:
 
         @ui.page("/video_feed")
         async def video_feed(request: Request):
+            async def frame_source() -> Optional[np.ndarray]:
+                frame = None
+                if self.camera_controller is not None:
+                    output = self.camera_controller.get_output()
+                    if isinstance(output, dict):
+                        frame = output.get("frame") or output.get("image")
+                    elif output is not None:
+                        frame = output
+                return frame
+
             async def gen():
-                last_sent = 0.0
-                fps_cap = max(float(self.settings.get("fps_cap", FPS_CAP)), 1.0)
-                interval = 1 / fps_cap
-                no_frame_start: Optional[float] = None
-                timeout = 3.0
-                placeholder_bytes: Optional[bytes] = None
                 try:
-                    while True:
-                        try:
-                            if await request.is_disconnected():
-                                break
-                        except asyncio.CancelledError:
-                            break
-
-                        frame = None
-                        if self.camera_controller is not None:
-                            output = self.camera_controller.get_output()
-                            if isinstance(output, dict):
-                                frame = output.get("frame") or output.get("image")
-                            elif output is not None:
-                                frame = output
-
-                        now = asyncio.get_running_loop().time()
-                        if frame is not None:
-                            no_frame_start = None
-                            if interval <= 0 or now - last_sent >= interval:
-                                success, buf = await run_in_executor(
-                                    cv2.imencode, ".jpg", frame
-                                )
-                                if success:
-                                    jpeg = buf.tobytes()
-                                    yield (
-                                        b"--frame\r\nContent-Type: image/jpeg\r\n\r\n"
-                                        + jpeg
-                                        + b"\r\n"
-                                    )
-                                    last_sent = now
-                        else:
-                            if no_frame_start is None:
-                                no_frame_start = now
-                            if now - no_frame_start >= timeout:
-                                error(
-                                    f"Camera failed to provide frames for {timeout} seconds"
-                                )
-
-                                if placeholder_bytes is None:
-                                    placeholder = np.zeros((10, 10, 3), dtype=np.uint8)
-                                    success, buf = cv2.imencode(".jpg", placeholder)
-                                    if success:
-                                        placeholder_bytes = buf.tobytes()
-                                if placeholder_bytes:
-                                    yield (
-                                        b"--frame\r\nContent-Type: image/jpeg\r\n\r\n"
-                                        + placeholder_bytes
-                                        + b"\r\n"
-                                    )
-                                break
-                        await asyncio.sleep(max(0.001, interval))
+                    async for chunk in generate_mjpeg_stream(
+                        frame_source,
+                        fps_cap=self.settings.get("fps_cap", FPS_CAP),
+                        request=request,
+                    ):
+                        yield chunk
                 finally:
                     if self.camera_controller is not None:
                         with contextlib.suppress(Exception):
