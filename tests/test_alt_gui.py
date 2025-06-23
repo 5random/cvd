@@ -20,7 +20,6 @@ pytest_plugins = ["nicegui.testing.user_plugin"]
 
 
 class MockEmailAlertService(EmailAlertService):
-
     def __init__(self, config_service):
         super().__init__(config_service)
         self._config_service = config_service
@@ -443,7 +442,7 @@ def create_mock_camera_controller():
 def create_mock_motion_controller():
     """Erstelle einen Mock Motion Detection Controller"""
     controller = Mock()
-    controller.motion_threshold_percentage = 0.5
+    controller.motion_threshold_percentage = 50
     controller.fps = 30
     controller.width = 640
     controller.height = 480
@@ -474,7 +473,9 @@ class TestSimpleGUIApplicationWithMockControllers:
 
         mock_camera = create_mock_camera_controller()
         mock_camera.start = AsyncMock(return_value=False)
-        simple_gui_app.controller_manager.add_mock_controller("camera_capture", mock_camera)
+        simple_gui_app.controller_manager.add_mock_controller(
+            "camera_capture", mock_camera
+        )
         simple_gui_app.camera_controller = mock_camera
 
         notifications = []
@@ -495,7 +496,9 @@ class TestSimpleGUIApplicationWithMockControllers:
         """Camera stays active and user is notified if stop fails"""
 
         mock_camera = create_mock_camera_controller()
-        simple_gui_app.controller_manager.add_mock_controller("camera_capture", mock_camera)
+        simple_gui_app.controller_manager.add_mock_controller(
+            "camera_capture", mock_camera
+        )
         simple_gui_app.camera_controller = mock_camera
 
         await simple_gui_app.toggle_camera()
@@ -529,7 +532,7 @@ class TestSimpleGUIApplicationWithMockControllers:
         simple_gui_app.update_sensitivity(80)
 
         # Verify controller was updated
-        assert mock_motion.motion_threshold_percentage == 0.8
+        assert mock_motion.motion_threshold_percentage == 80
 
         # Test FPS update
         simple_gui_app.update_fps(60)

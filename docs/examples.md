@@ -112,4 +112,8 @@ The motion detection controller also supports defining a region of interest
 within the camera frame. Provide ``roi_x`` and ``roi_y`` for the top-left corner
 along with ``roi_width`` and ``roi_height`` to restrict detection to that area.
 
+``motion_threshold_percentage`` defines the minimum percentage of the frame that
+must contain motion to trigger a detection. Specify this value in percent, so a
+threshold of ``1`` requires motion in 1% of the frame.
+
 

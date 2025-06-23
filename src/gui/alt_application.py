@@ -523,7 +523,7 @@ class SimpleGUIApplication:
 
         self.settings["sensitivity"] = value
         if self.motion_controller:
-            self.motion_controller.motion_threshold_percentage = value / 100.0
+            self.motion_controller.motion_threshold_percentage = value
         if hasattr(self, "webcam_stream"):
             self.webcam_stream.sensitivity_number.value = value
             self.webcam_stream.sensitivity_slider.value = value
