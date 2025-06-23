@@ -1,6 +1,6 @@
 # Configuration and Logging Services
 
-This repository bundles shared services under the `src.utils` package. The modern `config_service` and `log_service` packages supersede the deprecated `config_utils` and `log_utils` modules. Compatibility shims have been removed, so always import from the new packages.
+This repository bundles shared services under the `cvd.utils` package. The modern `config_service` and `log_service` packages supersede the deprecated `config_utils` and `log_utils` modules. Compatibility shims have been removed, so always import from the new packages.
 
 ## `config_service`
 
@@ -14,7 +14,7 @@ following submodules:
 Import the configuration service via:
 
 ```python
-from src.utils.config_service import ConfigurationService
+from cvd.utils.config_service import ConfigurationService
 ```
 
 ### ID format
@@ -33,7 +33,7 @@ Provides structured logging with rotation and audit features.  A companion
 Use it as follows:
 
 ```python
-from src.utils.log_service import get_log_service
+from cvd.utils.log_service import get_log_service
 log = get_log_service()
 log.info("message")
 ```
@@ -45,6 +45,6 @@ project's ``config`` directory. This mirrors the default used by
 
 ### Migrating imports
 
-Legacy import paths using the old `config_utils` or `log_utils` packages have been removed. Update any code to import directly from `src.utils.config_service` and `src.utils.log_service`.
+Legacy import paths using the old `config_utils` or `log_utils` packages have been removed. Update any code to import directly from `cvd.utils.config_service` and `cvd.utils.log_service`.
 
 
