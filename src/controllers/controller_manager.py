@@ -18,6 +18,7 @@ from src.controllers.controller_base import (
     ControllerConfig,
     ControllerStatus,
 )
+
 # Removed SensorReading import since sensors are not used
 from src.utils.log_service import info, error, debug
 
@@ -448,7 +449,7 @@ class ControllerManager:
                 "manager_id": self.manager_id,
                 "controllers": {
                     cid: {
-                        "controller_type": controller.controller_type.value,
+                        "controller_type": controller.config.controller_type,
                         "config": {
                             "controller_id": controller.config.controller_id,
                             "controller_type": controller.config.controller_type,
