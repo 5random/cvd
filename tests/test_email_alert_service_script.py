@@ -1,5 +1,6 @@
 import sys
 from email.message import EmailMessage
+from types import SimpleNamespace
 
 
 from scripts.email_alert_service_testing import (
@@ -8,6 +9,7 @@ from scripts.email_alert_service_testing import (
     DEFAULT_CONFIG,
     main,
 )
+from cvd.experiment_manager import ExperimentState
 
 
 class DummySMTP:
@@ -45,6 +47,10 @@ def test_send_alert_builds_message(monkeypatch):
     DummySMTP.instances.clear()
     monkeypatch.setattr("smtplib.SMTP", DummySMTP)
     monkeypatch.setattr("smtplib.SMTP_SSL", DummySMTP)
+    monkeypatch.setattr(
+        "cvd.utils.email_alert_service.get_experiment_manager",
+        lambda: SimpleNamespace(get_current_state=lambda: ExperimentState.RUNNING),
+    )
 
     service = ManualEmailAlertService(SimpleConfigService(DEFAULT_CONFIG.copy()))
     result = service.send_alert("Test", "Body", recipient="dest@example.com")
@@ -63,6 +69,10 @@ def test_main_argument_parsing(monkeypatch):
     DummySMTP.instances.clear()
     monkeypatch.setattr("smtplib.SMTP", DummySMTP)
     monkeypatch.setattr("smtplib.SMTP_SSL", DummySMTP)
+    monkeypatch.setattr(
+        "cvd.utils.email_alert_service.get_experiment_manager",
+        lambda: SimpleNamespace(get_current_state=lambda: ExperimentState.RUNNING),
+    )
 
     monkeypatch.setattr(sys, "argv", ["script", "--recipient", "dest@example.com"])
     main()

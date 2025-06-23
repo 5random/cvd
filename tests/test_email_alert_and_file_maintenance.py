@@ -8,6 +8,7 @@ from cvd.utils.alert_system_utils.email_alert_service import EmailAlertService
 from cvd.utils.data_utils.file_management_service import FileMaintenanceService
 from cvd.utils.data_utils.compression_service import CompressionService
 from typing import cast
+from cvd.experiment_manager import ExperimentState
 
 
 class DummyConfigService:
@@ -83,6 +84,10 @@ def test_send_alert_success(monkeypatch):
     }
     service = EmailAlertService(DummyConfigService(cfg))
     monkeypatch.setattr("smtplib.SMTP", DummySMTP)
+    monkeypatch.setattr(
+        "cvd.utils.email_alert_service.get_experiment_manager",
+        lambda: SimpleNamespace(get_current_state=lambda: ExperimentState.RUNNING),
+    )
 
     img = b"fakejpg"
     result = service.send_alert(
@@ -112,6 +117,10 @@ def test_send_alert_no_recipient(monkeypatch):
     service = EmailAlertService(DummyConfigService(cfg))
     DummySMTP.instances.clear()
     monkeypatch.setattr("smtplib.SMTP", DummySMTP)
+    monkeypatch.setattr(
+        "cvd.utils.email_alert_service.get_experiment_manager",
+        lambda: SimpleNamespace(get_current_state=lambda: ExperimentState.RUNNING),
+    )
 
     result = service.send_alert("a", "b", status_text="s", image_attachment=None)
 
@@ -166,7 +175,7 @@ def test_rotate_path_permission_error(tmp_path: Path, monkeypatch):
     )
 
     src = tmp_path / "data.csv"
-    cvd.write_text("x")
+    src.write_text("x")
     dest = tmp_path / "compressed" / "data.csv"
     dest.parent.mkdir()
 
@@ -182,7 +191,7 @@ def test_rotate_path_permission_error(tmp_path: Path, monkeypatch):
     result = service._rotate_path(src, dest)
 
     assert result is None
-    assert cvd.exists()
+    assert src.exists()
 
 
 def test_compress_directory_delegates(tmp_path: Path):
