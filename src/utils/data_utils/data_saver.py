@@ -244,14 +244,15 @@ class DataSaver:
         try:
             for directory in [self.raw_dir, self.proc_dir]:
                 for file_path in directory.glob("*.csv"):
-                    file_age = current_time - file_path.stat().st_mtime
+                    file_stat = file_path.stat()
+                    file_age = current_time - file_stat.st_mtime
 
                     if file_age > self.max_file_age_seconds:
                         # Move to compressed directory with timestamp
                         compressed_dir = directory / "compressed"
                         compressed_dir.mkdir(exist_ok=True)
 
-                        timestamp = int(file_path.stat().st_mtime)
+                        timestamp = int(file_stat.st_mtime)
                         new_name = f"{file_path.stem}_{timestamp}.csv"
                         rotated_path = compressed_dir / new_name
 
@@ -274,8 +275,9 @@ class DataSaver:
                     )
 
                     if not file_in_use:
-                        file_age = current_time - file_path.stat().st_atime
-                        file_size = file_path.stat().st_size
+                        stats = file_path.stat()
+                        file_age = current_time - stats.st_atime
+                        file_size = stats.st_size
 
                         # Compress if file is large and hasn't been accessed in a while
                         if (
