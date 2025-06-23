@@ -60,9 +60,7 @@ async def test_video_feed_multiple_connections(monkeypatch):
                 break
             yield b"x"
 
-    monkeypatch.setattr(
-        "src.gui.alt_application.generate_mjpeg_stream", fake_generate
-    )
+    monkeypatch.setattr("src.gui.alt_application.generate_mjpeg_stream", fake_generate)
 
     app_instance = SimpleGUIApplication(
         controller_manager=DummyControllerManager(),
@@ -128,3 +126,71 @@ async def test_video_feed_multiple_connections(monkeypatch):
         await gen2.__anext__()
     assert app_instance.camera_controller is None
     assert calls == [False]
+
+
+@pytest.mark.asyncio
+async def test_video_feed_generator_failure(monkeypatch):
+    import importlib
+    import sys
+
+    fake_alert_mod = types.ModuleType("alert_element_new")
+    fake_alert_mod.create_compact_alert_widget = lambda *a, **k: None
+    fake_alert_mod.create_demo_configurations = lambda *a, **k: []
+    fake_alert_mod.create_email_alert_status_display = lambda *a, **k: None
+    fake_alert_mod.create_email_alert_wizard = lambda *a, **k: None
+    fake_alert_mod.load_alert_configs = lambda *a, **k: []
+    fake_alert_mod.save_alert_configs = lambda *a, **k: None
+
+    class EmailAlertStatusDisplay:
+        def __init__(self, *a, **k) -> None:
+            self.update_callback = None
+
+    fake_alert_mod.EmailAlertStatusDisplay = EmailAlertStatusDisplay
+    sys.modules["cvd.gui.alt_gui_elements.alert_element_new"] = fake_alert_mod
+
+    SimpleGUIApplication = importlib.import_module(
+        "cvd.gui.alt_application"
+    ).SimpleGUIApplication
+
+    monkeypatch.setattr(
+        "cvd.gui.alt_application.load_alert_configs", lambda *a, **k: []
+    )
+    monkeypatch.setattr(
+        "cvd.gui.alt_application.create_demo_configurations", lambda: []
+    )
+    monkeypatch.setattr(
+        "cvd.gui.alt_application.EmailAlertStatusDisplay",
+        lambda *a, **k: types.SimpleNamespace(update_callback=None),
+    )
+
+    def failing_generate(*_a, **_k):
+        raise RuntimeError("boom")
+
+    monkeypatch.setattr(
+        "cvd.gui.alt_application.generate_mjpeg_stream", failing_generate
+    )
+
+    errors = []
+    monkeypatch.setattr(
+        "cvd.gui.alt_application.error", lambda *a, **k: errors.append(a)
+    )
+
+    app_instance = SimpleGUIApplication(
+        controller_manager=DummyControllerManager(),
+        config_service=DummyConfigService(),
+    )
+    with Client.auto_index_client:
+        app_instance.register_components()
+
+    route = [r for r in app.routes if getattr(r, "path", None) == "/video_feed"][0]
+    endpoint = route.endpoint.__wrapped__
+
+    class DummyRequest:
+        async def is_disconnected(self):
+            return False
+
+    resp = await endpoint(request=DummyRequest())
+    assert resp.status_code == 500
+    assert resp.media_type == "application/json"
+    assert app_instance._video_feed_connections == 0
+    assert errors

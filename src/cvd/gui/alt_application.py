@@ -28,7 +28,7 @@ import re
 import cv2
 import numpy as np
 from fastapi import Request
-from fastapi.responses import StreamingResponse
+from fastapi.responses import StreamingResponse, JSONResponse
 from nicegui import app, ui
 
 from cvd.controllers import controller_manager as controller_manager_module
@@ -428,7 +428,6 @@ class SimpleGUIApplication:
         """Start or stop recording from context menu"""
         if self.webcam_stream:
             self.webcam_stream.toggle_recording()
-
 
     def take_snapshot(self):
         """Trigger snapshot on the webcam element."""
@@ -1006,7 +1005,9 @@ class SimpleGUIApplication:
                 service.recipient = config["emails"][0]
 
         with ui.dialog() as dialog, ui.card().classes("w-full max-w-4xl"):
-            create_email_alert_wizard(on_save=_on_save, service=self.email_alert_service)
+            create_email_alert_wizard(
+                on_save=_on_save, service=self.email_alert_service
+            )
             with ui.row().classes("w-full justify-end mt-4"):
                 ui.button("Close", on_click=dialog.close).props("flat")
 
@@ -1295,6 +1296,7 @@ class SimpleGUIApplication:
         @ui.page("/video_feed")
         async def video_feed(request: Request):
             self._video_feed_connections += 1
+
             async def frame_source() -> Optional[np.ndarray]:
                 frame = None
                 if self.camera_controller is not None:
@@ -1305,13 +1307,31 @@ class SimpleGUIApplication:
                         frame = output
                 return frame
 
+            try:
+                stream_gen = generate_mjpeg_stream(
+                    frame_source,
+                    fps_cap=self.settings.get("fps_cap", FPS_CAP),
+                    request=request,
+                )
+            except Exception as exc:  # pragma: no cover
+                self._video_feed_connections -= 1
+                error("generate_mjpeg_stream failed", exc_info=exc)
+                if (
+                    self._video_feed_connections == 0
+                    and self.camera_controller is not None
+                ):
+                    with contextlib.suppress(Exception):
+                        await self.camera_controller.stop()
+                        await self.camera_controller.cleanup()
+                    self.camera_controller = None
+                    self.update_camera_status(False)
+                return JSONResponse(
+                    {"detail": "Failed to start video feed"}, status_code=500
+                )
+
             async def gen():
                 try:
-                    async for chunk in generate_mjpeg_stream(
-                        frame_source,
-                        fps_cap=self.settings.get("fps_cap", FPS_CAP),
-                        request=request,
-                    ):
+                    async for chunk in stream_gen:
                         yield chunk
                 finally:
                     self._video_feed_connections -= 1
@@ -1414,6 +1434,7 @@ def main() -> None:
     from main import main as entry_point
 
     entry_point()
+
 
 # The check for "__mp_main__" allows compatibility with multiprocessing on Windows,
 # where the module name is set to "__mp_main__" in subprocesses.
