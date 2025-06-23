@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Dict, List, Iterable, Optional, Any
 from src.utils.log_service import warning
 
+
 def _read_rows(path: Path) -> List[Dict[str, str]]:
     """Read CSV rows skipping duplicated headers."""
     with open(path, newline="", encoding="utf-8") as f:
@@ -26,18 +27,31 @@ def _normalize_rows(rows: Iterable[Dict[str, str]]) -> List[Dict[str, Any]]:
         try:
             ts = float(row["timestamp"])
         except (ValueError, KeyError) as e:
-            warning(f"Skipping row with invalid timestamp '{row.get('timestamp',None)}': {e}")
+            warning(
+                f"Skipping row with invalid timestamp '{row.get('timestamp',None)}': {e}"
+            )
             continue
         dt = datetime.fromtimestamp(ts)
         value = row.get("value", "")
-        value_float = float(value) if value else float("nan")
-        cleaned.append({
-            "timestamp": ts,
-            "datetime": dt,
-            "value": value_float,
-            "status": row.get("status", "")
-        })
-    cleaned.sort(key=lambda r: r["timestamp"])  # type: ignore  
+        if value:
+            try:
+                value_float = float(value)
+            except ValueError as e:
+                warning(
+                    f"Invalid value '{value}' at timestamp {row.get('timestamp')}: {e}"
+                )
+                value_float = float("nan")
+        else:
+            value_float = float("nan")
+        cleaned.append(
+            {
+                "timestamp": ts,
+                "datetime": dt,
+                "value": value_float,
+                "status": row.get("status", ""),
+            }
+        )
+    cleaned.sort(key=lambda r: r["timestamp"])  # type: ignore
     return cleaned
 
 
@@ -56,10 +70,16 @@ def _write_rows(rows: Iterable[Dict[str, Any]], path: Path) -> None:
             writer.writerow([dt_str, ts_str, value_str, row["status"]])
 
 
-def clean_file(input_path: Path | str, output_path: Optional[Path | str] = None) -> Path:
+def clean_file(
+    input_path: Path | str, output_path: Optional[Path | str] = None
+) -> Path:
     """Clean a sensor CSV file and write the result."""
     input_path = Path(input_path)
-    output_path = Path(output_path) if output_path else input_path.with_name(f"{input_path.stem}_cleaned.csv")
+    output_path = (
+        Path(output_path)
+        if output_path
+        else input_path.with_name(f"{input_path.stem}_cleaned.csv")
+    )
     rows = _read_rows(input_path)
     normalized = _normalize_rows(rows)
     _write_rows(normalized, output_path)
