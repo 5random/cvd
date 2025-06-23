@@ -19,6 +19,7 @@ from cvd.utils.log_service import debug, info, warning, error
 from cvd.utils.concurrency.thread_pool import get_thread_pool_manager, ThreadPoolType
 
 
+
 @dataclass
 class CompressionSettings:
     """Configuration for compression operations"""
@@ -94,7 +95,6 @@ class CompressionService:
         self._config_service = get_config_service()
         if self._config_service is None:
             raise CompressionError("Configuration service not available")
-
         # Load configuration
         self._load_configuration()
 
@@ -104,6 +104,11 @@ class CompressionService:
         info(
             f"Compression service initialized with algorithm: {self._compression_settings.algorithm}"
         )
+
+    @property
+    def compression_settings(self) -> CompressionSettings:
+        """Return the active compression settings."""
+        return self._compression_settings
 
     def _load_configuration(self) -> None:
         """Load compression and rotation settings from configuration"""

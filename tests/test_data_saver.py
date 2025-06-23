@@ -12,9 +12,19 @@ from cvd.data_handler.interface.sensor_interface import (
 )
 
 
+class DummyCompressionSettings:
+    def __init__(self):
+        self.preserve_original = False
+
+
 class DummyCompressionService:
     def __init__(self):
         self.calls = []
+        self._compression_settings = DummyCompressionSettings()
+
+    @property
+    def compression_settings(self) -> DummyCompressionSettings:
+        return self._compression_settings
 
     def compress_file(self, src: str, dst: str):
         # simply copy the input to the destination

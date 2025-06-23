@@ -117,12 +117,11 @@ class FileMaintenanceService:
             compressed_path = (
                 compressed_dir / f"{file_path.stem}_{int(time.time())}.csv.gz"
             )
-            result = self.compression_service.compress_file(str(file_path), str(compressed_path))
+            result = self.compression_service.compress_file(
+                str(file_path), str(compressed_path)
+            )
 
-            preserve = False
-            settings = getattr(self.compression_service, "_compression_settings", None)
-            if settings is not None:
-                preserve = getattr(settings, "preserve_original", False)
+            preserve = self.compression_service.compression_settings.preserve_original
 
             if not preserve and file_path.exists():
                 try:
@@ -130,7 +129,9 @@ class FileMaintenanceService:
                 except Exception as e:
                     warning(f"Failed to delete original file {file_path}: {e}")
                 if file_path.exists():
-                    warning(f"Source file was not deleted after compression: {file_path}")
+                    warning(
+                        f"Source file was not deleted after compression: {file_path}"
+                    )
 
             if preserve:
                 info(f"Compressed file {file_path} -> {compressed_path}")

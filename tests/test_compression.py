@@ -1,6 +1,7 @@
 import logging
 from pathlib import Path
 
+
 from cvd.utils.config_service import ConfigurationService, set_config_service
 from cvd.utils.data_utils.compression_service import CompressionService, set_compression_service
 from cvd.utils.data_utils.data_saver import DataSaver
@@ -22,9 +23,9 @@ def _init_services(tmp_path: Path) -> tuple[ConfigurationService, CompressionSer
 def test_data_saver_compress_sync(tmp_path: Path, caplog):
     _, compression_service, data_saver = _init_services(tmp_path)
 
-    file_path = tmp_path / 'raw' / 'sample.csv'
+    file_path = tmp_path / "raw" / "sample.csv"
     file_path.parent.mkdir(parents=True, exist_ok=True)
-    file_path.write_text('a,b\n1,2\n')
+    file_path.write_text("a,b\n1,2\n")
 
     caplog.set_level(logging.WARNING, logger="cvd_tracker.error")
 
@@ -34,17 +35,19 @@ def test_data_saver_compress_sync(tmp_path: Path, caplog):
     assert result is not None and result.exists()
     assert not any(r.levelno >= logging.WARNING for r in caplog.records)
 
-    compressed = list((file_path.parent / 'compressed').glob('sample*.csv.gz'))
+    compressed = list((file_path.parent / "compressed").glob("sample*.csv.gz"))
     assert len(compressed) == 1
     assert not file_path.exists()
 
 
 def test_file_maintenance_compress(tmp_path: Path, caplog):
     _, compression_service, _ = _init_services(tmp_path)
-    service = FileMaintenanceService(compression_service, compression_threshold_bytes=0, max_file_age_seconds=0)
+    service = FileMaintenanceService(
+        compression_service, compression_threshold_bytes=0, max_file_age_seconds=0
+    )
 
-    file_path = tmp_path / 'example.csv'
-    file_path.write_text('x,y\n')
+    file_path = tmp_path / "example.csv"
+    file_path.write_text("x,y\n")
 
     caplog.set_level(logging.WARNING, logger="cvd_tracker.error")
     result = service._compress_file(file_path)
@@ -52,7 +55,7 @@ def test_file_maintenance_compress(tmp_path: Path, caplog):
     assert result is not None and result.exists()
     assert not any(r.levelno >= logging.WARNING for r in caplog.records)
 
-    compressed = list((tmp_path / 'compressed').glob('example*.csv.gz'))
+    compressed = list((tmp_path / "compressed").glob("example*.csv.gz"))
     assert len(compressed) == 1
     assert not file_path.exists()
 
@@ -60,20 +63,24 @@ def test_file_maintenance_compress(tmp_path: Path, caplog):
 def test_is_already_compressed_partial_match(tmp_path: Path):
     _, compression_service, _ = _init_services(tmp_path)
 
-    assert not compression_service._is_already_compressed(
-        Path("uncompressed/file.csv")
-    )
+    assert not compression_service._is_already_compressed(Path("uncompressed/file.csv"))
 
 
 def test_is_already_compressed_dir_name(tmp_path: Path):
     _, compression_service, _ = _init_services(tmp_path)
 
-    assert compression_service._is_already_compressed(
-        Path("data/compressed/file.csv")
-    )
+    assert compression_service._is_already_compressed(Path("data/compressed/file.csv"))
 
 
 def test_is_already_compressed_extension(tmp_path: Path):
     _, compression_service, _ = _init_services(tmp_path)
 
     assert compression_service._is_already_compressed(Path("file.csv.gz"))
+
+
+def test_compression_settings_property(tmp_path: Path):
+    _, compression_service, _ = _init_services(tmp_path)
+
+    assert compression_service.compression_settings is getattr(
+        compression_service, "_compression_settings"
+    )
