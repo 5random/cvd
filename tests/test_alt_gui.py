@@ -7,6 +7,7 @@ These tests use the NiceGUI user plugin to exercise various GUI flows of the
 
 import pytest
 from typing import Dict, Any
+from collections import deque
 import types
 from unittest.mock import Mock, AsyncMock
 
@@ -32,7 +33,7 @@ class MockEmailAlertService(EmailAlertService):
         self.smtp_password = None
         self.smtp_use_ssl = False
         self.critical_timeout = 60
-        self._history = []
+        self._history = deque(maxlen=100)
 
     async def send_test_alert(self, message: str) -> bool:
         # Always return True to simulate a successful alert send in tests,
