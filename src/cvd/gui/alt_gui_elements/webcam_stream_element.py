@@ -119,7 +119,8 @@ class WebcamStreamElement:
                         "width: 640px; height: 480px; "
                         "background-color: #f5f5f5; "
                         "display: flex; align-items: center; "
-                        "justify-content: center;"
+                        "justify-content: center; "
+                        "position: relative;"
                     )
                 ):
                     # Image element displaying the MJPEG stream
@@ -128,6 +129,25 @@ class WebcamStreamElement:
                     self.video_element = ui.image("").style(
                         "width: 100%; height: 100%; object-fit: contain;"
                     )
+                    self.loading_spinner = (
+                        ui.spinner(size="2em")
+                        .classes("absolute")
+                        .style("top: 50%; left: 50%; transform: translate(-50%, -50%);")
+                    )
+                    self.video_element.on(
+                        "load", lambda _: self.loading_spinner.set_visibility(False)
+                    )
+                    self.video_element.on(
+                        "error",
+                        lambda _: (
+                            self.loading_spinner.set_visibility(False),
+                            ui.notify(
+                                "Failed to load video stream",
+                                type="negative",
+                            ),
+                        ),
+                    )
+                    self.loading_spinner.set_visibility(True)
 
                     # Right-click context menu for camera
                     with ui.context_menu():
@@ -565,9 +585,10 @@ class WebcamStreamElement:
     async def toggle_video_play(self):
         """Toggle video play state"""
         if not self.camera_active:
-            # assign the stream source only when starting playback
-            if self.video_element.source != "/video_feed":
-                self.video_element.set_source("/video_feed")
+            self.video_element.set_source("/video_feed")
+            if hasattr(self, "loading_spinner"):
+                self.loading_spinner.set_visibility(True)
+
             self.start_camera_btn.set_text("Pause Video")
             self.start_camera_btn.set_icon("pause")
             self.start_camera_btn.props("color=negative")
@@ -742,6 +763,8 @@ class WebcamStreamElement:
         if hasattr(self, "video_element"):
             # Reload by resetting the source path instead of using force_reload
             self.video_element.set_source(self.video_element.source)
+            if hasattr(self, "loading_spinner"):
+                self.loading_spinner.set_visibility(True)
         if getattr(self, "roi_checkbox", None):
             self.roi_checkbox.value = False
             if self._roi_update_cb:
