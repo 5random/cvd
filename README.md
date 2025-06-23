@@ -137,9 +137,8 @@ value on startup using the ``--controller-concurrency-limit`` option of
 
 ### Webcam UVC settings
 
-Webcam properties under ``uvc_settings`` follow OpenCV naming. The property
-``"backlight_compensation"`` can also be provided as ``"backlight_comp"`` and
-will be interpreted the same way.
+Webcam properties under ``uvc_settings`` follow OpenCV naming. Use
+``"backlight_compensation"`` for adjusting backlight compensation.
 
 ### Video capture backend
 
