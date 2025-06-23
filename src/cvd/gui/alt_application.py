@@ -1490,6 +1490,13 @@ class SimpleGUIApplication:
             self.webcam_stream.update_resolutions(self.supported_camera_modes)
             await self.scan_cameras()
 
+        if self.camera_controller is not None:
+            accessible = await self.camera_controller.test_camera_access()
+            if not accessible:
+                ui.notify("Camera access failed", type="warning")
+                warning("Camera access test failed")
+                return
+
         success = await self.controller_manager.start_all_controllers()
 
         if success:
