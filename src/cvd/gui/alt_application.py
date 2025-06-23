@@ -1399,10 +1399,6 @@ def main() -> None:
 
     entry_point()
 
-
-if __name__ in {"__main__", "__mp_main__"}:
-    main()
-
 # Integration Notes:
 # =================
 # The enhanced email alert system has been successfully integrated:
@@ -1430,10 +1426,11 @@ if __name__ in {"__main__", "__mp_main__"}:
 #    - Email addresses are partially anonymized in the display
 #
 # Usage:
+
 #   python src/cvd/gui/alt_application.py
 # or
 #   python -m cvd.gui.alt_application
-#
+
 # The application uses the configuration in ``src/cvd/config/simple_config.json``.
 # The email alert section will show in the bottom-right grid area.
 # Click "Configure" to set up new alerts or "Manage" to view existing ones.
