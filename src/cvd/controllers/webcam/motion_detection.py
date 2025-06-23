@@ -605,15 +605,14 @@ class MotionDetectionController(BaseCameraCapture, ImageController):
         if oldest and oldest.get("motion_detected"):
             self._motion_history_motion_count -= 1
 
-        old_flag: Optional[bool] = None
+        old_flag = False
         if len(self._recent_motion_flags) == self._recent_motion_flags.maxlen:
             old_flag = self._recent_motion_flags[0]
         self._recent_motion_flags.append(result.motion_detected)
         if result.motion_detected:
             self._recent_motion_count += 1
         if old_flag:
-            if old_flag:
-                self._recent_motion_count -= 1
+            self._recent_motion_count -= 1
 
     def get_motion_statistics(self) -> Dict[str, Any]:
         """Get motion detection statistics"""
