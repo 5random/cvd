@@ -9,6 +9,13 @@ This package bundles:
 
 from . import async_utils, process_pool, thread_pool
 
+import sys
+module = sys.modules[__name__]
+sys.modules.setdefault("src.utils.concurrency", module)
+sys.modules.setdefault("src.utils.concurrency.async_utils", async_utils)
+sys.modules.setdefault("src.utils.concurrency.process_pool", process_pool)
+sys.modules.setdefault("src.utils.concurrency.thread_pool", thread_pool)
+
 # expose the three submodules
 
 # re-export most-used names at package level
