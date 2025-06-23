@@ -93,6 +93,7 @@ class WebcamStreamElement:
         self.roi_y = 0
         self.roi_width = 0
         self.roi_height = 0
+        self.roi_overlay = None
         self.camera_settings_expansion = None
 
         # Register the page only once for the first created instance
@@ -131,6 +132,7 @@ class WebcamStreamElement:
                     .style(style)
                 ) as container:
                     self.video_container = container
+
                     # Image element displaying the MJPEG stream
                     # initialize without an active source; the stream will be
                     # assigned when playback starts
@@ -156,6 +158,13 @@ class WebcamStreamElement:
                         ),
                     )
                     self.loading_spinner.set_visibility(True)
+
+                    # Transparent ROI overlay layer
+                    self.roi_overlay = ui.html("").style(
+                        "position:absolute;top:0;left:0;width:100%;"
+                        "height:100%;pointer-events:none;"
+                    )
+                    self.refresh_roi_overlay()
 
                     # Right-click context menu for camera
                     with ui.context_menu():
@@ -777,6 +786,7 @@ class WebcamStreamElement:
             self.roi_checkbox.value = False
             if self._roi_update_cb:
                 self._roi_update_cb()
+        self.refresh_roi_overlay()
 
     def update_video_aspect(self, width: int, height: int) -> None:
         """Update video container aspect ratio."""
@@ -810,3 +820,24 @@ class WebcamStreamElement:
             self.device_select.options = self.available_devices
             if current not in self.available_devices and self.available_devices:
                 self.device_select.value = self.available_devices[0]
+
+    def refresh_roi_overlay(self):
+        """Update the ROI overlay based on current settings."""
+        if not getattr(self, "roi_overlay", None):
+            return
+        visible = (
+            getattr(self, "roi_checkbox", None)
+            and self.roi_checkbox.value
+            and self.roi_width > 0
+            and self.roi_height > 0
+        )
+        if visible:
+            self.roi_overlay.content = (
+                f'<svg width="100%" height="100%">'
+                f'<rect x="{self.roi_x}" y="{self.roi_y}" '
+                f'width="{self.roi_width}" height="{self.roi_height}" '
+                f'style="fill:none;stroke:red;stroke-width:2"/>'
+                f"</svg>"
+            )
+        else:
+            self.roi_overlay.content = ""

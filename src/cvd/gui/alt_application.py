@@ -753,6 +753,7 @@ class SimpleGUIApplication:
                         "roi_height": self.webcam_stream.roi_height,
                     }
                 )
+        self.webcam_stream.refresh_roi_overlay()
         notify_later("ROI updated", type="positive")
 
     async def apply_uvc_settings(self):
