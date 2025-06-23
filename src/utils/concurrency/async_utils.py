@@ -201,8 +201,7 @@ async def gather_with_concurrency(
                     errors.append(exc)
                 if cancel_on_exception:
                     raise
-            finally:
-                pass
+
 
         if limiter is not None:
             async with limiter:
@@ -338,8 +337,7 @@ class AsyncTaskManager:
                     with contextlib.suppress(Exception):
                         await on_error(exc)
                 raise
-            finally:
-                pass
+
 
         task = asyncio.create_task(_runner(), name=f"{self._name}:{task_id}")
         self._tasks[task_id] = task
