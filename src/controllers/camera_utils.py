@@ -96,7 +96,13 @@ async def probe_camera_modes(
     *,
     capture_backend: Optional[int] = None,
 ) -> List[Tuple[int, int, int]]:
-    """Probe camera for supported (width, height, fps) combinations."""
+    """Probe camera for supported (width, height, fps) combinations.
+
+    The previous implementation reopened the camera for every resolution/FPS
+    combination which could be very slow on some systems.  This version keeps a
+    single ``VideoCapture`` instance open and simply adjusts its properties
+    between attempts.
+    """
     resolutions = [
         (320, 240),
         (352, 288),
@@ -111,29 +117,40 @@ async def probe_camera_modes(
     fps_values = [5, 10, 15, 20, 24, 30]
 
     modes: List[Tuple[int, int, int]] = []
-    for w, h in resolutions:
-        for f in fps_values:
-            cap = await open_capture(
-                device_index,
-                w,
-                h,
-                f,
-                capture_backend=capture_backend,
-            )
-            if cap is None:
-                continue
-            try:
-                ret, _ = await run_camera_io(cap.read)
-            except Exception:
-                ret = False
-            if ret:
-                aw = int(await run_camera_io(cap.get, cv2.CAP_PROP_FRAME_WIDTH))
-                ah = int(await run_camera_io(cap.get, cv2.CAP_PROP_FRAME_HEIGHT))
-                af = int(round(await run_camera_io(cap.get, cv2.CAP_PROP_FPS)))
-                mode = (aw, ah, af or f)
-                if mode not in modes:
-                    modes.append(mode)
-            await run_camera_io(cap.release)
+    # Open the capture once using the first candidate settings and reuse it for
+    # all combinations.
+    first_width, first_height = resolutions[0]
+    first_fps = fps_values[0]
+    cap = await open_capture(
+        device_index,
+        first_width,
+        first_height,
+        first_fps,
+        capture_backend=capture_backend,
+    )
+    if cap is None:
+        modes.append((640, 480, 30))
+        return modes
+
+    try:
+        for w, h in resolutions:
+            for f in fps_values:
+                await run_camera_io(cap.set, cv2.CAP_PROP_FRAME_WIDTH, int(w))
+                await run_camera_io(cap.set, cv2.CAP_PROP_FRAME_HEIGHT, int(h))
+                await run_camera_io(cap.set, cv2.CAP_PROP_FPS, int(f))
+                try:
+                    ret, _ = await run_camera_io(cap.read)
+                except Exception:
+                    ret = False
+                if ret:
+                    aw = int(await run_camera_io(cap.get, cv2.CAP_PROP_FRAME_WIDTH))
+                    ah = int(await run_camera_io(cap.get, cv2.CAP_PROP_FRAME_HEIGHT))
+                    af = int(round(await run_camera_io(cap.get, cv2.CAP_PROP_FPS)))
+                    mode = (aw, ah, af or f)
+                    if mode not in modes:
+                        modes.append(mode)
+    finally:
+        await run_camera_io(cap.release)
 
     if not modes:
         modes.append((640, 480, 30))

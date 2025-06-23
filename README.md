@@ -155,6 +155,14 @@ providing ``"capture_backend"`` in a webcam or controller configuration. Common
 values include ``cv2.CAP_DSHOW`` and ``cv2.CAP_MSMF`` on Windows. If omitted,
 OpenCV will choose the default backend for the platform.
 
+### Enumerating supported camera modes
+
+``probe_camera_modes()`` tests a set of common resolution/FPS pairs to
+discover what the connected camera supports.  The function now reuses a single
+``cv2.VideoCapture`` instance while cycling through the options instead of
+reopening the device for every combination.  This speeds up probing on systems
+where camera initialization is slow.
+
 ### External camera capture
 
 The motion detection controller can rely on another controller for camera frames.
