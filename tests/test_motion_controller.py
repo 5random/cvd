@@ -396,6 +396,36 @@ async def test_roi_out_of_bounds_skip_crop(monkeypatch):
     assert warnings
     assert result.data.frame.shape == frame.shape
 
+def test_invalid_gaussian_blur_kernel_defaults(monkeypatch):
+    import src.controllers.webcam.motion_detection as md
+
+    warnings: list[str] = []
+    monkeypatch.setattr(md, "warning", lambda msg, **kw: warnings.append(msg))
+
+    cfg = ControllerConfig(
+        controller_id="md",
+        controller_type="motion_detection",
+        parameters={"gaussian_blur_kernel": (4, 4)},
+    )
+    ctrl = MotionDetectionController("md", cfg)
+    assert ctrl.gaussian_blur_kernel == (5, 5)
+    assert warnings
+
+
+def test_invalid_morphology_kernel_size_defaults(monkeypatch):
+    import src.controllers.webcam.motion_detection as md
+
+    warnings: list[str] = []
+    monkeypatch.setattr(md, "warning", lambda msg, **kw: warnings.append(msg))
+
+    cfg = ControllerConfig(
+        controller_id="md",
+        controller_type="motion_detection",
+        parameters={"morphology_kernel_size": 0},
+    )
+    ctrl = MotionDetectionController("md", cfg)
+    assert ctrl.morphology_kernel_size == 5
+    assert warnings
 
 @pytest.mark.asyncio
 async def test_frame_size_updates_on_roi_change(monkeypatch):
