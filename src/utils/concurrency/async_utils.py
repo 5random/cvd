@@ -219,9 +219,9 @@ async def gather_with_concurrency(
         raise
 
     if errors and not cancel_on_exception:
-        eg = ExceptionGroup(f"{label} collected errors", errors)
-        error("gather_errors", label=label, exc_info=eg)
-        raise eg
+        exc_group = ExceptionGroup(f"{label} collected errors", errors)
+        error("gather_errors", label=label, exc_info=exc_group)
+        raise exc_group
 
     return cast(List[T], results)
 
@@ -341,7 +341,9 @@ class AsyncTaskManager:
         task = asyncio.create_task(_runner(), name=f"{self._name}:{task_id}")
         self._tasks[task_id] = task
         info("task_registered", task_id=task_id, manager=self._name)
-        task.add_done_callback(lambda t, tid=task_id: self._tasks.pop(tid, None))
+        task.add_done_callback(
+            lambda t, tid=task_id: self._tasks.pop(tid, None)  # type: ignore[misc]
+        )
         return TaskHandle(task)
 
     # -------- stop helpers -----------------------------------------
@@ -366,7 +368,7 @@ class AsyncTaskManager:
         for tid, task in list(self._tasks.items()):
             if not task.done():
                 task.cancel()
-                
+
         # Convert to list to freeze current tasks and avoid iteration issues
         # if callbacks modify ``_tasks`` during ``asyncio.wait``
         tasks_list = list(self._tasks.values())
@@ -396,10 +398,12 @@ def install_signal_handlers(manager: AsyncTaskManager) -> None:
     for sig in (signal.SIGINT, signal.SIGTERM):
         try:
             loop.add_signal_handler(
-                sig, lambda s=sig: asyncio.create_task(_shutdown(s.name))
+                sig, lambda s=sig: asyncio.create_task(_shutdown(s.name))  # type: ignore[misc]
             )
         except NotImplementedError:  # Windows
-            signal.signal(sig, lambda *_: asyncio.create_task(_shutdown(sig.name)))
+            signal.signal(
+                sig, lambda *_: asyncio.create_task(_shutdown(sig.name))  # type: ignore[misc]
+            )
 
 
 __all__ = [
