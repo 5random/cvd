@@ -39,6 +39,7 @@ from src.controllers.webcam import CameraCaptureController
 from src.experiment_manager import (
     ExperimentConfig,
     ExperimentManager,
+    ExperimentState,
     set_experiment_manager,
 )
 from src.gui import (
@@ -856,6 +857,26 @@ class SimpleGUIApplication:
             self._experiment_timer = ui.timer(1.0, self._update_experiment_status)
             notify_later(f'Started experiment "{name}"', type="positive")
         else:
+            if self.experiment_manager.get_current_state() not in (
+                ExperimentState.RUNNING,
+                ExperimentState.PAUSED,
+            ):
+                # Experiment already stopped
+                self.experiment_running = False
+                self._current_experiment_id = None
+                self.experiment_section.start_experiment_btn.enable()
+                self.experiment_section.stop_experiment_btn.disable()
+                self.experiment_section.experiment_icon.classes("text-gray-500")
+                self.experiment_section.experiment_status_label.text = (
+                    "No experiment running"
+                )
+                self.experiment_section.experiment_details.set_visibility(False)
+                if self._experiment_timer:
+                    self._experiment_timer.cancel()
+                    self._experiment_timer = None
+                self.experiment_section.load_recent_experiments()
+                return
+
             success = await self.experiment_manager.stop_experiment()
             if not success:
                 notify_later("Failed to stop experiment", type="negative")
