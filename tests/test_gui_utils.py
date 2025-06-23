@@ -8,8 +8,8 @@ async def immediate(func, *args, **kwargs):
 
 @pytest.mark.asyncio
 async def test_generate_mjpeg_stream(monkeypatch):
-    monkeypatch.setattr('cvd.gui.utils.run_in_executor', immediate)
-    monkeypatch.setattr('cvd.gui.utils.cv2.imencode', lambda ext, frame: (True, np.array([1], dtype=np.uint8)))
+    monkeypatch.setattr('src.gui.utils.run_camera_io', immediate)
+    monkeypatch.setattr('src.gui.utils.cv2.imencode', lambda ext, frame: (True, np.array([1], dtype=np.uint8)))
 
     frames = [np.zeros((10, 10, 3), dtype=np.uint8)]
 

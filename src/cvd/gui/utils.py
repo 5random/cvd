@@ -4,8 +4,8 @@ from typing import Any, Awaitable, Callable, AsyncIterator, Optional
 import cv2
 import numpy as np
 
-from cvd.utils.concurrency import run_in_executor
-from cvd.utils.log_service import error
+from src.utils.concurrency import run_camera_io
+from src.utils.log_service import error
 
 DEFAULT_FPS_CAP = 30
 
@@ -39,7 +39,7 @@ async def generate_mjpeg_stream(
             no_frame_start = None
             placeholder_mode = False
             if interval <= 0 or now - last_sent >= interval:
-                success, buf = await run_in_executor(cv2.imencode, ".jpg", frame)
+                success, buf = await run_camera_io(cv2.imencode, ".jpg", frame)
                 if success:
                     jpeg = buf.tobytes()
                     yield (
