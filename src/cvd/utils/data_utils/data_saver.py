@@ -180,8 +180,14 @@ class DataSaver:
             preserve = self.compression_service.compression_settings.preserve_original
 
             if not preserve and file_path.exists():
-                msg = f"Source file was not deleted after compression: {file_path}"
-                warning(msg)
+                try:
+                    file_path.unlink(missing_ok=True)
+                except Exception as e:
+                    warning(f"Failed to delete source file {file_path}: {e}")
+                if file_path.exists():
+                    warning(
+                        f"Source file was not deleted after compression: {file_path}"
+                    )
 
             if preserve:
                 info(f"Compressed file {file_path} -> {compressed_path}")
@@ -212,8 +218,14 @@ class DataSaver:
             preserve = self.compression_service.compression_settings.preserve_original
 
             if not preserve and file_path.exists():
-                msg = f"Source file was not deleted after compression: {file_path}"
-                warning(msg)
+                try:
+                    file_path.unlink(missing_ok=True)
+                except Exception as e:
+                    warning(f"Failed to delete source file {file_path}: {e}")
+                if file_path.exists():
+                    warning(
+                        f"Source file was not deleted after compression: {file_path}"
+                    )
 
             if preserve:
                 info(f"Compressed file {file_path} -> {compressed_path}")
