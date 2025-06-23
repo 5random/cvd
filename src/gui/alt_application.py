@@ -1333,23 +1333,19 @@ class SimpleGUIApplication:
             self.webcam_stream.available_resolutions = self.supported_camera_modes
             self.webcam_stream.update_resolutions(self.supported_camera_modes)
 
-        await self.controller_manager.start_all_controllers()
-        self._processing_task = asyncio.create_task(self._processing_loop())
-
-        if (
-            self.camera_controller is not None
-            and self.camera_controller.status == ControllerStatus.RUNNING
-        ):
-            self.update_camera_status(True)
-        else:
-            warning("Camera controller failed to start")
-
         success = await self.controller_manager.start_all_controllers()
 
         if success:
             self._processing_task = asyncio.create_task(self._processing_loop())
-            self.camera_active = True
-            self.update_camera_status(True)
+
+            if (
+                self.camera_controller is not None
+                and self.camera_controller.status == ControllerStatus.RUNNING
+            ):
+                self.camera_active = True
+                self.update_camera_status(True)
+            else:
+                warning("Camera controller failed to start")
         else:
             ui.notify("Some controllers failed to start", type="warning")
             error("Failed to start controllers")
