@@ -73,6 +73,7 @@ async def test_initialize_logs_algorithm(monkeypatch):
     ctrl = MotionDetectionController("md", config)
 
     import src.controllers.webcam.motion_detection as md
+
     monkeypatch.setattr(md, "info", lambda msg, **kwargs: messages.append(msg))
 
     success = await ctrl.initialize()
@@ -81,7 +82,8 @@ async def test_initialize_logs_algorithm(monkeypatch):
     assert success
 
     assert any(
-        m == "Initialized motion detection controller with MOG2 algorithm" for m in messages
+        m == "Initialized motion detection controller with MOG2 algorithm"
+        for m in messages
     )
 
 
@@ -197,7 +199,9 @@ async def test_bg_subtractor_mog2_params(monkeypatch):
         "history": 321,
         "detect_shadows": False,
     }
-    config = ControllerConfig(controller_id="md", controller_type="motion_detection", parameters=params)
+    config = ControllerConfig(
+        controller_id="md", controller_type="motion_detection", parameters=params
+    )
     ctrl = MotionDetectionController("md", config)
 
     called = {}
@@ -230,7 +234,9 @@ async def test_bg_subtractor_knn_params(monkeypatch):
         "history": 111,
         "detect_shadows": False,
     }
-    config = ControllerConfig(controller_id="md", controller_type="motion_detection", parameters=params)
+    config = ControllerConfig(
+        controller_id="md", controller_type="motion_detection", parameters=params
+    )
     ctrl = MotionDetectionController("md", config)
 
     called = {}
@@ -317,6 +323,7 @@ async def test_invalid_roi_dimensions_skip_crop(monkeypatch):
     monkeypatch.setattr(ctrl._motion_pool, "submit_async", direct)
 
     import src.controllers.webcam.motion_detection as md
+
     warnings: list[str] = []
     monkeypatch.setattr(md, "warning", lambda msg, **kw: warnings.append(msg))
 
@@ -346,6 +353,7 @@ async def test_roi_out_of_bounds_skip_crop(monkeypatch):
     monkeypatch.setattr(ctrl._motion_pool, "submit_async", direct)
 
     import src.controllers.webcam.motion_detection as md
+
     warnings: list[str] = []
     monkeypatch.setattr(md, "warning", lambda msg, **kw: warnings.append(msg))
 
@@ -359,3 +367,34 @@ async def test_roi_out_of_bounds_skip_crop(monkeypatch):
     assert result.data.frame.shape == frame.shape
 
 
+@pytest.mark.asyncio
+async def test_roi_bbox_and_center_adjustment(monkeypatch):
+    cfg = ControllerConfig(
+        controller_id="md",
+        controller_type="motion_detection",
+        parameters={"roi_width": 5, "roi_height": 5, "roi_x": 3, "roi_y": 4},
+    )
+    ctrl = MotionDetectionController("md", cfg)
+
+    async def fake_submit(*a, **k):
+        return MotionDetectionResult(
+            True,
+            1.0,
+            20.0,
+            1,
+            motion_center=(1, 1),
+            motion_bbox=(0, 0, 2, 2),
+            confidence=0.9,
+        )
+
+    monkeypatch.setattr(ctrl._motion_pool, "submit_async", fake_submit)
+
+    await ctrl.start()
+    frame = np.zeros((10, 10, 3), dtype=np.uint8)
+    result = await ctrl.process_image(frame, {})
+    await ctrl.stop()
+
+    assert result.success
+    assert result.data.motion_bbox == (3, 4, 2, 2)
+    assert result.data.motion_center == (4, 5)
+    assert result.data.frame.shape[:2] == (5, 5)

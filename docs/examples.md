@@ -112,4 +112,9 @@ The motion detection controller also supports defining a region of interest
 within the camera frame. Provide ``roi_x`` and ``roi_y`` for the top-left corner
 along with ``roi_width`` and ``roi_height`` to restrict detection to that area.
 
+When cropping is active, the returned ``motion_bbox`` and ``motion_center``
+values are offset by ``roi_x`` and ``roi_y`` so they refer to coordinates in the
+original frame. Overlay code drawing on the cropped frame should subtract these
+offsets to align correctly.
+
 
