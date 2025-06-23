@@ -121,6 +121,10 @@ class SimpleGUIApplication:
             controller_manager=self.controller_manager,
             auto_install_signal_handlers=False,
         )
+        # track experiment state changes to keep the UI in sync
+        self.experiment_manager.add_state_change_callback(
+            self._on_experiment_state_change
+        )
         # expose globally for UI elements
         set_experiment_manager(self.experiment_manager)
 
@@ -1264,6 +1268,36 @@ class SimpleGUIApplication:
             except Exception as exc:
                 error("Processing loop error", exc_info=exc)
                 await asyncio.sleep(0.1)
+
+    def _on_experiment_state_change(
+        self, old_state: ExperimentState, new_state: ExperimentState
+    ) -> None:
+        """Synchronize UI when an experiment stops automatically."""
+
+        if not self.experiment_running:
+            return
+
+        if new_state in {
+            ExperimentState.COMPLETED,
+            ExperimentState.CANCELLED,
+            ExperimentState.FAILED,
+            ExperimentState.IDLE,
+        }:
+            self.experiment_running = False
+            self._current_experiment_id = None
+            if self._experiment_timer:
+                self._experiment_timer.cancel()
+                self._experiment_timer = None
+
+            exp_section = getattr(self, "experiment_section", None)
+            if exp_section is not None:
+                exp_section.start_experiment_btn.enable()
+                exp_section.stop_experiment_btn.disable()
+                exp_section.experiment_icon.classes("text-gray-500")
+                exp_section.experiment_status_label.text = "No experiment running"
+                exp_section.experiment_details.set_visibility(False)
+                exp_section.load_recent_experiments()
+            notify_later("Experiment stopped", type="info")
 
     def register_components(self) -> None:
         """Register NiceGUI pages"""
