@@ -47,6 +47,7 @@ from src.gui import (
     ExperimentManagementSection,
     MotionStatusSection,
     WebcamStreamElement,
+    create_demo_configurations,
     create_email_alert_wizard,
     setup_global_styles,
 )
@@ -165,6 +166,8 @@ class SimpleGUIApplication:
         # Load persisted alert configurations; empty list if none found
         self.alert_configurations = load_alert_configs(self.config_service)
         self._alert_configs_from_disk = bool(self.alert_configurations)
+        if not self.alert_configurations:
+            self.alert_configurations = create_demo_configurations()
         self.alert_display = EmailAlertStatusDisplay(self.alert_configurations)
         self.alert_display.update_callback = self._on_alert_config_changed
 
@@ -539,6 +542,28 @@ class SimpleGUIApplication:
             self.webcam_stream.sensitivity_slider.value = value
         notify_later(f"Sensitivity set to {value}%", type="positive")
 
+    def _set_camera_params(
+        self,
+        *,
+        width: int | None = None,
+        height: int | None = None,
+        fps: int | None = None,
+        rotation: int | None = None,
+    ) -> None:
+        """Apply camera parameters to all available controllers."""
+
+        for controller in (self.camera_controller, self.motion_controller):
+            if controller is None:
+                continue
+            if width is not None:
+                controller.width = width
+            if height is not None:
+                controller.height = height
+            if fps is not None:
+                controller.fps = fps
+            if rotation is not None:
+                controller.rotation = rotation
+
     def update_fps(self, e):
         """Update camera FPS setting"""
         try:
@@ -548,10 +573,7 @@ class SimpleGUIApplication:
             return
 
         self.settings["fps"] = value
-        if self.camera_controller:
-            self.camera_controller.fps = value
-        if self.motion_controller:
-            self.motion_controller.fps = value
+        self._set_camera_params(fps=value)
         if hasattr(self, "webcam_stream"):
             self.webcam_stream.fps_select.value = value
         notify_later(f"FPS set to {value}", type="positive")
@@ -570,12 +592,7 @@ class SimpleGUIApplication:
 
         self.settings["resolution"] = res
         if width and height:
-            if self.camera_controller:
-                self.camera_controller.width = width
-                self.camera_controller.height = height
-            if self.motion_controller:
-                self.motion_controller.width = width
-                self.motion_controller.height = height
+            self._set_camera_params(width=width, height=height)
         if hasattr(self, "webcam_stream"):
             self.webcam_stream.resolution_select.value = res
         notify_later(f"Resolution set to {res}", type="positive")
@@ -599,11 +616,7 @@ class SimpleGUIApplication:
             return
 
         self.settings["rotation"] = value
-
-        if self.camera_controller:
-            self.camera_controller.rotation = value
-        if self.motion_controller:
-            self.motion_controller.rotation = value
+        self._set_camera_params(rotation=value)
 
         # Transform existing ROI to maintain orientation
         if self.settings.get("roi_enabled") and hasattr(self, "webcam_stream"):
