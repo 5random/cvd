@@ -11,10 +11,10 @@ can be specified on the command line using ``--config-dir`` or via the
 
 ```python
 from pathlib import Path
-from src.utils.container import ApplicationContainer
+from cvd.utils.container import ApplicationContainer
 
-# Load configuration from the ``src/config`` directory
-container = ApplicationContainer.create_sync(Path("src/config"))
+# Load configuration from the ``src/cvd/config`` directory
+container = ApplicationContainer.create_sync(Path("src/cvd/config"))
 container.start_gui()
 ```
 
@@ -22,7 +22,7 @@ To start the application from the command line with a custom configuration
 directory run:
 
 ```bash
-python src/main.py --config-dir src/config
+python main.py --config-dir src/cvd/config
 ```
 
 You can also set ``CVD_CONFIG_DIR`` instead of passing the argument.
@@ -33,8 +33,8 @@ Mock sensor classes allow you to exercise the data pipeline without any hardware
 
 ```python
 import asyncio
-from src.data_handler.sources.mock_sensors import MockRS232Sensor
-from src.data_handler.interface.sensor_interface import SensorConfig
+from cvd.data_handler.sources.mock_sensors import MockRS232Sensor
+from cvd.data_handler.interface.sensor_interface import SensorConfig
 
 config = SensorConfig(sensor_id="mock1", sensor_type="rs232")
 sensor = MockRS232Sensor(config)
@@ -55,9 +55,9 @@ optional `show_on_dashboard` field to control whether the sensor appears on the
 dashboard.
 
 ```python
-from src.utils.config_service import ConfigurationService
+from cvd.utils.config_service import ConfigurationService
 
-service = ConfigurationService(Path("src/config/config.json"), Path("src/config/default_config.json"))
+service = ConfigurationService(Path("src/cvd/config/config.json"), Path("src/cvd/config/default_config.json"))
 service.add_sensor_config({
     "sensor_id": "mock1",
     "name": "Example",
