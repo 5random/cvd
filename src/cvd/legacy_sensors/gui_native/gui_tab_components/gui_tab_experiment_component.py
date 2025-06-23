@@ -635,8 +635,10 @@ class ExperimentCard(BaseComponent):
     async def _stop_experiment(self) -> None:
         """Stop the experiment"""
         try:
-            if self.experiment_manager.get_current_state()
-            not in (ExperimentState.RUNNING, ExperimentState.PAUSED):
+            if self.experiment_manager.get_current_state() not in (
+                ExperimentState.RUNNING,
+                ExperimentState.PAUSED,
+            ):
                 ui.notify("No experiment is currently running", color="info")
                 return
 
