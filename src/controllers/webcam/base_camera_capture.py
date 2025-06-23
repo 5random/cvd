@@ -148,6 +148,9 @@ class BaseCameraCapture(ABC):
 
     # Public helpers ---------------------------------------------------
     def start_capture(self) -> None:
+        """Start the asynchronous capture loop if not already running."""
+        if self._capture_task and not self._capture_task.done():
+            return
         self._stop_event.clear()
         self._capture_task = asyncio.create_task(self._capture_loop())
         info(
