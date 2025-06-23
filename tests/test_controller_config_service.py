@@ -1,5 +1,5 @@
 import json
-from src.utils.config_service import ConfigurationService
+from cvd.utils.config_service import ConfigurationService
 
 
 def create_service(tmp_path, cfg):
@@ -59,7 +59,7 @@ def test_helper_option_lists(tmp_path):
 
 def test_wizard_parameter_defaults(tmp_path):
     """Parameters are prefilled from templates for each controller type."""
-    from src.gui.gui_elements.gui_controller_setup_wizard_element import (
+    from cvd.gui.gui_elements.gui_controller_setup_wizard_element import (
         ControllerSetupWizardComponent,
         _PARAM_TEMPLATES,
     )
