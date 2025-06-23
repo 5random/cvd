@@ -4,9 +4,9 @@ import pytest
 import types
 from nicegui import ui
 
-from src.utils.config_service import ConfigurationService
-from src.gui.gui_elements import gui_controller_setup_wizard_element as wizard_mod
-from src.gui.gui_elements.gui_controller_setup_wizard_element import (
+from cvd.utils.config_service import ConfigurationService
+from cvd.gui.gui_elements import gui_controller_setup_wizard_element as wizard_mod
+from cvd.gui.gui_elements.gui_controller_setup_wizard_element import (
     ControllerSetupWizardComponent,
 )
 
