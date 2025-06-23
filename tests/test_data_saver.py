@@ -5,21 +5,31 @@ import time
 import threading
 
 
-from src.utils.data_utils import data_saver as ds_module
-from src.data_handler.interface.sensor_interface import (
+from cvd.utils.data_utils import data_saver as ds_module
+from cvd.data_handler.interface.sensor_interface import (
     SensorReading,
     SensorStatus,
 )
 
 
+class DummyCompressionSettings:
+    def __init__(self):
+        self.preserve_original = False
+
+
 class DummyCompressionService:
     def __init__(self):
         self.calls = []
+        self._compression_settings = DummyCompressionSettings()
+
+    @property
+    def compression_settings(self) -> DummyCompressionSettings:
+        return self._compression_settings
 
     def compress_file(self, src: str, dst: str):
         # simply copy the input to the destination
         with open(src, "rb") as fsrc, open(dst, "wb") as fdst:
-            fdst.write(fsrc.read())
+            fdst.write(fcvd.read())
         self.calls.append((src, dst))
         return Path(dst)
 

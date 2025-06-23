@@ -3,14 +3,14 @@ import pytest
 from nicegui import Client, app
 import numpy as np
 import cv2
-from src.utils import log_service
-from src.utils.container import ApplicationContainer
+from cvd.utils import log_service
+from cvd.utils.container import ApplicationContainer
 
 pytest_plugins = ['nicegui.testing.user_plugin']
 
 @pytest.mark.asyncio
 async def test_gui_pages(user):
-    container = ApplicationContainer.create(Path('src/config'))
+    container = ApplicationContainer.create(Path('src/cvd/config'))
     with Client.auto_index_client:
         container.web_application.register_components()
     await user.open('/')
@@ -25,7 +25,7 @@ async def test_video_feed_disconnect(monkeypatch):
     for name in ["debug", "info", "warning", "error"]:
         monkeypatch.setattr(log_service, name, lambda *a, **k: None)
 
-    container = ApplicationContainer.create(Path('src/config'))
+    container = ApplicationContainer.create(Path('src/cvd/config'))
     with Client.auto_index_client:
         container.web_application.register_components()
 
@@ -78,7 +78,7 @@ async def test_video_feed_creates_temp_camera(monkeypatch):
             pass
 
     monkeypatch.setattr(
-        "src.gui.application.CameraStreamComponent",
+        "cvd.gui.application.CameraStreamComponent",
         DummyCam,
     )
     monkeypatch.setattr(
@@ -87,7 +87,7 @@ async def test_video_feed_creates_temp_camera(monkeypatch):
         lambda ext, frame: (True, np.zeros(1, dtype=np.uint8)),
     )
 
-    container = ApplicationContainer.create(Path("src/config"))
+    container = ApplicationContainer.create(Path("src/cvd/config"))
     with Client.auto_index_client:
         container.web_application.register_components()
 

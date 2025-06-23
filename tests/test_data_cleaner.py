@@ -1,6 +1,6 @@
 import csv
 from pathlib import Path
-from src.utils.data_utils import data_cleaner
+from cvd.utils.data_utils import data_cleaner
 
 
 def test_clean_file(tmp_path: Path):

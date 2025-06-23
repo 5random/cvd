@@ -1,4 +1,4 @@
-from src.gui.alt_gui.alt_gui_elements.alert_element import EmailAlertsSection
+from cvd.gui.alt_gui.alt_gui_elements.alert_element import EmailAlertsSection
 from nicegui import ui
 
 

@@ -2,8 +2,8 @@ import time
 from types import SimpleNamespace
 
 
-from src.gui.gui_elements.gui_live_plot_element import LivePlotComponent, PlotConfig
-from src.data_handler.interface.sensor_interface import SensorReading, SensorStatus
+from cvd.gui.gui_elements.gui_live_plot_element import LivePlotComponent, PlotConfig
+from cvd.data_handler.interface.sensor_interface import SensorReading, SensorStatus
 
 
 class DummySensorManager:
