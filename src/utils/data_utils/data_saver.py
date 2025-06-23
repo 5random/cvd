@@ -61,6 +61,8 @@ class DataSaver:
             "raw": {},
             "processed": {},
         }
+        # Track currently open file paths for quick lookup
+        self._open_files: set[Path] = set()
         # Performance tracking
         self._operation_counts = {"raw": 0, "processed": 0}
         self._last_rotation_check = time.time()
@@ -136,6 +138,7 @@ class DataSaver:
                 with self._writer_lock:
                     # Close current file handle before compression
                     file_handle.close()
+                    self._open_files.discard(file_path)
 
                     # Remove from writers to trigger recreation
                     if sensor_id in self._writers[category]:
@@ -173,7 +176,9 @@ class DataSaver:
             compressed_path = (
                 compressed_dir / f"{file_path.stem}_{int(time.time())}.csv.gz"
             )
-            result = self.compression_service.compress_file(str(file_path), str(compressed_path))
+            result = self.compression_service.compress_file(
+                str(file_path), str(compressed_path)
+            )
 
             preserve = getattr(
                 self.compression_service,
@@ -207,7 +212,9 @@ class DataSaver:
             compressed_path = (
                 compressed_dir / f"{file_path.stem}_{int(time.time())}.csv.gz"
             )
-            result = self.compression_service.compress_file(str(file_path), str(compressed_path))
+            result = self.compression_service.compress_file(
+                str(file_path), str(compressed_path)
+            )
 
             preserve = getattr(
                 self.compression_service,
@@ -267,13 +274,7 @@ class DataSaver:
             for directory in [self.raw_dir, self.proc_dir]:
                 for file_path in directory.glob("*.csv"):
                     # Skip if file is currently being written to
-                    file_in_use = any(
-                        file_handle is not None and file_handle.name == str(file_path)
-                        for writers in self._writers.values()
-                        for _, file_handle, _ in writers.values()
-                    )
-
-                    if not file_in_use:
+                    if file_path not in self._open_files:
                         file_age = current_time - file_path.stat().st_atime
                         file_size = file_path.stat().st_size
 
@@ -327,6 +328,7 @@ class DataSaver:
                         temp_f,
                         row_count,
                     )
+                    self._open_files.add(file_path)
                     writer, f = temp_writer, temp_f
                 else:
                     writer, f, row_count = existing
@@ -393,9 +395,11 @@ class DataSaver:
                 if f:
                     try:
                         f.close()
+                        self._open_files.discard(Path(f.name))
                     except Exception as e:
                         warning(f"Failed to close file handle: {e}")
         self._writers.clear()
+        self._open_files.clear()
 
     def __del__(self) -> None:
         """Destructor to ensure files are closed on deletion."""
