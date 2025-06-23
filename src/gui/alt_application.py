@@ -137,7 +137,6 @@ class SimpleGUIApplication:
         self._experiment_timer: Optional[ui.timer] = None
         self._time_timer: Optional[ui.timer] = None
         self._processing_task: Optional[asyncio.Task] = None
-        self._time_timer: Optional[ui.timer] = None
         self.supported_camera_modes: list[tuple[int, int, int]] = []
 
         # Placeholder settings
