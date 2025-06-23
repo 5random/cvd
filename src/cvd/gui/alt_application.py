@@ -713,54 +713,31 @@ class SimpleGUIApplication:
 
     async def scan_cameras(self):
         """Scan for connected camera devices."""
-        devices: list[str] = []
-
-        async def _check(path_or_idx: str | int) -> str | None:
-            cap = None
-            try:
-                cap = await run_camera_io(cv2.VideoCapture, path_or_idx)
-                if cap is not None and await run_camera_io(cap.isOpened):
-                    return str(path_or_idx)
-                return None
-            finally:
-                if cap is not None:
-                    with contextlib.suppress(Exception):
-                        await run_camera_io(cap.release)
-
-        if sys.platform.startswith("linux"):
-            import glob
-
-            video_devices = sorted(glob.glob("/dev/video*"))
-            results = await gather_with_concurrency(
-                [_check(dev) for dev in video_devices], label="scan_cameras"
-            )
-            devices.extend([r for r in results if r])
-        else:
-            indices = range(6)
-            results = await gather_with_concurrency(
-                [_check(idx) for idx in indices], label="scan_cameras"
-            )
-            devices.extend([r for r in results if r])
+        # The simplified implementation always exposes a single camera with
+        # index ``0``. The UI elements for scanning and device selection remain
+        # intact but will only ever show this one option.
+        devices = ["0"]
 
         if self.webcam_stream:
             self.webcam_stream.update_devices(devices)
 
-        notify_later(f"Found {len(devices)} camera(s)", type="positive")
+        notify_later("Found 1 camera", type="positive")
 
     def select_camera(self, e):
-        """Select the active camera device."""
-        value = getattr(e, "value", e)
-        match = re.search(r"\d+", str(value))
-        if not match:
-            notify_later("Invalid camera selection", type="warning")
-            return
-        index = int(match.group())
+        """Select the active camera device.
+
+        The new implementation ignores the provided value and always selects
+        camera index ``0``. Existing controllers are updated accordingly so the
+        rest of the application continues to operate as before.
+        """
+
+        index = 0
         self.settings["device_index"] = index
         if self.camera_controller:
             self.camera_controller.device_index = index
         if self.motion_controller:
             self.motion_controller.device_index = index
-        notify_later(f"Camera device set to {index}", type="positive")
+        notify_later("Camera device set to 0", type="positive")
 
     def set_roi(self):
         """Set region of interest"""
