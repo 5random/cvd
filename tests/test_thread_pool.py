@@ -3,7 +3,7 @@ import time
 import asyncio
 import pytest
 
-from src.utils.concurrency.thread_pool import (
+from cvd.utils.concurrency.thread_pool import (
     ManagedThreadPool,
     ThreadPoolConfig,
     get_thread_pool_manager,
@@ -86,7 +86,7 @@ def test_thread_pool_circuit_breaker():
 
 
 def test_get_thread_pool_manager_default_workers(monkeypatch):
-    from src.utils import concurrency
+    from cvd.utils import concurrency
 
     monkeypatch.setattr(concurrency.thread_pool, "_global_mgr", None)
 
@@ -99,10 +99,10 @@ def test_get_thread_pool_manager_default_workers(monkeypatch):
 
 def test_container_applies_thread_pool_max_workers(tmp_path, monkeypatch):
     import json
-    from src.utils.container import ApplicationContainer
+    from cvd.utils.container import ApplicationContainer
 
     monkeypatch.setattr(
-        "src.utils.concurrency.thread_pool._global_mgr", None
+        "cvd.utils.concurrency.thread_pool._global_mgr", None
     )
 
     # Patch heavy UI elements to lightweight stubs for initialization
@@ -122,7 +122,7 @@ def test_container_applies_thread_pool_max_workers(tmp_path, monkeypatch):
             pass
 
     monkeypatch.setattr(
-        "src.gui.alt_application.SimpleGUIApplication", DummyWebApp
+        "cvd.gui.alt_application.SimpleGUIApplication", DummyWebApp
     )
 
     cfg = {
@@ -140,5 +140,5 @@ def test_container_applies_thread_pool_max_workers(tmp_path, monkeypatch):
         container.shutdown_sync()
         asyncio.run(get_thread_pool_manager().shutdown_all())
         monkeypatch.setattr(
-            "src.utils.concurrency.thread_pool._global_mgr", None
+            "cvd.utils.concurrency.thread_pool._global_mgr", None
         )
