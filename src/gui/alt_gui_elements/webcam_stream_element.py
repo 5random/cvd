@@ -112,7 +112,7 @@ class WebcamStreamElement:
 
             # Live camera stream from the /video_feed endpoint
             with ui.row().classes("justify-center mb-4"):
-                with (
+                self.video_container = (
                     ui.card()
                     .classes("border-2 border-dashed border-gray-300")
                     .style(
@@ -121,7 +121,8 @@ class WebcamStreamElement:
                         "display: flex; align-items: center; "
                         "justify-content: center;"
                     )
-                ):
+                )
+                with self.video_container:
                     # Image element displaying the MJPEG stream
                     self.video_element = ui.image("/video_feed").style(
                         "width: 100%; height: 100%; object-fit: contain;"
@@ -705,6 +706,16 @@ class WebcamStreamElement:
             self.roi_checkbox.value = False
             if self._roi_update_cb:
                 self._roi_update_cb()
+
+    def swap_video_container_dimensions(self):
+        """Swap the width and height of the video container."""
+        if not hasattr(self, "video_container"):
+            return
+        style = getattr(self.video_container, "_style", {})
+        width = style.get("width")
+        height = style.get("height")
+        if width and height:
+            self.video_container.style(f"width: {height}; height: {width};")
 
     def update_resolutions(self, modes):
         """Update resolution dropdown options."""
