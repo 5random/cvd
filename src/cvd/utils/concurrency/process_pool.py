@@ -3,10 +3,10 @@ Process-pool utilities – v3.1 (2025-06-03)
 
 Changelog
 ---------
-* Einzelner Timeout zerstört den Pool nur noch, wenn
+* A single timeout only destroys the pool when
   `kill_on_timeout=True`.
-* `scale_workers` verhindert Umskalieren bei laufenden Tasks,
-  außer `force_shutdown=True`.
+* `scale_workers` avoids resizing while tasks are running,
+  unless `force_shutdown=True`.
 """
 
 from __future__ import annotations
@@ -102,7 +102,7 @@ class ManagedProcessPool:
             with self._telemetry_lock:
                 self._telemetry.inc("cancelled")
             fut.cancel()
-            # Pool bleibt bestehen
+            # Pool remains intact
             raise
 
     # ───────── Scaling ─────────
