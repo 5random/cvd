@@ -117,3 +117,26 @@ class CameraCaptureController(BaseCameraCapture, ControllerStage):
                 self.uvc_settings if settings is None else settings,
                 controller_id=self.controller_id,
             )
+
+    async def test_camera_access(self) -> bool:
+        """Quickly check if the configured camera can be accessed."""
+        cap = None
+        try:
+            if self.capture_backend is not None:
+                cap = await run_camera_io(
+                    cv2.VideoCapture, self.device_index, self.capture_backend
+                )
+            else:
+                cap = await run_camera_io(cv2.VideoCapture, self.device_index)
+            if not cap or not await run_camera_io(cap.isOpened):
+                if cap is not None:
+                    await run_camera_io(cap.release)
+                return False
+            ret, _ = await run_camera_io(cap.read)
+            await run_camera_io(cap.release)
+            return bool(ret)
+        except Exception:
+            if cap is not None:
+                with contextlib.suppress(Exception):
+                    await run_camera_io(cap.release)
+            return False
