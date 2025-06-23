@@ -159,8 +159,6 @@ class WebcamStreamElement:
                     )
                     self.loading_spinner.set_visibility(True)
 
-
-
             # Camera controls
             with ui.row().classes("gap-2 justify-center mb-4"):
                 self.start_camera_btn = ui.button(
@@ -566,25 +564,22 @@ class WebcamStreamElement:
 
     async def toggle_video_play(self):
         """Toggle video play state"""
-        if not self.camera_active:
-            self.video_element.set_source("/video_feed")
-            if hasattr(self, "loading_spinner"):
-                self.loading_spinner.set_visibility(True)
+        start_camera = not self.camera_active
 
-            self.start_camera_btn.set_text("Pause Video")
-            self.start_camera_btn.set_icon("pause")
-            self.start_camera_btn.props("color=negative")
-            self.camera_active = True
+        result = True
 
-            result = True
+        if self._camera_toggle_cb:
+            if inspect.iscoroutinefunction(self._camera_toggle_cb):
+                result = await self._camera_toggle_cb()
+            else:
+                result = await asyncio.to_thread(self._camera_toggle_cb)
 
-            if self._camera_toggle_cb:
-                if inspect.iscoroutinefunction(self._camera_toggle_cb):
-                    result = await self._camera_toggle_cb()
-                else:
-                    result = await asyncio.to_thread(self._camera_toggle_cb)
+        if start_camera:
             if result:
                 self.video_element.set_source("/video_feed")
+                if hasattr(self, "loading_spinner"):
+                    self.loading_spinner.set_visibility(True)
+
                 self.start_camera_btn.set_text("Pause Video")
                 self.start_camera_btn.set_icon("pause")
                 self.start_camera_btn.props("color=negative")
@@ -593,24 +588,9 @@ class WebcamStreamElement:
             else:
                 notify_later("Failed to start camera", type="negative")
         else:
-            # Clear the image source to stop streaming
-            if self.video_element.source:
-                self.video_element.set_source("")
-            self.start_camera_btn.set_text("Play Video")
-            self.start_camera_btn.set_icon("play_arrow")
-            self.start_camera_btn.props("color=positive")
-            self.camera_active = False
-
-            result = True
-
-            if self._camera_toggle_cb:
-                if inspect.iscoroutinefunction(self._camera_toggle_cb):
-                    result = await self._camera_toggle_cb()
-                else:
-                    result = await asyncio.to_thread(self._camera_toggle_cb)
             if result:
-                # Clear the image source to stop streaming
-                self.video_element.set_source("")
+                if self.video_element.source:
+                    self.video_element.set_source("")
                 self.start_camera_btn.set_text("Play Video")
                 self.start_camera_btn.set_icon("play_arrow")
                 self.start_camera_btn.props("color=positive")
