@@ -5,9 +5,9 @@ from typing import Dict
 import pytest
 from nicegui import ui
 
-from src.gui.application import WebApplication
-from src.data_handler.interface.sensor_interface import SensorReading, SensorStatus
-from src.utils.config_service import ConfigurationService
+from cvd.gui.application import WebApplication
+from cvd.data_handler.interface.sensor_interface import SensorReading, SensorStatus
+from cvd.utils.config_service import ConfigurationService
 
 
 class DummySensorManager:

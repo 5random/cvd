@@ -1,14 +1,14 @@
 import logging
 from pathlib import Path
 
-from src.utils.config_service import ConfigurationService, set_config_service
-from src.utils.data_utils.compression_service import CompressionService, set_compression_service
-from src.utils.data_utils.data_saver import DataSaver
-from src.utils.data_utils.file_management_service import FileMaintenanceService
+from cvd.utils.config_service import ConfigurationService, set_config_service
+from cvd.utils.data_utils.compression_service import CompressionService, set_compression_service
+from cvd.utils.data_utils.data_saver import DataSaver
+from cvd.utils.data_utils.file_management_service import FileMaintenanceService
 
 
 def _init_services(tmp_path: Path) -> tuple[ConfigurationService, CompressionService, DataSaver]:
-    cfg_dir = Path('src/config')
+    cfg_dir = Path('src/cvd/config')
     config_service = ConfigurationService(cfg_dir / 'config.json', cfg_dir / 'default_config.json')
     set_config_service(config_service)
 

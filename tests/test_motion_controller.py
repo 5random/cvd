@@ -4,12 +4,12 @@ import asyncio
 from PIL import Image
 import cv2
 
-from src.controllers.webcam import (
+from cvd.controllers.webcam import (
     MotionDetectionController,
     MotionDetectionResult,
 )
-from src.controllers.webcam.motion_detection import analyze_motion
-from src.controllers.controller_base import ControllerConfig
+from cvd.controllers.webcam.motion_detection import analyze_motion
+from cvd.controllers.controller_base import ControllerConfig
 
 messages: list[str] = []
 
@@ -76,7 +76,7 @@ async def test_initialize_logs_algorithm(monkeypatch):
     config = ControllerConfig(controller_id="md", controller_type="motion_detection")
     ctrl = MotionDetectionController("md", config)
 
-    import src.controllers.webcam.motion_detection as md
+    import cvd.controllers.webcam.motion_detection as md
 
     monkeypatch.setattr(md, "info", lambda msg, **kwargs: messages.append(msg))
 
@@ -352,7 +352,7 @@ async def test_invalid_roi_dimensions_skip_crop(monkeypatch):
 
     monkeypatch.setattr(ctrl._motion_pool, "submit_async", direct)
 
-    import src.controllers.webcam.motion_detection as md
+    import cvd.controllers.webcam.motion_detection as md
 
     warnings: list[str] = []
     monkeypatch.setattr(md, "warning", lambda msg, **kw: warnings.append(msg))
@@ -382,7 +382,7 @@ async def test_roi_out_of_bounds_skip_crop(monkeypatch):
 
     monkeypatch.setattr(ctrl._motion_pool, "submit_async", direct)
 
-    import src.controllers.webcam.motion_detection as md
+    import cvd.controllers.webcam.motion_detection as md
 
     warnings: list[str] = []
     monkeypatch.setattr(md, "warning", lambda msg, **kw: warnings.append(msg))
@@ -397,7 +397,7 @@ async def test_roi_out_of_bounds_skip_crop(monkeypatch):
     assert result.data.frame.shape == frame.shape
 
 def test_invalid_gaussian_blur_kernel_defaults(monkeypatch):
-    import src.controllers.webcam.motion_detection as md
+    import cvd.controllers.webcam.motion_detection as md
 
     warnings: list[str] = []
     monkeypatch.setattr(md, "warning", lambda msg, **kw: warnings.append(msg))
@@ -413,7 +413,7 @@ def test_invalid_gaussian_blur_kernel_defaults(monkeypatch):
 
 
 def test_invalid_morphology_kernel_size_defaults(monkeypatch):
-    import src.controllers.webcam.motion_detection as md
+    import cvd.controllers.webcam.motion_detection as md
 
     warnings: list[str] = []
     monkeypatch.setattr(md, "warning", lambda msg, **kw: warnings.append(msg))
