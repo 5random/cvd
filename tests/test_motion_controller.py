@@ -398,6 +398,31 @@ async def test_roi_out_of_bounds_skip_crop(monkeypatch):
 
 
 @pytest.mark.asyncio
+async def test_frame_size_updates_on_roi_change(monkeypatch):
+    cfg = ControllerConfig(controller_id="md", controller_type="motion_detection")
+    ctrl = MotionDetectionController("md", cfg)
+
+    async def direct(func, *a, **k):
+        return func(*a, **k)
+
+    monkeypatch.setattr(ctrl._motion_pool, "submit_async", direct)
+
+    await ctrl.start()
+    frame = np.zeros((10, 20, 3), dtype=np.uint8)
+    result1 = await ctrl.process_image(frame, {})
+    assert result1.metadata["frame_size"] == (20, 10)
+
+    ctrl.roi_x = 5
+    ctrl.roi_y = 0
+    ctrl.roi_width = 10
+    ctrl.roi_height = 10
+
+    result2 = await ctrl.process_image(frame, {})
+    await ctrl.stop()
+
+    assert result2.metadata["frame_size"] == (10, 10)
+    assert ctrl._frame_size == (10, 10)
+
 async def test_roi_bbox_and_center_adjustment(monkeypatch):
     cfg = ControllerConfig(
         controller_id="md",
