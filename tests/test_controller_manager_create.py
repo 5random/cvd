@@ -1,11 +1,11 @@
 import logging
 import json
 import pytest
-from src.controllers.controller_manager import ControllerManager
-from src.controllers.webcam import MotionDetectionController
-from src.controllers.algorithms.reactor_state import ReactorStateController
-from src.controllers.controller_registry import register_controller_type
-from src.utils.config_service import ConfigurationError
+from cvd.controllers.controller_manager import ControllerManager
+from cvd.controllers.webcam import MotionDetectionController
+from cvd.controllers.algorithms.reactor_state import ReactorStateController
+from cvd.controllers.controller_registry import register_controller_type
+from cvd.utils.config_service import ConfigurationError
 
 
 def test_create_known_controller_types():

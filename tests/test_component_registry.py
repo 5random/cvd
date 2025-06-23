@@ -1,5 +1,5 @@
 
-from src.gui.gui_tab_components.gui_tab_base_component import (
+from cvd.gui.gui_tab_components.gui_tab_base_component import (
     BaseComponent,
     ComponentConfig,
     ComponentRegistry,
@@ -32,7 +32,7 @@ def test_register_same_instance_no_extra_log(monkeypatch):
     logs: list[str] = []
 
     monkeypatch.setattr(
-        "src.gui.gui_tab_components.gui_tab_base_component.info",
+        "cvd.gui.gui_tab_components.gui_tab_base_component.info",
         lambda msg, **k: logs.append(msg),
     )
 
@@ -49,7 +49,7 @@ def test_register_new_instance_logs_replacement(monkeypatch):
     logs: list[str] = []
 
     monkeypatch.setattr(
-        "src.gui.gui_tab_components.gui_tab_base_component.info",
+        "cvd.gui.gui_tab_components.gui_tab_base_component.info",
         lambda msg, **k: logs.append(msg),
     )
 
