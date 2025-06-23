@@ -154,3 +154,83 @@ class ManagedProcessPool:
     def shutdown(self, wait: bool = True) -> None:
         self._closed = True
         self._terminate_executor()
+
+
+class ProcessPoolManager:
+    """Singleton-style manager for :class:`ManagedProcessPool` instances."""
+
+    _defaults: dict[ProcessPoolType, ProcessPoolConfig] = {
+        ProcessPoolType.DEFAULT: ProcessPoolConfig(),
+        ProcessPoolType.CPU: ProcessPoolConfig(),
+        ProcessPoolType.ML: ProcessPoolConfig(),
+    }
+
+    def __init__(self) -> None:
+        self._pools: dict[ProcessPoolType, ManagedProcessPool] = {}
+        self._refcounts: dict[ProcessPoolType, int] = {}
+        self._lock = threading.Lock()
+
+    def get_pool(
+        self, pool_type: ProcessPoolType, *, config: ProcessPoolConfig | None = None
+    ) -> ManagedProcessPool:
+        with self._lock:
+            if pool_type not in self._pools:
+                cfg = config or self._defaults.get(pool_type, ProcessPoolConfig())
+                self._pools[pool_type] = ManagedProcessPool(cfg, pool_type=pool_type)
+                self._refcounts[pool_type] = 1
+            else:
+                self._refcounts[pool_type] += 1
+            return self._pools[pool_type]
+
+    def release_pool(self, pool_type: ProcessPoolType, *, wait: bool = True) -> None:
+        with self._lock:
+            if pool_type not in self._pools:
+                return
+            self._refcounts[pool_type] -= 1
+            if self._refcounts[pool_type] > 0:
+                return
+            pool = self._pools.pop(pool_type)
+            self._refcounts.pop(pool_type, None)
+        pool.shutdown(wait=wait)
+
+    async def submit_to_pool(
+        self,
+        pool_type: ProcessPoolType,
+        fn: Callable[..., Any],
+        *args: Any,
+        **kwargs: Any,
+    ) -> Any:
+        pool = self.get_pool(pool_type)
+        return await pool.submit_async(fn, *args, **kwargs)
+
+    async def shutdown_all(self) -> None:
+        with self._lock:
+            pools = list(self._pools.items())
+            self._pools.clear()
+            self._refcounts.clear()
+        await asyncio.gather(
+            *(asyncio.to_thread(pool.shutdown) for _, pool in pools)
+        )
+
+
+_global_mgr: ProcessPoolManager | None = None
+_mgr_lock = threading.Lock()
+
+
+def get_process_pool_manager() -> ProcessPoolManager:
+    """Return global :class:`ProcessPoolManager` instance."""
+    global _global_mgr
+    if _global_mgr is None:
+        with _mgr_lock:
+            if _global_mgr is None:
+                _global_mgr = ProcessPoolManager()
+    return _global_mgr
+
+
+__all__ = [
+    "ProcessPoolType",
+    "ProcessPoolConfig",
+    "ManagedProcessPool",
+    "ProcessPoolManager",
+    "get_process_pool_manager",
+]
