@@ -1,6 +1,6 @@
 import json
-from src.utils.config_service import ConfigurationService
-from src.gui.gui_tab_components.gui_setup_wizard_component import SetupWizardComponent
+from cvd.utils.config_service import ConfigurationService
+from cvd.gui.gui_tab_components.gui_setup_wizard_component import SetupWizardComponent
 
 class Dummy:
     pass
