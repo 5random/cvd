@@ -2,6 +2,7 @@ import asyncio
 import numpy as np
 
 import pytest
+import cv2
 
 from cvd.controllers.webcam import CameraCaptureController, MotionDetectionController
 from cvd.controllers.controller_base import ControllerConfig, ControllerInput
@@ -45,6 +46,32 @@ class DummyClosed(DummyCapture):
 
     def isOpened(self):
         return False
+
+
+class DummyProbeCapture(DummyCapture):
+    def __init__(self, index, width=None, height=None, fps=None):
+        super().__init__(index)
+        self.width = width
+        self.height = height
+        self.fps = fps
+
+    def set(self, prop, value):
+        if prop == cv2.CAP_PROP_FRAME_WIDTH:
+            self.width = int(value)
+        elif prop == cv2.CAP_PROP_FRAME_HEIGHT:
+            self.height = int(value)
+        elif prop == cv2.CAP_PROP_FPS:
+            self.fps = int(value)
+        return True
+
+    def get(self, prop):
+        if prop == cv2.CAP_PROP_FRAME_WIDTH:
+            return self.width or 0
+        if prop == cv2.CAP_PROP_FRAME_HEIGHT:
+            return self.height or 0
+        if prop == cv2.CAP_PROP_FPS:
+            return self.fps or 0
+        return 0
 
 
 async def immediate(fn, *args, **kwargs):
@@ -103,6 +130,24 @@ async def test_camera_capture_recovery(monkeypatch):
     except asyncio.CancelledError:
         pass
     await controller.cleanup()
+
+
+@pytest.mark.asyncio
+async def test_probe_camera_modes_single_capture(monkeypatch):
+    from src.controllers import camera_utils
+
+    open_count = {"count": 0}
+
+    async def dummy_open(device_index, width, height, fps, capture_backend=None):
+        open_count["count"] += 1
+        return DummyProbeCapture(device_index, width, height, fps)
+
+    monkeypatch.setattr(camera_utils, "open_capture", dummy_open)
+    monkeypatch.setattr(camera_utils, "run_camera_io", immediate)
+
+    modes = await camera_utils.probe_camera_modes(device_index=0)
+    assert open_count["count"] == 1
+    assert modes
 
 
 @pytest.mark.asyncio

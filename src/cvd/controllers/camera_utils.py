@@ -98,8 +98,14 @@ async def probe_camera_modes(
 ) -> List[Tuple[int, int, int]]:
     """Probe camera for supported (width, height, fps) combinations.
 
+    The previous implementation reopened the camera for every resolution/FPS
+    combination which could be very slow on some systems.  This version keeps a
+    single ``VideoCapture`` instance open and simply adjusts its properties
+    between attempts.
+
     Stops iterating fps values for a resolution once a working combination
     has been found to reduce the probing time.
+
     """
     resolutions = [
         (320, 240),
@@ -115,6 +121,22 @@ async def probe_camera_modes(
     fps_values = [5, 10, 15, 20, 24, 30]
 
     modes: List[Tuple[int, int, int]] = []
+
+    # Open the capture once using the first candidate settings and reuse it for
+    # all combinations.
+    first_width, first_height = resolutions[0]
+    first_fps = fps_values[0]
+    cap = await open_capture(
+        device_index,
+        first_width,
+        first_height,
+        first_fps,
+        capture_backend=capture_backend,
+    )
+    if cap is None:
+        modes.append((640, 480, 30))
+        return modes
+
     for w, h in resolutions:
         found_for_resolution = False
         for f in fps_values:
