@@ -51,7 +51,6 @@ class MotionDetectionResult:
 
 def analyze_motion(
     mask: np.ndarray,
-    frame: np.ndarray,
     *,
     min_contour_area: int,
     roundness_enabled: bool,
@@ -336,7 +335,6 @@ class MotionDetectionController(ImageController):
             motion_result = await self._motion_pool.submit_async(
                 analyze_motion,
                 processed_mask,
-                frame,
                 min_contour_area=self.min_contour_area,
                 roundness_enabled=self.roundness_enabled,
                 roundness_threshold=self.roundness_threshold,
