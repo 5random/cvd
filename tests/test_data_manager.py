@@ -6,9 +6,9 @@ import zipfile
 
 import pytest
 
-from src.utils.data_utils.data_manager import DataManager
-from src.utils.data_utils.maintenance import MaintenanceManager
-from src.utils.data_utils.indexing import FileStatus
+from cvd.utils.data_utils.data_manager import DataManager
+from cvd.utils.data_utils.maintenance import MaintenanceManager
+from cvd.utils.data_utils.indexing import FileStatus
 
 
 class DummyCompressionSettings:
@@ -17,13 +17,12 @@ class DummyCompressionSettings:
 
 
 class DummyCompressionService:
-
     def __init__(self):
-
-        class Settings:
-            preserve_original = False
-
         self._compression_settings = DummyCompressionSettings()
+
+    @property
+    def compression_settings(self) -> DummyCompressionSettings:
+        return self._compression_settings
 
     def compress_file(self, src: str, dst: str):
         with open(src, "rb") as f_in, gzip.open(dst, "wb") as f_out:
@@ -40,6 +39,7 @@ def data_manager(tmp_path, monkeypatch):
     monkeypatch.setenv("ENABLE_WATCHDOG", "0")
     # Ensure configuration service does not override test paths
     import src.utils.config_service as cs_module
+
     cs_module._config_service_instance = None
     monkeypatch.setattr(MaintenanceManager, "start_worker", lambda self: None)
     mgr = DataManager(base_output_dir=tmp_path)

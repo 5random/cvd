@@ -1,7 +1,7 @@
 import pytest
 from nicegui import ui
 
-from src.gui.gui_tab_components.gui_tab_sensors_component import SensorCardComponent, SensorInfo
+from cvd.gui.gui_tab_components.gui_tab_sensors_component import SensorCardComponent, SensorInfo
 
 
 class Dummy:

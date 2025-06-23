@@ -2,12 +2,12 @@ from datetime import datetime, date
 import types
 
 
-from src.experiment_manager import (
+from cvd.experiment_manager import (
     ExperimentConfig,
     ExperimentResult,
     ExperimentState,
 )
-from src.gui.gui_tab_components.gui_tab_experiment_component import (
+from cvd.gui.gui_tab_components.gui_tab_experiment_component import (
     ExperimentHistoryTable,
 )
 
