@@ -258,6 +258,7 @@ class DataSaver:
         try:
             for directory in [self.raw_dir, self.proc_dir]:
                 for file_path in directory.glob("*.csv"):
+
                     stat_result = file_path.stat()
                     file_age = current_time - stat_result.st_mtime
 
@@ -267,6 +268,7 @@ class DataSaver:
                         compressed_dir.mkdir(exist_ok=True)
 
                         timestamp = int(stat_result.st_mtime)
+
                         new_name = f"{file_path.stem}_{timestamp}.csv"
                         rotated_path = compressed_dir / new_name
 
@@ -290,6 +292,7 @@ class DataSaver:
                     )
 
                     if not file_in_use:
+
                         stat_result = file_path.stat()
                         file_age = current_time - stat_result.st_atime
                         file_size = stat_result.st_size
