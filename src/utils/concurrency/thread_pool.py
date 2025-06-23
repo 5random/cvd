@@ -466,7 +466,7 @@ class ThreadPoolManager:
         ),
         ThreadPoolType.CAMERA_IO: ThreadPoolConfig(
             pool_type=ThreadPoolType.CAMERA_IO,
-            max_workers=1,
+            max_workers=2,
             cpu_factor=2.0,
         ),
         ThreadPoolType.FILE_IO: ThreadPoolConfig(
