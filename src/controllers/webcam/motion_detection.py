@@ -256,6 +256,9 @@ class MotionDetectionController(BaseCameraCapture, ImageController):
         # Statistics
         self._max_history = params.get("max_history", 100)
         self._motion_history: Deque[dict[str, Any]] = deque(maxlen=self._max_history)
+        self._motion_history_motion_count: int = 0
+        self._recent_motion_flags: Deque[bool] = deque(maxlen=self.multi_frame_window)
+        self._recent_motion_count: int = 0
 
         # Lock to protect shared state in async processing
         self._state_lock = asyncio.Lock()
@@ -454,12 +457,10 @@ class MotionDetectionController(BaseCameraCapture, ImageController):
                 if self.multi_frame_enabled:
                     probability = motion_result.confidence
                     if self.multi_frame_method == "threshold":
-                        if len(self._motion_history) >= self.multi_frame_window:
-                            recent = list(self._motion_history)[
-                                -self.multi_frame_window :
-                            ]
-                            count = sum(1 for h in recent if h["motion_detected"])
-                            probability = count / self.multi_frame_window
+                        if len(self._recent_motion_flags) >= self.multi_frame_window:
+                            probability = (
+                                self._recent_motion_count / self.multi_frame_window
+                            )
                         if probability < self.multi_frame_threshold:
                             motion_result.motion_detected = False
                     elif self.multi_frame_method == "probability":
@@ -587,6 +588,9 @@ class MotionDetectionController(BaseCameraCapture, ImageController):
 
     def _update_statistics(self, result: MotionDetectionResult) -> None:
         """Update motion detection statistics"""
+        oldest: Optional[dict[str, Any]] = None
+        if len(self._motion_history) == self._motion_history.maxlen:
+            oldest = self._motion_history[0]
         self._motion_history.append(
             {
                 "timestamp": time.time(),
@@ -595,30 +599,50 @@ class MotionDetectionController(BaseCameraCapture, ImageController):
                 "confidence": result.confidence,
             }
         )
+        if result.motion_detected:
+            self._motion_history_motion_count += 1
+        if oldest and oldest.get("motion_detected"):
+            self._motion_history_motion_count -= 1
+
+        old_flag: Optional[bool] = None
+        if len(self._recent_motion_flags) == self._recent_motion_flags.maxlen:
+            old_flag = self._recent_motion_flags[0]
+        self._recent_motion_flags.append(result.motion_detected)
+        if result.motion_detected:
+            self._recent_motion_count += 1
+        if old_flag:
+            if old_flag:
+                self._recent_motion_count -= 1
 
     def get_motion_statistics(self) -> Dict[str, Any]:
         """Get motion detection statistics"""
         if not self._motion_history:
             return {}
 
-        recent_detections = [h for h in self._motion_history if h["motion_detected"]]
+        motion_frames = self._motion_history_motion_count
+        detections = [h for h in self._motion_history if h["motion_detected"]]
 
         return {
             "total_frames": len(self._motion_history),
-            "motion_frames": len(recent_detections),
-            "motion_rate": len(recent_detections) / len(self._motion_history),
+            "motion_frames": motion_frames,
+            "motion_rate": motion_frames / len(self._motion_history),
             "avg_motion_percentage": (
-                np.mean([h["motion_percentage"] for h in recent_detections])
-                if recent_detections
+                np.mean([h["motion_percentage"] for h in detections])
+                if detections
                 else 0
             ),
             "avg_confidence": (
-                np.mean([h["confidence"] for h in recent_detections])
-                if recent_detections
-                else 0
+                np.mean([h["confidence"] for h in detections]) if detections else 0
             ),
             "last_motion_time": (
-                recent_detections[-1]["timestamp"] if recent_detections else None
+                next(
+                    (
+                        h["timestamp"]
+                        for h in reversed(self._motion_history)
+                        if h["motion_detected"]
+                    ),
+                    None,
+                )
             ),
         }
 
@@ -642,6 +666,9 @@ class MotionDetectionController(BaseCameraCapture, ImageController):
         self._bg_subtractor = None
         self._last_frame = None
         self._motion_history.clear()
+        self._recent_motion_flags.clear()
+        self._motion_history_motion_count = 0
+        self._recent_motion_count = 0
         info(
             "Motion detection controller cleaned up",
             controller_id=self.controller_id,
