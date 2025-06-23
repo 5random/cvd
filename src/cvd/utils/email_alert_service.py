@@ -9,6 +9,7 @@ from datetime import datetime
 import sys
 from cvd.utils.config_service import get_config_service, ConfigurationService
 from cvd.utils.log_service import info, warning, error
+from cvd.experiment_manager import get_experiment_manager, ExperimentState
 
 
 class EmailAlertService:
@@ -93,6 +94,11 @@ class EmailAlertService:
         if not targets:
             warning("EmailAlertService: no recipient configured")
             return False
+
+        manager = get_experiment_manager()
+        if not (manager and manager.get_current_state() == ExperimentState.RUNNING):
+            info("EmailAlertService: no experiment running; skipping alert")
+            return False
         try:
             # Establish connection: SSL or plain
             smtp_conn: smtplib.SMTP
@@ -165,6 +171,7 @@ def set_email_alert_service(service: EmailAlertService) -> None:
     """Set the global :class:`EmailAlertService` instance."""
     global _email_alert_service_instance
     _email_alert_service_instance = service
+
 
 module = sys.modules[__name__]
 sys.modules.setdefault("src.utils.email_alert_service", module)
