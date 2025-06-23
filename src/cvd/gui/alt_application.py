@@ -14,6 +14,9 @@ import sys
 
 # Allow running this file directly without installing the package
 if __name__ == "__main__" and __package__ is None:
+    # Add project root to path so 'main' module can be imported
+    sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
+    # Add src directory to path so 'cvd' package can be imported
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 import asyncio
@@ -1451,6 +1454,11 @@ def main() -> None:
     from main import main as entry_point
 
     entry_point()
+
+# The check for "__mp_main__" allows compatibility with multiprocessing on Windows,
+# where the module name is set to "__mp_main__" in subprocesses.
+if __name__ in {"__main__", "__mp_main__"}:
+    main()
 
 # Integration Notes:
 # =================

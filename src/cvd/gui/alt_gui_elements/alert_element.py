@@ -31,15 +31,16 @@ class EmailAlertWizard:
         self,
         on_save: Optional[Callable[[Dict[str, Any]], None]] = None,
         *,
-        service = get_email_alert_service(),
+        service: Optional[Any] = None,
     ):
         """Initialize the Email Alert Wizard
 
         Args:
             on_save: optional callback invoked with the configuration when saved
         """
+        # Initialize service lazily to ensure config service is set
         self.on_save = on_save
-        self.service = service
+        self.service = service or get_email_alert_service()
         self.stepper: Any = None  # define stepper attribute to suppress optional member access warnings
         self.alert_data = {
             "name": "",

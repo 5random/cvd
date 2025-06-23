@@ -150,13 +150,13 @@ _email_alert_service_instance: Optional[EmailAlertService] = None
 
 
 def get_email_alert_service() -> Optional[EmailAlertService]:
-    """Return the global :class:`EmailAlertService` instance."""
+    """Return the global :class:`EmailAlertService` instance, or None if unavailable."""
     global _email_alert_service_instance
     if _email_alert_service_instance is None:
         try:
             _email_alert_service_instance = EmailAlertService()
-        except Exception as exc:
-            error(f"Failed to create email alert service: {exc}")
+        except Exception:
+            # Configuration service not available; alert service disabled
             return None
     return _email_alert_service_instance
 
