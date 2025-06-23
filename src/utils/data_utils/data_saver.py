@@ -67,6 +67,8 @@ class DataSaver:
 
         # Thread safety
         self._writer_lock = threading.Lock()
+        # Track open file paths for quick lookup
+        self._open_files: set[str] = set()
 
         # Services - initialize compression service if available
         try:
@@ -136,6 +138,7 @@ class DataSaver:
                 with self._writer_lock:
                     # Close current file handle before compression
                     file_handle.close()
+                    self._open_files.discard(str(file_handle.name))
 
                     # Remove from writers to trigger recreation
                     if sensor_id in self._writers[category]:
@@ -173,7 +176,9 @@ class DataSaver:
             compressed_path = (
                 compressed_dir / f"{file_path.stem}_{int(time.time())}.csv.gz"
             )
-            result = self.compression_service.compress_file(str(file_path), str(compressed_path))
+            result = self.compression_service.compress_file(
+                str(file_path), str(compressed_path)
+            )
 
             preserve = getattr(
                 self.compression_service,
@@ -207,7 +212,9 @@ class DataSaver:
             compressed_path = (
                 compressed_dir / f"{file_path.stem}_{int(time.time())}.csv.gz"
             )
-            result = self.compression_service.compress_file(str(file_path), str(compressed_path))
+            result = self.compression_service.compress_file(
+                str(file_path), str(compressed_path)
+            )
 
             preserve = getattr(
                 self.compression_service,
@@ -266,14 +273,7 @@ class DataSaver:
         try:
             for directory in [self.raw_dir, self.proc_dir]:
                 for file_path in directory.glob("*.csv"):
-                    # Skip if file is currently being written to
-                    file_in_use = any(
-                        file_handle is not None and file_handle.name == str(file_path)
-                        for writers in self._writers.values()
-                        for _, file_handle, _ in writers.values()
-                    )
-
-                    if not file_in_use:
+                    if str(file_path) not in self._open_files:
                         file_age = current_time - file_path.stat().st_atime
                         file_size = file_path.stat().st_size
 
@@ -308,6 +308,7 @@ class DataSaver:
                 file_path = output_dir / f"{safe_id}.csv"
                 is_new = not file_path.exists() or file_path.stat().st_size == 0
                 temp_f = open(file_path, "a", newline="", encoding="utf-8")
+                self._open_files.add(str(file_path))
                 temp_writer = csv.writer(temp_f)
                 row_count = 0
                 existing = sensor_map.get(sensor_id)
@@ -321,6 +322,7 @@ class DataSaver:
                                 f"Failed to write CSV header ({category}) for {sensor_id}: {e}"
                             )
                             temp_f.close()
+                            self._open_files.discard(str(file_path))
                             return
                     sensor_map[sensor_id] = (
                         temp_writer,
@@ -331,6 +333,7 @@ class DataSaver:
                 else:
                     writer, f, row_count = existing
                     temp_f.close()
+                    self._open_files.discard(str(file_path))
             else:
                 writer, f, row_count = writer_data
 
@@ -395,6 +398,8 @@ class DataSaver:
                         f.close()
                     except Exception as e:
                         warning(f"Failed to close file handle: {e}")
+                    finally:
+                        self._open_files.discard(str(f.name))
         self._writers.clear()
 
     def __del__(self) -> None:
