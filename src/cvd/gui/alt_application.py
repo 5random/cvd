@@ -445,86 +445,23 @@ class SimpleGUIApplication:
 
     # Main event handlers - placeholder implementations
     async def toggle_camera(self) -> bool:
-        """Start or stop the camera capture controller.
-
-        Returns
-        -------
-        bool
-            ``True`` if the action succeeded, ``False`` otherwise.
-        """
-
-        async def _start() -> bool:
-            if self.camera_controller is None:
-                cfg = ControllerConfig(
-                    controller_id="camera_capture",
-                    controller_type="camera_capture",
-                    parameters={"device_index": 0},
-                )
-                self.camera_controller = CameraCaptureController("camera_capture", cfg)
-
-            try:
-                result = await self.camera_controller.start()
-            except Exception as exc:  # pragma: no cover - unexpected errors
-                error("Failed to start camera", error=str(exc))
-                notify_later("Failed to start camera", type="negative")
-                return False
-            if not result:
-                notify_later("Failed to start camera", type="negative")
-            return result
-
-        async def _stop():
-            if self.camera_controller is not None:
-                try:
-                    await self.camera_controller.stop()
-                    await self.camera_controller.cleanup()
-                    self.camera_controller = None
-                    result = True
-                except Exception as exc:  # pragma: no cover - unexpected errors
-                    error("Failed to stop camera", error=str(exc))
-                    notify_later("Failed to stop camera", type="negative")
-                    result = False
-                if not result:
-                    notify_later("Failed to stop camera", type="negative")
-                return result
-            return True
+        """Toggle streaming of the camera feed without affecting capture."""
 
         ws = getattr(self, "webcam_stream", None)
-        if not self.camera_active:
-            try:
-                started = await _start()
-            except Exception as exc:  # noqa: BLE001
-                error("camera_start_failed", exc_info=exc)
-                notify_later("Failed to start camera", type="negative")
-                return False
-            if not started:
-                return False
-            self.camera_active = True
-            if hasattr(self, "camera_status_icon"):
-                self.camera_status_icon.classes(replace="text-green-300")
-            ws = getattr(self, "webcam_stream", None)
-            if getattr(ws, "start_camera_btn", None):
-                btn = getattr(ws, "start_camera_btn", None)
-                if btn:
-                    btn.set_icon("pause")
-                    btn.set_text("Pause Video")
-        else:
-            try:
-                stopped = await _stop()
-            except Exception as exc:  # noqa: BLE001
-                error("camera_stop_failed", exc_info=exc)
-                notify_later("Failed to stop camera", type="negative")
-                return False
-            if not stopped:
-                return False
-            self.camera_active = False
-            if hasattr(self, "camera_status_icon"):
-                self.camera_status_icon.classes(replace="text-gray-400")
-            ws = getattr(self, "webcam_stream", None)
-            if getattr(ws, "start_camera_btn", None):
-                btn = getattr(ws, "start_camera_btn", None)
-                if btn:
-                    btn.set_icon("play_arrow")
-                    btn.set_text("Play Video")
+        streaming = not self.camera_active
+
+        # Update internal state and header icon
+        self.update_camera_status(streaming)
+
+        # Update play/pause button on the webcam widget
+        if ws and getattr(ws, "start_camera_btn", None):
+            btn = getattr(ws, "start_camera_btn")
+            if streaming:
+                btn.set_icon("pause")
+                btn.set_text("Pause Video")
+            else:
+                btn.set_icon("play_arrow")
+                btn.set_text("Play Video")
 
         return True
 
@@ -1330,14 +1267,7 @@ class SimpleGUIApplication:
             except Exception as exc:  # pragma: no cover
                 self._video_feed_connections -= 1
                 error("generate_mjpeg_stream failed", exc_info=exc)
-                if (
-                    self._video_feed_connections == 0
-                    and self.camera_controller is not None
-                ):
-                    with contextlib.suppress(Exception):
-                        await self.camera_controller.stop()
-                        await self.camera_controller.cleanup()
-                    self.camera_controller = None
+                if self._video_feed_connections == 0:
                     self.update_camera_status(False)
                 return JSONResponse(
                     {"detail": "Failed to start video feed"}, status_code=500
@@ -1349,14 +1279,7 @@ class SimpleGUIApplication:
                         yield chunk
                 finally:
                     self._video_feed_connections -= 1
-                    if (
-                        self._video_feed_connections == 0
-                        and self.camera_controller is not None
-                    ):
-                        with contextlib.suppress(Exception):
-                            await self.camera_controller.stop()
-                            await self.camera_controller.cleanup()
-                        self.camera_controller = None
+                    if self._video_feed_connections == 0:
                         self.update_camera_status(False)
 
             return StreamingResponse(
@@ -1386,8 +1309,10 @@ class SimpleGUIApplication:
                 self.camera_controller is not None
                 and self.camera_controller.status == ControllerStatus.RUNNING
             ):
-                self.camera_active = True
-                self.update_camera_status(True)
+                # Camera capture runs immediately for motion detection. The
+                # video stream remains disabled until toggled by the user.
+                self.camera_active = False
+                self.update_camera_status(False)
             else:
                 warning("Camera controller failed to start")
         else:
