@@ -5,9 +5,9 @@ from pathlib import Path
 
 import pytest
 
-from src.utils.config_service import ConfigurationService
-from src.utils.log_service import LogService
-from src.gui.gui_elements.gui_notification_center_element import (
+from cvd.utils.config_service import ConfigurationService
+from cvd.utils.log_service import LogService
+from cvd.gui.gui_elements.gui_notification_center_element import (
     NotificationCenter,
     NotificationSeverity,
     NotificationSource,
@@ -36,7 +36,7 @@ def minimal_services(tmp_path, monkeypatch):
     log_service = LogService(config_service)
 
     monkeypatch.setattr(
-        "src.gui.gui_elements.gui_notification_center_element.get_log_service",
+        "cvd.gui.gui_elements.gui_notification_center_element.get_log_service",
         lambda: log_service,
     )
     return config_service, log_service
@@ -192,7 +192,7 @@ def test_init_uses_configuration(tmp_path, monkeypatch):
     monkeypatch.setattr(LogService, "_initialize_logging", lambda self: None)
     monkeypatch.setattr(NotificationCenter, "_setup_monitoring", lambda self: None)
     monkeypatch.setattr(
-        "src.gui.gui_elements.gui_notification_center_element.get_log_service",
+        "cvd.gui.gui_elements.gui_notification_center_element.get_log_service",
         lambda: LogService(config_service),
     )
 

@@ -7,14 +7,15 @@ These tests use the NiceGUI user plugin to exercise various GUI flows of the
 
 import pytest
 from typing import Dict, Any
+from collections import deque
 import types
 from unittest.mock import Mock, AsyncMock
 
 from nicegui import ui
 from nicegui.testing import User
-from src.gui.alt_application import SimpleGUIApplication
-from src.utils.config_service import ConfigurationService
-from src.utils.email_alert_service import EmailAlertService
+from cvd.gui.alt_application import SimpleGUIApplication
+from cvd.utils.config_service import ConfigurationService
+from cvd.utils.email_alert_service import EmailAlertService
 
 # Plugin for the NiceGUI testing framework
 pytest_plugins = ["nicegui.testing.user_plugin"]
@@ -32,7 +33,7 @@ class MockEmailAlertService(EmailAlertService):
         self.smtp_password = None
         self.smtp_use_ssl = False
         self.critical_timeout = 60
-        self._history = []
+        self._history = deque(maxlen=100)
 
     async def send_test_alert(self, message: str) -> bool:
         # Always return True to simulate a successful alert send in tests,
@@ -128,8 +129,8 @@ def mock_experiment_manager(mock_config_service, mock_controller_manager):
 def simple_gui_app(mock_controller_manager, mock_config_service, tmp_path):
     """Create a ``SimpleGUIApplication`` instance for tests"""
     # Mock external dependencies
-    import src.controllers.controller_manager as cm_module
-    import src.experiment_manager as em_module
+    import cvd.controllers.controller_manager as cm_module
+    import cvd.experiment_manager as em_module
 
     # Patch the module-level functions to return our mocks
     original_create_manager = getattr(cm_module, "create_cvd_controller_manager", None)
@@ -484,8 +485,8 @@ class TestSimpleGUIApplicationWithMockControllers:
         def notifier(msg, **kw):
             notifications.append(msg)
 
-        monkeypatch.setattr("src.utils.ui_helpers.notify_later", notifier)
-        monkeypatch.setattr("src.gui.alt_application.notify_later", notifier)
+        monkeypatch.setattr("cvd.utils.ui_helpers.notify_later", notifier)
+        monkeypatch.setattr("cvd.gui.alt_application.notify_later", notifier)
 
         await simple_gui_app.toggle_camera()
 
@@ -511,8 +512,8 @@ class TestSimpleGUIApplicationWithMockControllers:
         def notifier(msg, **kw):
             notifications.append(msg)
 
-        monkeypatch.setattr("src.utils.ui_helpers.notify_later", notifier)
-        monkeypatch.setattr("src.gui.alt_application.notify_later", notifier)
+        monkeypatch.setattr("cvd.utils.ui_helpers.notify_later", notifier)
+        monkeypatch.setattr("cvd.gui.alt_application.notify_later", notifier)
 
         await simple_gui_app.toggle_camera()
 
