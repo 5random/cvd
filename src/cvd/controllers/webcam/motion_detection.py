@@ -19,11 +19,13 @@ from cvd.controllers.controller_base import (
     ControllerConfig,
     ControllerInput,
 )
+
 from cvd.utils.config_service import get_config_service
 from cvd.utils.concurrency.process_pool import (
     ManagedProcessPool,
     ProcessPoolConfig,
     ProcessPoolType,
+    get_process_pool_manager,
 )
 from cvd.utils.log_service import info, warning, error
 from cvd.utils.concurrency.thread_pool import run_camera_io
@@ -126,10 +128,9 @@ class MotionDetectionController(BaseCameraCapture, ImageController):
 
     def __init__(self, controller_id: str, config: ControllerConfig):
         super().__init__(controller_id, config)
-        # Create dedicated process pool for motion analysis (CPU-bound)
-        self._motion_pool = ManagedProcessPool(
-            ProcessPoolConfig(), pool_type=ProcessPoolType.CPU
-        )
+        # Obtain shared process pool for motion analysis (CPU-bound)
+        self._pool_manager = get_process_pool_manager()
+        self._motion_pool = self._pool_manager.get_pool(ProcessPoolType.CPU)
 
         # Parameters from config
         params = config.parameters
@@ -661,7 +662,7 @@ class MotionDetectionController(BaseCameraCapture, ImageController):
                     active=getattr(self._motion_pool, "_telemetry").active,
                 )
                 break
-        self._motion_pool.shutdown(wait=True)
+        self._pool_manager.release_pool(ProcessPoolType.CPU, wait=True)
 
         self._bg_subtractor = None
         self._last_frame = None

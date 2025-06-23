@@ -28,6 +28,8 @@ from .process_pool import (
     ProcessPoolType,
     ProcessPoolConfig,
     ManagedProcessPool,
+    ProcessPoolManager,
+    get_process_pool_manager,
 )
 
 from .thread_pool import (
@@ -58,6 +60,8 @@ __all__ = [
     "ProcessPoolType",
     "ProcessPoolConfig",
     "ManagedProcessPool",
+    "ProcessPoolManager",
+    "get_process_pool_manager",
     # thread_pool
     "ThreadPoolType",
     "ThreadPoolConfig",
