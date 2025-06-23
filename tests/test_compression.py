@@ -1,16 +1,26 @@
 import logging
 from pathlib import Path
+import zipfile
 
 
 from cvd.utils.config_service import ConfigurationService, set_config_service
-from cvd.utils.data_utils.compression_service import CompressionService, set_compression_service
+from cvd.utils.data_utils.compression_service import (
+    CompressionService,
+    set_compression_service,
+)
 from cvd.utils.data_utils.data_saver import DataSaver
 from cvd.utils.data_utils.file_management_service import FileMaintenanceService
 
 
-def _init_services(tmp_path: Path) -> tuple[ConfigurationService, CompressionService, DataSaver]:
-    cfg_dir = Path('src/cvd/config')
-    config_service = ConfigurationService(cfg_dir / 'config.json', cfg_dir / 'default_config.json')
+def _init_services(
+    tmp_path: Path,
+) -> tuple[ConfigurationService, CompressionService, DataSaver]:
+    cfg_dir = tmp_path
+    (cfg_dir / "config.json").write_text("{}")
+    (cfg_dir / "default_config.json").write_text("{}")
+    config_service = ConfigurationService(
+        cfg_dir / "config.json", cfg_dir / "default_config.json"
+    )
     set_config_service(config_service)
 
     compression_service = CompressionService()
@@ -18,6 +28,19 @@ def _init_services(tmp_path: Path) -> tuple[ConfigurationService, CompressionSer
 
     data_saver = DataSaver(base_output_dir=tmp_path, enable_background_operations=False)
     return config_service, compression_service, data_saver
+
+
+def _init_compression_service(tmp_path: Path) -> CompressionService:
+    cfg_dir = tmp_path
+    (cfg_dir / "config.json").write_text("{}")
+    (cfg_dir / "default_config.json").write_text("{}")
+    config_service = ConfigurationService(
+        cfg_dir / "config.json", cfg_dir / "default_config.json"
+    )
+    set_config_service(config_service)
+    compression_service = CompressionService()
+    set_compression_service(compression_service)
+    return compression_service
 
 
 def test_data_saver_compress_sync(tmp_path: Path, caplog):
@@ -84,3 +107,36 @@ def test_compression_settings_property(tmp_path: Path):
     assert compression_service.compression_settings is getattr(
         compression_service, "_compression_settings"
     )
+
+
+def test_decompress_zip_prevents_path_traversal(tmp_path: Path):
+    compression_service = _init_compression_service(tmp_path)
+
+    archive = tmp_path / "malicious.zip"
+    with zipfile.ZipFile(archive, "w") as zf:
+        zf.writestr("../evil.txt", "bad")
+
+    dest = tmp_path / "out"
+    dest.mkdir()
+
+    result = compression_service.decompress_file(archive, dest)
+
+    assert result is None
+    assert not (tmp_path / "evil.txt").exists()
+    assert not any(dest.iterdir())
+
+
+def test_decompress_zip_valid(tmp_path: Path):
+    compression_service = _init_compression_service(tmp_path)
+
+    archive = tmp_path / "archive.zip"
+    with zipfile.ZipFile(archive, "w") as zf:
+        zf.writestr("good.txt", "hello")
+
+    dest = tmp_path / "extract"
+    dest.mkdir()
+
+    result = compression_service.decompress_file(archive, dest)
+
+    assert result == dest
+    assert (dest / "good.txt").read_text() == "hello"
