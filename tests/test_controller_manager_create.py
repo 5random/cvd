@@ -1,4 +1,5 @@
 import logging
+import json
 import pytest
 from src.controllers.controller_manager import ControllerManager
 from src.controllers.webcam import MotionDetectionController
@@ -36,3 +37,15 @@ def test_save_configuration_creates_directory(tmp_path):
     result = manager.save_configuration(cfg_path)
     assert result is True
     assert cfg_path.exists()
+
+
+def test_save_configuration_includes_controller_type(tmp_path):
+    manager = ControllerManager()
+    manager.add_controller_from_config(
+        {"controller_id": "cam1", "type": "camera_capture"}
+    )
+    cfg_path = tmp_path / "controllers.json"
+    result = manager.save_configuration(cfg_path)
+    assert result is True
+    data = json.loads(cfg_path.read_text())
+    assert data["controllers"]["cam1"]["controller_type"] == "camera_capture"

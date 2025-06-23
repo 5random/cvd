@@ -478,8 +478,10 @@ class CameraStreamComponent(BaseComponent):
             # Draw bounding box using stored resize scale
             if self.show_bounding_boxes and frame_data.motion_bbox:
                 x, y, w_box, h_box = frame_data.motion_bbox
-                # adjust coordinates using captured scale
-                x_s, y_s = int(x * scale), int(y * scale)
+                roi_x = getattr(self, "roi_x", 0)
+                roi_y = getattr(self, "roi_y", 0)
+                # adjust coordinates using captured scale and ROI offset
+                x_s, y_s = int((x - roi_x) * scale), int((y - roi_y) * scale)
                 w_s, h_s = int(w_box * scale), int(h_box * scale)
                 cv2.rectangle(
                     overlay_frame, (x_s, y_s), (x_s + w_s, y_s + h_s), (0, 255, 0), 2
@@ -500,8 +502,10 @@ class CameraStreamComponent(BaseComponent):
             # Draw motion center
             if frame_data.motion_center:
                 cx, cy = frame_data.motion_center
-                # scale center point using captured scale
-                cx_s, cy_s = int(cx * scale), int(cy * scale)
+                roi_x = getattr(self, "roi_x", 0)
+                roi_y = getattr(self, "roi_y", 0)
+                # scale center point using captured scale and ROI offset
+                cx_s, cy_s = int((cx - roi_x) * scale), int((cy - roi_y) * scale)
                 cv2.circle(overlay_frame, (cx_s, cy_s), 5, (255, 0, 0), -1)
 
             # Draw confidence score and other info

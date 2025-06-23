@@ -41,7 +41,11 @@ def test_data_saver_sync_compression(tmp_path, monkeypatch, caplog):
         flush_interval=1,
     )
 
-    for _ in range(20):
+    saver.save(create_reading())
+    writer_info = saver._writers["raw"]["s1"]
+    assert len(writer_info) == 3
+
+    for _ in range(19):
         saver.save(create_reading())
 
     saver.flush_all()

@@ -116,4 +116,8 @@ along with ``roi_width`` and ``roi_height`` to restrict detection to that area.
 must contain motion to trigger a detection. Specify this value in percent, so a
 threshold of ``1`` requires motion in 1% of the frame.
 
+When cropping is active, the returned ``motion_bbox`` and ``motion_center``
+values are offset by ``roi_x`` and ``roi_y`` so they refer to coordinates in the
+original frame. Overlay code drawing on the cropped frame should subtract these
+offsets to align correctly.
 

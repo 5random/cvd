@@ -1,110 +1,110 @@
-# Tests für alt_gui.py
+# Tests for ``alt_gui.py``
 
-Diese Datei enthält umfassende Tests für die `SimpleGUIApplication` aus `alt_application.py` unter Verwendung des NiceGUI Testing Frameworks.
+This file contains comprehensive tests for the ``SimpleGUIApplication`` from
+``alt_application.py`` using the NiceGUI testing framework.
 
-## Überblick
+## Overview
 
-Die Tests sind in mehrere Kategorien unterteilt:
+The tests are divided into several categories:
 
 ### 1. TestSimpleGUIApplicationBasics
-- Tests für grundlegende Funktionalitäten
-- Initialisierung der Anwendung
-- Standard-Einstellungen
+- Tests for basic functionality
+- Application initialization
+- Default settings
 
-### 2. TestSimpleGUIApplicationUI  
-- Tests für die Benutzeroberfläche
-- Laden der Hauptseite
-- Header-Elemente
-- Dark Mode Toggle
+### 2. TestSimpleGUIApplicationUI
+- Tests for the user interface
+- Loading the main page
+- Header elements
+- Dark mode toggle
 
 ### 3. TestSimpleGUIApplicationCameraFunctionality
-- Tests für Kamera-Funktionalitäten
-- Kamera-Status Updates
-- Kamera-Einstellungen (Sensitivity, FPS, Resolution, Rotation)
+- Tests for camera functionality
+- Camera status updates
+- Camera settings (Sensitivity, FPS, Resolution, Rotation)
 
 ### 4. TestSimpleGUIApplicationExperimentManagement
-- Tests für Experiment-Management
-- Experiment-Sektion Creation
-- Standard-Experiment-Einstellungen
+- Tests for experiment management
+- Experiment section creation
+- Default experiment settings
 
 ### 5. TestSimpleGUIApplicationAlertSystem
-- Tests für das Alert-System
-- Alert-Status Updates
-- Alert-Konfiguration Loading
+- Tests for the alert system
+- Alert status updates
+- Alert configuration loading
 
 ### 6. TestSimpleGUIApplicationNavigation
-- Tests für Navigation und Seitenaktionen
-- Fullscreen Toggle
-- Page Reload
+- Tests for navigation and page actions
+- Fullscreen toggle
+- Page reload
 
-### 7. TestSimpleGUIApplicationIntegration
-- Integrationstests für die gesamte Anwendung
-- Vollständiges Layout Creation
-- Zeit-Anzeige Updates
+- Integration tests for the entire application
+- Full layout creation
+- Time display updates
 
 ### 8. TestSimpleGUIApplicationErrorHandling
-- Tests für Fehlerbehandlung
-- Behandlung fehlender Controller
-- Ungültige Einstellungen
+- Tests for error handling
+- Handling missing controllers
+- Invalid settings
 
 ### 9. TestSimpleGUIApplicationWithMockControllers
-- Tests mit Mock-Controllern
-- Erweiterte Kamera- und Motion Detection-Funktionalität
+- Tests with mock controllers
+- Extended camera and motion detection functionality
 
 ### 10. TestSimpleGUIApplicationPerformance
-- Performance-Tests (markiert mit @pytest.mark.slow)
-- Schnelle aufeinanderfolgende Updates
+- Performance tests (marked with @pytest.mark.slow)
+- Rapid consecutive updates
 
-## Mock-Klassen
+## Mock classes
 
 ### MockEmailAlertService
-Erbt von der echten `EmailAlertService` Klasse und überschreibt kritische Methoden für Test-Zwecke.
+Inherits from the real ``EmailAlertService`` class and overrides critical methods for testing.
 
 ### MockControllerManager
-Simuliert den Controller Manager mit der Möglichkeit, Mock-Controller hinzuzufügen.
+Simulates the controller manager with the ability to add mock controllers.
 
 ### MockExperimentManager
-Simuliert den Experiment Manager mit Test-Daten.
+Simulates the experiment manager with test data.
 
-## Verwendung
+## Usage
 
-### Einzelne Tests ausführen:
+### Running individual tests:
 ```bash
-# Alle Tests für alt_gui
+# Run all tests for alt_gui
 pytest tests/test_alt_gui.py -v
 
-# Bestimmte Test-Klasse
+# Specific test class
 pytest tests/test_alt_gui.py::TestSimpleGUIApplicationBasics -v
 
-# Bestimmten Test
+# Specific test
 pytest tests/test_alt_gui.py::TestSimpleGUIApplicationBasics::test_application_initialization -v
 
-# Performance-Tests überspringen
+# Skip performance tests
 pytest tests/test_alt_gui.py -v -m "not slow"
 ```
 
-### Debugging mit Ausgabe:
+### Debugging with output:
 ```bash
 pytest tests/test_alt_gui.py -v -s
 ```
 
-### Mit Coverage:
+### With coverage:
 ```bash
 pytest tests/test_alt_gui.py --cov=src.gui.alt_application
 ```
 
 ## Fixtures
 
-- `mock_config_service`: Erstellt einen Mock Configuration Service
-- `mock_controller_manager`: Erstellt einen Mock Controller Manager
-- `mock_experiment_manager`: Erstellt einen Mock Experiment Manager
-- `simple_gui_app`: Erstellt eine vollständig konfigurierte SimpleGUIApplication für Tests
+- `mock_config_service`: creates a mock configuration service
+- `mock_controller_manager`: creates a mock controller manager
+- `mock_experiment_manager`: creates a mock experiment manager
+- `simple_gui_app`: creates a fully configured ``SimpleGUIApplication`` for tests
 
-## Erweiterte Test-Szenarien
+## Advanced test scenarios
 
-### Hinzufügen neuer Tests:
+### Adding new tests:
 
-1. **UI-Tests**: Verwenden Sie das `user` Fixture für Interaktion mit der GUI
+1. **UI tests**: use the `user` fixture for interaction with the GUI
 ```python
 async def test_new_ui_feature(user: User, simple_gui_app):
     @ui.page('/')
@@ -117,7 +117,7 @@ async def test_new_ui_feature(user: User, simple_gui_app):
     await user.should_see('Result Text')
 ```
 
-2. **Mock Controller Tests**: Erstellen Sie spezifische Mock-Controller
+2. **Mock controller tests**: create specific mock controllers
 ```python
 def test_new_controller_feature(simple_gui_app):
     mock_controller = Mock()
@@ -130,7 +130,7 @@ def test_new_controller_feature(simple_gui_app):
     assert result == "expected_result"
 ```
 
-3. **Async Tests**: Verwenden Sie AsyncMock für asynchrone Operationen
+3. **Async tests**: use ``AsyncMock`` for asynchronous operations
 ```python
 async def test_async_functionality(simple_gui_app):
     mock_async_method = AsyncMock(return_value="async_result")
@@ -141,25 +141,25 @@ async def test_async_functionality(simple_gui_app):
     mock_async_method.assert_called_once()
 ```
 
-## Bekannte Limitationen
+## Known limitations
 
-1. **JavaScript-basierte Funktionen**: Funktionen wie Fullscreen-Toggle führen JavaScript aus, das in Tests nicht vollständig simuliert werden kann.
+1. **JavaScript-based functions**: functions such as the fullscreen toggle run JavaScript which cannot be fully simulated in tests.
 
-2. **Timing-abhängige Tests**: Timer-basierte Updates können in Tests schwer zu prüfen sein.
+2. **Timing-dependent tests**: timer-based updates can be difficult to verify in tests.
 
-3. **Externe Abhängigkeiten**: SMTP-Services und Hardware-Kameras werden durch Mocks ersetzt.
+3. **External dependencies**: SMTP services and hardware cameras are replaced with mocks.
 
-## Tipps für Entwickler
+## Tips for developers
 
-1. **Test-Isolation**: Jeder Test sollte unabhängig laufen können
-2. **Mock richtig**: Mocken Sie nur das Nötige, um Tests fokussiert zu halten
-3. **Aussagekräftige Assertions**: Verwenden Sie spezifische Assertions statt nur `assert True`
-4. **Error-Handling testen**: Vergessen Sie nicht, Fehlerfälle zu testen
-5. **Performance bewusst**: Markieren Sie langsame Tests entsprechend
+1. **Test isolation**: each test should be able to run independently
+2. **Mock appropriately**: mock only what is necessary to keep tests focused
+3. **Meaningful assertions**: use specific assertions instead of just `assert True`
+4. **Test error handling**: don't forget to test failure cases
+5. **Performance awareness**: mark slow tests accordingly
 
-## Zukünftige Erweiterungen
+## Future extensions
 
-- Integration mit echten Hardware-Controllern in CI/CD
-- Screenshot-Tests für UI-Regression
-- Load-Tests für Multi-User-Szenarien
-- Accessibility-Tests für die GUI-Elemente
+- Integration with real hardware controllers in CI/CD
+- Screenshot tests for UI regression
+- Load tests for multi-user scenarios
+- Accessibility tests for the GUI elements

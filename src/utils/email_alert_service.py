@@ -14,6 +14,7 @@ class EmailAlertService:
 
     def __init__(self, config_service: Optional[ConfigurationService] = None) -> None:
         self._config_service = config_service or get_config_service()
+        self.recipients: Optional[list[str]] = None
         if self._config_service is None:
             raise ValueError("Configuration service not available")
         self._load_configuration()
