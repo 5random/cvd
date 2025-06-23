@@ -173,13 +173,11 @@ class DataSaver:
             compressed_path = (
                 compressed_dir / f"{file_path.stem}_{int(time.time())}.csv.gz"
             )
-            result = self.compression_service.compress_file(str(file_path), str(compressed_path))
+            result = self.compression_service.compress_file(
+                str(file_path), str(compressed_path)
+            )
 
-            preserve = getattr(
-                self.compression_service,
-                "_compression_settings",
-                SimpleNamespace(preserve_original=False),
-            ).preserve_original
+            preserve = self.compression_service.compression_settings.preserve_original
 
             if not preserve and file_path.exists():
                 msg = f"Source file was not deleted after compression: {file_path}"
@@ -207,13 +205,11 @@ class DataSaver:
             compressed_path = (
                 compressed_dir / f"{file_path.stem}_{int(time.time())}.csv.gz"
             )
-            result = self.compression_service.compress_file(str(file_path), str(compressed_path))
+            result = self.compression_service.compress_file(
+                str(file_path), str(compressed_path)
+            )
 
-            preserve = getattr(
-                self.compression_service,
-                "_compression_settings",
-                SimpleNamespace(preserve_original=False),
-            ).preserve_original
+            preserve = self.compression_service.compression_settings.preserve_original
 
             if not preserve and file_path.exists():
                 msg = f"Source file was not deleted after compression: {file_path}"
