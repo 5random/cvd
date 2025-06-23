@@ -29,19 +29,21 @@ import sys
 # Only adjust ``sys.path`` when executed directly so that ``src`` is importable
 if __name__ == "__main__" and __package__ is None:
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+    # Ensure 'cvd' package (under src) is importable
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 
-from cvd.utils.email_alert_service import EmailAlertService
-from cvd.utils.log_service import info, warning, error
+from src.cvd.utils.email_alert_service import EmailAlertService
+from src.cvd.utils.log_service import info, warning, error
 
 
 DEFAULT_CONFIG = {
     "alerting": {
-        "email_recipient": "willemdittloff@gmail.com",
-        "smtp_host": "smtp.gmail.com",
-        "smtp_port": 587,
-        "smtp_user": "willemdittloff@gmail.com",
-        "smtp_password": "pudm jrtu xgqa gsdn",
+        "email_recipient": "willem.dittloff@tuhh.de",
+        "smtp_host": "mail.tuhh.de",
+        "smtp_port": 25,
+        "smtp_user": "willem.dittloff@tuhh.de",
+        "smtp_password": "",
         "smtp_use_ssl": False,
         "critical_state_timeout_s": 60,
     }
@@ -185,6 +187,13 @@ def main() -> None:
         service.smtp_host = args.smtp_host
     if args.smtp_port:
         service.smtp_port = args.smtp_port
+    # Prompt for SMTP password if not provided (required for authenticated servers)
+    if service.login_user and not service.login_password:
+        import getpass
+
+        service.login_password = getpass.getpass(
+            f"SMTP password for user {service.login_user}: "
+        )
 
     image_bytes = None
     if args.image:
