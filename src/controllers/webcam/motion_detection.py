@@ -27,6 +27,7 @@ from src.utils.concurrency.process_pool import (
 )
 from src.utils.log_service import info, warning, error
 from src.utils.concurrency.thread_pool import run_camera_io
+from src.controllers.camera_utils import apply_uvc_settings
 from .base_camera_capture import BaseCameraCapture
 
 
@@ -129,8 +130,6 @@ class MotionDetectionController(BaseCameraCapture, ImageController):
         self._motion_pool = ManagedProcessPool(
             ProcessPoolConfig(), pool_type=ProcessPoolType.CPU
         )
-
-
 
         # Parameters from config
         params = config.parameters
@@ -690,3 +689,15 @@ class MotionDetectionController(BaseCameraCapture, ImageController):
             return ControllerResult.success_result(None)
         return ControllerResult.success_result(output)
 
+    async def apply_uvc_settings(
+        self, settings: Optional[dict[str, Any]] | None = None
+    ) -> None:
+        """Apply UVC settings to the capture device."""
+        if settings:
+            self.uvc_settings.update(settings)
+        if self._capture is not None:
+            await apply_uvc_settings(
+                self._capture,
+                self.uvc_settings if settings is None else settings,
+                controller_id=self.controller_id,
+            )

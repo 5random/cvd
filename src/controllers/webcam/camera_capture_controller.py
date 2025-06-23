@@ -6,6 +6,7 @@ import contextlib
 from typing import Optional, Any
 
 from src.utils.concurrency.thread_pool import run_camera_io
+from src.controllers.camera_utils import apply_uvc_settings
 from src.utils.config_service import get_config_service
 from src.controllers.controller_base import (
     ControllerStage,
@@ -62,7 +63,6 @@ class CameraCaptureController(BaseCameraCapture, ControllerStage):
                     self.uvc_settings.update(cam_cfg.get("uvc", {}))
                     self.uvc_settings.update(cam_cfg.get("uvc_settings", {}))
 
-
     async def initialize(self) -> bool:
         """Initialize camera capture using the camera I/O thread pool."""
         opened = await self._open_capture()
@@ -77,7 +77,6 @@ class CameraCaptureController(BaseCameraCapture, ControllerStage):
     async def handle_frame(self, frame: Any) -> None:
         """Store the latest captured frame."""
         self._output_cache[self.controller_id] = frame
-
 
     async def start(self) -> bool:
         """Start capturing frames."""
@@ -101,3 +100,16 @@ class CameraCaptureController(BaseCameraCapture, ControllerStage):
         if frame is None:
             return ControllerResult.success_result(None)
         return ControllerResult.success_result({"frame": frame})
+
+    async def apply_uvc_settings(
+        self, settings: Optional[dict[str, Any]] | None = None
+    ) -> None:
+        """Apply UVC settings to the underlying capture device."""
+        if settings:
+            self.uvc_settings.update(settings)
+        if self._capture is not None:
+            await apply_uvc_settings(
+                self._capture,
+                self.uvc_settings if settings is None else settings,
+                controller_id=self.controller_id,
+            )
