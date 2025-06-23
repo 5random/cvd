@@ -176,7 +176,39 @@ class MotionDetectionController(ImageController):
             "motion_threshold_percentage", 1.0
         )
         self.gaussian_blur_kernel = params.get("gaussian_blur_kernel", (5, 5))
+        # Validate gaussian_blur_kernel
+        if (
+            not isinstance(self.gaussian_blur_kernel, (tuple, list))
+            or len(self.gaussian_blur_kernel) != 2
+            or any(
+                not isinstance(k, int) or k <= 0 or k % 2 == 0
+                for k in self.gaussian_blur_kernel
+            )
+        ):
+            warning(
+                "Invalid gaussian_blur_kernel, using default",
+                controller_id=self.controller_id,
+                value=self.gaussian_blur_kernel,
+            )
+            self.gaussian_blur_kernel = (5, 5)
+        else:
+            self.gaussian_blur_kernel = (
+                int(self.gaussian_blur_kernel[0]),
+                int(self.gaussian_blur_kernel[1]),
+            )
+
         self.morphology_kernel_size = params.get("morphology_kernel_size", 5)
+        # Validate morphology_kernel_size
+        if (
+            not isinstance(self.morphology_kernel_size, int)
+            or self.morphology_kernel_size <= 0
+        ):
+            warning(
+                "morphology_kernel_size must be > 0, using default",
+                controller_id=self.controller_id,
+                value=self.morphology_kernel_size,
+            )
+            self.morphology_kernel_size = 5
         self.confidence_threshold = params.get("confidence_threshold", 0.5)
         # New: roundness and multi-frame criteria from config
         self.roundness_enabled = params.get("roundness_enabled", False)
@@ -353,7 +385,9 @@ class MotionDetectionController(ImageController):
                     probability = motion_result.confidence
                     if self.multi_frame_method == "threshold":
                         if len(self._motion_history) >= self.multi_frame_window:
-                            recent = list(self._motion_history)[-self.multi_frame_window :]
+                            recent = list(self._motion_history)[
+                                -self.multi_frame_window :
+                            ]
                             count = sum(1 for h in recent if h["motion_detected"])
                             probability = count / self.multi_frame_window
                         if probability < self.multi_frame_threshold:
