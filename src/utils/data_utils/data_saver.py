@@ -380,8 +380,8 @@ class DataSaver:
             except Exception:
                 try:
                     fut.cancel()
-                except Exception:
-                    pass
+                except Exception as e:
+                    warning(f"Failed to cancel background task: {e}")
             finally:
                 with contextlib.suppress(ValueError):
                     with self._tasks_lock:
@@ -401,8 +401,8 @@ class DataSaver:
         """Destructor to ensure files are closed on deletion."""
         try:
             self.close()
-        except Exception:
-            pass
+        except Exception as e:
+            warning(f"Error during DataSaver cleanup: {e}")
 
     def get_performance_stats(self) -> Dict[str, Any]:
         """Get performance statistics for monitoring."""
@@ -431,6 +431,7 @@ class DataSaver:
                 with self._tasks_lock:
                     self._tasks.remove(f)
             except ValueError:
+                # Task was already removed
                 pass
 
         fut.add_done_callback(_remove)
