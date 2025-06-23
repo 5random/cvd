@@ -15,13 +15,14 @@ from cvd.utils.log_service import info, warning, error
 
 
 class BaseCameraCapture(ABC):
-    # declared attributes for subclass and Pylance type checking, 
+    # declared attributes for subclass and Pylance type checking,
     # shall be set in simple_config.json
-    #TODO: get values from simple_config.json
+    # TODO: get values from simple_config.json
     controller_id: str
     config: Any
     device_index: int
     capture_backend: Any
+    capture_backend_fallbacks: Any
     width: Any
     height: Any
     fps: Any
@@ -36,6 +37,7 @@ class BaseCameraCapture(ABC):
         self._capture: Optional[cv2.VideoCapture] = None
         self._capture_task: Optional[asyncio.Task] = None
         self._stop_event = asyncio.Event()
+        self.capture_backend_fallbacks = []
 
     # ------------------------------------------------------------------
     # Hooks for subclasses
@@ -50,45 +52,63 @@ class BaseCameraCapture(ABC):
 
     # ------------------------------------------------------------------
     async def _open_capture(self) -> bool:
-        try:
-            if getattr(self, "capture_backend", None) is not None:
-                self._capture = await run_camera_io(
-                    cv2.VideoCapture, self.device_index, self.capture_backend
+        backends = []
+        if getattr(self, "capture_backend", None) is not None:
+            backends.append(self.capture_backend)
+        else:
+            backends.append(None)
+        if getattr(self, "capture_backend_fallbacks", None):
+            backends.extend(self.capture_backend_fallbacks)
+        else:
+            fallback = cv2.CAP_DSHOW if cv2.__dict__.get("CAP_DSHOW") else cv2.CAP_V4L2
+            backends.append(fallback)
+
+        for backend in backends:
+            cap = None
+            try:
+                if backend is None:
+                    cap = await run_camera_io(cv2.VideoCapture, self.device_index)
+                else:
+                    cap = await run_camera_io(
+                        cv2.VideoCapture, self.device_index, backend
+                    )
+                if not cap or not cap.isOpened():
+                    if cap is not None:
+                        await run_camera_io(cap.release)
+                    continue
+                if getattr(self, "width", None):
+                    await run_camera_io(
+                        cap.set, cv2.CAP_PROP_FRAME_WIDTH, int(self.width)
+                    )
+                if getattr(self, "height", None):
+                    await run_camera_io(
+                        cap.set, cv2.CAP_PROP_FRAME_HEIGHT, int(self.height)
+                    )
+                if getattr(self, "fps", None):
+                    await run_camera_io(cap.set, cv2.CAP_PROP_FPS, int(self.fps))
+                await apply_uvc_settings(
+                    cap, self.uvc_settings, controller_id=self.controller_id
                 )
-            else:
-                self._capture = await run_camera_io(cv2.VideoCapture, self.device_index)
-            if not self._capture or not self._capture.isOpened():
-                if self._capture is not None:
-                    await run_camera_io(self._capture.release)
-                self._capture = None
-                return False
-            if getattr(self, "width", None):
-                await run_camera_io(
-                    self._capture.set, cv2.CAP_PROP_FRAME_WIDTH, int(self.width)
+                ret, _ = await run_camera_io(cap.read)
+                if not ret:
+                    await run_camera_io(cap.release)
+                    continue
+                self._capture = cap
+                await self.on_capture_opened()
+                return True
+            except Exception as exc:  # pragma: no cover - defensive
+                error(
+                    "Failed to initialize camera",
+                    controller_id=self.controller_id,
+                    device_index=getattr(self, "device_index", "unknown"),
+                    error=str(exc),
                 )
-            if getattr(self, "height", None):
-                await run_camera_io(
-                    self._capture.set, cv2.CAP_PROP_FRAME_HEIGHT, int(self.height)
-                )
-            if getattr(self, "fps", None):
-                await run_camera_io(self._capture.set, cv2.CAP_PROP_FPS, int(self.fps))
-            await apply_uvc_settings(
-                self._capture, self.uvc_settings, controller_id=self.controller_id
-            )
-            await self.on_capture_opened()
-            return True
-        except Exception as exc:  # pragma: no cover - defensive
-            error(
-                "Failed to initialize camera",
-                controller_id=self.controller_id,
-                device_index=getattr(self, "device_index", "unknown"),
-                error=str(exc),
-            )
-            if self._capture is not None:
-                with contextlib.suppress(Exception):
-                    await run_camera_io(self._capture.release)
-            self._capture = None
-            return False
+                if cap is not None:
+                    with contextlib.suppress(Exception):
+                        await run_camera_io(cap.release)
+
+        self._capture = None
+        return False
 
     # ------------------------------------------------------------------
     async def _capture_loop(self) -> None:
@@ -137,16 +157,14 @@ class BaseCameraCapture(ABC):
                     failure_count += 1
                     delay = min(failure_delay * 2**failure_count, 2.0)
                     if failure_count > max_failures:
-                        opened = await run_camera_io(self._capture.isOpened)
-                        if not opened:
-                            warning(
-                                "Camera not opened, reinitializing",
-                                controller_id=self.controller_id,
-                                device_index=self.device_index,
-                            )
-                            await run_camera_io(self._capture.release)
-                            self._capture = None
-                            continue
+                        warning(
+                            "Camera read failures, reopening",
+                            controller_id=self.controller_id,
+                            device_index=self.device_index,
+                        )
+                        await run_camera_io(self._capture.release)
+                        self._capture = None
+                        continue
             except Exception as e:  # pragma: no cover - defensive
                 error(
                     "Camera capture error",

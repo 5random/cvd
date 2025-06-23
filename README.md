@@ -159,7 +159,10 @@ Webcam properties under ``uvc_settings`` follow OpenCV naming. Use
 You may explicitly select the OpenCV backend used for capturing frames by
 providing ``"capture_backend"`` in a webcam or controller configuration. Common
 values include ``cv2.CAP_DSHOW`` and ``cv2.CAP_MSMF`` on Windows. If omitted,
-OpenCV will choose the default backend for the platform.
+OpenCV will choose the default backend for the platform. When a backend fails
+to produce frames you can specify additional candidates using
+``"capture_backend_fallbacks"``. If no fallbacks are provided the library will
+attempt ``cv2.CAP_DSHOW`` on Windows or ``cv2.CAP_V4L2`` on Linux.
 
 ### Enumerating supported camera modes
 
