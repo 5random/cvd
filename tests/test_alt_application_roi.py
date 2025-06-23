@@ -1,5 +1,5 @@
 import pytest
-from src.gui.alt_application import SimpleGUIApplication
+from src.controllers.roi_utils import clamp_roi, rotate_roi
 
 
 @pytest.mark.parametrize(
@@ -16,7 +16,7 @@ from src.gui.alt_application import SimpleGUIApplication
     ],
 )
 def test_clamp_roi(roi, width, height, expected):
-    assert SimpleGUIApplication._clamp_roi(roi, width, height) == expected
+    assert clamp_roi(roi, width, height) == expected
 
 
 @pytest.mark.parametrize(
@@ -30,7 +30,4 @@ def test_clamp_roi(roi, width, height, expected):
     ],
 )
 def test_rot_roi(roi, old_rot, new_rot, width, height, expected):
-    assert (
-        SimpleGUIApplication._rot_roi(roi, old_rot, new_rot, width, height)
-        == expected
-    )
+    assert rotate_roi(roi, old_rot, new_rot, width, height) == expected
