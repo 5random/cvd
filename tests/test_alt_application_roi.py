@@ -1,5 +1,5 @@
 import pytest
-from src.controllers.roi_utils import clamp_roi, rotate_roi
+from cvd.controllers.roi_utils import clamp_roi, rotate_roi
 
 
 @pytest.mark.parametrize(
