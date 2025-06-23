@@ -7,8 +7,8 @@ import sys
 import os
 from pathlib import Path
 
-from src.utils.container import ApplicationContainer
-from src.utils.log_service import info, error
+from cvd.utils.container import ApplicationContainer
+from cvd.utils.log_service import info, error
 import argparse
 
 
