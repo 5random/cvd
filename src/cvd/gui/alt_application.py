@@ -90,6 +90,7 @@ class SimpleGUIApplication:
         self.experiment_running = False
         self.alerts_enabled = False
         self.camera_controller: Optional[CameraCaptureController] = None
+        self._video_feed_connections = 0
 
         # Determine configuration directory and initialise core services
         if config_service is None:
@@ -1294,6 +1295,7 @@ class SimpleGUIApplication:
 
         @ui.page("/video_feed")
         async def video_feed(request: Request):
+            self._video_feed_connections += 1
             async def frame_source() -> Optional[np.ndarray]:
                 frame = None
                 if self.camera_controller is not None:
@@ -1313,7 +1315,11 @@ class SimpleGUIApplication:
                     ):
                         yield chunk
                 finally:
-                    if self.camera_controller is not None:
+                    self._video_feed_connections -= 1
+                    if (
+                        self._video_feed_connections == 0
+                        and self.camera_controller is not None
+                    ):
                         with contextlib.suppress(Exception):
                             await self.camera_controller.stop()
                             await self.camera_controller.cleanup()
