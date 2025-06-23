@@ -347,8 +347,8 @@ class NotificationCenter(
                             source=NotificationSource.CONTROLLER,
                             metadata={"controller_id": cid, "status": status},
                         )
-                        service = get_email_alert_service()
-                        if service:
+                        service = getattr(self, "email_alert_service", None)
+                        if isinstance(service, EmailAlertService):
                             subject = f"Controller {cid} critical"
                             body = f"Controller {cid} has reported an error for {timeout} seconds."
                             service.send_alert(subject, body)

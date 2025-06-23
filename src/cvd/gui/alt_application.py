@@ -115,7 +115,6 @@ class SimpleGUIApplication:
 
         cls = email_alert_service_cls or email_alert_service.EmailAlertService
         self.email_alert_service = cls(self.config_service)
-        email_alert_service.set_email_alert_service(self.email_alert_service)
         # use the already created controller manager for the experiment manager
         self.experiment_manager = ExperimentManager(
             config_service=self.config_service,
@@ -990,12 +989,12 @@ class SimpleGUIApplication:
             save_alert_configs(self.alert_configurations, service=self.config_service)
             self._on_alert_config_changed()
             self._update_alerts_status()
-            service = email_alert_service.get_email_alert_service()
+            service = self.email_alert_service
             if service and config.get("emails"):
                 service.recipient = config["emails"][0]
 
         with ui.dialog() as dialog, ui.card().classes("w-full max-w-4xl"):
-            create_email_alert_wizard(on_save=_on_save)
+            create_email_alert_wizard(on_save=_on_save, service=self.email_alert_service)
             with ui.row().classes("w-full justify-end mt-4"):
                 ui.button("Close", on_click=dialog.close).props("flat")
 
@@ -1127,7 +1126,7 @@ class SimpleGUIApplication:
             notify_later("No active alert configurations available", type="warning")
             return
 
-        service = email_alert_service.get_email_alert_service()
+        service = self.email_alert_service
         if service is None:
             notify_later("EmailAlertService unavailable", type="warning")
             return
@@ -1200,7 +1199,7 @@ class SimpleGUIApplication:
         with ui.dialog() as dialog, ui.card().classes("w-full max-w-4xl"):
             ui.label("Alert History").classes("text-xl font-bold mb-4")
 
-            service = email_alert_service.get_email_alert_service()
+            service = self.email_alert_service
             history_entries = service.get_history() if service else []
 
             with ui.column().classes("gap-3"):

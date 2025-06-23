@@ -77,7 +77,6 @@ class ApplicationContainer:
 
             # Initialize email alert service
             email_alert_service = EmailAlertService()
-            set_email_alert_service(email_alert_service)
             info("Email alert service initialized")
             # Get thread pool configuration
             max_workers = config_service.get("thread_pool.max_workers", int, 4)

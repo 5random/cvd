@@ -29,7 +29,6 @@ _lazy_modules = {
     "data_utils": ".data_utils",
     "ApplicationContainer": ".container",
     "EmailAlertService": ".email_alert_service",
-    "set_email_alert_service": ".email_alert_service",
     "info": ".log_service",
     "warning": ".log_service",
     "error": ".log_service",
@@ -78,7 +77,6 @@ __all__ = [
     "ApplicationContainer",
     # email_alert_service
     "EmailAlertService",
-    "set_email_alert_service",
     # log_service
     "info",
     "warning",

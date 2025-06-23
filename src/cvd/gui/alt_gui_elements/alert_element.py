@@ -27,13 +27,19 @@ class EmailAlertWizard:
        instance to release references to UI elements and callbacks.
     """
 
-    def __init__(self, on_save: Optional[Callable[[Dict[str, Any]], None]] = None):
+    def __init__(
+        self,
+        on_save: Optional[Callable[[Dict[str, Any]], None]] = None,
+        *,
+        service = get_email_alert_service(),
+    ):
         """Initialize the Email Alert Wizard
 
         Args:
             on_save: optional callback invoked with the configuration when saved
         """
         self.on_save = on_save
+        self.service = service
         self.stepper: Any = None  # define stepper attribute to suppress optional member access warnings
         self.alert_data = {
             "name": "",
@@ -697,7 +703,7 @@ class EmailAlertWizard:
             notify_later("Please add email addresses before testing", type="warning")
             return
 
-        service = get_email_alert_service()
+        service = self.service
         if service is None:
             notify_later("EmailAlertService not available", type="warning")
             return
@@ -1060,7 +1066,7 @@ class EmailAlertStatusDisplay:
                 cb()
             dialog.close()
 
-        wizard = EmailAlertWizard(on_save=_on_save)
+        wizard = EmailAlertWizard(on_save=_on_save, service=self.service)
 
         with ui.dialog() as dialog, ui.card().classes("w-full max-w-4xl"):
             wizard.create_wizard()
@@ -1081,7 +1087,7 @@ class EmailAlertStatusDisplay:
             )
             dialog.close()
 
-        wizard = EmailAlertWizard(on_save=_on_save)
+        wizard = EmailAlertWizard(on_save=_on_save, service=self.service)
         wizard.alert_data = config.copy()
 
         with ui.dialog() as dialog, ui.card().classes("w-full max-w-4xl"):
@@ -1094,7 +1100,7 @@ class EmailAlertStatusDisplay:
 
     async def _send_test_alert(self, config: Dict[str, Any]):
         """Send a test alert for the configuration"""
-        service = get_email_alert_service()
+        service = self.service
         if service is None:
             notify_later("EmailAlertService unavailable", type="warning")
             return
@@ -1171,7 +1177,8 @@ class EmailAlertStatusDisplay:
 
 class EmailAlertsSection:
     """Section for managing basic email alerts within the GUI."""
-    def __init__(self, settings, callbacks=None):
+
+    def __init__(self, settings, callbacks=None, *, service: Optional[EmailAlertService] = None):
         self.experiment_running = False
         self.alerts_enabled = False
         settings = settings or {}
@@ -1183,6 +1190,7 @@ class EmailAlertsSection:
         settings.setdefault("experiment_complete_alert", False)
         self.settings = settings
         self.callbacks = callbacks or {}
+        self.service = service
 
         @ui.page("/email_alerts")
         def page():
@@ -1292,9 +1300,11 @@ class EmailAlertsSection:
 
 def create_email_alert_wizard(
     on_save: Optional[Callable[[Dict[str, Any]], None]] = None,
+    *,
+    service: Optional[EmailAlertService] = None,
 ) -> ui.card:
     """Factory function to create an Email Alert Setup Wizard"""
-    wizard = EmailAlertWizard(on_save=on_save)
+    wizard = EmailAlertWizard(on_save=on_save, service=service)
     return wizard.create_wizard()
 
 

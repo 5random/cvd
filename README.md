@@ -106,8 +106,9 @@ You may also set the ``CVD_CONFIG_DIR`` environment variable instead of passing
 When creating a custom ``SimpleGUIApplication`` make sure to call
 ``set_config_service`` after instantiating the
 ``ConfigurationService``. This allows helper functions such as
-``create_cvd_controller_manager`` and ``get_email_alert_service`` to read from
-the same configuration instance.
+``create_cvd_controller_manager`` to read from the same configuration
+instance while still letting you pass the ``EmailAlertService`` explicitly
+where needed.
 
 Use the fullscreen button in the header to toggle between windowed and fullscreen mode.
 
