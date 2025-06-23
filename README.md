@@ -43,13 +43,22 @@ pip install -r dev-requirements.txt
 This installs all Python dependencies including `psutil`, which the dashboard
 uses to display CPU and memory usage.
 
-All dependencies are defined in `pyproject.toml`. Both `setup.py` and
-`requirements.txt` read from this file so there is a single authoritative list.
-Run the helper script whenever you change the dependency list to keep
-`requirements.txt` up to date:
+All runtime dependencies are declared under ``[project.dependencies]`` in
+``pyproject.toml``.  The ``setup.py`` and ``requirements.txt`` files both read
+from this section so there is a single authoritative list.  Whenever you edit
+``pyproject.toml`` to add or remove a package you must regenerate
+``requirements.txt``.  Use the helper script to update the file:
 
 ```bash
 python scripts/update_requirements.py
+```
+
+This extracts the dependencies from ``pyproject.toml`` and writes them sorted to
+``requirements.txt``.  You can also run the convenience target below which wraps
+the same command:
+
+```bash
+make update-requirements
 ```
 
 

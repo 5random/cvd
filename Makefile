@@ -7,5 +7,8 @@ test:
 
 
 lint:
-	pre-commit run --all-files
+        pre-commit run --all-files
+
+update-requirements:
+        python scripts/update_requirements.py
 
