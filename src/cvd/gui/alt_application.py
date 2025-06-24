@@ -1615,8 +1615,8 @@ class SimpleGUIApplication:
         info(f"Starting Simple CVD GUI on http://{host}:{port}")
 
         ui.run(
-            host=host,
-            port=port,
+            host=0.0.0.0,
+            port=8080,
             title="CVD Tracker - Simple",
             favicon="https://www.tuhh.de/favicon.ico",
             dark=False,
