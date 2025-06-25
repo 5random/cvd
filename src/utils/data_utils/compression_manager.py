@@ -2,8 +2,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, List
 
 
-from cvd.utils.log_service import debug, error
-from cvd.utils.data_utils.indexing import FileStatus
+from utils.log_service import debug, error
+from utils.data_utils.indexing import FileStatus
 
 if TYPE_CHECKING:
     from .data_manager import DataManager

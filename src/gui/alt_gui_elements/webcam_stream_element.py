@@ -1,7 +1,7 @@
 from nicegui import ui, events
 import asyncio
 import inspect
-from cvd.gui.ui_helpers import notify_later
+from gui.ui_helpers import notify_later
 
 
 # Default values for UVC camera controls

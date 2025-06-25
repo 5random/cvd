@@ -22,19 +22,19 @@ from enum import Enum
 import contextlib
 import threading
 
-from cvd.utils.config_service import (
+from utils.config_service import (
     ConfigurationService,
     ConfigurationError,
 )
-from cvd.utils.data_utils.data_saver import DataSaver
-from cvd.utils.data_utils.compression_service import (
+from utils.data_utils.data_saver import DataSaver
+from utils.data_utils.compression_service import (
     get_compression_service,
     CompressionError,
 )
-from cvd.utils.data_utils.file_management_service import FileMaintenanceService
-from cvd.utils.log_service import info, warning, error, debug
-from cvd.controllers.controller_manager import ControllerManager
-from cvd.utils.concurrency.async_utils import (
+from utils.data_utils.file_management_service import FileMaintenanceService
+from utils.log_service import info, warning, error, debug
+from controllers.controller_manager import ControllerManager
+from utils.concurrency.async_utils import (
     AsyncTaskManager,
     install_signal_handlers,
     TaskHandle,

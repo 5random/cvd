@@ -31,19 +31,19 @@ from fastapi import Request
 from fastapi.responses import StreamingResponse, JSONResponse
 from nicegui import app, ui
 
-from controllers import controller_manager as controller_manager_module
-from controllers.webcam import MotionDetectionController
-from controllers.controller_base import ControllerConfig, ControllerStatus
-from controllers.controller_manager import ControllerManager
-from controllers.camera_utils import probe_camera_modes
-from controllers.webcam import CameraCaptureController
+from src.controllers import controller_manager as controller_manager_module
+from src.controllers.webcam import MotionDetectionController
+from src.controllers.controller_base import ControllerConfig, ControllerStatus
+from src.controllers.controller_manager import ControllerManager
+from src.controllers.camera_utils import probe_camera_modes
+from src.controllers.webcam import CameraCaptureController
 from src.core.experiment_manager import (
     ExperimentConfig,
     ExperimentManager,
     ExperimentState,
     set_experiment_manager,
 )
-from gui import (
+from src.gui import (
     EmailAlertStatusDisplay,
     ExperimentManagementSection,
     MotionStatusSection,
@@ -52,24 +52,24 @@ from gui import (
     create_email_alert_wizard,
     setup_global_styles,
 )
-from gui.alt_gui_elements.alert_element import (
+from src.gui.alt_gui_elements.alert_element import (
     load_alert_configs,
     save_alert_configs,
 )
-from gui.alt_gui_elements.webcam_stream_element import UVC_DEFAULTS
-from utils import email_alert_service
-from utils.concurrency import (
+from src.gui.alt_gui_elements.webcam_stream_element import UVC_DEFAULTS
+from src.core import email_alert_service
+from src.utils.concurrency import (
     gather_with_concurrency,
     run_in_executor,
     run_network_io,
     run_camera_io,
 )
-from utils.concurrency.async_utils import install_signal_handlers
-from utils.config_service import ConfigurationService, set_config_service
-from gui.ui_helpers import notify_later
-from gui.utils import generate_mjpeg_stream
-from utils.log_service import info, warning, error
-from controllers.roi_utils import clamp_roi, rotate_roi
+from src.utils.concurrency.async_utils import install_signal_handlers
+from src.utils.config_service import ConfigurationService, set_config_service
+from src.gui.ui_helpers import notify_later
+from src.gui.utils import generate_mjpeg_stream
+from src.utils.log_service import info, warning, error
+from src.controllers.roi_utils import clamp_roi, rotate_roi
 
 # Maximum frames per second for the MJPEG video feed
 FPS_CAP = 30

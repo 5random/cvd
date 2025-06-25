@@ -4,7 +4,7 @@ import csv
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Iterable, Optional, Any
-from cvd.utils.log_service import warning
+from utils.log_service import warning
 
 
 def _read_rows(path: Path) -> Iterator[Dict[str, str]]:

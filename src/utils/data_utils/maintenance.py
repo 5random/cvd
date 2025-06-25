@@ -4,9 +4,9 @@ import time
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Tuple, List
 from concurrent.futures import Future
-from cvd.utils.data_utils.indexing import DataCategory, DirectoryEventHandler
-from cvd.utils.log_service import info, warning, error, debug
-from cvd.utils.concurrency.thread_pool import (
+from utils.data_utils.indexing import DataCategory, DirectoryEventHandler
+from utils.log_service import info, warning, error, debug
+from utils.concurrency.thread_pool import (
     get_thread_pool_manager,
     ThreadPoolType,
     ManagedThreadPool,

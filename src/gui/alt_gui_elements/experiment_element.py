@@ -7,7 +7,7 @@ from src.core.experiment_manager import (
     ExperimentState,
     get_experiment_manager,
 )
-from cvd.gui.ui_helpers import notify_later
+from gui.ui_helpers import notify_later
 
 
 class ExperimentManagementSection:

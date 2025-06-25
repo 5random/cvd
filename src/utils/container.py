@@ -10,31 +10,31 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import List, Tuple, TYPE_CHECKING
 from concurrent.futures import Future
-from cvd.utils.log_service import info, error
-from cvd.utils.concurrency.thread_pool import (
+from utils.log_service import info, error
+from utils.concurrency.thread_pool import (
     ManagedThreadPool,
     ThreadPoolType,
     get_thread_pool_manager,
 )
 
-from cvd.utils.config_service import (
+from utils.config_service import (
     ConfigurationService,
     ConfigurationError,
     set_config_service,
 )
 
-from cvd.utils.data_utils.data_saver import DataSaver
-from cvd.utils.data_utils.compression_service import (
+from utils.data_utils.data_saver import DataSaver
+from utils.data_utils.compression_service import (
     CompressionService,
     set_compression_service,
 )
-from cvd.utils.email_alert_service import (
+from utils.email_alert_service import (
     EmailAlertService,
     set_email_alert_service,
 )
 
 if TYPE_CHECKING:
-    from cvd.gui.alt_application import WebApplication
+    from gui.alt_application import WebApplication
 
 
 @dataclass
@@ -101,7 +101,7 @@ class ApplicationContainer:
             )
 
             # Initialize web application
-            from cvd.gui.alt_application import SimpleGUIApplication as WebApplication
+            from gui.alt_application import SimpleGUIApplication as WebApplication
 
             web_application = WebApplication(config_service=config_service)
 

@@ -5,12 +5,12 @@ Email-Alert-Service mit NiceGUI Stepper
 """
 
 from nicegui import ui
-from cvd.gui.ui_helpers import notify_later
-from cvd.utils.concurrency import run_network_io, gather_with_concurrency
-from cvd.utils.log_service import error
+from gui.ui_helpers import notify_later
+from utils.concurrency import run_network_io, gather_with_concurrency
+from utils.log_service import error
 from typing import Dict, List, Optional, Any, Callable
-from cvd.utils.email_alert_service import get_email_alert_service
-from cvd.utils.config_service import get_config_service, ConfigurationService
+from core.email_alert_service import get_email_alert_service
+from utils.config_service import get_config_service, ConfigurationService
 from pathlib import Path
 import json
 from datetime import datetime

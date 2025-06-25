@@ -21,7 +21,7 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Any, Callable
 
-from cvd.utils.log_service import info, warning
+from utils.log_service import info, warning
 
 
 class ProcessPoolType(Enum):

@@ -3,9 +3,9 @@ from typing import List, Optional
 import time
 import os
 
-from cvd.utils.log_service import info, warning, error
-from cvd.utils.concurrency.thread_pool import get_thread_pool_manager, ThreadPoolType
-from cvd.utils.data_utils.compression_service import CompressionService
+from utils.log_service import info, warning, error
+from utils.concurrency.thread_pool import get_thread_pool_manager, ThreadPoolType
+from utils.data_utils.compression_service import CompressionService
 
 
 class FileMaintenanceService:

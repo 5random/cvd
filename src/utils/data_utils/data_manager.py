@@ -11,14 +11,14 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Type
 from types import TracebackType
 
-from cvd.utils.config_service import get_config_service
-from cvd.utils.concurrency.thread_pool import (
+from utils.config_service import get_config_service
+from utils.concurrency.thread_pool import (
     get_thread_pool_manager,
     ThreadPoolType,
 )
-from cvd.utils.data_utils.compression_service import get_compression_service
-from cvd.utils.data_utils.file_management_service import FileMaintenanceService
-from cvd.utils.data_utils.indexing import (
+from utils.data_utils.compression_service import get_compression_service
+from utils.data_utils.file_management_service import FileMaintenanceService
+from utils.data_utils.indexing import (
     DataCategory,
     FileStatus,
     FileMetadata,
@@ -27,9 +27,9 @@ from cvd.utils.data_utils.indexing import (
     Indexer,
     DirectoryEventHandler,
 )
-from cvd.utils.data_utils.compression_manager import CompressionManager
-from cvd.utils.data_utils.maintenance import MaintenanceManager
-from cvd.utils.log_service import info, warning, error
+from utils.data_utils.compression_manager import CompressionManager
+from utils.data_utils.maintenance import MaintenanceManager
+from utils.log_service import info, warning, error
 
 
 class DataManager:

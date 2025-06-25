@@ -28,7 +28,7 @@ from typing import Any, Dict, Optional, Iterator
 from contextlib import contextmanager
 from enum import Enum
 
-from cvd.utils.config_service import (
+from utils.config_service import (
     get_config_service,
     set_config_service,
     ConfigurationError,

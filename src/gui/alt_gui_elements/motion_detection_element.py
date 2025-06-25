@@ -2,8 +2,8 @@ from nicegui import ui
 from datetime import datetime
 from typing import Optional, Callable
 
-from cvd.controllers.controller_manager import ControllerManager
-from cvd.controllers.webcam import MotionDetectionResult
+from controllers.controller_manager import ControllerManager
+from controllers.webcam import MotionDetectionResult
 
 
 class MotionStatusSection:

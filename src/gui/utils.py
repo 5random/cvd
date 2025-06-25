@@ -4,8 +4,8 @@ from typing import Any, Awaitable, Callable, AsyncIterator, Optional
 import cv2
 import numpy as np
 
-from cvd.utils.concurrency import run_camera_io
-from cvd.utils.log_service import error
+from utils.concurrency import run_camera_io
+from utils.log_service import error
 
 DEFAULT_FPS_CAP = 30
 

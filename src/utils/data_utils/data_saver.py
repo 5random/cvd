@@ -4,13 +4,13 @@ from typing import Dict, Tuple, IO, Any, Optional, List
 from types import SimpleNamespace
 import contextlib
 from concurrent.futures import Future
-from cvd.utils.concurrency.thread_pool import get_thread_pool_manager, ThreadPoolType
-from cvd.utils.log_service import info, warning, error
+from utils.concurrency.thread_pool import get_thread_pool_manager, ThreadPoolType
+from utils.log_service import info, warning, error
 import threading
 import time
-from cvd.utils.data_utils.compression_service import get_compression_service
-from cvd.utils.data_utils.file_management_service import FileMaintenanceService
-from cvd.utils.data_utils.id_utils import sanitize_id
+from utils.data_utils.compression_service import get_compression_service
+from utils.data_utils.file_management_service import FileMaintenanceService
+from utils.data_utils.id_utils import sanitize_id
 
 
 class DataSaver:

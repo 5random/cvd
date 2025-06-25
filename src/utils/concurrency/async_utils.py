@@ -27,7 +27,7 @@ import random
 import signal
 import time
 import weakref
-from cvd.utils.log_service import (
+from utils.log_service import (
     info,
     warning,
     error,

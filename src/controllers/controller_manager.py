@@ -11,7 +11,7 @@ import json
 from pathlib import Path
 import os
 
-from cvd.controllers.controller_base import (
+from src.controllers.controller_base import (
     ControllerStage,
     ControllerInput,
     ControllerResult,
@@ -20,10 +20,10 @@ from cvd.controllers.controller_base import (
 )
 
 # Removed SensorReading import since sensors are not used
-from cvd.utils.log_service import info, error, debug
+from src.utils.log_service import info, error, debug
 
 
-from cvd.utils.config_service import (
+from src.utils.config_service import (
     get_config_service,
     ConfigurationError,
 )

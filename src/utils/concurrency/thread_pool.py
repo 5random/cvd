@@ -23,7 +23,7 @@ from threading import BoundedSemaphore, Lock
 from types import TracebackType
 from typing import Any, Callable, Dict, Optional, Set, TypeVar
 
-from cvd.utils.log_service import debug, error, info, warning
+from utils.log_service import debug, error, info, warning
 
 # ───────────────────────────── optional dependencies ─────────────────────────
 try:

@@ -15,9 +15,9 @@ from typing import Optional, Dict, Any, List, Union
 from dataclasses import dataclass
 from threading import Lock
 
-from cvd.utils.config_service import get_config_service, ConfigurationError
-from cvd.utils.log_service import debug, info, warning, error
-from cvd.utils.concurrency.thread_pool import get_thread_pool_manager, ThreadPoolType
+from utils.config_service import get_config_service, ConfigurationError
+from utils.log_service import debug, info, warning, error
+from utils.concurrency.thread_pool import get_thread_pool_manager, ThreadPoolType
 
 
 @dataclass
