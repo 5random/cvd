@@ -1,5 +1,5 @@
 from cvd.utils.container import ApplicationContainer
-from cvd import gui
+from src import gui
 from cvd.gui.alt_gui_elements.alert_element_new import EmailAlertStatusDisplay
 
 class DummyWebApp:

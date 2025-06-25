@@ -23,7 +23,7 @@ from cvd.gui.gui_tab_components.gui_tab_base_component import (
     ComponentConfig,
 )
 from .dialog_utils import CancelableDialogMixin
-from cvd.experiment_manager import (
+from experiment_manager import (
     ExperimentManager,
     ExperimentConfig,
     ExperimentState,
@@ -1528,7 +1528,7 @@ class ExperimentComponent(BaseComponent):
         self.experiment_manager = get_experiment_manager()
         if not self.experiment_manager:
             warning("No experiment manager available - creating new instance")
-            from cvd.experiment_manager import (
+            from experiment_manager import (
                 ExperimentManager,
                 set_experiment_manager,
             )

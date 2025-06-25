@@ -131,7 +131,7 @@ def simple_gui_app(mock_controller_manager, mock_config_service, tmp_path):
     """Create a ``SimpleGUIApplication`` instance for tests"""
     # Mock external dependencies
     import cvd.controllers.controller_manager as cm_module
-    import cvd.experiment_manager as em_module
+    import experiment_manager as em_module
 
     # Patch the module-level functions to return our mocks
     original_create_manager = getattr(cm_module, "create_cvd_controller_manager", None)

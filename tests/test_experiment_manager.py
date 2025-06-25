@@ -7,8 +7,8 @@ from cvd.data_handler.interface.sensor_interface import (
     SensorReading,
     SensorStatus,
 )
-from cvd import experiment_manager as em_module
-from cvd.experiment_manager import (
+from . import experiment_manager as em_module
+from experiment_manager import (
     ExperimentManager,
     ExperimentResult,
     ExperimentPhase,

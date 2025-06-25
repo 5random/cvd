@@ -9,7 +9,7 @@ from scripts.email_alert_service_testing import (
     DEFAULT_CONFIG,
     main,
 )
-from cvd.experiment_manager import ExperimentState
+from experiment_manager import ExperimentState
 
 
 class DummySMTP:

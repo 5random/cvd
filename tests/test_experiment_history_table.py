@@ -2,7 +2,7 @@ from datetime import datetime, date
 import types
 
 
-from cvd.experiment_manager import (
+from experiment_manager import (
     ExperimentConfig,
     ExperimentResult,
     ExperimentState,

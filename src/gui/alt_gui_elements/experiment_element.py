@@ -2,7 +2,7 @@ from nicegui import ui
 from datetime import datetime
 from typing import List, Optional
 
-from cvd.experiment_manager import (
+from experiment_manager import (
     ExperimentConfig,
     ExperimentState,
     get_experiment_manager,

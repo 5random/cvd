@@ -37,7 +37,7 @@ from cvd.gui.gui_tab_components.gui_tab_base_component import (
 )
 from cvd.utils.log_service import get_log_service
 from cvd.utils.config_service import ConfigurationService
-from cvd.experiment_manager import ExperimentManager, ExperimentState
+from experiment_manager import ExperimentManager, ExperimentState
 from cvd.data_handler.sources.sensor_source_manager import SensorManager
 from cvd.controllers.controller_manager import ControllerManager
 from cvd.controllers.controller_base import ControllerStatus

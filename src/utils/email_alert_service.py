@@ -9,7 +9,7 @@ from datetime import datetime
 import sys
 from cvd.utils.config_service import get_config_service, ConfigurationService
 from cvd.utils.log_service import info, warning, error
-from cvd.experiment_manager import get_experiment_manager, ExperimentState
+from experiment_manager import get_experiment_manager, ExperimentState
 
 
 class EmailAlertService:

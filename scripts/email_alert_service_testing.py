@@ -187,6 +187,7 @@ def main() -> None:
         service.smtp_host = args.smtp_host
     if args.smtp_port:
         service.smtp_port = args.smtp_port
+
     # Prompt for SMTP password if not provided (required for authenticated servers)
     if service.login_user and not service.login_password:
         import getpass

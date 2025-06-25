@@ -3,7 +3,7 @@ from datetime import datetime
 from cvd.gui.gui_tab_components.gui_tab_experiment_component import (
     CurrentExperimentDisplay,
 )
-from cvd.experiment_manager import (
+from experiment_manager import (
     ExperimentConfig,
     ExperimentResult,
     ExperimentState,

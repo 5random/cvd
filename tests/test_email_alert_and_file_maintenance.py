@@ -8,7 +8,7 @@ from cvd.utils.alert_system_utils.email_alert_service import EmailAlertService
 from cvd.utils.data_utils.file_management_service import FileMaintenanceService
 from cvd.utils.data_utils.compression_service import CompressionService
 from typing import cast
-from cvd.experiment_manager import ExperimentState
+from experiment_manager import ExperimentState
 
 
 class DummyConfigService:

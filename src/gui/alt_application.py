@@ -37,7 +37,7 @@ from cvd.controllers.controller_base import ControllerConfig, ControllerStatus
 from cvd.controllers.controller_manager import ControllerManager
 from cvd.controllers.camera_utils import probe_camera_modes
 from cvd.controllers.webcam import CameraCaptureController
-from cvd.experiment_manager import (
+from experiment_manager import (
     ExperimentConfig,
     ExperimentManager,
     ExperimentState,
