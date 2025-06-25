@@ -31,19 +31,19 @@ from fastapi import Request
 from fastapi.responses import StreamingResponse, JSONResponse
 from nicegui import app, ui
 
-from cvd.controllers import controller_manager as controller_manager_module
-from cvd.controllers.webcam import MotionDetectionController
-from cvd.controllers.controller_base import ControllerConfig, ControllerStatus
-from cvd.controllers.controller_manager import ControllerManager
-from cvd.controllers.camera_utils import probe_camera_modes
-from cvd.controllers.webcam import CameraCaptureController
-from experiment_manager import (
+from controllers import controller_manager as controller_manager_module
+from controllers.webcam import MotionDetectionController
+from controllers.controller_base import ControllerConfig, ControllerStatus
+from controllers.controller_manager import ControllerManager
+from controllers.camera_utils import probe_camera_modes
+from controllers.webcam import CameraCaptureController
+from src.core.experiment_manager import (
     ExperimentConfig,
     ExperimentManager,
     ExperimentState,
     set_experiment_manager,
 )
-from cvd.gui import (
+from gui import (
     EmailAlertStatusDisplay,
     ExperimentManagementSection,
     MotionStatusSection,
@@ -52,24 +52,24 @@ from cvd.gui import (
     create_email_alert_wizard,
     setup_global_styles,
 )
-from cvd.gui.alt_gui_elements.alert_element import (
+from gui.alt_gui_elements.alert_element import (
     load_alert_configs,
     save_alert_configs,
 )
-from cvd.gui.alt_gui_elements.webcam_stream_element import UVC_DEFAULTS
-from cvd.utils import email_alert_service
-from cvd.utils.concurrency import (
+from gui.alt_gui_elements.webcam_stream_element import UVC_DEFAULTS
+from utils import email_alert_service
+from utils.concurrency import (
     gather_with_concurrency,
     run_in_executor,
     run_network_io,
     run_camera_io,
 )
-from cvd.utils.concurrency.async_utils import install_signal_handlers
-from cvd.utils.config_service import ConfigurationService, set_config_service
-from cvd.gui.ui_helpers import notify_later
-from cvd.gui.utils import generate_mjpeg_stream
-from cvd.utils.log_service import info, warning, error
-from cvd.controllers.roi_utils import clamp_roi, rotate_roi
+from utils.concurrency.async_utils import install_signal_handlers
+from utils.config_service import ConfigurationService, set_config_service
+from gui.ui_helpers import notify_later
+from gui.utils import generate_mjpeg_stream
+from utils.log_service import info, warning, error
+from controllers.roi_utils import clamp_roi, rotate_roi
 
 # Maximum frames per second for the MJPEG video feed
 FPS_CAP = 30
@@ -1667,7 +1667,7 @@ if __name__ in {"__main__", "__mp_main__"}:
 
 #   python src/cvd/gui/alt_application.py
 # or
-#   python -m cvd.gui.alt_application
+#   python -m gui.alt_application
 
 # The application uses the configuration in ``src/cvd/config/simple_config.json``.
 # The email alert section will show in the bottom-right grid area.

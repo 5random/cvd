@@ -18,6 +18,8 @@ from .config_service import (
     set_config_service,
 )
 
+from src.core.email_alert_service import EmailAlertService
+
 _BASE_PACKAGE = __name__
 
 # ----------------------------------------------------------------------
@@ -37,6 +39,7 @@ _lazy_modules = {
     "timer": ".log_service",
     "context": ".log_service",
     "notify_later": "..gui.ui_helpers",
+
 }
 
 
